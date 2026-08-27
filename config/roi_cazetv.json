@@ -1,0 +1,27 @@
+{
+  "cazetv": {
+    "top_hud_unificado": {
+      "x": 0.0625,
+      "y": 0.025926,
+      "w": 0.196875,
+      "h": 0.064815
+    },
+    "banner": {
+      "x": 0.013542,
+      "y": 0.719444,
+      "w": 0.981771,
+      "h": 0.250926
+    },
+    "countdown_center": {
+      "x": 0.561458,
+      "y": 0.0,
+      "w": 0.289583,
+      "h": 0.109259
+    },
+    "__enabled__": {
+      "top_hud_unificado": false,
+      "banner": true,
+      "countdown_center": false
+    }
+  }
+}
