@@ -1,0 +1,5 @@
+{
+  "version": "1.3.5",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.3.5/Monitor_Esportes.exe",
+  "changelog": "Versão 1.3.5: Motor Autônomo CBF (modules/cbf_schedule_fetcher.py) com decodificação de legendas de transmissão, filtro Brasileirão/Copa do Brasil, Sistema de Etiquetagem (Tags) e Visualizador Interno de PDF."
+}
