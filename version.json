@@ -1,0 +1,5 @@
+{
+  "version": "1.3.4",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.3.4/Monitor_Esportes.exe",
+  "changelog": "Versão 1.3.4: Integração com Streaming_Scheduler, Mural de Próximos Confrontos CBF, Botão de Auto-Preenchimento da Rodada e Visualizador Interno de PDF com PyMuPDF."
+}
