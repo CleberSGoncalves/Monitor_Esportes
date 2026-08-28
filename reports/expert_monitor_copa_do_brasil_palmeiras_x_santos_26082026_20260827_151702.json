@@ -1,0 +1,94 @@
+{
+  "expert_results": [
+    {
+      "match_id": "Palmeiras_Santos_26/08/2026",
+      "date": "26/08/2026",
+      "match_display": "Palmeiras x Santos",
+      "competition": "Copa do Brasil",
+      "confidence_score": 0.99,
+      "pre_game_start": "21:25:00",
+      "match_start": "21:30:00",
+      "first_half_start": "21:30:00",
+      "half_time_start": "22:15:00",
+      "half_time_end": "22:36:00",
+      "second_half_start": "22:36:00",
+      "match_end": "23:22:00",
+      "post_game_end": "23:27:00",
+      "stoppage_time_1t": 0,
+      "stoppage_time_2t": 1,
+      "technical_milestones": [
+        {
+          "time": "21:30:00",
+          "minute": 0,
+          "event": "Início do 1º Tempo.",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "21:50:00",
+          "minute": 20,
+          "event": "Cartão para G. Caballero.",
+          "type": "Cartão Amarelo",
+          "confidence": 0.95
+        },
+        {
+          "time": "22:03:00",
+          "minute": 33,
+          "event": "GOL de J. López (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:14:00",
+          "minute": 44,
+          "event": "GOL de Andreas Pereira (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:15:00",
+          "minute": 45,
+          "event": "Fim do 1º Tempo.",
+          "type": "Fim de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:15:00",
+          "minute": 45,
+          "event": "Início do 2º Tempo.",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:51:00",
+          "minute": 60,
+          "event": "GOL de J. López (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "23:21:00",
+          "minute": 90,
+          "event": "Cartão para A. Barboza.",
+          "type": "Cartão Amarelo",
+          "confidence": 0.95
+        },
+        {
+          "time": "23:21:00",
+          "minute": 90,
+          "event": "Fim de Jogo.",
+          "type": "Fim de Jogo",
+          "confidence": 0.99
+        }
+      ],
+      "transcript_events": [],
+      "sources": [
+        {
+          "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHHdZvTtAA6gw3hCtBzpc6rvzXjriI8u-XGHEwZcdG-_rrotY2fIne3OrZhzwllbAZGfrpfMeQMtrxIhmEOAV3eFym22MkCKL-q1QJ4cpnw88LGqTVxMUvqFfFOtWm9lcL2r0fIbemy7xhlXnPWiGrf58xGz8uGwHqjcYvSuqellN0HgvNoyL0pX_KQ0rrEcRbG94FIWVGSONqMq-Z3K7srshLyVUYZzYFUf2XLzh6zKjnZKcFb83twhNokFJmFklmsHAjouI6vf8ObdPR52G1WeD-khNCkC6gM_W9C1UdJoBY=",
+          "title": "Google Search Evidence"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-08-27T15:17:02.484162"
+}

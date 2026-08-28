@@ -1,0 +1,31 @@
+{
+  "expert_results": [
+    {
+      "match_id": "São Paulo_Fluminense_16/05/2026",
+      "date": "16/05/2026",
+      "match_display": "São Paulo x Fluminense",
+      "competition": "Brasileirão",
+      "confidence_score": 0.99,
+      "pre_game_start": "20:00:00",
+      "match_start": "20:17:00",
+      "first_half_start": "20:17:00",
+      "half_time_start": "21:02:00",
+      "half_time_end": "21:20:00",
+      "second_half_start": "21:20:00",
+      "match_end": "22:05:00",
+      "post_game_end": "22:15:00",
+      "stoppage_time_1t": 0,
+      "stoppage_time_2t": 0,
+      "technical_milestones": [],
+      "transcript_events": [],
+      "sources": [
+        {
+          "uri": "https://www.google.com/search?q=São Paulo+x=Fluminense+16/05/2026",
+          "title": "Link de Auditoria (Google Search)"
+        }
+      ],
+      "duration": 8100
+    }
+  ],
+  "generated_at": "2026-05-27T11:14:10.521907"
+}
