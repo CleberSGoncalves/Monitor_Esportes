@@ -1,0 +1,5 @@
+{
+  "version": "1.4.0",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.4.0/Monitor_Esportes.exe",
+  "changelog": "Versão 1.4.0: Mapeamento de Colunas CBF por Campeonato (Copa do Brasil: Coluna 3 = Amazon Prime | Brasileirão: Coluna 4 = Amazon, Coluna 5 = CazéTV), Form de Auditoria no Topo e Barra Lateral Ampliada."
+}

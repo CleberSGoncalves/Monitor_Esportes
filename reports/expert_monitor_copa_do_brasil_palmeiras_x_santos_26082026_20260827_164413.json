@@ -1,0 +1,80 @@
+{
+  "expert_results": [
+    {
+      "match_id": "Palmeiras_Santos_26/08/2026",
+      "date": "26/08/2026",
+      "match_display": "Palmeiras x Santos",
+      "competition": "Copa do Brasil",
+      "confidence_score": 0.99,
+      "pre_game_start": "21:25:00",
+      "match_start": "21:30:00",
+      "first_half_start": "21:30:00",
+      "half_time_start": "22:17:00",
+      "half_time_end": "22:38:00",
+      "second_half_start": "22:38:00",
+      "match_end": "23:28:00",
+      "post_game_end": "23:33:00",
+      "stoppage_time_1t": 2,
+      "stoppage_time_2t": 5,
+      "technical_milestones": [
+        {
+          "time": "21:30:00",
+          "minute": 0,
+          "event": "Início do 1º Tempo",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:03:00",
+          "minute": 33,
+          "event": "GOL de J. López (Palmeiras)",
+          "type": "Gol",
+          "confidence": 0.95
+        },
+        {
+          "time": "22:14:00",
+          "minute": 44,
+          "event": "GOL de Andreas Pereira (Palmeiras)",
+          "type": "Gol",
+          "confidence": 0.95
+        },
+        {
+          "time": "22:40:00",
+          "minute": 47,
+          "event": "Fim do 1º Tempo",
+          "type": "Fim de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:15:00",
+          "minute": 45,
+          "event": "Início do 2º Tempo",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:53:00",
+          "minute": 60,
+          "event": "GOL de J. López (Palmeiras)",
+          "type": "Gol",
+          "confidence": 0.95
+        },
+        {
+          "time": "23:27:00",
+          "minute": 94,
+          "event": "Fim de Jogo",
+          "type": "Fim de Jogo",
+          "confidence": 0.99
+        }
+      ],
+      "transcript_events": [],
+      "sources": [
+        {
+          "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHx63S2yF1X_218Jy57IqopYtXa7K_RwLW6m5MPq6FCnhs6E5zmFyFNy-MYwGz97nYGXG74c3ynzJoZcBV4h70B1KsSYnQGCdGqx9ryWRHNrJg0_wyAQ2bYJ3fGKA0REzFhkV8duKVgEvpDqwa0l6z5YaxlJXqXOXj-c9HWLz8EalTr9a12BcfWAixtWkBfamKk99tUat3NesCHdyhzOL5hzcqQe4va2UEcTA6wTP5lgbdmVFcuKRrvj3R4gZc=",
+          "title": "Google Search Evidence"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-08-27T16:44:13.544085"
+}

@@ -1,0 +1,101 @@
+{
+  "expert_results": [
+    {
+      "match_id": "Palmeiras_Santos_26/08/2026",
+      "date": "26/08/2026",
+      "match_display": "Palmeiras x Santos",
+      "competition": "Copa do Brasil",
+      "confidence_score": 0.99,
+      "pre_game_start": "21:25:00",
+      "match_start": "21:30:00",
+      "first_half_start": "21:30:00",
+      "half_time_start": "22:31:00",
+      "half_time_end": "22:46:00",
+      "second_half_start": "22:46:00",
+      "match_end": "23:35:00",
+      "post_game_end": "23:40:00",
+      "stoppage_time_1t": 16,
+      "stoppage_time_2t": 4,
+      "technical_milestones": [
+        {
+          "time": "21:30:00",
+          "minute": 0,
+          "event": "Início do 1º Tempo.",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:03:00",
+          "minute": 33,
+          "event": "GOL de Flaco López (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:14:00",
+          "minute": 44,
+          "event": "GOL de Andreas Pereira (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:15:00",
+          "minute": 45,
+          "event": "Fim do 1º Tempo.",
+          "type": "Fim de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:15:00",
+          "minute": 45,
+          "event": "Início do 2º Tempo.",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "23:01:00",
+          "minute": 60,
+          "event": "GOL de Flaco López (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "23:18:00",
+          "minute": 77,
+          "event": "Cartão Amarelo para Andreas Pereira (Palmeiras).",
+          "type": "Cartão Amarelo",
+          "confidence": 0.99
+        },
+        {
+          "time": "23:20:00",
+          "minute": 79,
+          "event": "Cartão Amarelo para Rony (Santos).",
+          "type": "Cartão Amarelo",
+          "confidence": 0.99
+        },
+        {
+          "time": "23:31:00",
+          "minute": 90,
+          "event": "Cartão Amarelo para Alexander Barboza (Palmeiras) aos 90+1'.",
+          "type": "Cartão Amarelo",
+          "confidence": 0.99
+        },
+        {
+          "time": "23:31:00",
+          "minute": 90,
+          "event": "Fim de Jogo aos 90+5'.",
+          "type": "Fim de Jogo",
+          "confidence": 0.99
+        }
+      ],
+      "transcript_events": [],
+      "sources": [
+        {
+          "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGQhNiDyg8oeEfdH-17E1X8bgdOST6A4Nham_o3I_1f5HGOET5Ti0t0Ba3Y8zeT7e6wrSf9TdfvcLB17siuBYEashqGM_NncDqFo-IFz1X1ZzQ85Ib0ov5CpD-uKGZytFrRzZSWjpxOBLlUTm7QCYYwCTFjSob8IM1B92rM2tXhzwVLzBjuXtQjH317C1aAMjiF8USzVLgRZkJlHeqUmiykXep6TPn1TtEbMnIkZBTEdXgueMJAdvmcimd61Y6NnYD0",
+          "title": "Google Search Evidence"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-08-27T15:08:19.386700"
+}
