@@ -1,0 +1,5 @@
+{
+  "version": "1.5.0",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.5.0/Monitor_Esportes.exe",
+  "changelog": "Versão 1.5.0: Removida a chave da aba Config, integrada inteiramente no Modal de Agendamentos com indicador de status de sincronização automática na barra lateral."
+}
