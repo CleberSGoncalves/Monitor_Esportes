@@ -1,0 +1,5 @@
+{
+  "version": "1.4.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.4.7/Monitor_Esportes.exe",
+  "changelog": "Versão 1.4.7: Correção de import timedelta nos agendamentos, ordenação dinâmica do Grid cronológico, cache inteligente de IA (Expert) e Auditoria Automática autônoma de jogos da CBF com disparo de e-mails."
+}
