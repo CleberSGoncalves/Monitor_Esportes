@@ -1,0 +1,5 @@
+{
+  "version": "1.5.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.5.7/Monitor_Esportes.exe",
+  "changelog": "Versão 1.5.7: Resolvido fallback cego do validador (retorna erro/rejeição em caso de falha técnica de rede/limite de requisições) e implementada proteção total de integridade para forçar a IA a refazer o processamento."
+}
