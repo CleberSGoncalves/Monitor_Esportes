@@ -1,0 +1,5 @@
+{
+  "version": "1.5.8",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.5.8/Monitor_Esportes.exe",
+  "changelog": "Versão 1.5.8: Refatorado parser de PDF de times compostos (Vasco da Gama, São Paulo, Bragantino), adicionados alertas explícitos de fallback e expandido o limite de marcos técnicos oficiais de 30 para 45 itens."
+}
