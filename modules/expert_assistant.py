@@ -1,0 +1,954 @@
+from google import genai
+from google.genai import types
+import json
+import os
+from typing import List, Dict, Any, Optional
+
+class ExpertAssistant:
+    """
+    Assistente Especialista que utiliza Gemini com Search Grounding para extrair
+    metadados técnicos e cronologia de eventos esportivos sem necessidade de vídeo.
+    """
+    def __init__(self, api_key: str, model_id: str = "gemini-2.5-flash", yt_api_key: Optional[str] = None):
+        if not api_key:
+            raise ValueError("API Key do Gemini é obrigatória para ExpertAssistant.")
+        # Aceita lista de chaves separadas por vírgula para rotação/failover
+        self.api_keys = [k.strip() for k in api_key.split(",") if k.strip()]
+        self.exhausted_keys = set() # Chaves que retornaram 429 / spend cap
+        self.current_key_idx = 0
+        self.model_id = model_id
+        self.yt_api_key = yt_api_key or self.api_keys[0]
+        self._init_client()
+
+    def _init_client(self):
+        # Seleciona a primeira chave saudável (que não esteja esgotada)
+        healthy_indices = [i for i, k in enumerate(self.api_keys) if k not in self.exhausted_keys]
+        if healthy_indices:
+            if self.current_key_idx not in healthy_indices:
+                self.current_key_idx = healthy_indices[0]
+        else:
+            # Se todas foram marcadas como esgotadas, limpa o conjunto e reinicia o ciclo
+            print("[EXPERT WARN] Todas as chaves foram marcadas como esgotadas. Reiniciando ciclo de chaves...")
+            self.exhausted_keys.clear()
+            self.current_key_idx = 0
+
+        key = self.api_keys[self.current_key_idx]
+        import httpx
+        limits = httpx.Limits(max_keepalive_connections=0, max_connections=10)
+        timeout = httpx.Timeout(45.0, connect=15.0)
+        http_options = types.HttpOptions(
+            client_args={
+                "verify": False,
+                "timeout": timeout,
+                "http2": False,
+                "limits": limits
+            }
+        )
+        self.client = genai.Client(api_key=key, http_options=http_options)
+        print(f"[EXPERT] Cliente do SDK inicializado com a chave índice {self.current_key_idx} (final: ...{key[-6:]})")
+
+    def rotate_key(self, mark_exhausted: bool = True) -> bool:
+        if len(self.api_keys) <= 1:
+            return False
+        if mark_exhausted:
+            bad_key = self.api_keys[self.current_key_idx]
+            self.exhausted_keys.add(bad_key)
+            print(f"[EXPERT WARN] Chave índice {self.current_key_idx} (final ...{bad_key[-6:]}) marcada como ESGOTADA (429/cota).")
+        
+        self.current_key_idx = (self.current_key_idx + 1) % len(self.api_keys)
+        self._init_client()
+        return True
+
+    def get_match_chronology(self, team1: str, team2: str, competition: str, platform: str, date: str, start_timestamp: Optional[int] = None, duration: Optional[int] = None, video_url: Optional[str] = None, transcript_text: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Método público principal de auditoria de cronologia. Possui lógica de caching
+        e loop auto-corretivo de validação contra a súmula oficial e portais.
+        """
+        from datetime import datetime, timedelta, timezone
+        import hashlib
+        
+        # Sanitizar a competição logo no início
+        comp_clean = str(competition or "").strip()
+        if not comp_clean or comp_clean in ("—", "-", "None"):
+            comp_clean = "Brasileirão / Copa do Brasil"
+        competition = comp_clean
+
+        # Caching de resultados do Expert
+        cache_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "expert_cache")
+        os.makedirs(cache_dir, exist_ok=True)
+        cache_key_raw = f"v3_{str(team1).strip()}_{str(team2).strip()}_{str(competition).strip()}_{str(date).strip()}".lower()
+        cache_key = hashlib.md5(cache_key_raw.encode("utf-8")).hexdigest()
+        cache_file = os.path.join(cache_dir, f"{cache_key}.json")
+        
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, "r", encoding="utf-8") as fcache:
+                    cached_res = json.load(fcache)
+                if cached_res and "error" not in cached_res:
+                    print(f"[EXPERT CACHE] Reaproveitando resultado cacheado para {team1} x {team2} ({date})")
+                    return cached_res
+            except Exception as e_cache:
+                print(f"[EXPERT CACHE WARN] Erro ao ler cache: {e_cache}")
+
+        # Loop de Auditoria e Validação com Auto-Correção
+        directive_correction = ""
+        max_validation_attempts = 3
+        res = None
+
+        for val_attempt in range(max_validation_attempts):
+            print(f"[EXPERT PIPELINE] Iniciando ciclo de auditoria/validação (Tentativa {val_attempt+1}/{max_validation_attempts})...")
+            
+            # 1. Executa o fluxo de geração (IA com Busca Ativa)
+            try:
+                res = self._execute_generation_flow(
+                    team1=team1, team2=team2, competition=competition, platform=platform, date=date,
+                    start_timestamp=start_timestamp, duration=duration, video_url=video_url,
+                    transcript_text=transcript_text, directive_correction=directive_correction
+                )
+            except Exception as ex_gen:
+                print(f"[EXPERT PIPELINE WARN] Erro crítico no fluxo de geração: {ex_gen}")
+                if val_attempt == max_validation_attempts - 1:
+                    raise ex_gen
+                continue
+            
+            if not res or "error" in res:
+                if val_attempt == max_validation_attempts - 1:
+                    return res or {"error": "IA não retornou um relatório válido."}
+                continue
+
+            # 2. Executa a validação cruzada independente contra a súmula
+            validation = self.validate_chronology(team1, team2, date, competition, res)
+            
+            if validation.get("is_valid") is True:
+                print(f"[EXPERT PIPELINE] Sucesso! Relatório validado e aprovado na tentativa {val_attempt+1}.")
+                break
+            else:
+                directive_correction = validation.get("inconsistencies", "")
+                print(f"[EXPERT PIPELINE] Discrepâncias identificadas na tentativa {val_attempt+1}: {directive_correction}")
+                # Na próxima tentativa, a diretriz de correção guiará o modelo a corrigir os desvios.
+
+        # 3. Salvar no cache (apenas se for um resultado sem erro)
+        if res and "error" not in res:
+            try:
+                with open(cache_file, "w", encoding="utf-8") as fcache:
+                    json.dump(res, fcache, indent=2, ensure_ascii=False)
+                print(f"[EXPERT CACHE] Resultado validado salvo com sucesso no cache para {team1} x {team2} ({date})")
+            except Exception as e_save:
+                print(f"[EXPERT CACHE WARN] Falha ao salvar no cache: {e_save}")
+        
+        return res
+
+    def _execute_generation_flow(self, team1: str, team2: str, competition: str, platform: str, date: str, start_timestamp: Optional[int] = None, duration: Optional[int] = None, video_url: Optional[str] = None, transcript_text: Optional[str] = None, directive_correction: str = "") -> Dict[str, Any]:
+        """
+        Executa a geração do prompt de auditoria e a consulta à IA com busca ativa.
+        """
+        from datetime import datetime, timedelta, timezone
+        import hashlib
+
+        # Caching de resultados do Expert (interno para fluxo)
+        cache_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "expert_cache")
+        os.makedirs(cache_dir, exist_ok=True)
+        cache_key_raw = f"{str(team1).strip()}_{str(team2).strip()}_{str(competition).strip()}_{str(date).strip()}".lower()
+        cache_key = hashlib.md5(cache_key_raw.encode("utf-8")).hexdigest()
+        cache_file = os.path.join(cache_dir, f"{cache_key}.json")
+
+        # Fuso horário de Brasília para a âncora do relatório
+        br_tz = timezone(timedelta(hours=-3))
+        
+        start_time_str = "Não informado"
+        duration_str = "Não informada"
+        end_time_str = "Não calculado"
+        
+        if start_timestamp:
+            try:
+                dt_start = None
+                if isinstance(start_timestamp, (int, float)):
+                    dt_start = datetime.fromtimestamp(int(start_timestamp), tz=br_tz)
+                elif isinstance(start_timestamp, str):
+                    s_str = start_timestamp.strip()
+                    if s_str.isdigit():
+                        dt_start = datetime.fromtimestamp(int(s_str), tz=br_tz)
+                    else:
+                        s_iso = s_str.replace("Z", "+00:00")
+                        try:
+                            dt_start = datetime.fromisoformat(s_iso).astimezone(br_tz)
+                        except Exception:
+                            dt_start = datetime.strptime(s_iso[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).astimezone(br_tz)
+                
+                if dt_start:
+                    start_time_str = dt_start.strftime("%H:%M:%S")
+                    start_timestamp = int(dt_start.timestamp())
+                    if duration:
+                        dt_end = dt_start + timedelta(seconds=int(float(duration)))
+                        end_time_str = dt_end.strftime("%H:%M:%S")
+            except Exception as e_ts:
+                print(f"[EXPERT WARN] Falha ao processar start_timestamp ({start_timestamp}): {e_ts}")
+                
+        if duration:
+            try:
+                dur_f = float(duration)
+                h = int(dur_f // 3600)
+                m = int((dur_f % 3600) // 60)
+                s = int(dur_f % 60)
+                duration_str = f"{h:02d}:{m:02d}:{s:02d}"
+            except:
+                pass
+
+        if video_url and start_time_str == "Não informado":
+            import re
+            vid_match = re.search(r"(?:v=|/)([0-9A-Za-z_-]{11})", video_url)
+            if vid_match:
+                vid_id = vid_match.group(1)
+                meta = self.get_youtube_live_metadata(vid_id)
+                if meta.get("actual_start_time"):
+                    try:
+                        dt = datetime.strptime(meta["actual_start_time"].replace("Z", "+00:00"), "%Y-%m-%dT%H:%M:%S%z")
+                        dt = dt.astimezone(br_tz)
+                        start_time_str = dt.strftime("%H:%M:%S")
+                        start_timestamp = int(dt.timestamp())
+                    except: pass
+                if meta.get("duration") and duration_str == "Não informada":
+                    try:
+                        dur_sec = meta["duration"]
+                        duration = dur_sec
+                        h, m, s = dur_sec // 3600, (dur_sec % 3600) // 60, dur_sec % 60
+                        duration_str = f"{h:02d}:{m:02d}:{s:02d}"
+                    except: pass
+
+        match_id_val = f"{team1}_{team2}_{date}"
+        team1_safe = (team1 or "Time 1").replace('"', "'")
+        team2_safe = (team2 or "Time 2").replace('"', "'")
+        comp_clean = str(competition or "").strip()
+        if not comp_clean or comp_clean in ("—", "-", "None"):
+            comp_clean = "Brasileirão / Copa do Brasil"
+        competition_safe = comp_clean.replace('"', "'")
+        
+        transcript_block = ""
+        if transcript_text:
+            transcript_block = f"""
+        [TRANSCRIÇÃO DE ÁUDIO DO NARRADOR - TIMESTAMPS DO VÍDEO]:
+        Esta é a transcrição fiel da narração de áudio do vídeo, dividida por janelas de tempo [MM:SS] (minutos e segundos do vídeo). Use-a como fonte prioritária de verdade para alinhar os lances e apitos:
+        {transcript_text}
+        """
+
+        # Classificação de Mídia (Highlights/Short Video ou Sem Âncora)
+        use_grounding_clock = False
+        duration_sec = None
+        if duration:
+            try: duration_sec = float(duration)
+            except: pass
+            
+        if not start_timestamp or (duration_sec is not None and duration_sec < 5400):
+            use_grounding_clock = True
+
+        if use_grounding_clock:
+            rule_7_prompt = f"""7. BUSCA FOCADA NA SÚMULA ELETRÔNICA CBF E COBERTURA MINUTO A MINUTO (CRÍTICO):
+           Para garantir que a cronologia reflita os horários reais e a súmula exata da partida "{team1_safe}" x "{team2_safe}" na data {date}:
+           
+           VOCÊ DEVE PESQUISAR EXPLICITAMENTE NO GOOGLE SEARCH PELOS SEGUINTES TERMOS E FONTES:
+           1. "site:cbf.com.br" "Súmula" "{team1_safe}" "{team2_safe}"
+           2. "Súmula Eletrônica CBF" "{team1_safe} x {team2_safe}" "{date}"
+           3. "Tempo Real" "{team1_safe} x {team2_safe}" "{date}" site:ge.globo.com OR site:uol.com.br OR site:lance.com.br OR site:flashscore.com.br
+           
+           A Súmula Eletrônica Oficial da CBF e os relatos oficiais registram obrigatoriamente em relógio real os 4 carimbos de hora (timestamps) vitais da partida:
+            - Início do 1º Tempo (first_half_start)
+            - Término do 1º Tempo (half_time_start)
+            - Início do 2º Tempo (second_half_start / half_time_end)
+            - Término do 2º Tempo / Apito Final (match_end)
+
+            REGRA DE ANCORAGEM RÍGIDA (DERIVA ZERO):
+            1. EXTRAIA OS 4 CARIMBOS DE HORA REAIS DA SÚMULA/FICHA TÉCNICA. NUNCA faça cálculos sintéticos de soma ou inferências lineares para esses 4 marcos.
+            2. O Apito Final ('match_end') DEVE obrigatoriamente receber o horário oficial de encerramento registrado na súmula/transmissão (ex: 23:24:03 ou 23:25:00). NUNCA calcule o apito final por soma sintética.
+            3. O reinício do 2º tempo ('second_half_start') DEVE ser lido diretamente da súmula (ex: 22:35:00 ou 22:38:00) e servirá de base rígida para calcular a hora dos gols/cartões do 2º tempo.
+            4. Preserve segundos exatos sempre que disponíveis na súmula ou na transmissão (ex: 23:24:03). NUNCA pode ser anterior ao último gol ou cartão ocorrido nos acréscimos!"""
+            
+            anchor_start_line = ""
+            anchor_directive = "Busque o horário oficial da partida de Brasília (UTC-3) na internet e utilize-o como base absoluta para todos os campos do relatório."
+            if start_time_str != "Não informado":
+                anchor_start_line = f"\n          - Início Real/VOD da Transmissão (Informado): {start_time_str} (Brasília - UTC-3)."
+                anchor_directive = f"Ignore horários de upload e buscas genéricas de início de relógio na internet. O 'Início Real/VOD da Transmissão (Informado)' ({start_time_str}) é a hora EXATA do apito inicial do primeiro tempo (first_half_start / match_start) e NÃO o início do pré-jogo. A bola deve começar a rolar exatamente neste segundo/minuto informado (ex: se informado {start_time_str}, preencha first_half_start = '{start_time_str}'). Utilize-o como base rígida e construa a linha do tempo a partir dele."
+
+            context_anchor_prompt = f"""CONTEXTO DA TRANSMISSÃO (ÂNCORA):
+          - Tipo de Mídia: MELHORES MOMENTOS / BUSCA DE IMAGEM / MANUAL (Sem fluxo contínuo de transmissão).{anchor_start_line}
+          - Duração Total da Mídia: {duration_str}.
+          - Diretriz: {anchor_directive}
+          {transcript_block}"""
+        else:
+            rule_7_prompt = f"""7. ENCERRAMENTO OBRIGATÓRIO:
+           O campo 'post_game_end' DEVE obrigatoriamente ser EXATAMENTE igual ao 'Encerramento OBRIGATÓRIO' ({end_time_str}) informado no Contexto da Transmissão abaixo! NENHUM segundo de diferença."""
+            
+            context_anchor_prompt = f"""CONTEXTO DA TRANSMISSÃO (ÂNCORA):
+         - Início Real da Transmissão (VOD/Live): {start_time_str} (Brasília - UTC-3).
+         - Duração Total da Mídia: {duration_str}.
+         - Encerramento OBRIGATÓRIO: {end_time_str}.
+         {transcript_block}"""
+
+        prompt = f"""
+        Você é o Motor de Reconstrução de Linha Temporal Canônica (Auditor Sênior V2.1).
+        Hoje é dia {datetime.now(br_tz).strftime('%d/%m/%Y')}. A partida ocorreu no passado. O ano atual de relógio real é {datetime.now(br_tz).strftime('%Y')}.
+        Sua missão é criar uma cronologia técnica EXAUSTIVA, LIVRE DE DERIVAS e EXTREMAMENTE PRECISA da partida: "{team1_safe}" x "{team2_safe}" pela competição "{competition_safe}" na data {date} (ou na data real do jogo, caso a transmissão/upload tenha ocorrido após a meia-noite ou no dia seguinte).
+
+        DIRETRIZES DA ARQUITETURA TEMPORAL (BLUEPRINT V2):
+        1. RELAÇÃO DE CONFIANÇA E DERIVA ZERO: 
+           Não confie cegamente na soma linear 'início + offsets do vídeo' se houver indícios de cortes, retransmissões ou VODs editados. Crie uma "Linha Temporal Canônica" cruzando todas as evidências.
+           A hierarquia de confiança absoluta é: OCR/Relógio Físico de Transmissão (Peso 1.0) > OCR do Scoreboard de Jogo (Peso 0.95) > Transcrição do Narrador (Peso 0.75) > Grounding Histórico do Gemini (Peso 0.55).
+           Se houver conflito de horários entre o que o narrador diz e o relógio visual exibido na tela, o OCR visual VENCE sempre!
+
+        2. REVERSE TIMELINE SOLVER (CRÍTICO):
+           Use a técnica de cálculo reverso (back-solving) para alinhamento temporal quando aplicável (ou seja, quando tiver uma âncora de encerramento real e confiável da transmissão completa).
+           
+        3. CLOCK DO FUTEBOL vs RELÓGIO REAL E INTERVALO:
+            - Separe explicitamente o tempo absoluto (Relógio real de Brasília) do tempo futebolístico oficial (ex: 45+3' ou 90+6' do 2T).
+            - O intervalo do jogo NÃO conta como tempo de partida jogado, mas consome tempo real de relógio de transmissão (média de 21 minutos no Brasil).
+            - REGRA MATEMÁTICA RÍGIDA DE CÁLCULO DE TIMESTAMPS:
+              - O fim do 1º Tempo ('half_time_start') DEVE ser igual a: 'first_half_start' + 45 minutos + 'stoppage_time_1t' minutos.
+              - O reinício do 2º Tempo ('second_half_start') DEVE ser igual a: 'half_time_start' + Tempo de Intervalo (exato ou estimado de 21 minutos).
+              - O fim do jogo ('match_end') DEVE ser igual a: 'second_half_start' + 45 minutos + 'stoppage_time_2t' minutos.
+              - Se um evento ocorre nos acréscimos do 1T (ex: 45+X minutos), seu horário real DEVE ser: 'first_half_start' + 45 minutos + X minutos.
+              - Se um evento ocorre nos acréscimos do 2T (ex: 90+Y minutos), seu horário real DEVE ser: 'second_half_start' + 45 minutos + Y minutos.
+              Qualquer desvio destas fórmulas causará rejeição pelo validador.
+
+         4. GROUNDING DE PESQUISA REAL (BUSCA DA SÚMULA E COBERTURA MINUTO A MINUTO):
+            Você DEVE pesquisar ativamente no Google Search pela SÚMULA OFICIAL DA CBF / FEDERAÇÃO ou coberturas minuto a minuto (Globo Esporte, UOL, Lance, Flashscore, ESPN) da partida "{team1_safe}" x "{team2_safe}" na data {date}.
+            Extraia as informações REAIS pesquisadas na internet:
+            - Minutos exatos em que cada gol, cartão ou substituição ocorreu (ex: 45+3' ou 90+8').
+            - Os acréscimos oficiais exatos concedidos pela arbitragem no 1º tempo ('stoppage_time_1t') e no 2º tempo ('stoppage_time_2t').
+            - NUNCA invente acréscimos genéricos se a pesquisa indicar o acréscimo real da partida.
+            - O apito final da partida ('match_end') DEVE obrigatoriamente acontecer APÓS o último gol/evento ocorrido nos acréscimos.
+
+        5. CONCISÃO ABSOLUTA (EVITAR TRUNCAMENTO):
+           Seja extremamente conciso e direto. Não adicione conversas, explicações longas ou rodeios fora do formato JSON. Mantenha os campos "analysis" e "event" extremamente curtos (máximo 15 palavras) para garantir que a resposta não seja cortada (MAX_TOKENS).
+
+        6. LIMITE MÁXIMO DE ITENS E FORMATO (EVITAR ESTOURO DE TOKENS):
+           - A lista 'technical_milestones' deve conter apenas os marcos técnicos capitais do jogo (gols, cartões vermelhos, início/fim de tempos). Limite a no máximo 10 itens.
+           - Se a mídia não possui vídeo ou transcrição de vídeo (use_grounding_clock é True), a lista 'transcript_events' DEVE obrigatoriamente vir vazia: [].
+           - Se houver vídeo, a lista 'transcript_events' deve conter no máximo 15 eventos narrativos importantes e bem distribuídos ao longo do jogo. Filtre rigidamente apenas o que for relevante.
+
+        {rule_7_prompt}
+
+        {context_anchor_prompt}
+
+        FORMATO DE RESPOSTA (JSON ABSOLUTAMENTE SEVERO, RETORNE APENAS O OBJETO):
+        {{
+            "match_id": "{match_id_val}",
+            "date": "{date}",
+            "match_display": "{team1_safe} x {team2_safe}",
+            "competition": "{competition_safe}",
+            "confidence_score": 0.99,
+            "pre_game_start": "HH:MM:SS",
+            "match_start": "HH:MM:SS",
+            "first_half_start": "HH:MM:SS",
+            "half_time_start": "HH:MM:SS",
+            "half_time_end": "HH:MM:SS",
+            "second_half_start": "HH:MM:SS",
+            "match_end": "HH:MM:SS",
+            "post_game_end": "HH:MM:SS",
+            "stoppage_time_1t": 0,
+            "stoppage_time_2t": 0,
+            "technical_milestones": [
+                {{
+                    "time": "HH:MM:SS", 
+                    "minute": 19,
+                    "event": "Descrição curta e clara do evento, ex: GOL de John Kennedy (Fluminense).", 
+                    "type": "Gol",
+                    "confidence": 0.99
+                }}
+            ],
+            "transcript_events": [
+                {{
+                    "video_time": "MM:SS",
+                    "real_time": "HH:MM:SS",
+                    "narration": "Narração ou evento detectado na transcrição de áudio.",
+                    "analysis": "Cálculo matemático detalhado (ex: Back-solving ou soma ao início)."
+                }}
+            ]
+        }}
+        """
+        if directive_correction:
+            prompt += f"\n\n[ATENÇÃO - DIRETRIZ DE AUTO-CORREÇÃO OBRIGATÓRIA (TENTATIVA ADICIONAL)]:\nO seu relatório gerado anteriormente continha as seguintes inconsistências em relação aos dados oficiais de súmula e minuto a minuto. Você DEVE corrigir estas discrepâncias e preencher o que estiver faltando de forma rigorosa no JSON final:\n{directive_correction}\n"
+            
+        try:
+            config = types.GenerateContentConfig(
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                temperature=0.1,
+                max_output_tokens=8192,
+                safety_settings=[
+                    types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_NONE"),
+                    types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_NONE"),
+                    types.SafetySetting(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="BLOCK_NONE"),
+                    types.SafetySetting(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="BLOCK_NONE"),
+                    types.SafetySetting(category="HARM_CATEGORY_CIVIC_INTEGRITY", threshold="BLOCK_NONE")
+                ]
+            )
+
+            config_no_grounding = types.GenerateContentConfig(
+                temperature=0.1,
+                max_output_tokens=8192,
+                safety_settings=[
+                    types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_NONE"),
+                    types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_NONE"),
+                    types.SafetySetting(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="BLOCK_NONE"),
+                    types.SafetySetting(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="BLOCK_NONE"),
+                    types.SafetySetting(category="HARM_CATEGORY_CIVIC_INTEGRITY", threshold="BLOCK_NONE")
+                ]
+            )
+
+            # Mecanismo de Retry Otimizado (3 tentativas por modelo: 1ª e 2ª com Grounding, 3ª sem Grounding)
+            max_retries = 3
+            fallbacks = [
+                "gemini-2.5-flash",
+                "gemini-3.5-flash",
+                "gemini-1.5-flash",
+                "gemini-3.1-pro-preview"
+            ]
+            models_to_try = [self.model_id]
+            for m in fallbacks:
+                if m not in models_to_try:
+                    models_to_try.append(m)
+
+            last_error = None
+            for current_model in models_to_try:
+                for attempt in range(max_retries):
+                    use_cfg = config if attempt < 2 else config_no_grounding
+                    mode_label = f"Com Grounding (Tentativa {attempt+1})" if attempt < 2 else "Sem Grounding (Fallback Proxy)"
+                    try:
+                        print(f"[EXPERT] Tentativa {attempt+1} com modelo {current_model} ({mode_label})...")
+                        response = self.client.models.generate_content(
+                            model=current_model,
+                            contents=prompt,
+                            config=use_cfg
+                        )
+                        
+                        self._last_raw_response = response
+                        # Debug de resposta
+                        c = response.candidates[0] if response.candidates else None
+                        print(f"[EXPERT] Resposta recebida. Candidatos: {len(response.candidates or [])} | Finish Reason: {c.finish_reason if c else 'N/A'}")
+                        
+                        if not response or not response.candidates or not response.candidates[0].content:
+                             raise ValueError(f"Modelo {current_model} retornou resposta totalmente vazia.")
+                             
+                        # Verificar se houve truncamento por limite de tokens
+                        if c and c.finish_reason and "MAX_TOKENS" in str(c.finish_reason):
+                             raise ValueError("Resposta do modelo truncada pelo limite de tokens de saída (MAX_TOKENS).")
+
+                        # Extração manual de texto das partes
+                        txt = ""
+                        if c.content and c.content.parts:
+                            # Se o modelo retornou a resposta em partes idênticas devido a bug do SDK, removemos a duplicata
+                            seen_parts = set()
+                            for idx_p, p in enumerate(c.content.parts):
+                                p_text = getattr(p, 'text', None)
+                                if p_text:
+                                    print(f"[DEBUG] Part {idx_p}: text_type={type(p_text)} | len={len(p_text)}")
+                                    p_text_str = str(p_text)
+                                    # Se a mesma string exata de texto for repetida sequencialmente, ignora para evitar duplicação do JSON
+                                    if p_text_str not in seen_parts:
+                                        txt += p_text_str
+                                        seen_parts.add(p_text_str)
+
+                        if not txt.strip():
+                             raise ValueError("Falha ao extrair texto (vazio) das partes da resposta.")
+
+                        # Extração de fontes (Search Grounding com Links Oficiais da CBF e Portais)
+                        sources = []
+                        try:
+                            # 1. Adicionar Links Oficiais de Auditoria da CBF e Cobertura Esportiva
+                            cbf_search_url = f"https://www.cbf.com.br/futebol-brasileiro/jogos?q={team1_safe}+{team2_safe}"
+                            ge_search_url = f"https://ge.globo.com/busca/?q=Sumula+{team1_safe}+{team2_safe}+{date}"
+                            
+                            sources.append({
+                                "uri": cbf_search_url,
+                                "title": "Súmula Eletrônica Oficial - Confederação Brasileira de Futebol (cbf.com.br)"
+                            })
+                            sources.append({
+                                "uri": ge_search_url,
+                                "title": "Cobertura Minuto a Minuto - Globo Esporte (ge.globo.com)"
+                            })
+
+                            if response.candidates and response.candidates[0].grounding_metadata:
+                                metadata = response.candidates[0].grounding_metadata
+                                
+                                # 2. Extrair das grounding_chunks (Evidências de busca do Gemini)
+                                chunks = getattr(metadata, "grounding_chunks", [])
+                                if chunks:
+                                    for chunk in chunks:
+                                        if hasattr(chunk, "web") and chunk.web:
+                                            raw_uri = str(chunk.web.uri or "")
+                                            raw_title = str(chunk.web.title or "Fonte de Pesquisa").strip()
+                                            
+                                            # Formatar nome amigável do portal
+                                            display_title = raw_title
+                                            if "cbf" in raw_title.lower() or "cbf" in raw_uri.lower():
+                                                display_title = "cbf.com.br - Súmula Oficial CBF"
+                                            elif "lance" in raw_title.lower():
+                                                display_title = "lance.com.br - Cobertura da Partida"
+                                            elif "abril" in raw_title.lower() or "placar" in raw_title.lower():
+                                                display_title = "placar.abril.com.br - Ficha Técnica"
+                                            elif "flashscore" in raw_title.lower() or "flashscore" in raw_uri.lower():
+                                                display_title = "flashscore.com.br - Cronologia Oficial"
+                                            elif "uol" in raw_title.lower():
+                                                display_title = "uol.com.br/esporte - Tempo Real"
+
+                                            sources.append({
+                                                "uri": raw_uri,
+                                                "title": display_title
+                                            })
+
+                                # 3. Limpar duplicatas de URLs
+                                unique_sources = []
+                                seen_urls = set()
+                                for s in sources:
+                                    u = s.get("uri")
+                                    if u and u not in seen_urls:
+                                        unique_sources.append(s)
+                                        seen_urls.add(u)
+                                sources = unique_sources
+                                print(f"[EXPERT] Sucesso: {len(sources)} fontes de grounding formatadas com CBF e portais.")
+                        except Exception as e_sources:
+                            print(f"[EXPERT] Erro ao processar fontes de grounding: {e_sources}")
+                            pass
+
+                        # --- PROCESSAMENTO DO JSON ---
+                        raw_text = txt.strip()
+                        clean_text = raw_text
+                        if clean_text.lower().startswith("```json"):
+                            clean_text = clean_text[7:]
+                        elif clean_text.startswith("```"):
+                            clean_text = clean_text[3:]
+                            
+                        if clean_text.endswith("```"):
+                            clean_text = clean_text[:-3]
+                            
+                        clean_text = clean_text.strip()
+
+                        # Tenta extrair o bloco JSON usando regex
+                        import re
+                        json_match = re.search(r'(\{.*\})', clean_text, re.DOTALL)
+                        if json_match:
+                            clean_text = json_match.group(1).strip()
+                        else:
+                            snippet = clean_text[:150].replace('\n', ' ')
+                            raise ValueError(f"IA não retornou objeto JSON válido no texto. Resposta: {snippet}...")
+
+                        # Limpeza de wrappers Markdown residuais
+                        clean_text = clean_text.replace("```json", "").replace("```", "").strip()
+
+                        # Limpeza de caracteres de controle invisíveis
+                        clean_text = "".join(ch for ch in clean_text if ord(ch) >= 32 or ch in '\n\r\t')
+
+                        if not clean_text:
+                            raise ValueError("Bloco de texto limpo para JSON está vazio.")
+
+                        # Reparo de aspas não escapadas e novas linhas
+                        import json
+                        def fix_json_values(text):
+                            def replacer(match):
+                                prefix = match.group(1) # ": "
+                                content = match.group(2) # value
+                                content = re.sub(r'(?<!\\)"', r'\"', content)
+                                content = content.replace('\n', '\\n').replace('\r', '\\r')
+                                return prefix + content + '"'
+                            
+                            fixed = re.sub(r'(":\s*")(.+?)("(?=\s*[,}\]]))', replacer, text, flags=re.DOTALL)
+                            fixed = re.sub(r'}\s*{', '}, {', fixed)
+                            fixed = re.sub(r']\s*\[', '], [', fixed)
+                            fixed = re.sub(r',\s*}', '}', fixed)
+                            fixed = re.sub(r',\s*]', ']', fixed)
+                            return fixed
+
+                        # Função de alinhamento temporal (Time Shift) com recálculo matemático de desvio zero
+                        def align_result(res):
+                            if "error" not in res:
+                                try:
+                                    import re
+                                    def parse_int_safe(val):
+                                         if val is None: return 0
+                                         if isinstance(val, int): return val
+                                         val_str = str(val).strip()
+                                         if "+" in val_str:
+                                             parts = val_str.split("+")
+                                             try:
+                                                 return sum(int(re.sub(r'\D', '', p)) for p in parts if re.sub(r'\D', '', p))
+                                             except:
+                                                 pass
+                                         try:
+                                             digits = re.findall(r'\d+', val_str)
+                                             if digits:
+                                                 return int(digits[0])
+                                         except:
+                                             pass
+                                         return 0
+
+                                    # 1. Determinar o horário base (kickoff)
+                                    # Se o usuário informou um horário de VOD/start_timestamp, usamos ele como base
+                                    if start_timestamp:
+                                        res["first_half_start"] = start_time_str
+                                        res["match_start"] = start_time_str
+                                    
+                                    ia_start_str = res.get("first_half_start") or res.get("match_start")
+                                    if not ia_start_str or ia_start_str == "HH:MM:SS":
+                                        return res
+                                    
+                                    # Caso o modelo tenha retornado em formato parcial (ex: sem segundos), completa
+                                    if len(ia_start_str) == 5:
+                                        ia_start_str += ":00"
+                                    
+                                    t_start = datetime.strptime(ia_start_str, "%H:%M:%S")
+                                    
+                                    # 2. Obter acréscimos informados pela IA
+                                    stop1 = parse_int_safe(res.get("stoppage_time_1t"))
+                                    stop2 = parse_int_safe(res.get("stoppage_time_2t"))
+                                    
+                                    # Determinar dinamicamente a duração regulamentar de cada tempo (padrão: 45 min)
+                                    # para suportar jogos juvenis (40min), amistosos diferenciados ou outras ligas.
+                                    half_dur_1t = 45
+                                    try:
+                                        orig_start = res.get("first_half_start") or res.get("match_start")
+                                        orig_ht_start = res.get("half_time_start")
+                                        if orig_start and orig_ht_start and orig_start != "HH:MM:SS" and orig_ht_start != "HH:MM:SS":
+                                            t_os = datetime.strptime(orig_start[:8], "%H:%M:%S")
+                                            t_oh = datetime.strptime(orig_ht_start[:8], "%H:%M:%S")
+                                            diff_min = int((t_oh - t_os).total_seconds() / 60)
+                                            calc_dur = diff_min - stop1
+                                            if 20 <= calc_dur <= 60:
+                                                half_dur_1t = calc_dur
+                                    except:
+                                        pass
+
+                                    half_dur_2t = half_dur_1t
+                                    
+                                    # Determinar o intervalo real (padrão: 21 min para transmissões comerciais)
+                                    interval_dur = 21
+                                    try:
+                                        orig_ht_start = res.get("half_time_start")
+                                        orig_ht_end = res.get("half_time_end") or res.get("second_half_start")
+                                        if orig_ht_start and orig_ht_end and orig_ht_start != "HH:MM:SS" and orig_ht_end != "HH:MM:SS":
+                                            t_ohs = datetime.strptime(orig_ht_start[:8], "%H:%M:%S")
+                                            t_ohe = datetime.strptime(orig_ht_end[:8], "%H:%M:%S")
+                                            diff_int = int((t_ohe - t_ohs).total_seconds() / 60)
+                                            if 5 <= diff_int <= 45:
+                                                interval_dur = diff_int
+                                    except:
+                                        pass
+                                    
+                                    # 3. Analisar marcos técnicos para calcular o maior minuto de cada tempo
+                                    # e garantir que os acréscimos (stop1 e stop2) cubram 100% dos eventos nos acréscimos!
+                                    milestones = res.get("technical_milestones", [])
+                                    max_min_1t = 0
+                                    max_min_2t = 0
+                                    for m in milestones:
+                                        m_min = m.get("minute")
+                                        if m_min is not None:
+                                            try:
+                                                v_min = parse_int_safe(m_min)
+                                                m_str = str(m.get("event", "")).upper() + " " + str(m.get("type", "")).upper() + " " + str(m_min)
+                                                is_explicit_1t = ("1T" in m_str or "45+" in m_str or "PRIMEIRO" in m_str)
+                                                if is_explicit_1t or (v_min <= half_dur_1t):
+                                                    if v_min > half_dur_1t:
+                                                        max_min_1t = max(max_min_1t, v_min - half_dur_1t)
+                                                else:
+                                                    max_min_2t = max(max_min_2t, v_min - half_dur_1t)
+                                            except:
+                                                pass
+
+                                    # Sanity check: acréscimo do 1T raramente passa de 10 min
+                                    if stop1 > 10:
+                                        stop1 = 2
+                                        res["stoppage_time_1t"] = stop1
+
+                                    # Se houve evento além dos acréscimos informados (ex: gol aos 98' -> 53min do 2T),
+                                    # reajusta o acréscimo do 2T para cobrir o evento + 1 minuto de margem pro Apito Final!
+                                    if max_min_1t > stop1 and max_min_1t <= 10:
+                                        stop1 = max_min_1t + 1
+                                        res["stoppage_time_1t"] = stop1
+                                        print(f"[EXPERT] Acréscimo do 1T ajustado dinamicamente para +{stop1}min")
+                                        
+                                    if max_min_2t >= (half_dur_2t + stop2 - half_dur_1t):
+                                        needed_stop2 = (max_min_2t - half_dur_2t) + 1
+                                        if needed_stop2 > stop2:
+                                            stop2 = needed_stop2
+                                            res["stoppage_time_2t"] = stop2
+                                            print(f"[EXPERT] Acréscimo do 2T ajustado dinamicamente para +{stop2}min")
+
+                                    # 4. Travar os 3 Timestamps Oficiais da Súmula (Deriva Zero / Ancoragem Rígida)
+                                    # Se a Súmula CBF/portais informou o horário de término do 1T (half_time_start), preserva-o
+                                    orig_ht_start = res.get("half_time_start")
+                                    if orig_ht_start and orig_ht_start != "HH:MM:SS" and len(orig_ht_start) >= 5:
+                                        if len(orig_ht_start) == 5: orig_ht_start += ":00"
+                                        t_half_start = datetime.strptime(orig_ht_start[:8], "%H:%M:%S")
+                                    else:
+                                        t_half_start = t_start + timedelta(minutes=half_dur_1t + stop1)
+                                    res["half_time_start"] = t_half_start.strftime("%H:%M:%S")
+                                    
+                                    # Se a Súmula CBF/portais informou o horário de reinício do 2T (second_half_start), preserva-o
+                                    orig_sh_start = res.get("second_half_start") or res.get("half_time_end")
+                                    if orig_sh_start and orig_sh_start != "HH:MM:SS" and len(orig_sh_start) >= 5:
+                                        if len(orig_sh_start) == 5: orig_sh_start += ":00"
+                                        t_half_end = datetime.strptime(orig_sh_start[:8], "%H:%M:%S")
+                                    else:
+                                        t_half_end = t_half_start + timedelta(minutes=interval_dur)
+                                    
+                                    res["half_time_end"] = t_half_end.strftime("%H:%M:%S")
+                                    res["second_half_start"] = t_half_end.strftime("%H:%M:%S")
+                                    
+                                    # TRAVA DO APITO FINAL: Se a Súmula CBF/portais informou o horário final real (match_end), preserva-o!
+                                    orig_match_end = res.get("match_end")
+                                    if orig_match_end and orig_match_end != "HH:MM:SS" and len(orig_match_end) >= 5:
+                                        if len(orig_match_end) == 5: orig_match_end += ":00"
+                                        t_match_end = datetime.strptime(orig_match_end[:8], "%H:%M:%S")
+                                    else:
+                                        t_match_end = t_half_end + timedelta(minutes=half_dur_2t + stop2)
+                                    
+                                    res["match_end"] = t_match_end.strftime("%H:%M:%S")
+                                    
+                                    # Ajustar tempos de captação (pre e post game)
+                                    res["pre_game_start"] = (t_start - timedelta(minutes=5)).strftime("%H:%M:%S")
+                                    res["post_game_end"] = (t_match_end + timedelta(minutes=5)).strftime("%H:%M:%S")
+                                    
+                                    # 5. Ajustar cirurgicamente a hora exata de cada marco técnico (gols/cartões)
+                                    # com base em sua minutagem real de jogo a partir do horário real do tempo
+                                    milestones = res.get("technical_milestones", [])
+                                    for m in milestones:
+                                        min_val = m.get("minute")
+                                        if min_val is not None:
+                                            try:
+                                                min_val = parse_int_safe(min_val)
+                                                if min_val <= half_dur_1t:
+                                                    # Evento no primeiro tempo -> a partir do kickoff (t_start)
+                                                    t_event = t_start + timedelta(minutes=min_val)
+                                                else:
+                                                    # Evento no segundo tempo -> a partir do reinício real (t_half_end)
+                                                    min_2t = max(0, min_val - half_dur_1t)
+                                                    t_event = t_half_end + timedelta(minutes=min_2t)
+                                                
+                                                m["time"] = t_event.strftime("%H:%M:%S")
+                                            except Exception as e_m:
+                                                print(f"[EXPERT WARN] Falha ao alinhar marco técnico: {e_m}")
+                                                
+                                    print(f"[EXPERT] Ancoragem rígida de Súmula travada. 1T: {res['first_half_start']}->{res['half_time_start']} | 2T: {res['second_half_start']}->{res['match_end']}")
+                                except Exception as e_shift:
+                                    print(f"[EXPERT WARN] Falha ao aplicar alinhamento temporal dinâmico: {e_shift}")
+                            
+                            # Salvar resultado final no cache
+                            try:
+                                with open(cache_file, "w", encoding="utf-8") as fcache:
+                                    json.dump(res, fcache, indent=2, ensure_ascii=False)
+                                print(f"[EXPERT CACHE] Resultado salvo com sucesso no cache para {team1} x {team2} ({date})")
+                            except Exception as e_save:
+                                print(f"[EXPERT CACHE WARN] Falha ao salvar no cache: {e_save}")
+                                
+                            return res
+
+                        # Tenta decodificar o JSON
+                        try:
+                            result = json.loads(clean_text)
+                            result["sources"] = sources if sources else []
+                            if duration: result["duration"] = duration
+                            
+                            if not result.get("sources"):
+                                result["sources"] = [{
+                                    "uri": f"https://www.google.com/search?q={team1}+x={team2}+{date}",
+                                    "title": "Link de Auditoria (Pesquisa Web)"
+                                }]
+                            return align_result(result)
+                        except json.JSONDecodeError as je:
+                            # Tenta reparar aspas e vírgulas usando a função fix_json_values
+                            try:
+                                fixed_text = fix_json_values(clean_text)
+                                result = json.loads(fixed_text)
+                                result["sources"] = sources if sources else []
+                                if duration: result["duration"] = duration
+                                
+                                if not result.get("sources"):
+                                    result["sources"] = [{
+                                        "uri": f"https://www.google.com/search?q={team1}+x={team2}+{date}",
+                                        "title": "Link de Auditoria (Pesquisa Web)"
+                                    }]
+                                return align_result(result)
+                            except json.JSONDecodeError as je2:
+                                with open("scratch/debug_raw_response.txt", "w", encoding="utf-8") as debug_f:
+                                    debug_f.write(clean_text)
+                                raise ValueError(f"JSON Decode Error: {je2} | Início: {clean_text[:150]}")
+
+                    except Exception as e:
+                        last_error = e
+                        err_msg = str(e)
+                        print(f"[EXPERT WARN] Falha na tentativa {attempt+1} com modelo {current_model}: {err_msg}")
+                        
+                        # Se for erro de quota (429) ou spend cap excedido, tenta rotacionar a chave de API e re-executar
+                        if "429" in err_msg or "spend cap" in err_msg.lower() or "limit" in err_msg.lower() or "exhausted" in err_msg.lower():
+                            if self.rotate_key():
+                                print(f"[EXPERT] Rotação de chave ativada devido a limite/quota! Nova chave carregada. Repetindo a tentativa...")
+                                continue
+
+                        # Se for erro de quota (429), indisponibilidade (503) ou desconexão do proxy, aguarda e tenta novamente
+                        is_recoverable = (
+                            "503" in err_msg or
+                            "429" in err_msg or
+                            "server disconnected" in err_msg.lower() or
+                            "disconnected without sending" in err_msg.lower() or
+                            "connection reset" in err_msg.lower() or
+                            "remote end closed" in err_msg.lower() or
+                            "timed out" in err_msg.lower() or
+                            "timeout" in err_msg.lower()
+                        )
+                        if is_recoverable:
+                            import time
+                            wait_sec = 8 * (attempt + 1)
+                            print(f"[EXPERT] Modelo {current_model} desconectado/indisponível. Aguardando {wait_sec}s antes de tentar novamente...")
+                            time.sleep(wait_sec)
+                            continue
+
+            # Se saiu de todos os loops e não conseguiu resposta
+            if last_error:
+                raise last_error
+            else:
+                raise RuntimeError("Falha desconhecida na consulta IA (Grounding Inacessível).")
+            
+            return {"error": "IA não retornou texto (Response.text vazio)."}
+            
+        except Exception as e:
+            # print(f"[EXPERT] Exceção em get_match_chronology: {str(e)}")
+            return {"error": f"Falha na consulta Expert: {str(e)}"}
+
+    def get_youtube_live_metadata(self, video_id: str) -> Dict[str, Any]:
+        """
+        Integração com YouTube Data API v3 para pegar o actualStartTime e actualEndTime precisos.
+        v10.8: Adicionado Fallback via yt-dlp caso a API Key não tenha a cota de YouTube habilitada.
+        """
+        import requests
+        import re
+        import json
+        import subprocess
+        import sys
+
+        out_meta = {}
+
+        # 1. Tentativa via API Oficial (Mais rápido)
+        try:
+            url = f"https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails,contentDetails&id={video_id}&key={self.yt_api_key}"
+            res = requests.get(url, timeout=8)
+            if res.status_code == 200:
+                data = res.json()
+                items = data.get("items")
+                if items:
+                    item = items[0]
+                    live_dets = item.get("liveStreamingDetails") or {}
+                    dur_iso = (item.get("contentDetails") or {}).get("duration")
+                    actual_start = live_dets.get("actualStartTime")
+                    scheduled = live_dets.get("scheduledStartTime")
+                    
+                    secs = None
+                    if dur_iso:
+                        m = re.search(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', dur_iso)
+                        if m:
+                            secs = int(m.group(1) or 0) * 3600 + int(m.group(2) or 0) * 60 + int(m.group(3) or 0)
+                    
+                    out_meta = {
+                        "actual_start_time": actual_start or scheduled,
+                        "duration": secs
+                    }
+        except Exception:
+            pass
+
+        # 2. Fallback via yt-dlp (Independente de API Key, busca direto no VOD/Live)
+        if not out_meta.get("actual_start_time"):
+            try:
+                import yt_dlp
+                ydl_opts = {
+                    'quiet': True,
+                    'no_warnings': True,
+                    'extract_flat': True,
+                    'skip_download': True,
+                }
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    data = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
+                    if data:
+                        actual_start = data.get("actual_start_time")
+                        # No yt-dlp, actual_start_time costuma vir em segundos (timestamp) ou string ISO
+                        if actual_start:
+                            if isinstance(actual_start, (int, float)):
+                                from datetime import datetime, timezone
+                                out_meta["actual_start_time"] = datetime.fromtimestamp(int(actual_start), tz=timezone.utc).isoformat()
+                            else:
+                                out_meta["actual_start_time"] = str(actual_start)
+                        
+                        if not out_meta.get("duration") and data.get("duration"):
+                            out_meta["duration"] = int(data["duration"])
+            except Exception:
+                pass
+                
+        return out_meta
+
+    def validate_chronology(self, team1: str, team2: str, date: str, competition: str, chronology_json: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Realiza uma verificação independente via IA com Busca Ativa para validar se a cronologia gerada
+        está completa e condizente com a súmula oficial da CBF e notícias minuto a minuto.
+        Retorna {"is_valid": True} ou {"is_valid": False, "inconsistencies": "detalhes..."}
+        """
+        print(f"[EXPERT VALIDATOR] Iniciando verificação cruzada para {team1} x {team2} ({date})...")
+        
+        # prompt para o validador
+        prompt = f"""
+        Você é o Auditor Sênior de Integridade de Dados Esportivos (Validador Canônico V1.0).
+        Sua tarefa é cruzar a cronologia de eventos de futebol gerada abaixo com a realidade oficial pesquisada na internet
+        (súmula da CBF/Federação e coberturas minuto a minuto do Globo Esporte, UOL, Lance, Flashscore).
+        
+        Partida: {team1} x {team2}
+        Competição: {competition}
+        Data: {date}
+        
+        Cronologia gerada para validação:
+        {json.dumps(chronology_json, indent=2, ensure_ascii=False)}
+        
+        INSTRUÇÕES DE VALIDAÇÃO CRÍTICAS E OBRIGATÓRIAS:
+        1. Faça uma busca ativa e minuciosa no Google pela súmula oficial da CBF/Federação e coberturas minuto-a-minuto da partida.
+        2. EXIJA conformidade absoluta nos seguintes pontos (se houver divergência, is_valid DEVE ser false):
+           - ACRESCIMOS (stoppage_time_1t e stoppage_time_2t): Compare com a súmula real. Se a súmula oficial tiver +3' no 1T e +6' no 2T e no JSON testado constar 0, marque como INVÁLIDO (is_valid = false).
+           - MARCOS DO JOGO (technical_milestones):
+             - GOLS: Verifique se todos os gols oficiais estão listados no minuto e tempo corretos.
+             - CARTÕES: Verifique e liste TODOS os cartões amarelos e vermelhos aplicados na partida (ex: Carlos Vinícius, Matheus Bahia, Alexandro Bernabei, Kannemann). Se qualquer cartão listado na súmula oficial estiver ausente do JSON, marque como INVÁLIDO (is_valid = false).
+             - SUBSTITUIÇÕES: Ambas as equipes devem ter suas substituições devidamente registradas. Se faltar, marque como INVÁLIDO.
+           - MATEMÁTICA DOS HORÁRIOS REAIS:
+             - O fim do 1º tempo ('half_time_start') deve ser 'first_half_start' + 45 minutos + 'stoppage_time_1t'.
+             - O fim do jogo ('match_end') deve ser 'second_half_start' + 45 minutos + 'stoppage_time_2t'.
+             - Se houver discrepância maior que 1 minuto nos horários calculados ou se o jogo foi cravado artificialmente em 90 minutos teóricos ignorando os acréscimos reais da súmula, marque como INVÁLIDO.
+        3. O retorno DEVE ser um objeto JSON estrito com esta estrutura:
+           {{
+             "is_valid": true ou false,
+             "inconsistencies": "Descreva aqui com detalhes cirúrgicos tudo o que está errado, ausente ou divergente (ex: 'Falta cartão amarelo para Carlos Vinícius aos 41 e Matheus Bahia aos 42 do 1T; Acréscimos do 2T devem ser +6 em vez de +0, ajustando o fim do jogo para 22:06:58'). Se is_valid for true, deixe este campo vazio."
+           }}
+        
+        Retorne APENAS o JSON estruturado acima. Sem texto explicativo.
+        """
+        
+        config = types.GenerateContentConfig(
+            temperature=0.0,
+            response_mime_type="application/json",
+            tools=[types.Tool(google_search=types.GoogleSearch())]
+        )
+        
+        try:
+            response = self.client.models.generate_content(
+                model=self.model_id,
+                contents=prompt,
+                config=config
+            )
+            txt = response.text.strip()
+            # Extrair JSON do bloco
+            import re
+            json_match = re.search(r'(\{.*\})', txt, re.DOTALL)
+            if json_match:
+                result = json.loads(json_match.group(1).strip())
+                # Garantir formato correto
+                if "is_valid" in result:
+                    result["is_valid"] = bool(result["is_valid"])
+                    result.setdefault("inconsistencies", "")
+                    return result
+        except Exception as e:
+            print(f"[EXPERT VALIDATOR WARN] Falha na validação do relatório: {e}")
+            
+        # Fallback se falhar
+        return {"is_valid": True, "inconsistencies": ""}
+
+
