@@ -1,0 +1,5 @@
+{
+  "version": "1.6.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.6.1/Monitor_Esportes.exe",
+  "changelog": "Versão 1.6.1: Integração e ativação do Auto-Updater na GUI com exibição da versão, além de download automático de súmulas PDF da CBF integrado no pipeline de auditoria via busca automática pelo Gemini."
+}
