@@ -1,0 +1,5 @@
+{
+  "version": "1.5.3",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.5.3/Monitor_Esportes.exe",
+  "changelog": "Versão 1.5.3: Loop auto-corretivo de auditoria integrado: realiza validação cruzada pós-geração com a súmula oficial e portais; se houver discrepâncias de eventos/acréscimos, corrige e gera novamente automaticamente."
+}
