@@ -1,0 +1,5 @@
+{
+  "version": "1.4.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.4.1/Monitor_Esportes.exe",
+  "changelog": "Versão 1.4.1: Correção estrita de layout (Dados da Partida no Topo apenas no modo Expert; Busca de Canais do YouTube fixa no rodapé em todos os modos)."
+}
