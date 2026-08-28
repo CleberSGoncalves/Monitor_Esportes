@@ -1,0 +1,95 @@
+{
+  "expert_results": [
+    {
+      "match_id": "Cruzeiro_Mirassol_09/08/2026",
+      "date": "09/08/2026",
+      "match_display": "Cruzeiro x Mirassol",
+      "competition": "Campeonato Brasileiro",
+      "confidence_score": 0.95,
+      "pre_game_start": "10:30:00",
+      "match_start": "11:00:00",
+      "first_half_start": "11:00:00",
+      "half_time_start": "11:47:00",
+      "half_time_end": "12:02:00",
+      "second_half_start": "12:02:00",
+      "match_end": "12:54:00",
+      "post_game_end": "13:04:00",
+      "stoppage_time_1t": 2,
+      "stoppage_time_2t": 7,
+      "technical_milestones": [
+        {
+          "time": "11:11:00",
+          "minute": 11,
+          "event": "GOL de João Marcelo (Cruzeiro).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "11:25:00",
+          "minute": 25,
+          "event": "Cartão amarelo para Gerson (Cruzeiro).",
+          "type": "Cartão Amarelo",
+          "confidence": 0.9
+        },
+        {
+          "time": "11:26:00",
+          "minute": 26,
+          "event": "GOL de Reinaldo (Mirassol) de pênalti.",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "11:47:00",
+          "minute": 47,
+          "event": "Cartão amarelo para Kaique Kenji (Cruzeiro).",
+          "type": "Cartão Amarelo",
+          "confidence": 0.9
+        },
+        {
+          "time": "12:24:00",
+          "minute": 67,
+          "event": "Cartão amarelo para Elias (Mirassol).",
+          "type": "Cartão Amarelo",
+          "confidence": 0.9
+        },
+        {
+          "time": "12:32:00",
+          "minute": 75,
+          "event": "GOL de Kaio Jorge (Cruzeiro).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "12:40:00",
+          "minute": 83,
+          "event": "GOL de Wesley (Cruzeiro).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "12:40:00",
+          "minute": 83,
+          "event": "Cartão amarelo para Wesley (Cruzeiro) por comemoração.",
+          "type": "Cartão Amarelo",
+          "confidence": 0.9
+        },
+        {
+          "time": "12:51:00",
+          "minute": 94,
+          "event": "Cartão amarelo para Shaylon (Mirassol).",
+          "type": "Cartão Amarelo",
+          "confidence": 0.9
+        }
+      ],
+      "transcript_events": [],
+      "sources": [
+        {
+          "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEXR_TPyAEiHHCdhDvhrxgmrtzHZmihVpfLVy3zk3O9mhRd6LOWHy-kMKD7PCoifAq2KHjrPkKFryr1S-hgxAD8rQsRChRsbMPzcciGkJK26i1mB65nM74OLXVR2b_DeF3ZXkKbL0oHWSAx4eaoxD1jPEc0umMOCn5Lq4NFkb6hIEsoIYuOrZV0ogVUyO9FO3R11Kk8wtiMX9gsowJM0UZIxmBbJ0RIPk3rRVIE",
+          "title": "Google Search Evidence"
+        }
+      ],
+      "platform": "CazéTV"
+    }
+  ],
+  "generated_at": "2026-08-13T14:42:07.792091"
+}

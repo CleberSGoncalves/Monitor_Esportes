@@ -1,0 +1,5 @@
+{
+  "version": "1.5.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.5.1/Monitor_Esportes.exe",
+  "changelog": "Versão 1.5.1: Corrigido acionamento do botão 'Iniciar Auditoria' e tratada falha de rede/credenciais SMTP para exibir exceções detalhadas nos logs da GUI."
+}
