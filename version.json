@@ -1,0 +1,5 @@
+{
+  "version": "1.3.6",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.3.6/Monitor_Esportes.exe",
+  "changelog": "Versão 1.3.6: Mural CBF no Topo Direito, Datas Futuras Reais (hoje em diante), Limpeza de UI no Modo Expert, Auto-preenchimento corrigido e Deduplicação no Histórico de Momentos."
+}
