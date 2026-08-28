@@ -1,0 +1,5 @@
+{
+  "version": "1.6.0",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.6.0/Monitor_Esportes.exe",
+  "changelog": "Versão 1.6.0: Leitura direta de súmula PDF da CBF (sem Web Search), cláusula anti-invenção de atletas sintéticos no prompt, cálculo matemático rígido de acréscimos e blindagem de cache. Inclui método fetch_sumula_text no CBFScheduleFetcher."
+}
