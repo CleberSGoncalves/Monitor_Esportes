@@ -1,0 +1,5 @@
+{
+  "version": "1.5.4",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.5.4/Monitor_Esportes.exe",
+  "changelog": "Versão 1.5.4: Atualizadas as credenciais SMTP padrão para a nova Senha de App configurada e corrigido o layout da janela de conclusão para evitar corte de botões na parte inferior."
+}
