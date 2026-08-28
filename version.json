@@ -1,0 +1,5 @@
+{
+  "version": "1.3.8",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.3.8/Monitor_Esportes.exe",
+  "changelog": "Versão 1.3.8: Mapeamento Rígido de Legendas CBF (BSA: 5=CazéTV, 4=Amazon | CDB: 3=Amazon), Barra Lateral Ampliada (360px), Form de Auditoria no Topo e Botão de Refresh Live."
+}

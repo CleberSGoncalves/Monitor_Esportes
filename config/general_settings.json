@@ -1,0 +1,19 @@
+{
+  "theme": "Dark",
+  "channel_preset": "CazéTV",
+  "channel_url": "https://www.youtube.com/@CazeTV/streams",
+  "cloud_enabled": true,
+  "cloud_interval_minutes": 2,
+  "banner_ocr_interval_s": 1.0,
+  "selected_categories": [
+    "Todos"
+  ],
+  "auto_prepare": false,
+  "auto_start": false,
+  "debug_mode": true,
+  "email_recipients": "cleber.goncalves@ibope.com;luiz.lemos@ibope.com",
+  "send_report_email": true,
+  "auto_stop_pos_mins": 5,
+  "show_context_boxes": false,
+  "updated_at": "2026-08-13T14:47:43"
+}
