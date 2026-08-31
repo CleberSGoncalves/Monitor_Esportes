@@ -1,0 +1,5 @@
+{
+  "version": "1.7.5",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.7.5/Monitor_Esportes.exe",
+  "changelog": "Versão 1.7.5: Fixação definitiva do formulário de dados da partida no rodapé e letreiro no topo, liberando 100% de altura central."
+}
