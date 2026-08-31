@@ -1,0 +1,5 @@
+{
+  "version": "1.6.2",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.6.2/Monitor_Esportes.exe",
+  "changelog": "Versão 1.6.2: Mural CBF Dinâmico que filtra confrontos passados com base na data do sistema (com limite de tolerância de 3 horas para partidas de hoje) e atualiza corretamente ao clicar no botão 🔄."
+}
