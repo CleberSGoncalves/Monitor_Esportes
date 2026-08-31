@@ -1,0 +1,65 @@
+[
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Vasco da Gama",
+    "team2": "Cruzeiro",
+    "date": "29/08/2026",
+    "time": "21:20",
+    "platform": "CazéTV",
+    "tag": "📺 Transmissão Exclusiva"
+  },
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Mirassol",
+    "team2": "Palmeiras",
+    "date": "30/08/2026",
+    "time": "18:30",
+    "platform": "Amazon Prime",
+    "tag": "⭐ Alta Prioridade"
+  },
+  {
+    "comp": "Copa do Brasil",
+    "team1": "Vitória",
+    "team2": "Vasco da Gama",
+    "date": "02/09/2026",
+    "time": "21:30",
+    "platform": "Amazon Prime",
+    "tag": "🏆 Decisivo"
+  },
+  {
+    "comp": "Copa do Brasil",
+    "team1": "Santos",
+    "team2": "Palmeiras",
+    "date": "02/09/2026",
+    "time": "21:30",
+    "platform": "Amazon Prime",
+    "tag": "🏆 Decisivo"
+  },
+  {
+    "comp": "Copa do Brasil",
+    "team1": "Grêmio",
+    "team2": "Internacional",
+    "date": "03/09/2026",
+    "time": "20:00",
+    "platform": "Amazon Prime",
+    "tag": "🏆 Decisivo"
+  },
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Botafogo",
+    "team2": "Palmeiras",
+    "date": "06/09/2026",
+    "time": "18:30",
+    "platform": "CazéTV",
+    "tag": "📺 Transmissão Exclusiva"
+  },
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Corinthians",
+    "team2": "Chapecoense",
+    "date": "06/09/2026",
+    "time": "19:30",
+    "platform": "Amazon Prime",
+    "tag": "🔥 Clássico"
+  }
+]
