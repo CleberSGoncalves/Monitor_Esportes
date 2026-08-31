@@ -1,0 +1,12 @@
+.venv/
+build/
+dist/
+*.exe
+*.zip
+logs/
+*.log
+scratch/
+config/google_ai.json
+.gemini/
+.idea/
+.vscode/
