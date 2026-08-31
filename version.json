@@ -1,0 +1,5 @@
+{
+  "version": "1.6.5",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.6.5/Monitor_Esportes.exe",
+  "changelog": "Versão 1.6.5: Aba de visualização integrada de relatórios PDF com buscador de termos e leitor interno via PyMuPDF. Fila de auditorias paralelas com semáforo de controle de concorrência máxima de 2 processos simultâneos contra estouros de cota da API Gemini."
+}
