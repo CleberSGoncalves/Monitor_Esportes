@@ -1,0 +1,5 @@
+{
+  "version": "1.6.9",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.6.9/Monitor_Esportes.exe",
+  "changelog": "Versão 1.6.9: Download do auto-updater via requests stream com headers de navegador e bypass SSL para VPNs como GlobalProtect."
+}
