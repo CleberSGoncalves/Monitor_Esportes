@@ -1,0 +1,5 @@
+{
+  "version": "1.6.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.6.7/Monitor_Esportes.exe",
+  "changelog": "Versão 1.6.7: Exposição direta de tracebacks de erro no download do auto-updater nas abas de logs da UI."
+}
