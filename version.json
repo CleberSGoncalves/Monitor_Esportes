@@ -1,0 +1,5 @@
+{
+  "version": "1.7.4",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.7.4/Monitor_Esportes.exe",
+  "changelog": "Versão 1.7.4: Letreiro inteligente com alternância entre Últimos Jogos (Auditoria Imediata) e Próximos Jogos (Agendamento na Fila)."
+}
