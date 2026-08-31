@@ -1,0 +1,5 @@
+{
+  "version": "1.7.0",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.7.0/Monitor_Esportes.exe",
+  "changelog": "Versão 1.7.0: Cliente Google GenAI com headers de navegador e descarte de sockets mortos para bypass definitivo de VPN GlobalProtect."
+}
