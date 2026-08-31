@@ -1,0 +1,5 @@
+{
+  "version": "1.7.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.7.1/Monitor_Esportes.exe",
+  "changelog": "Versão 1.7.1: Persistência híbrida global no AppData e auto-preenchimento automático da grade de jogos para novas instalações."
+}
