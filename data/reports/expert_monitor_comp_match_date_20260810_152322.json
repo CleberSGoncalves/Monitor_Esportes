@@ -1,0 +1,8 @@
+{
+  "expert_results": [
+    {
+      "error": "Falha na consulta Expert: JSON Syntax Error (IA): Expecting ',' delimiter: line 217 column 10 (char 8498) | Início: {\n    \"match_id\": \"CORITIBA_CHAPECOENSE_08/08/2026\",\n    \"date\": \"08/08/2026\",\n    \"match_display\": \"CORITIBA x CHAPECOENSE\",\n    \"competition\": \"Bras"
+    }
+  ],
+  "generated_at": "2026-08-10T15:23:22.103002"
+}
