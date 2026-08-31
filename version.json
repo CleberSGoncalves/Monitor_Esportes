@@ -1,0 +1,5 @@
+{
+  "version": "1.6.4",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.6.4/Monitor_Esportes.exe",
+  "changelog": "Versão 1.6.4: Auto-Updater posicionado no cabeçalho superior direito da tela principal com a indicação da versão vigente e botão de checagem manual que emite alertas visuais caso o software esteja desatualizado."
+}
