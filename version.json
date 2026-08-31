@@ -1,0 +1,5 @@
+{
+  "version": "1.6.8",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.6.8/Monitor_Esportes.exe",
+  "changelog": "Versão 1.6.8: Indicador de pulso LIVE e relógio em tempo real no cabeçalho da fila de agendamentos com animação de spinners de processamento."
+}
