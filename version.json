@@ -1,0 +1,5 @@
+{
+  "version": "1.6.6",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.6.6/Monitor_Esportes.exe",
+  "changelog": "Versão 1.6.6: Otimização da fila vazia de agendamentos impedindo o painel preto de inicialização e garantindo a label informativa em tempo real."
+}

@@ -1,0 +1,95 @@
+{
+  "expert_results": [
+    {
+      "match_id": "Palmeiras_Santos_26/08/2026",
+      "date": "26/08/2026",
+      "match_display": "Palmeiras x Santos",
+      "competition": "Copa do Brasil",
+      "confidence_score": 0.99,
+      "pre_game_start": "21:25:00",
+      "match_start": "21:30:00",
+      "first_half_start": "21:30:00",
+      "half_time_start": "22:31:00",
+      "half_time_end": "22:52:00",
+      "second_half_start": "22:52:00",
+      "match_end": "23:41:00",
+      "post_game_end": "23:46:00",
+      "stoppage_time_1t": 16,
+      "stoppage_time_2t": 4,
+      "technical_milestones": [
+        {
+          "time": "21:30:00",
+          "minute": 0,
+          "event": "Início do 1º Tempo.",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:03:00",
+          "minute": 33,
+          "event": "GOL de J. López (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:14:00",
+          "minute": 44,
+          "event": "GOL de Andreas Pereira (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:15:00",
+          "minute": 45,
+          "event": "Fim do 1º Tempo.",
+          "type": "Fim de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:15:00",
+          "minute": 45,
+          "event": "Início do 2º Tempo.",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "23:07:00",
+          "minute": 60,
+          "event": "GOL de J. López (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "23:37:00",
+          "minute": 90,
+          "event": "Cartão Amarelo para A. Barboza (Santos).",
+          "type": "Cartão Amarelo",
+          "confidence": 0.95
+        },
+        {
+          "time": "23:37:00",
+          "minute": 90,
+          "event": "Fim de Jogo.",
+          "type": "Fim de Jogo",
+          "confidence": 0.99
+        }
+      ],
+      "transcript_events": [],
+      "sources": [
+        {
+          "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFWckKc5LU70Luj-oS4kEmsRuz8GOpy75gYb4-ccZ0lfYiQuyUlOFA251tKLOOpe0BhfNBsi5HdVhxHalXOwfqrIQvUAK4ZA4kJY-N-vnJdxY45fY6iHBfA33N731EPbT1QWmT8nICgcxqIXEaJxCvfafncxq8wEq29Ibd1MOR2S_EoBST8c0yBdGpAwjBlQL8H2VFocw==",
+          "title": "lance.com.br"
+        },
+        {
+          "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGQc3jb7pTnflhCbDcc7m--iw7U5ePkLSa5RlArbZKOSjzcRuSyedVVErcuNqSzifMPh9kGH6uDKrNgh-_wS3jJnHNDJilEdj0xOyLGsVPgw2wFX-VnlpDpWak3xzmEk7oOEDkMKWs-2yo9fvpNovAVdRld2eVE5vXOYtlQGiE86e_olfBM78iKLQ==",
+          "title": "abril.com.br"
+        },
+        {
+          "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEqIySMWnsBNFL44rUOTvH4TZrK1GsaSsP0J4NTWf3rhffOO4oJzV82qazYsgcZAKGAOXxHaoE0YW07OfANZeu-umVL-HHLB7gIpxca5EuuBrQvj2y0gpxsW2F8Lld_Wi8PvijccQJ-BlqEJ47c02UosDZxgQRnNv8B_kzpe2FHa3vya_CpDfRl4162zlrBtmsBFdY99Tr68m7i4pBo5g8ePToQGHN00YriOVETbH0MVZoAuFWNteFhkL0LvedOfhs9JEApY1AL",
+          "title": "Google Search Evidence"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-08-27T14:57:56.611926"
+}
