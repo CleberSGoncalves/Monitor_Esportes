@@ -8620,12 +8620,8 @@ class LoginWindow(ctk.CTk):
 
 
 def main() -> None:
-    login = LoginWindow()
-    login.mainloop()
-    
-    if getattr(login, "authenticated", False):
-        app = MonitorApp()
-        app.mainloop()
+    app = MonitorApp()
+    app.mainloop()
 
 
 if __name__ == "__main__":
