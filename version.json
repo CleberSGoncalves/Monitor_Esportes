@@ -1,5 +1,5 @@
 {
-  "version": "1.9.1",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.1/Monitor_Esportes.exe",
-  "changelog": "Versão 1.9.1: Expansão do limite max_output_tokens (16k) e tratamento resiliente de respostas extensas do Gemini."
+  "version": "1.9.2",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.2/Monitor_Esportes.exe",
+  "changelog": "Versão 1.9.2: Compensação do fuso horário de Brasília (UTC-3) no SharePoint e 16k tokens no Gemini."
 }

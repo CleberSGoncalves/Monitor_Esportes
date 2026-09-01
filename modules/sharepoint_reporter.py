@@ -106,43 +106,68 @@ class SharePointReporter:
         """
         Converte uma data de evento (ex: '26/08/2026', '2026-08-26' ou '26 de agosto de 2026')
         e horário (ex: '21:30') em formato ISO 8601 UTC para a coluna Data_Hora do SharePoint.
+        Ajusta a data/horário local de Brasília (UTC-3) para UTC (+3h) para que o SharePoint
+        exiba exatamente a data e hora corretas sem recuar o dia!
         """
         if not date_str or not str(date_str).strip():
             return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         raw_str = f"{str(date_str).strip()} {str(time_str or '').strip()}".strip()
+        has_time = bool(time_str and ":" in str(time_str))
         
         formats = [
-            "%d/%m/%Y %H:%M", "%d/%m/%Y %H:%M:%S", "%d/%m/%Y",
-            "%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d",
+            "%d/%m/%Y %H:%M", "%d/%m/%Y %H:%M:%S",
+            "%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S",
             "%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S"
         ]
+        date_only_formats = ["%d/%m/%Y", "%Y-%m-%d"]
+        
+        dt = None
         for fmt in formats:
             try:
                 dt = datetime.strptime(raw_str, fmt)
-                return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+                break
             except Exception:
                 pass
-        
+                
+        if not dt:
+            for fmt in date_only_formats:
+                try:
+                    dt_d = datetime.strptime(str(date_str).strip(), fmt)
+                    dt = datetime(dt_d.year, dt_d.month, dt_d.day, 15, 0, 0)
+                    has_time = True
+                    break
+                except Exception:
+                    pass
+
         # Parse textual ex: "26 de agosto de 2026"
-        m_txt = re.search(r'(\d{1,2})\s+de\s+(\w+)\s+de\s+(\d{4})', str(date_str))
-        if m_txt:
-            day, month_name, year = m_txt.groups()
-            months = {
-                "janeiro": 1, "fevereiro": 2, "março": 3, "marco": 3, "abril": 4,
-                "maio": 5, "junho": 6, "julho": 7, "agosto": 8, "setembro": 9,
-                "outubro": 10, "novembro": 11, "dezembro": 12
-            }
-            m_num = months.get(month_name.lower(), 1)
-            t_str = time_str or "20:00"
-            try:
-                t_parts = t_str.split(":")
-                hh, mm = int(t_parts[0]), int(t_parts[1])
-            except Exception:
-                hh, mm = 20, 0
-            dt = datetime(int(year), m_num, int(day), hh, mm)
+        if not dt:
+            m_txt = re.search(r'(\d{1,2})\s+de\s+(\w+)\s+de\s+(\d{4})', str(date_str))
+            if m_txt:
+                day, month_name, year = m_txt.groups()
+                months = {
+                    "janeiro": 1, "fevereiro": 2, "março": 3, "marco": 3, "abril": 4,
+                    "maio": 5, "junho": 6, "julho": 7, "agosto": 8, "setembro": 9,
+                    "outubro": 10, "novembro": 11, "dezembro": 12
+                }
+                m_num = months.get(month_name.lower(), 1)
+                t_str = time_str or "15:00"
+                try:
+                    t_parts = t_str.split(":")
+                    hh, mm = int(t_parts[0]), int(t_parts[1])
+                except Exception:
+                    hh, mm = 15, 0
+                dt = datetime(int(year), m_num, int(day), hh, mm)
+
+        if dt:
+            # Compensar o fuso horário de Brasília (UTC-3 -> UTC +3h)
+            # Se for data sem horário (00:00), usa 15:00 UTC (12:00 BRT) para não mudar o dia
+            if not has_time and dt.hour == 0 and dt.minute == 0:
+                dt = dt.replace(hour=15, minute=0, second=0)
+            else:
+                dt = dt + timedelta(hours=3)
             return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-            
+
         return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     @classmethod
