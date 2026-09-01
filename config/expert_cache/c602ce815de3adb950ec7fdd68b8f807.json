@@ -1,0 +1,177 @@
+{
+  "match_id": "Palmeiras_Santos_26/08/2026",
+  "date": "26/08/2026",
+  "match_display": "Palmeiras x Santos",
+  "competition": "Copa do Brasil",
+  "confidence_score": 0.99,
+  "pre_game_start": "21:25:00",
+  "match_start": "21:30:00",
+  "first_half_start": "21:30:00",
+  "half_time_start": "22:16:00",
+  "half_time_end": "22:37:00",
+  "second_half_start": "22:37:00",
+  "match_end": "23:26:00",
+  "post_game_end": "23:31:00",
+  "stoppage_time_1t": 1,
+  "stoppage_time_2t": 4,
+  "technical_milestones": [
+    {
+      "time": "21:30:00",
+      "minute": 0,
+      "event": "Início do 1º Tempo",
+      "type": "Início de Tempo",
+      "confidence": 0.99
+    },
+    {
+      "time": "21:50:00",
+      "minute": 20,
+      "event": "Cartão Amarelo para G. Caballero (Santos)",
+      "type": "Cartão Amarelo",
+      "confidence": 0.95
+    },
+    {
+      "time": "22:03:00",
+      "minute": 33,
+      "event": "GOL de J. López (Palmeiras)",
+      "type": "Gol",
+      "confidence": 0.99
+    },
+    {
+      "time": "22:14:00",
+      "minute": 44,
+      "event": "GOL de Andreas Pereira (Palmeiras)",
+      "type": "Gol",
+      "confidence": 0.99
+    },
+    {
+      "time": "22:15:00",
+      "minute": 45,
+      "event": "Substituição Palmeiras: Sai Gustavo Gómez, Entra Alexander Barboza",
+      "type": "Substituição",
+      "confidence": 0.95
+    },
+    {
+      "time": "22:15:00",
+      "minute": 45,
+      "event": "Substituição Santos: Sai Benjamín Rollheiser, Entra Rony",
+      "type": "Substituição",
+      "confidence": 0.95
+    },
+    {
+      "time": "22:15:00",
+      "minute": 45,
+      "event": "Substituição Santos: Sai João Schmidt, Entra Gabriel Bontempo",
+      "type": "Substituição",
+      "confidence": 0.95
+    },
+    {
+      "time": "22:15:00",
+      "minute": 45,
+      "event": "Substituição Santos: Sai Gustavo Caballero, Entra Gabriel Barbosa (Gabigol)",
+      "type": "Substituição",
+      "confidence": 0.95
+    },
+    {
+      "time": "22:15:00",
+      "minute": 45,
+      "event": "Fim do 1º Tempo",
+      "type": "Fim de Tempo",
+      "confidence": 0.99
+    },
+    {
+      "time": "22:15:00",
+      "minute": 45,
+      "event": "Início do 2º Tempo",
+      "type": "Início de Tempo",
+      "confidence": 0.99
+    },
+    {
+      "time": "22:52:00",
+      "minute": 60,
+      "event": "GOL de J. López (Palmeiras)",
+      "type": "Gol",
+      "confidence": 0.99
+    },
+    {
+      "time": "22:57:00",
+      "minute": 65,
+      "event": "Substituição Santos: Sai Igor Vinícius, Entra Davizinho",
+      "type": "Substituição",
+      "confidence": 0.95
+    },
+    {
+      "time": "23:00:00",
+      "minute": 68,
+      "event": "Substituição Santos: Sai Lucas Veríssimo, Entra Christian Oliva",
+      "type": "Substituição",
+      "confidence": 0.95
+    },
+    {
+      "time": "23:06:00",
+      "minute": 74,
+      "event": "Substituição Palmeiras: Sai Vitor Roque, Entra Heittor",
+      "type": "Substituição",
+      "confidence": 0.95
+    },
+    {
+      "time": "23:08:00",
+      "minute": 76,
+      "event": "Cartão Amarelo para Andreas Pereira (Palmeiras)",
+      "type": "Cartão Amarelo",
+      "confidence": 0.95
+    },
+    {
+      "time": "23:10:00",
+      "minute": 78,
+      "event": "Cartão Amarelo para Rony (Santos)",
+      "type": "Cartão Amarelo",
+      "confidence": 0.95
+    },
+    {
+      "time": "23:14:00",
+      "minute": 82,
+      "event": "Substituição Palmeiras: Sai Marlon Freitas, Entra Lucas Evangelista",
+      "type": "Substituição",
+      "confidence": 0.95
+    },
+    {
+      "time": "23:14:00",
+      "minute": 82,
+      "event": "Substituição Palmeiras: Sai José Manuel López, Entra E. Martínez",
+      "type": "Substituição",
+      "confidence": 0.95
+    },
+    {
+      "time": "23:17:00",
+      "minute": 85,
+      "event": "Substituição Palmeiras: Sai Jhon Arias, Entra Felipe Anderson",
+      "type": "Substituição",
+      "confidence": 0.95
+    },
+    {
+      "time": "23:22:00",
+      "minute": 90,
+      "event": "Cartão Amarelo para Alexander Barboza (Palmeiras)",
+      "type": "Cartão Amarelo",
+      "confidence": 0.95
+    },
+    {
+      "time": "23:22:00",
+      "minute": 90,
+      "event": "Fim de Jogo",
+      "type": "Fim de Jogo",
+      "confidence": 0.99
+    }
+  ],
+  "transcript_events": [],
+  "sources": [
+    {
+      "uri": "https://www.cbf.com.br/futebol-brasileiro/jogos?q=Palmeiras+Santos",
+      "title": "Súmula Eletrônica Oficial - Confederação Brasileira de Futebol (cbf.com.br)"
+    },
+    {
+      "uri": "https://ge.globo.com/busca/?q=Sumula+Palmeiras+Santos+26/08/2026",
+      "title": "Cobertura Minuto a Minuto - Globo Esporte (ge.globo.com)"
+    }
+  ]
+}

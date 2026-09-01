@@ -1,0 +1,108 @@
+{
+  "expert_results": [
+    {
+      "match_id": "Palmeiras_Santos_26/08/2026",
+      "date": "26/08/2026",
+      "match_display": "Palmeiras x Santos",
+      "competition": "Copa do Brasil",
+      "confidence_score": 0.99,
+      "pre_game_start": "21:25:00",
+      "match_start": "21:30:00",
+      "first_half_start": "21:30:00",
+      "half_time_start": "22:17:00",
+      "half_time_end": "22:38:00",
+      "second_half_start": "22:38:00",
+      "match_end": "23:27:00",
+      "post_game_end": "23:32:00",
+      "stoppage_time_1t": 2,
+      "stoppage_time_2t": 4,
+      "technical_milestones": [
+        {
+          "time": "21:30:00",
+          "minute": 0,
+          "event": "Início do 1º Tempo",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "21:50:00",
+          "minute": 20,
+          "event": "Cartão Amarelo para Gustavo Caballero (Santos)",
+          "type": "Cartão Amarelo",
+          "confidence": 0.95
+        },
+        {
+          "time": "22:03:00",
+          "minute": 33,
+          "event": "GOL de José Manuel López (Palmeiras)",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:14:00",
+          "minute": 44,
+          "event": "GOL de Andreas Pereira (Palmeiras)",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:15:00",
+          "minute": 45,
+          "event": "Fim do 1º Tempo",
+          "type": "Fim de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:15:00",
+          "minute": 45,
+          "event": "Início do 2º Tempo",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:53:00",
+          "minute": 60,
+          "event": "GOL de José Manuel López (Palmeiras)",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "23:10:00",
+          "minute": 77,
+          "event": "Cartão Amarelo para Andreas Pereira (Palmeiras)",
+          "type": "Cartão Amarelo",
+          "confidence": 0.95
+        },
+        {
+          "time": "23:12:00",
+          "minute": 79,
+          "event": "Cartão Amarelo para Rony (Santos)",
+          "type": "Cartão Amarelo",
+          "confidence": 0.95
+        },
+        {
+          "time": "23:23:00",
+          "minute": 90,
+          "event": "Cartão Amarelo para Alexander Barboza (Palmeiras)",
+          "type": "Cartão Amarelo",
+          "confidence": 0.95
+        },
+        {
+          "time": "23:23:00",
+          "minute": 90,
+          "event": "Fim de Jogo",
+          "type": "Fim de Jogo",
+          "confidence": 0.99
+        }
+      ],
+      "transcript_events": [],
+      "sources": [
+        {
+          "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFXt8riFg16k3r_EIrrNyqhVZZJ_FBDQE8MzyBZMH1RoGSqYbUwfc9dspUwzwbCm6fmHzi0ph70wvTQSTwwm5r2n049nudD2l_aaFzi4ThE4oDrz1JIZHBNlVDq9B8bhLi8OjDhPhE5vI0JUPxW3g4hR2bqhxjRIpzovoqkuEpmTMQ5174oGci_saKg1-ZYlo5mmXsX8jAx4OZsaQgsiSuvsjGDSVxhpXTiCIqbkXPU4ft31rym-eBQiE-64tflknDG-6MHYVDAM6HTaVd-aRjV",
+          "title": "Google Search Evidence"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-08-27T15:09:12.547238"
+}
