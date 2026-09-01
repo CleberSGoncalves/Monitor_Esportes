@@ -1,5 +1,5 @@
 {
-  "version": "1.9.3",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.3/Monitor_Esportes.exe",
-  "changelog": "Versão 1.9.3: Correção de importação de timedelta e ajuste retroativo de datas de Vasco e Cruzeiro no SharePoint."
+  "version": "1.9.4",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.4/Monitor_Esportes.exe",
+  "changelog": "Versão 1.9.4: Auto-relançamento à prova de falhas com substituição por renomeação e suporte a diretório ativo (/D)."
 }

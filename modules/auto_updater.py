@@ -10,7 +10,7 @@ import time
 import urllib.request
 import subprocess
 
-CURRENT_VERSION = "1.9.3"
+CURRENT_VERSION = "1.9.4"
 
 class AutoUpdater:
     def __init__(self, version_url: str = "https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/version.json"):
@@ -91,24 +91,33 @@ class AutoUpdater:
                                 mb = downloaded / (1024 * 1024)
                                 progress_callback(f"{mb:.1f} MB")
 
-            # Criar script batch com retry loop, fechamento do PID anterior e execução da nova versão
+            # Criar script batch com renomeação garantida e relançamento em seu diretório de trabalho (/D)
             pid = os.getpid()
+            old_exe_path = os.path.join(exe_dir, "Monitor_Esportes_old.exe")
+            old_exe_name = os.path.basename(old_exe_path)
+            
             bat_content = f"""@echo off
 setlocal
 chcp 65001 > NUL
 
-:: Aguarda o processo anterior fechar e realiza a troca do arquivo
-for /L %%i in (1,1,15) do (
-    taskkill /F /PID {pid} > NUL 2>&1
-    move /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
-    if not exist "{new_exe_path}" (
-        goto Launch
-    )
-    timeout /t 1 /nobreak > NUL
+timeout /t 1 /nobreak > NUL
+taskkill /F /PID {pid} > NUL 2>&1
+
+if exist "{exe_path}" (
+    del /f /q "{old_exe_path}" > NUL 2>&1
+    ren "{exe_path}" "{old_exe_name}" > NUL 2>&1
 )
 
-:Launch
-start "" "{exe_path}"
+if exist "{new_exe_path}" (
+    move /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
+)
+
+if exist "{exe_path}" (
+    start "" /D "{exe_dir}" "{exe_path}"
+)
+
+timeout /t 2 /nobreak > NUL
+del /f /q "{old_exe_path}" > NUL 2>&1
 (goto) 2>nul & del "%~f0"
 """
             with open(bat_path, "w", encoding="utf-8") as f:
@@ -123,7 +132,7 @@ start "" "{exe_path}"
                 close_fds=True
             )
             
-            # Encerramento imediato para liberar handle do arquivo sem travas
+            # Encerramento imediato para liberar o processo anterior
             os._exit(0)
             return True
         except Exception as e:
