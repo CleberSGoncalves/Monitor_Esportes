@@ -1,0 +1,5 @@
+{
+  "version": "1.8.3",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.8.3/Monitor_Esportes.exe",
+  "changelog": "Versão 1.8.3: Hotfix do Auto-Updater (correção do escopo da variável local 'os' ao baixar atualizações)."
+}

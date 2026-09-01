@@ -1,0 +1,9 @@
+{
+  "profile": "cazetv",
+  "updated_at": "2026-08-13T14:47:43",
+  "roi_enabled": {
+    "top_hud_unificado": false,
+    "banner": true,
+    "countdown_center": false
+  }
+}

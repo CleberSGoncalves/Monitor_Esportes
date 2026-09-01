@@ -1,0 +1,180 @@
+{
+  "expert_results": [
+    {
+      "match_id": "CORITIBA 2_1 CHAPECOENSE_09/08/2026",
+      "date": "09/08/2026",
+      "match_display": "CORITIBA 2 x 1 CHAPECOENSE",
+      "competition": "Brasileirão",
+      "confidence_score": 0.99,
+      "pre_game_start": "20:30:00",
+      "match_start": "20:30:00",
+      "first_half_start": "20:30:00",
+      "half_time_start": "21:18:00",
+      "half_time_end": "21:36:00",
+      "second_half_start": "21:36:00",
+      "match_end": "22:25:00",
+      "post_game_end": "22:25:00",
+      "stoppage_time_1t": 3,
+      "stoppage_time_2t": 4,
+      "technical_milestones": [
+        {
+          "time": "20:30:00",
+          "minute": 0,
+          "event": "Início do 1º tempo.",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "21:00:00",
+          "minute": 30,
+          "event": "GOL de Tiago Cóser (Coritiba).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "21:13:00",
+          "minute": 43,
+          "event": "Gol anulado de Jaci (Coritiba).",
+          "type": "Gol Anulado",
+          "confidence": 0.99
+        },
+        {
+          "time": "21:18:00",
+          "minute": 45,
+          "event": "Fim do 1º tempo.",
+          "type": "Fim de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "21:36:00",
+          "minute": 45,
+          "event": "Início do 2º tempo.",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:13:00",
+          "minute": 82,
+          "event": "GOL de Pedro Rocha (Coritiba).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:25:00",
+          "minute": 94,
+          "event": "GOL de Kevin Ramirez (Chapecoense).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:25:00",
+          "minute": 94,
+          "event": "Fim da partida.",
+          "type": "Fim de Partida",
+          "confidence": 0.99
+        }
+      ],
+      "transcript_events": [
+        {
+          "video_time": "00:00",
+          "real_time": "20:30:00",
+          "narration": "autoriza o árbitro. Tá valendo. Tá rolando a bola na tela da CASE TV. Rodada 22 do Brasileirão da Série A. Coritiba e Chapecoense. Já a bola jogada para dentro da área.",
+          "analysis": "Cálculo: match_start (20:30:00) + 0 minutos (início do 1T)."
+        },
+        {
+          "video_time": "00:45",
+          "real_time": "21:00:00",
+          "narration": "Veio o cruzamento agora do lado esquerdo. Ó como o Sebas Gomes consegue evitar a saída e fazer o cruzamento. O desvio. Aí o levantamento para dentro da área. Desvio de cabeça. Cer [aplausos] gol é do",
+          "analysis": "Cálculo: match_start (20:30:00) + 30 minutos (minuto narrado do 1T)."
+        },
+        {
+          "video_time": "01:15",
+          "real_time": "21:00:00",
+          "narration": "30 minutos, primeiro tempo de jogo no CTO Pereira. Na cobrança de escanteio, ele subiu e subiu muito. Já tinha levado perigo em uma oportunidade no jogo. Dessa vez a",
+          "analysis": "Cálculo: match_start (20:30:00) + 30 minutos (minuto narrado do 1T)."
+        },
+        {
+          "video_time": "01:45",
+          "real_time": "21:13:00",
+          "narration": "segunda trave. A sobra ainda vai ser do Coritiba. Deu opção ali mais atrás o Tinga. Veio o levantamento. Já [aplausos] gol é do Coxa.",
+          "analysis": "Cálculo: match_start (20:30:00) + 43 minutos (minuto narrado do 1T)."
+        },
+        {
+          "video_time": "02:00",
+          "real_time": "21:13:00",
+          "narration": "43 minutos, primeiro tempo de jogo no CTO Pereira. Eu acho que o Jaci acabou pulando, não sei, numa bala, num buraco que tem ali atrás da placa de publicidade, >> rapaz. E tudo isso, a posição, eu falava",
+          "analysis": "Cálculo: match_start (20:30:00) + 43 minutos (minuto narrado do 1T)."
+        },
+        {
+          "video_time": "02:30",
+          "real_time": "21:13:00",
+          "narration": "era justa e era irregular do Jaci. Está anulado o gol do Coritiba. O risco dele se machucar feio ali era enorme. Olha a pressão do Coritiba. A roubada de bola do Thiago Santos. Sai enfiada para",
+          "analysis": "Cálculo: match_start (20:30:00) + 43 minutos (minuto narrado do 1T)."
+        },
+        {
+          "video_time": "03:30",
+          "real_time": "21:41:00",
+          "narration": "hora de firmar o pé direito. Quase 8 minutos. Bropes para dentro da área, faz o passe, Lavega de primeira, defendeu o goleiro em dois tempos o Anderson.",
+          "analysis": "Cálculo: second_half_start (21:36:00) + 5 minutos (estimativa para 5' do 2T)."
+        },
+        {
+          "video_time": "04:00",
+          "real_time": "21:51:00",
+          "narration": "a batida na trave. Vai chegando ao 20º jogo sem vitória. A Chapecoense tenta evitar agora para dentro da área",
+          "analysis": "Cálculo: second_half_start (21:36:00) + 15 minutos (estimativa para 15' do 2T)."
+        },
+        {
+          "video_time": "04:15",
+          "real_time": "22:01:00",
+          "narration": "com o Túlio. Ganhou da marcação ainda. O Túlio faz o cruzamento. Cabeceio. Não valeu. Tá marcado o impedimento no ataque da Chapecoense.",
+          "analysis": "Cálculo: second_half_start (21:36:00) + 25 minutos (estimativa para 25' do 2T)."
+        },
+        {
+          "video_time": "05:30",
+          "real_time": "22:13:00",
+          "narration": "Mais uma vez domina o Tinga. Tem a bola da direita pra esquerda. La Vega para tentar tirar a marcação. Vem o cruzamento. Batida. Gol é doa",
+          "analysis": "Cálculo: second_half_start (21:36:00) + 37 minutos (minuto narrado do 2T)."
+        },
+        {
+          "video_time": "06:00",
+          "real_time": "22:13:00",
+          "narration": "da bola que sai de um lado pro outro. >> [aplausos] >> 37 minutos, segundo tempo de jogo. A",
+          "analysis": "Cálculo: second_half_start (21:36:00) + 37 minutos (minuto narrado do 2T)."
+        },
+        {
+          "video_time": "06:15",
+          "real_time": "22:13:00",
+          "narration": "jogada do La Vega, ele faz o cruzamento. Pedro Rocha, um dos artilheiros do time para finalizar quase na pequena área para tirar do Anderson. O Coritiba aumenta agora. Coritiba dois Chapecoense 0 Pedrosa.",
+          "analysis": "Cálculo: second_half_start (21:36:00) + 37 minutos (minuto narrado do 2T)."
+        },
+        {
+          "video_time": "07:00",
+          "real_time": "22:25:00",
+          "narration": "Ramirez. Gol! Gol [grito] é da Chape.",
+          "analysis": "Cálculo: second_half_start (21:36:00) + 49 minutos (minuto narrado do 2T)."
+        },
+        {
+          "video_time": "07:15",
+          "real_time": "22:25:00",
+          "narration": "49 minutos, segundo tempo de jogo no CTO Pereira. O cruzamento forte, a falha de marcação, né? Ninguém marcou o Ramirez, ele bateu",
+          "analysis": "Cálculo: second_half_start (21:36:00) + 49 minutos (minuto narrado do 2T)."
+        },
+        {
+          "video_time": "07:30",
+          "real_time": "22:25:00",
+          "narration": "cruzado, colocado, a bola ainda desviou. A bola desvia no Túlio e morre no fundo do gol. A Chapecoense desconta no finalzinho. E aí, gostou do vídeo, cara? Não se",
+          "analysis": "Cálculo: second_half_start (21:36:00) + 49 minutos (minuto narrado do 2T)."
+        }
+      ],
+      "sources": [
+        {
+          "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGlcVPVteIvsBF0WJ1MWXmJGv95wXDkb9UWfWC9KGROoK49G4tdnvM3UEgexDWwIE4s1x54PtVrjNaFD0x0VVIRVITo0_J6pHqVqvPQHxur6nwvbemn-IkG_lW89x_0GXgxRHD11i5S9tDX_SRQBNdATDLHL3N1AHRrVTQ1fDszS0Juik_tSguWfPIfJcvYAejQdOxdwR5XMtbdSO_teU87QNg9DscK-yEIsAboQUTl7eKBkA==",
+          "title": "Google Search Evidence"
+        }
+      ],
+      "duration": 474,
+      "platform": "CazéTV"
+    }
+  ],
+  "generated_at": "2026-08-10T15:35:59.007614"
+}
