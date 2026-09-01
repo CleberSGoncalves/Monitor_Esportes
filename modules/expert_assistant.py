@@ -104,7 +104,7 @@ class ExpertAssistant:
                 print(f"[EXPERT CACHE WARN] Erro ao ler cache: {e_cache}")
 
         # Tentativa de buscar e decodificar a súmula em PDF automaticamente antes do loop
-        if sumula_raw_text is None:
+        if sumula_raw_text is None or not str(sumula_raw_text).strip():
             try:
                 msg = "Buscando súmula oficial da CBF em formato PDF..."
                 print(f"[EXPERT PIPELINE] {msg}")
@@ -125,6 +125,23 @@ class ExpertAssistant:
                         print(f"[EXPERT PIPELINE] Súmula PDF obtida automaticamente! O pipeline rodará em modo canônico determinístico.")
             except Exception as e_pdf:
                 print(f"[EXPERT PIPELINE WARN] Falha na rotina de busca de súmula automática: {e_pdf}")
+
+        # TRAVA ESTRITA OBRIGATÓRIA: Relatórios Expert NÃO PODEM sair sem a súmula oficial baixada da CBF!
+        if not sumula_raw_text or not str(sumula_raw_text).strip():
+            msg_err = (
+                f"❌ [AUDITORIA BLOQUEADA] Súmula oficial da CBF não encontrada ou pendente de publicação para {team1} x {team2} ({date}).\n"
+                f"A auditoria no modo Expert exige obrigatoriamente o download da súmula oficial para garantir 100% de conformidade."
+            )
+            print(f"[EXPERT PIPELINE STRICT GUARD] {msg_err}")
+            if status_callback:
+                status_callback("❌ Auditoria cancelada: Súmula CBF pendente de publicação.")
+            return {
+                "error": msg_err,
+                "status": "blocked_missing_sumula",
+                "team1": team1,
+                "team2": team2,
+                "date": date
+            }
 
         # Loop de Auditoria e Validação com Auto-Correção
         directive_correction = ""

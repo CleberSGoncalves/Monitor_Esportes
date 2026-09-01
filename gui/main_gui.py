@@ -1813,6 +1813,35 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         )
         self.btn_header_update.pack(side="left")
 
+        # Disparar checagem automática silenciosa na inicialização
+        self._check_update_silent_startup()
+
+    def _check_update_silent_startup(self) -> None:
+        """Checa silenciosamente se há novas versões ao iniciar e destaca o botão se houver atualização."""
+        def run_silent():
+            try:
+                updater = AutoUpdater()
+                has_update, remote_ver, download_url, changelog = updater.check_for_update()
+                if has_update:
+                    def highlight_ui():
+                        if hasattr(self, "btn_header_update") and self.btn_header_update:
+                            self.btn_header_update.configure(
+                                text=f"🚀 NOVA VERSÃO DISPONÍVEL (v{remote_ver})",
+                                fg_color="#FF3300",
+                                hover_color="#CC0000",
+                                text_color="#FFFFFF"
+                            )
+                        if hasattr(self, "lbl_header_version") and self.lbl_header_version:
+                            self.lbl_header_version.configure(
+                                text=f"v{updater.current_version} (⚠️ Desatualizado!)",
+                                text_color="#FF6666"
+                            )
+                        self._log(f"🔔 [AUTO UPDATER] Nova versão v{remote_ver} disponível no GitHub! Clique no botão vermelho no topo para atualizar.")
+                    self.after(0, highlight_ui)
+            except Exception:
+                pass
+        threading.Thread(target=run_silent, daemon=True).start()
+
         # 1. Letreiro Horizontal de Jogos CBF (Ticker Bar no Topo com Alternância: Últimos Jogos vs Próximos)
         self.cbf_ticker_frame = ctk.CTkFrame(self, height=44, corner_radius=10, fg_color="#141414", border_width=1, border_color="#1f538d")
         self.cbf_ticker_frame.pack(side="top", fill="x", padx=12, pady=(2, 4))
