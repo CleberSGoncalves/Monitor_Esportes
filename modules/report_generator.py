@@ -1284,6 +1284,16 @@ class ReportGenerator:
             y -= 30
             
         c.save()
+        try:
+            from modules.sharepoint_reporter import SharePointReporter
+            res0 = results[0] if results else {}
+            partida = str(res0.get("match_display") or res0.get("match_id") or "Partida").strip()
+            comp = str(res0.get("competition") or "Brasileiro Serie A").strip()
+            plat = str(res0.get("platform") or "Amazon Prime").strip()
+            conf = f"{float(res0.get('confidence_score') or 99.0):.1f}%"
+            SharePointReporter.sync_pdf_to_sharepoint(pdf_path, partida, comp, plat, confianca=conf)
+        except Exception as e_sp:
+            pass
         return pdf_path
 
 

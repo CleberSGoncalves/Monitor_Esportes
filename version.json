@@ -1,5 +1,5 @@
 {
-  "version": "1.8.3",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.8.3/Monitor_Esportes.exe",
-  "changelog": "Versão 1.8.3: Hotfix do Auto-Updater (correção do escopo da variável local 'os' ao baixar atualizações)."
+  "version": "1.8.5",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.8.5/Monitor_Esportes.exe",
+  "changelog": "Versão 1.8.5: Sincronização automática de relatórios PDF com o SharePoint Document Library (7 metadados) + Remoção das abas Erros e Logs IA."
 }

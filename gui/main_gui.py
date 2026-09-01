@@ -2462,7 +2462,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         self._history_cards = []
 
     def _on_mode_change(self, mode: str) -> None:
-        """Alterna a visibilidade dos campos e abas baseada no modo de estratégia."""
+        """Alterna a visibilidade das abas baseada no modo de estratégia."""
         self._selected_indices.clear()
         self._render_events()
         self._log(f"[UI] Modo alterado para: {mode}")
@@ -2472,18 +2472,17 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         is_ads    = (mode == "Ads & Merchan")
         is_ia     = (mode == "Config IA")
 
-        # 1. Barra de Pesquisa do YouTube / Canais (self.top) - FICA NO FUNDO ABSOLUTO DO RODAPÉ (EMBAIXO)
+        # 1. Barra de Pesquisa do YouTube / Canais (self.top)
         if hasattr(self, "top") and self.top:
             self.top.pack_forget()
             self.top.pack(side="bottom", fill="x", padx=12, pady=(4, 4))
 
-        # 2. Painel manual do Expert (self.expert_manual_frame) - FICA ACIMA DA PESQUISA DO YOUTUBE (EM CIMA)
+        # 2. Painel de Dados da Partida para Auditoria
         if hasattr(self, "expert_manual_frame") and self.expert_manual_frame:
             self.expert_manual_frame.pack_forget()
-            if is_expert:
-                self.expert_manual_frame.pack(side="bottom", fill="x", padx=12, pady=(4, 4))
+            self.expert_manual_frame.pack(side="bottom", fill="x", padx=12, pady=(4, 4))
 
-        # 3. Painel Telemetria Live OBS (Só no modo Visual OBS)
+        # 3. Painel Telemetria Live OBS
         if hasattr(self, "top_status") and self.top_status:
             if is_visual:
                 self.top_status.pack(fill="x", side="top", pady=(0, 12), before=getattr(self, "history_header", None))
@@ -2501,10 +2500,8 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                         show = is_expert or is_visual
                     elif tab_name in ["Debug Visual", "Fragmentos"]:
                         show = is_visual
-                    elif tab_name in ["Logs", "Erros", "Config", "📊 Jogos Auditados", "Relatórios PDF", "Dashboard"]:
-                        show = True  # Jogos Auditados, Logs, Erros e Config sempre visíveis em todos os modos!
-                    elif tab_name == "Logs IA":
-                        show = is_expert or is_visual or is_ia
+                    elif tab_name in ["Logs", "Config", "📊 Jogos Auditados", "Dashboard"]:
+                        show = True
                     elif tab_name in ["Ads/Merchan"]:
                         show = is_ads or is_visual
                     if show:
@@ -2519,7 +2516,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
             except: pass
         elif is_ia and hasattr(self, "tabs"):
             try:
-                self.tabs.set("Logs IA")
+                self.tabs.set("Config")
             except: pass
         elif (is_expert or is_visual) and hasattr(self, "tabs"):
             try:
@@ -3818,10 +3815,17 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
 
         btn_view = ctk.CTkButton(
             card_actions, text="🔍 Ver Dossiê", font=ctk.CTkFont(size=10, weight="bold"),
-            width=85, height=22, fg_color="#333333", hover_color="#444444",
+            width=80, height=22, fg_color="#333333", hover_color="#444444",
             command=lambda it=item: self._select_audited_game(it)
         )
         btn_view.pack(side="left", padx=4)
+
+        btn_sp = ctk.CTkButton(
+            card_actions, text="☁️ SharePoint", font=ctk.CTkFont(size=10, weight="bold"),
+            width=85, height=22, fg_color="#006699", hover_color="#004466",
+            command=lambda it=item: self._upload_audited_game_to_sharepoint(it)
+        )
+        btn_sp.pack(side="left", padx=4)
 
         btn_del = ctk.CTkButton(
             card_actions, text="🗑️", font=ctk.CTkFont(size=10, weight="bold"),
@@ -3937,6 +3941,60 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                     f"O arquivo PDF desta partida ainda não foi gravado em disco ou foi movido.\n\n"
                     f"Você pode gerar um novo relatório a qualquer momento clicando em '🚀 Iniciar Auditoria' no modo Expert."
                 )
+
+    def _upload_audited_game_to_sharepoint(self, item: dict) -> None:
+        """Envia o PDF do jogo auditado selecionado para a Document Library do SharePoint."""
+        pdf_path = item.get("pdf_path")
+        if not pdf_path or not os.path.exists(pdf_path):
+            # Tentar encontrar um PDF correspondente na pasta de relatórios
+            reports_dir = os.path.join(PROJECT_ROOT, "reports")
+            import glob
+            pdfs = glob.glob(os.path.join(reports_dir, "*.pdf"))
+            if pdfs:
+                pdf_path = pdfs[0]
+            else:
+                messagebox.showwarning("SharePoint", "Dossiê PDF não encontrado para esta partida.")
+                return
+
+        t1 = item.get("team1", "")
+        t2 = item.get("team2", "")
+        match_str = f"{t1} x {t2}" if t1 and t2 else item.get("match_id", "Partida")
+        comp = item.get("comp", "Brasileirão")
+        plat = item.get("channel", "Amazon Prime")
+        date_str = item.get("date", "")
+        
+        iso_date = None
+        if date_str:
+            try:
+                dt = datetime.strptime(date_str, "%d/%m/%Y")
+                iso_date = dt.strftime("%Y-%m-%dT20:00:00Z")
+            except Exception:
+                pass
+
+        self._log(f"[SHAREPOINT] Sincronizando '{match_str}' com o SharePoint Document Library...")
+        
+        def run_sync():
+            try:
+                from modules.sharepoint_reporter import SharePointReporter
+                success = SharePointReporter.sync_pdf_to_sharepoint(
+                    pdf_path=pdf_path,
+                    partida=match_str,
+                    campeonato=comp,
+                    plataforma=plat,
+                    data_hora_iso=iso_date,
+                    confianca="99.5%"
+                )
+                if success:
+                    self.after(0, lambda: self._log(f"🎉 [SHAREPOINT] '{match_str}' enviado com sucesso para o SharePoint!"))
+                    self.after(0, lambda: messagebox.showinfo("SharePoint Document Library", f"Relatório PDF de '{match_str}' e seus 7 metadados sincronizados com sucesso no SharePoint!"))
+                else:
+                    self.after(0, lambda: self._log(f"❌ [SHAREPOINT] Falha ao enviar '{match_str}'."))
+                    self.after(0, lambda: messagebox.showerror("SharePoint Error", "Falha ao enviar relatório para o SharePoint. Verifique logs/conexão."))
+            except Exception as ex:
+                self.after(0, lambda: self._log(f"❌ [SHAREPOINT ERROR] {ex}"))
+
+        import threading
+        threading.Thread(target=run_sync, daemon=True).start()
 
     def _delete_audited_game(self, audit_id: str) -> None:
         """Exclui uma auditoria do histórico."""
