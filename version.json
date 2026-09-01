@@ -1,5 +1,5 @@
 {
-  "version": "1.8.8",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.8.8/Monitor_Esportes.exe",
-  "changelog": "Versão 1.8.8: Remoção da tela de login - Abertura direta e instantânea da aplicação."
+  "version": "1.8.9",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.8.9/Monitor_Esportes.exe",
+  "changelog": "Versão 1.8.9: Correção na classificação do campeonato Copa do Brasil e escala de 100% de confiança no SharePoint."
 }

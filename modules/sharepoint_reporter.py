@@ -63,12 +63,12 @@ class SharePointReporter:
     @staticmethod
     def normalizar_campeonato(comp: str) -> str:
         comp_upper = (comp or "").upper()
-        if "BRASIL" in comp_upper:
+        if "COPA DO BRASIL" in comp_upper or "COPA BRASIL" in comp_upper or "COPA" in comp_upper:
+            return "Copa do Brasil"
+        elif "BRASIL" in comp_upper or "SÉRIE A" in comp_upper or "SERIE A" in comp_upper:
             return "Brasileiro Serie A"
         elif "PAULIST" in comp_upper:
             return "Paulista"
-        elif "COPA DO BRASIL" in comp_upper or "COPA BRASIL" in comp_upper:
-            return "Copa do Brasil"
         elif "CHAMPIONS" in comp_upper:
             return "Champions League"
         elif "MUNDO" in comp_upper:
@@ -87,6 +87,19 @@ class SharePointReporter:
         elif "MAX" in plat_upper or "HBO" in plat_upper:
             return "Max"
         return "Amazon Prime"
+
+    @classmethod
+    def normalizar_confianca(cls, conf: float | str) -> str:
+        if conf is None:
+            return "99.0%"
+        conf_str = str(conf).replace("%", "").strip()
+        try:
+            val = float(conf_str)
+            if val <= 1.0:
+                val = val * 100.0
+            return f"{val:.1f}%"
+        except Exception:
+            return "99.0%"
 
     @classmethod
     def format_iso_datetime(cls, date_str: str, time_str: str = None) -> str:
@@ -194,7 +207,7 @@ class SharePointReporter:
                 "Campeonato": cls.normalizar_campeonato(campeonato),
                 "Plataforma": cls.normalizar_plataforma(plataforma),
                 "Data_Partida": data_hora_iso,  # NOME INTERNO DA COLUNA Data_Hora NO SHAREPOINT
-                "Confianca": str(confianca),
+                "Confianca": cls.normalizar_confianca(confianca),
                 "Auditado": True
             }
             
