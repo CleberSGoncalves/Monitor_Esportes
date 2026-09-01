@@ -1,0 +1,77 @@
+{
+  "expert_results": [
+    {
+      "match_id": "Palmeiras_Santos_26/08/2026",
+      "date": "26/08/2026",
+      "match_display": "Palmeiras x Santos",
+      "competition": "Copa do Brasil",
+      "confidence_score": 0.99,
+      "pre_game_start": "21:25:00",
+      "match_start": "21:30:00",
+      "first_half_start": "21:30:00",
+      "half_time_start": "22:15:00",
+      "half_time_end": "22:36:00",
+      "second_half_start": "22:36:00",
+      "match_end": "23:25:00",
+      "post_game_end": "23:30:00",
+      "stoppage_time_1t": 0,
+      "stoppage_time_2t": 5,
+      "technical_milestones": [
+        {
+          "time": "22:03:00",
+          "minute": 33,
+          "event": "GOL de J. López (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:14:00",
+          "minute": 44,
+          "event": "GOL de Andreas Pereira (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:15:00",
+          "minute": 45,
+          "event": "Fim do 1º Tempo.",
+          "type": "Fim de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:37:00",
+          "minute": 46,
+          "event": "Início do 2º Tempo.",
+          "type": "Início de Tempo",
+          "confidence": 0.99
+        },
+        {
+          "time": "22:51:00",
+          "minute": 60,
+          "event": "GOL de J. López (Palmeiras).",
+          "type": "Gol",
+          "confidence": 0.99
+        },
+        {
+          "time": "23:25:00",
+          "minute": 94,
+          "event": "Fim de Jogo.",
+          "type": "Fim de Jogo",
+          "confidence": 0.99
+        }
+      ],
+      "transcript_events": [],
+      "sources": [
+        {
+          "uri": "https://www.cbf.com.br/futebol-brasileiro/jogos?q=Palmeiras+Santos",
+          "title": "Súmula Eletrônica Oficial - Confederação Brasileira de Futebol (cbf.com.br)"
+        },
+        {
+          "uri": "https://ge.globo.com/busca/?q=Sumula+Palmeiras+Santos+26/08/2026",
+          "title": "Cobertura Minuto a Minuto - Globo Esporte (ge.globo.com)"
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-08-27T18:15:08.782730"
+}
