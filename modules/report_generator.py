@@ -1291,7 +1291,10 @@ class ReportGenerator:
             comp = str(res0.get("competition") or "Brasileiro Serie A").strip()
             plat = str(res0.get("platform") or "Amazon Prime").strip()
             conf = f"{float(res0.get('confidence_score') or 99.0):.1f}%"
-            SharePointReporter.sync_pdf_to_sharepoint(pdf_path, partida, comp, plat, confianca=conf)
+            event_date = res0.get("date") or res0.get("event_date") or ""
+            event_time = res0.get("time") or res0.get("event_time") or ""
+            iso_date = SharePointReporter.format_iso_datetime(event_date, event_time)
+            SharePointReporter.sync_pdf_to_sharepoint(pdf_path, partida, comp, plat, data_hora_iso=iso_date, confianca=conf)
         except Exception as e_sp:
             pass
         return pdf_path

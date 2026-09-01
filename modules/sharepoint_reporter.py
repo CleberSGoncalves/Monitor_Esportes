@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 import json
 import logging
@@ -88,6 +89,50 @@ class SharePointReporter:
         return "Amazon Prime"
 
     @classmethod
+    def format_iso_datetime(cls, date_str: str, time_str: str = None) -> str:
+        """
+        Converte uma data de evento (ex: '26/08/2026', '2026-08-26' ou '26 de agosto de 2026')
+        e horário (ex: '21:30') em formato ISO 8601 UTC para a coluna Data_Hora do SharePoint.
+        """
+        if not date_str or not str(date_str).strip():
+            return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        raw_str = f"{str(date_str).strip()} {str(time_str or '').strip()}".strip()
+        
+        formats = [
+            "%d/%m/%Y %H:%M", "%d/%m/%Y %H:%M:%S", "%d/%m/%Y",
+            "%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d",
+            "%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S"
+        ]
+        for fmt in formats:
+            try:
+                dt = datetime.strptime(raw_str, fmt)
+                return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+            except Exception:
+                pass
+        
+        # Parse textual ex: "26 de agosto de 2026"
+        m_txt = re.search(r'(\d{1,2})\s+de\s+(\w+)\s+de\s+(\d{4})', str(date_str))
+        if m_txt:
+            day, month_name, year = m_txt.groups()
+            months = {
+                "janeiro": 1, "fevereiro": 2, "março": 3, "marco": 3, "abril": 4,
+                "maio": 5, "junho": 6, "julho": 7, "agosto": 8, "setembro": 9,
+                "outubro": 10, "novembro": 11, "dezembro": 12
+            }
+            m_num = months.get(month_name.lower(), 1)
+            t_str = time_str or "20:00"
+            try:
+                t_parts = t_str.split(":")
+                hh, mm = int(t_parts[0]), int(t_parts[1])
+            except Exception:
+                hh, mm = 20, 0
+            dt = datetime(int(year), m_num, int(day), hh, mm)
+            return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+            
+        return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    @classmethod
     def sync_pdf_to_sharepoint(cls, pdf_path: str, partida: str, campeonato: str, plataforma: str, data_hora_iso: str = None, confianca: str = "99.0%") -> bool:
         """
         Envia o PDF para a biblioteca de documentos do SharePoint e sincroniza os 7 campos de metadados.
@@ -148,7 +193,7 @@ class SharePointReporter:
                 "Partida": partida,
                 "Campeonato": cls.normalizar_campeonato(campeonato),
                 "Plataforma": cls.normalizar_plataforma(plataforma),
-                "Data_Partida": data_hora_iso,  # NOME INTERNO NO SHAREPOINT
+                "Data_Partida": data_hora_iso,  # NOME INTERNO DA COLUNA Data_Hora NO SHAREPOINT
                 "Confianca": str(confianca),
                 "Auditado": True
             }
@@ -156,7 +201,7 @@ class SharePointReporter:
             fields_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{item_id}/listItem/fields"
             r_fields = requests.patch(fields_url, headers=headers, json=fields_payload, timeout=20)
             if r_fields.status_code in (200, 201):
-                logger.info(f"🎉 [SharePoint] PDF '{filename}' e 7 metadados sincronizados com sucesso!")
+                logger.info(f"🎉 [SharePoint] PDF '{sp_filename}' e 7 metadados sincronizados com sucesso!")
                 return True
             else:
                 logger.warning(f"⚠️ [SharePoint] PDF enviado, mas erro nos metadados ({r_fields.status_code}): {r_fields.text}")

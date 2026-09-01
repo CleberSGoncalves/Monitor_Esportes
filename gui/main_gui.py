@@ -5,6 +5,24 @@ import sys
 from pathlib import Path
 import ssl
 
+# --- BOOTSTRAP DE SYS.PATH (Garantia de importação para 'modules' em Script e Executável PyInstaller) ---
+if getattr(sys, "frozen", False):
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass and meipass not in sys.path:
+        sys.path.insert(0, meipass)
+    exe_dir = str(Path(sys.executable).parent)
+    if exe_dir not in sys.path:
+        sys.path.insert(0, exe_dir)
+    try:
+        os.chdir(Path(sys.executable).parent)
+    except Exception:
+        pass
+else:
+    file_dir = Path(__file__).resolve().parent
+    root_dir = str(file_dir.parent) if file_dir.name == "gui" else str(file_dir)
+    if root_dir not in sys.path:
+        sys.path.insert(0, root_dir)
+
 try:
     ssl._create_default_https_context = ssl._create_unverified_context
 except AttributeError:
@@ -21,16 +39,8 @@ try:
 except Exception:
     pass
 
-if getattr(sys, "frozen", False):
-    try:
-        os.chdir(Path(sys.executable).parent)
-    except Exception:
-        pass
 os.environ["PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK"] = "True"
 
-# --- bootstrap de path (pra rodar no VSCode / python gui/main_gui.py) ---
-import sys
-from pathlib import Path
 from datetime import datetime, timedelta
 
 import tkinter as tk
@@ -39,15 +49,23 @@ import unicodedata
 import urllib.request
 import io
 
-_TEMP_ROOT = Path(__file__).resolve().parents[1]
-if str(_TEMP_ROOT) not in sys.path:
-    sys.path.insert(0, str(_TEMP_ROOT))
-
 if getattr(sys, "frozen", False):
     PROJECT_ROOT = Path(sys.executable).parent
 else:
-    PROJECT_ROOT = _TEMP_ROOT
+    file_dir = Path(__file__).resolve().parent
+    PROJECT_ROOT = file_dir.parent if file_dir.name == "gui" else file_dir
 # ------------------------------------------------------------------------
+
+# --- SMOKE TEST GUARDRAIL (Validação de inicialização pré-deploy) ---
+if "--check-version" in sys.argv or "--smoke-test" in sys.argv:
+    try:
+        from modules.auto_updater import AutoUpdater
+        print(f"SMOKE_TEST_OK: v{AutoUpdater().current_version}")
+        sys.exit(0)
+    except Exception as e_smoke:
+        print(f"SMOKE_TEST_FAILED: {e_smoke}")
+        sys.exit(1)
+# --------------------------------------------------------------------
 
 import os
 import re
@@ -3991,20 +4009,15 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         comp = item.get("comp", "Brasileirão")
         plat = item.get("channel", "Amazon Prime")
         date_str = item.get("date", "")
+        time_str = item.get("time", "")
         
-        iso_date = None
-        if date_str:
-            try:
-                dt = datetime.strptime(date_str, "%d/%m/%Y")
-                iso_date = dt.strftime("%Y-%m-%dT20:00:00Z")
-            except Exception:
-                pass
+        from modules.sharepoint_reporter import SharePointReporter
+        iso_date = SharePointReporter.format_iso_datetime(date_str, time_str)
 
-        self._log(f"[SHAREPOINT] Sincronizando '{match_str}' com o SharePoint Document Library...")
+        self._log(f"[SHAREPOINT] Sincronizando '{match_str}' (Data/Hora evento: {iso_date}) com o SharePoint...")
         
         def run_sync():
             try:
-                from modules.sharepoint_reporter import SharePointReporter
                 success = SharePointReporter.sync_pdf_to_sharepoint(
                     pdf_path=pdf_path,
                     partida=match_str,
@@ -5954,6 +5967,15 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         container = ctk.CTkScrollableFrame(flow_win, fg_color="transparent")
         container.pack(fill="both", expand=True, padx=30, pady=20)
 
+        def _resolve_asset(name: str) -> str:
+            if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+                p = os.path.join(sys._MEIPASS, "data", "assets", name)
+                if os.path.exists(p): return p
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            p2 = os.path.join(base_dir, "data", "assets", name)
+            if os.path.exists(p2): return p2
+            return os.path.join("data", "assets", name)
+
         # 1. MODO VISUAL (Layout Lateral)
         vis_f = ctk.CTkFrame(container, border_width=1, border_color="#00CED1", fg_color="#141414", corner_radius=15)
         vis_f.pack(fill="x", pady=(0, 30), padx=5)
@@ -5962,16 +5984,16 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         left_v.pack(side="left", padx=20, pady=20)
         
         right_v = ctk.CTkFrame(vis_f, fg_color="transparent")
-        right_v.pack(side="left", fill="both", expand=True, padx=(100, 20), pady=20)
+        right_v.pack(side="left", fill="both", expand=True, padx=(20, 20), pady=20)
         
-        img_v_path = os.path.join("data", "assets", "visual_flow.png")
+        img_v_path = _resolve_asset("visual_flow.png")
         if os.path.exists(img_v_path):
             try:
                 pil_v = Image.open(img_v_path)
-                # Tamanho equilibrado para evitar clipping lateral
-                ctk_v = ctk.CTkImage(light_image=pil_v, dark_image=pil_v, size=(650, 650))
+                ctk_v = ctk.CTkImage(light_image=pil_v, dark_image=pil_v, size=(600, 600))
                 ctk.CTkLabel(left_v, image=ctk_v, text="").pack()
-            except: pass
+            except Exception as e_v:
+                print(f"[UI WARN] Erro ao carregar visual_flow.png: {e_v}")
             
         ctk.CTkLabel(right_v, text=" MODO VISUAL (AI VISION & OBS)", font=ctk.CTkFont(size=26, weight="bold"), 
                      text_color="#00CED1").pack(pady=(10, 20), anchor="nw")
@@ -6002,25 +6024,29 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         left_e.pack(side="left", padx=20, pady=20)
         
         right_e = ctk.CTkFrame(exp_f, fg_color="transparent")
-        right_e.pack(side="left", fill="both", expand=True, padx=(100, 20), pady=20)
+        right_e.pack(side="left", fill="both", expand=True, padx=(20, 20), pady=20)
         
-        img_e_path = os.path.join("data", "assets", "expert_flow.png")
+        img_e_path = _resolve_asset("expert_flow.png")
+        print(f"[UI ASSET] Carregando imagem expert_flow.png de: {img_e_path}")
         if os.path.exists(img_e_path):
             try:
                 pil_e = Image.open(img_e_path)
-                ctk_e = ctk.CTkImage(light_image=pil_e, dark_image=pil_e, size=(650, 650))
+                ctk_e = ctk.CTkImage(light_image=pil_e, dark_image=pil_e, size=(600, 600))
                 ctk.CTkLabel(left_e, image=ctk_e, text="").pack()
-            except: pass
+            except Exception as e_e:
+                print(f"[UI WARN] Erro ao carregar expert_flow.png: {e_e}")
+        else:
+            print(f"[UI WARN] Imagem expert_flow.png não existe em {img_e_path}")
             
         ctk.CTkLabel(right_e, text=" MODO EXPERT ASSISTANT (API & SEARCH)", font=ctk.CTkFont(size=26, weight="bold"), 
                      text_color="#FFD700").pack(pady=(10, 20), anchor="nw")
         
         exp_desc = (
-            "• BUSCA PROFUNDA (GROUNDING): A IA consulta portais esportivos e súmulas oficiais.\n\n"
-            "• RECONSTRUÇÃO TÉCNICA: Reconstitui Gols, Cartões, VAR e Substituições com precisão.\n\n"
-            "• EXAUSTIVIDADE GARANTIDA: Motor configurado para extrair 100% dos lances técnicos.\n\n"
-            "• AUDITORIA DIGITAL: Validação baseada em trilha pública (Digital Footprint).\n\n"
-            "• RELATÓRIO CONSOLIDADO: Gera PDF técnico detalhado para fins de conformidade legal."
+            "• RASPAGEM AUTOMÁTICA DE SÚMULAS: Localiza e extrai automaticamente as súmulas oficiais dos jogos da CBF (Copa do Brasil e Brasileirão).\n\n"
+            "• LINHA DO TEMPO REGULAMENTAR: Mapeia o horário de início do 1º Tempo, acréscimos, os 15 min de intervalo (norma FIFA) e o encerramento do jogo.\n\n"
+            "• REGISTRO COMPLETO DE EVENTOS: Consolidação total de Gols, Cartões Amarelos/Vermelhos, Substituições e Equipe de Arbitragem.\n\n"
+            "• AUDITORIA DE TRANSMISSÃO: Cruza os horários oficiais da súmula com a transmissão ao vivo do canal (CazéTV / Amazon Prime).\n\n"
+            "• RELATÓRIO CONSOLIDADO DE COMPLIANCE: Gera relatório oficial pronto para auditoria, controle de qualidade e conformidade legal."
         )
         ctk.CTkLabel(right_e, text=exp_desc, font=ctk.CTkFont(size=20), text_color="#EEEEEE", 
                      justify="left", wraplength=600, anchor="nw").pack(anchor="nw", fill="both", expand=True)
