@@ -1,5 +1,5 @@
 {
-  "version": "1.8.9",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.8.9/Monitor_Esportes.exe",
-  "changelog": "Versão 1.8.9: Correção na classificação do campeonato Copa do Brasil e escala de 100% de confiança no SharePoint."
+  "version": "1.9.0",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.0/Monitor_Esportes.exe",
+  "changelog": "Versão 1.9.0: Reordenação canônica e alinhamento sem lacunas/buracos dos botões do menu superior (Monitoramento, Jogos Auditados, Dashboard, Logs, Config)."
 }

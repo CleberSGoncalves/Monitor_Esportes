@@ -2382,15 +2382,15 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         self.tabs.pack(fill="both", expand=True, padx=12, pady=12)
 
         self.tab_monitor = self.tabs.add("Monitoramento")
+        self.tab_reports = self.tabs.add("📊 Jogos Auditados")
+        self.tab_dash = self.tabs.add("Dashboard")
+        self.tab_logs = self.tabs.add("Logs")
+        self.tab_cfg = self.tabs.add("Config")
         self.tab_debug = self.tabs.add("Debug Visual")
         self.tab_frag = self.tabs.add("Fragmentos")
-        self.tab_logs = self.tabs.add("Logs")
         self.tab_errors = self.tabs.add("Erros")
-        self.tab_cfg = self.tabs.add("Config")
         self.tab_ia_logs = self.tabs.add("Logs IA")
         self.tab_ads = self.tabs.add("Ads/Merchan")
-        self.tab_dash = self.tabs.add("Dashboard")
-        self.tab_reports = self.tabs.add("📊 Jogos Auditados")
         
         # Variáveis de Auto-clip
         self.auto_clip_var = ctk.BooleanVar(value=True)
@@ -2536,25 +2536,34 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
             else:
                 self.top_status.pack_forget()
 
-        # 4. Controle dinâmico da visibilidade das Abas no Tabview
+        # 4. Controle dinâmico da visibilidade e ordenação contínua das Abas no Tabview (sem buracos)
         if hasattr(self, "tabs") and hasattr(self.tabs, "_segmented_button"):
             seg_btn = self.tabs._segmented_button
             if hasattr(seg_btn, "_buttons_dict"):
                 b_dict = seg_btn._buttons_dict
-                for tab_name, btn_w in b_dict.items():
-                    show = False
-                    if tab_name == "Monitoramento":
-                        show = is_expert or is_visual
-                    elif tab_name in ["Debug Visual", "Fragmentos"]:
-                        show = is_visual
-                    elif tab_name in ["Logs", "Config", "📊 Jogos Auditados", "Dashboard"]:
-                        show = True
-                    elif tab_name in ["Ads/Merchan"]:
-                        show = is_ads or is_visual
-                    if show:
-                        btn_w.grid()
-                    else:
+                
+                # Ordem Oficial Rígida Solicitada: Monitoramento, Jogos Auditados, Dashboard, Logs, Config
+                ordered_tab_names = ["Monitoramento", "📊 Jogos Auditados", "Dashboard", "Logs", "Config"]
+                
+                if is_visual:
+                    ordered_tab_names.extend(["Debug Visual", "Fragmentos", "Ads/Merchan"])
+                elif is_ads:
+                    ordered_tab_names.append("Ads/Merchan")
+                    
+                # Primeiro des-gridar todas as abas para eliminar lacunas
+                for btn_w in b_dict.values():
+                    try:
+                        btn_w.grid_forget()
+                    except Exception:
                         btn_w.grid_remove()
+                        
+                # Re-gridar em colunas sequenciais contínuas (sem buracos intermediários)
+                col_idx = 0
+                for t_name in ordered_tab_names:
+                    if t_name in b_dict:
+                        btn = b_dict[t_name]
+                        btn.grid(row=0, column=col_idx, padx=2, pady=2, sticky="ew")
+                        col_idx += 1
 
         # Seleciona a aba principal automaticamente ao trocar de modo
         if is_ads and hasattr(self, "tabs"):
