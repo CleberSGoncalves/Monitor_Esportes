@@ -106,11 +106,14 @@ class ExpertAssistant:
         # Tentativa de buscar e decodificar a súmula em PDF automaticamente antes do loop
         if sumula_raw_text is None or not str(sumula_raw_text).strip():
             try:
-                msg = "Buscando súmula oficial da CBF em formato PDF..."
+                msg = "Buscando súmula oficial da CBF..."
                 print(f"[EXPERT PIPELINE] {msg}")
                 if status_callback:
                     status_callback(msg)
                 
+                from modules.cbf_schedule_fetcher import CBFScheduleFetcher
+
+                # 1ª tentativa: PDF direto
                 pdf_url = self.find_sumula_url_via_gemini(team1, team2, date, competition)
                 if pdf_url:
                     msg = "Baixando e decodificando PDF da súmula..."
@@ -118,11 +121,40 @@ class ExpertAssistant:
                     if status_callback:
                         status_callback(msg)
                         
-                    from modules.cbf_schedule_fetcher import CBFScheduleFetcher
                     pdf_text = CBFScheduleFetcher.fetch_sumula_text(team1, team2, date, sumula_url=pdf_url)
                     if pdf_text and pdf_text.strip():
                         sumula_raw_text = pdf_text
                         print(f"[EXPERT PIPELINE] Súmula PDF obtida automaticamente! O pipeline rodará em modo canônico determinístico.")
+
+                # 2ª tentativa: Extrair dados diretamente do HTML da página do jogo (fallback para SSL bloqueado)
+                if not sumula_raw_text or not str(sumula_raw_text).strip():
+                    print(f"[EXPERT PIPELINE] PDF bloqueado ou indisponível. Tentando extração via HTML da página CBF...")
+                    if status_callback:
+                        status_callback("PDF inacessível. Extraindo dados da página oficial CBF...")
+                    
+                    # Derivar URL da página do jogo a partir da URL do PDF ou buscar diretamente
+                    game_page_url = None
+                    if pdf_url:
+                        # Converter URL do PDF em URL da página do jogo
+                        import re as _re
+                        # Tenta extrair o slug e ID do jogo do pdf_url se o mesmo foi encontrado via tabela
+                        page_url_from_finder = getattr(self, '_last_game_page_url', None)
+                        if page_url_from_finder:
+                            game_page_url = page_url_from_finder
+                    
+                    if not game_page_url:
+                        # Buscar a URL da página do jogo diretamente via scraping da tabela CBF
+                        game_page_url = CBFScheduleFetcher.find_game_page_url(team1, team2, date, competition)
+                    
+                    if game_page_url:
+                        html_text = CBFScheduleFetcher.fetch_sumula_from_cbf_html(game_page_url)
+                        if html_text and html_text.strip():
+                            sumula_raw_text = html_text
+                            print(f"[EXPERT PIPELINE] Dados extraídos com sucesso do HTML da CBF! Pipeline rodará em modo canônico via página oficial.")
+                    
+                    if not sumula_raw_text or not str(sumula_raw_text).strip():
+                        print(f"[EXPERT PIPELINE WARN] Falha em ambas as tentativas (PDF e HTML) de obter a súmula.")
+
             except Exception as e_pdf:
                 print(f"[EXPERT PIPELINE WARN] Falha na rotina de busca de súmula automática: {e_pdf}")
 
@@ -519,7 +551,7 @@ class ExpertAssistant:
             config = types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
                 temperature=0.1,
-                max_output_tokens=8192,
+                max_output_tokens=16384,
                 safety_settings=[
                     types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_NONE"),
                     types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_NONE"),
@@ -531,7 +563,7 @@ class ExpertAssistant:
 
             config_no_grounding = types.GenerateContentConfig(
                 temperature=0.1,
-                max_output_tokens=8192,
+                max_output_tokens=16384,
                 safety_settings=[
                     types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_NONE"),
                     types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_NONE"),
@@ -580,10 +612,10 @@ class ExpertAssistant:
                         
                         if not response or not response.candidates or not response.candidates[0].content:
                              raise ValueError(f"Modelo {current_model} retornou resposta totalmente vazia.")
-                             
-                        # Verificar se houve truncamento por limite de tokens
+                              
+                        # Aviso tolerante de truncamento sem derrubar a extração
                         if c and c.finish_reason and "MAX_TOKENS" in str(c.finish_reason):
-                             raise ValueError("Resposta do modelo truncada pelo limite de tokens de saída (MAX_TOKENS).")
+                             print("[EXPERT WARN] Resposta atingiu MAX_TOKENS, tentando extrair conteúdo gerado...")
 
                         # Extração manual de texto das partes
                         txt = ""
@@ -1104,47 +1136,152 @@ class ExpertAssistant:
 
     def find_sumula_url_via_gemini(self, team1: str, team2: str, date: str, competition: str) -> Optional[str]:
         """
-        Utiliza o Gemini com busca ativa no Google Search para encontrar a URL direta e oficial
-        do PDF da súmula da CBF para o confronto e data específicos.
+        Localiza a URL do PDF da súmula oficial da CBF via:
+        1. Raspagem ativa das tabelas da CBF e histórico de partidas dos times
+        2. Google Search (Gemini Grounding) + extração da página de documentos
         """
-        print(f"[EXPERT PDF FINDER] Buscando link oficial da súmula CBF para {team1} x {team2} em {date}...")
+        import re
+        import requests
+        import unicodedata
+        import urllib3
+        urllib3.disable_warnings()
+
+        print(f"[EXPERT PDF FINDER] Buscando súmula oficial CBF para {team1} x {team2} em {date}...")
+
+        # Extrair ano da data
+        date_str = str(date).replace("-", "/")
+        parts = date_str.split("/")
+        year = parts[2] if len(parts) >= 3 and len(parts[2]) == 4 else parts[0]
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        }
+
+        def _norm_clean(s):
+            s = unicodedata.normalize("NFKD", str(s)).encode("ascii", "ignore").decode()
+            return re.sub(r"[^a-z0-9]+", "", s.lower())
+
+        t1_key = _norm_clean(team1)[:4]
+        t2_key = _norm_clean(team2)[:4]
+
+        candidate_pages = set()
+
+        # --- ETAPA 1: Raspagem direta das Tabelas e Histórico de Times da CBF ---
+        table_urls = [
+            f"https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/{year}",
+            f"https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/{year}",
+            f"https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-b/{year}",
+        ]
+
+        for t_url in table_urls:
+            try:
+                r_tab = requests.get(t_url, headers=headers, verify=False, timeout=8)
+                if r_tab.status_code == 200:
+                    # 1a. Buscar links de jogos nas tabelas
+                    g_links = re.findall(r'href=["\'](/futebol-brasileiro/jogos/[^"\']+)["\']', r_tab.text)
+                    for gl in g_links:
+                        gl_norm = _norm_clean(gl)
+                        if t1_key in gl_norm and t2_key in gl_norm:
+                            candidate_pages.add("https://www.cbf.com.br" + gl)
+
+                    # 1b. Buscar links de times nas tabelas para varrer o histórico
+                    team_links = re.findall(r'href=["\'](/futebol-brasileiro/times/[^"\']+)["\']', r_tab.text)
+                    for tl in list(set(team_links))[:10]:
+                        t_hist_url = "https://www.cbf.com.br" + tl
+                        if "?tab=" not in t_hist_url:
+                            t_hist_url += "?tab=historico-de-partidas"
+                        try:
+                            r_t = requests.get(t_hist_url, headers=headers, verify=False, timeout=6)
+                            if r_t.status_code == 200:
+                                t_games = re.findall(r'href=["\'](/futebol-brasileiro/jogos/[^"\']+)["\']', r_t.text)
+                                for tg in t_games:
+                                    tg_norm = _norm_clean(tg)
+                                    if t1_key in tg_norm and t2_key in tg_norm:
+                                        candidate_pages.add("https://www.cbf.com.br" + tg)
+                        except Exception:
+                            continue
+            except Exception as e_tab:
+                print(f"[EXPERT PDF FINDER WARN] Falha na raspagem de {t_url}: {e_tab}")
+
+        # --- ETAPA 2: Google Search via Gemini Grounding ---
         prompt = f"""
-        Pesquise no Google Search pela URL oficial do arquivo PDF da súmula da partida entre "{team1}" e "{team2}" realizada na data {date} pela competição "{competition}".
-        A URL procurada deve ser um link direto para o PDF hospedado preferencialmente no site da CBF (iniciando com https://conteudo.cbf.com.br/sumulas/ ou conter cbf.com.br).
-        
-        Retorne APENAS a URL direta do PDF (ex: https://conteudo.cbf.com.br/sumulas/2026/74124202SU.PDF).
-        Se você não encontrar a URL direta de forma alguma, responda apenas a palavra NONE.
-        Não adicione explicações, justificativas ou formatações adicionais. Retorne apenas a URL ou NONE.
-        """
-        config = types.GenerateContentConfig(
-            temperature=0.0,
-            tools=[types.Tool(google_search=types.GoogleSearch())]
-        )
+Pesquise no Google Search pela Súmula Eletrônica Oficial da CBF da partida de futebol entre "{team1}" e "{team2}" realizada na data {date}.
+Busque por links no site cbf.com.br ou conteudo.cbf.com.br.
+
+Procure por:
+1. Link direto do PDF da súmula em conteudo.cbf.com.br/sumulas/{year}/
+2. Link da página da partida no portal da CBF (ex: cbf.com.br/futebol-brasileiro/jogos/.../{year}/...)
+
+Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
+"""
         try:
+            config = types.GenerateContentConfig(
+                temperature=0.0,
+                tools=[types.Tool(google_search=types.GoogleSearch())]
+            )
             response = self.client.models.generate_content(
                 model=self.model_id,
                 contents=prompt,
                 config=config
             )
-            url_text = str(response.text).strip()
-            # Se a resposta contiver links com markdown, limpa
-            if "[" in url_text and "]" in url_text:
-                import re
-                urls = re.findall(r'\((https?://[^\)]+)\)', url_text)
-                if urls:
-                    url_text = urls[0]
-            # Limpa wrappers e tags markdown
-            url_text = url_text.replace("`", "").replace("'", "").replace('"', "").strip()
-            if url_text and url_text.lower() != "none" and "http" in url_text.lower():
-                print(f"[EXPERT PDF FINDER] URL da súmula encontrada: {url_text}")
-                return url_text
-        except Exception as e:
-            print(f"[EXPERT PDF FINDER WARN] Erro ao buscar URL da súmula via Gemini: {e}")
-            try:
-                self._init_client()
-            except: pass
-        
-        print("[EXPERT PDF FINDER] Nenhuma URL direta de súmula oficial foi encontrada via busca ativa.")
+            raw_text = str(response.text).strip()
+            # 2a. Tentar extrair link direto de PDF da resposta do Gemini
+            pdf_matches = re.findall(r'https://conteudo\.cbf\.com\.br/sumulas/\d{4}/[^\s"\'<>\)\],]+\.pdf', raw_text, re.IGNORECASE)
+            if pdf_matches:
+                print(f"[EXPERT PDF FINDER] PDF direto encontrado via resposta do Gemini: {pdf_matches[0]}")
+                return pdf_matches[0]
+
+            # 2b. Extrair das grounding_chunks se disponível
+            if response.candidates and response.candidates[0].grounding_metadata:
+                g_meta = response.candidates[0].grounding_metadata
+                chunks = getattr(g_meta, "grounding_chunks", None) or []
+                for chunk in chunks:
+                    if hasattr(chunk, "web") and chunk.web and getattr(chunk.web, "uri", None):
+                        uri = str(chunk.web.uri)
+                        if "cbf.com.br" in uri.lower():
+                            candidate_pages.add(uri)
+
+            # 2c. Extrair URLs do texto
+            urls_in_text = re.findall(r'https?://[^\s"\'<>\)\],]+', raw_text)
+            for u in urls_in_text:
+                if "cbf.com.br" in u.lower():
+                    candidate_pages.add(u)
+        except Exception as e_gem:
+            print(f"[EXPERT PDF FINDER WARN] Gemini search erro: {e_gem}")
+
+        # ETAPA 3: Testar todas as páginas candidatas e extrair o PDF de súmula
+        for page_url in list(candidate_pages):
+            # Se a página já é o PDF direto
+            if "conteudo.cbf.com.br/sumulas" in page_url.lower() and page_url.lower().endswith(".pdf"):
+                print(f"[EXPERT PDF FINDER] PDF direto encontrado: {page_url}")
+                return page_url
+
+            urls_to_fetch = [page_url]
+            if "?view=documentos" not in page_url:
+                urls_to_fetch.append(page_url + "?view=documentos")
+
+            for target_url in urls_to_fetch:
+                try:
+                    r_game = requests.get(target_url, headers=headers, verify=False, timeout=8)
+                    if r_game.status_code == 200:
+                        # Salvar a URL base da página do jogo para uso posterior como fallback HTML
+                        base_page = page_url.split("?")[0]
+                        self._last_game_page_url = base_page
+
+                        pdfs = re.findall(r'https?://conteudo\.cbf\.com\.br/sumulas/\d{4}/[^\s"\'<>]+\.pdf', r_game.text, re.IGNORECASE)
+                        if pdfs:
+                            se_pdf = [p for p in pdfs if "se.pdf" in p.lower() or "su.pdf" in p.lower()]
+                            final_pdf = se_pdf[0] if se_pdf else pdfs[0]
+                            print(f"[EXPERT PDF FINDER] PDF de súmula capturado da página CBF ({target_url}): {final_pdf}")
+                            return final_pdf
+                except Exception:
+                    continue
+
+        print("[EXPERT PDF FINDER] Nenhuma súmula em PDF encontrada.")
         return None
+
+
+
 
 

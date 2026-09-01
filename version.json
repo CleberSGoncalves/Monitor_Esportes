@@ -1,5 +1,5 @@
 {
-  "version": "1.9.0",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.0/Monitor_Esportes.exe",
-  "changelog": "Versão 1.9.0: Reordenação canônica e alinhamento sem lacunas/buracos dos botões do menu superior (Monitoramento, Jogos Auditados, Dashboard, Logs, Config)."
+  "version": "1.9.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.1/Monitor_Esportes.exe",
+  "changelog": "Versão 1.9.1: Expansão do limite max_output_tokens (16k) e tratamento resiliente de respostas extensas do Gemini."
 }
