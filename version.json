@@ -1,5 +1,5 @@
 {
-  "version": "1.9.6",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.6/Monitor_Esportes.exe",
-  "changelog": "Versão 1.9.6: Nova funcionalidade Cronologia da Live (Início, Fim, Duração e Plataforma CazéTV/YouTube, Amazon Prime Video, Max) adicionada ao relatório PDF e resumo textual."
+  "version": "1.9.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.7/Monitor_Esportes.exe",
+  "changelog": "Versão 1.9.7: Suporte aos campos dedicados Início Live e Fim Live no formulário da GUI, permitindo registrar o horário real da transmissão nas plataformas (YouTube/CazéTV, Prime Video, etc)."
 }

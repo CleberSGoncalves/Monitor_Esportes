@@ -618,6 +618,8 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         self.expert_platform_var = ctk.StringVar(value="CazéTV")
         self.expert_date_var = ctk.StringVar(value=datetime.now().strftime("%d/%m/%Y"))
         self.expert_time_var = ctk.StringVar(value="")
+        self.expert_live_start_var = ctk.StringVar(value="")
+        self.expert_live_end_var = ctk.StringVar(value="")
         self.expert_tag_var = ctk.StringVar(value="🏷️ Normal")
         self.dbg_comp_var = ctk.StringVar(value="competição: —")
         self.dbg_seek_var = ctk.StringVar(value="seek: —")
@@ -2013,8 +2015,14 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         )
         self.expert_platform_combo.pack(side="left", padx=(0, 10))
 
-        ctk.CTkLabel(row_inputs, text="Horário (VOD):", font=ctk.CTkFont(size=11, weight="bold")).pack(side="left", padx=(0, 4))
-        ctk.CTkEntry(row_inputs, textvariable=self.expert_time_var, width=75, placeholder_text="Ex: 22:30").pack(side="left", padx=(0, 10))
+        ctk.CTkLabel(row_inputs, text="Horário Jogo:", font=ctk.CTkFont(size=11, weight="bold")).pack(side="left", padx=(0, 4))
+        ctk.CTkEntry(row_inputs, textvariable=self.expert_time_var, width=70, placeholder_text="21:30").pack(side="left", padx=(0, 8))
+
+        ctk.CTkLabel(row_inputs, text="Início Live:", font=ctk.CTkFont(size=11, weight="bold")).pack(side="left", padx=(0, 4))
+        ctk.CTkEntry(row_inputs, textvariable=self.expert_live_start_var, width=70, placeholder_text="16:55").pack(side="left", padx=(0, 8))
+
+        ctk.CTkLabel(row_inputs, text="Fim Live:", font=ctk.CTkFont(size=11, weight="bold")).pack(side="left", padx=(0, 4))
+        ctk.CTkEntry(row_inputs, textvariable=self.expert_live_end_var, width=70, placeholder_text="21:35").pack(side="left", padx=(0, 8))
 
         ctk.CTkLabel(row_inputs, text="Tag:", font=ctk.CTkFont(size=11, weight="bold")).pack(side="left", padx=(0, 4))
         self.expert_tag_combo = ctk.CTkComboBox(
@@ -5182,7 +5190,9 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                 "competition": self.expert_comp_var.get().strip(),
                 "platform": self.expert_platform_var.get().strip(),
                 "date": self.expert_date_var.get().strip(),
-                "time": self.expert_time_var.get().strip()
+                "time": self.expert_time_var.get().strip(),
+                "live_start_time": self.expert_live_start_var.get().strip(),
+                "live_end_time": self.expert_live_end_var.get().strip(),
             }
             if not data["team1"] or not data["team2"]:
                 self._ui_error("Preencha ao menos os times para análise Expert.")
@@ -7026,6 +7036,8 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
             "comp": self.expert_comp_var.get().strip(),
             "date": self.expert_date_var.get().strip(),
             "time": self.expert_time_var.get().strip(),
+            "live_start_time": self.expert_live_start_var.get().strip(),
+            "live_end_time": self.expert_live_end_var.get().strip(),
             "platform": self.expert_platform_var.get().strip(),
         }
         if not data["team1"] or not data["team2"]:

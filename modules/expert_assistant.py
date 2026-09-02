@@ -67,7 +67,7 @@ class ExpertAssistant:
         self._init_client()
         return True
 
-    def get_match_chronology(self, team1: str, team2: str, competition: str, platform: str, date: str, start_timestamp: Optional[int] = None, duration: Optional[int] = None, video_url: Optional[str] = None, transcript_text: Optional[str] = None, status_callback: Optional[Callable[[str], None]] = None, sumula_raw_text: Optional[str] = None) -> Dict[str, Any]:
+    def get_match_chronology(self, team1: str, team2: str, competition: str, platform: str, date: str, start_timestamp: Optional[int] = None, duration: Optional[int] = None, video_url: Optional[str] = None, transcript_text: Optional[str] = None, status_callback: Optional[Callable[[str], None]] = None, sumula_raw_text: Optional[str] = None, live_start_time: Optional[str] = None, live_end_time: Optional[str] = None) -> Dict[str, Any]:
         """
         Método público principal de auditoria de cronologia. Possui lógica de caching
         e loop auto-corretivo de validação contra a súmula oficial e portais.
@@ -277,13 +277,30 @@ class ExpertAssistant:
                 # Na próxima tentativa, a diretriz de correção guiará o modelo a corrigir os desvios.
 
         # 3. Salvar no cache (apenas se for um resultado sem erro e totalmente validado)
-        if res and "error" not in res and is_final_valid:
-            try:
-                with open(cache_file, "w", encoding="utf-8") as fcache:
-                    json.dump(res, fcache, indent=2, ensure_ascii=False)
-                print(f"[EXPERT CACHE] Resultado validado salvo com sucesso no cache para {team1} x {team2} ({date})")
-            except Exception as e_save:
-                print(f"[EXPERT CACHE WARN] Falha ao salvar no cache: {e_save}")
+        if res and "error" not in res:
+            if sumula_raw_text:
+                import re as _re
+                m_time = _re.search(r'hor[áa]rio(?:\s+de\s+in[íi]cio)?\s*:?\s*(\d{2}:\d{2})', str(sumula_raw_text), _re.IGNORECASE)
+                if not m_time:
+                    m_time = _re.search(r'1º\s*Tempo\s*:?\s*(\d{2}:\d{2})', str(sumula_raw_text), _re.IGNORECASE)
+                if m_time:
+                    ext_time = m_time.group(1).strip()
+                    res["time"] = ext_time
+                    res["event_time"] = ext_time
+                    print(f"[EXPERT PIPELINE] Horário oficial da partida extraído da Súmula: {ext_time}")
+
+            if live_start_time and str(live_start_time).strip():
+                res["live_start_time"] = str(live_start_time).strip()
+            if live_end_time and str(live_end_time).strip():
+                res["live_end_time"] = str(live_end_time).strip()
+
+            if is_final_valid:
+                try:
+                    with open(cache_file, "w", encoding="utf-8") as fcache:
+                        json.dump(res, fcache, indent=2, ensure_ascii=False)
+                    print(f"[EXPERT CACHE] Resultado validado salvo com sucesso no cache para {team1} x {team2} ({date})")
+                except Exception as e_save:
+                    print(f"[EXPERT CACHE WARN] Falha ao salvar no cache: {e_save}")
         
         return res
 

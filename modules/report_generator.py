@@ -905,14 +905,20 @@ class ReportGenerator:
             to_render.sort(key=sort_key)
             
             # --- Seção: CRONOLOGIA DA LIVE DE TRANSMISSÃO (Texto) ---
-            inicio_live_txt = None
-            fim_live_txt = None
-            for item in to_render:
-                lbl_u = item.get("lbl", "").upper()
-                if not inicio_live_txt and any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "PRE_JOGO", "INÍCIO"]):
-                    inicio_live_txt = item.get("clock")
-                if any(k in lbl_u for k in ["ENCERRAMENTO", "FIM TRANSMISSÃO", "FIM DE JOGO", "APITO FINAL"]):
-                    fim_live_txt = item.get("clock")
+            inicio_live_txt = res.get("live_start_time") or res.get("stream_start_time")
+            fim_live_txt = res.get("live_end_time") or res.get("stream_end_time")
+            
+            if not inicio_live_txt:
+                for item in to_render:
+                    lbl_u = item.get("lbl", "").upper()
+                    if not inicio_live_txt and any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "PRE_JOGO", "INÍCIO"]):
+                        inicio_live_txt = item.get("clock")
+            
+            if not fim_live_txt:
+                for item in to_render:
+                    lbl_u = item.get("lbl", "").upper()
+                    if any(k in lbl_u for k in ["ENCERRAMENTO", "FIM TRANSMISSÃO", "FIM DE JOGO", "APITO FINAL"]):
+                        fim_live_txt = item.get("clock")
             
             if not inicio_live_txt and to_render:
                 inicio_live_txt = to_render[0].get("clock")
@@ -1209,14 +1215,20 @@ class ReportGenerator:
                 to_render.append(enc_item)
             
             # --- Seção: CRONOLOGIA DA LIVE DE TRANSMISSÃO ---
-            inicio_live = None
-            fim_live = None
-            for item in to_render:
-                lbl_u = item.get("lbl", "").upper()
-                if not inicio_live and any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "PRE_JOGO", "INÍCIO"]):
-                    inicio_live = item.get("clock")
-                if any(k in lbl_u for k in ["ENCERRAMENTO", "FIM TRANSMISSÃO", "FIM DE JOGO", "APITO FINAL"]):
-                    fim_live = item.get("clock")
+            inicio_live = res.get("live_start_time") or res.get("stream_start_time")
+            fim_live = res.get("live_end_time") or res.get("stream_end_time")
+            
+            if not inicio_live:
+                for item in to_render:
+                    lbl_u = item.get("lbl", "").upper()
+                    if not inicio_live and any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "PRE_JOGO", "INÍCIO"]):
+                        inicio_live = item.get("clock")
+            
+            if not fim_live:
+                for item in to_render:
+                    lbl_u = item.get("lbl", "").upper()
+                    if any(k in lbl_u for k in ["ENCERRAMENTO", "FIM TRANSMISSÃO", "FIM DE JOGO", "APITO FINAL"]):
+                        fim_live = item.get("clock")
             
             if not inicio_live and to_render:
                 inicio_live = to_render[0].get("clock")
