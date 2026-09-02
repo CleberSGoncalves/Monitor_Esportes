@@ -911,14 +911,14 @@ class ReportGenerator:
             if not inicio_live_txt:
                 for item in to_render:
                     lbl_u = item.get("lbl", "").upper()
-                    if any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO DA LIVE", "START LIVE"]):
+                    if any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "PRE_JOGO", "INÍCIO DA LIVE", "START LIVE"]):
                         inicio_live_txt = item.get("clock")
                         break
             
             if not fim_live_txt:
                 for item in to_render:
                     lbl_u = item.get("lbl", "").upper()
-                    if any(k in lbl_u for k in ["ENCERRAMENTO DE TRANSMISSÃO", "ENCERRAMENTO DA LIVE", "END LIVE"]):
+                    if any(k in lbl_u for k in ["ENCERRAMENTO DE TRANSMISSÃO", "ENCERRAMENTO DA LIVE", "ENCERRAMENTO", "END LIVE"]):
                         fim_live_txt = item.get("clock")
                         break
 
@@ -1218,14 +1218,14 @@ class ReportGenerator:
             if not inicio_live:
                 for item in to_render:
                     lbl_u = item.get("lbl", "").upper()
-                    if any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO DA LIVE", "START LIVE"]):
+                    if any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "PRE_JOGO", "INÍCIO DA LIVE", "START LIVE"]):
                         inicio_live = item.get("clock")
                         break
             
             if not fim_live:
                 for item in to_render:
                     lbl_u = item.get("lbl", "").upper()
-                    if any(k in lbl_u for k in ["ENCERRAMENTO DE TRANSMISSÃO", "ENCERRAMENTO DA LIVE", "END LIVE"]):
+                    if any(k in lbl_u for k in ["ENCERRAMENTO DE TRANSMISSÃO", "ENCERRAMENTO DA LIVE", "ENCERRAMENTO", "END LIVE"]):
                         fim_live = item.get("clock")
                         break
                 
@@ -1402,16 +1402,19 @@ class ReportGenerator:
         try:
             from modules.sharepoint_reporter import SharePointReporter
             res0 = results[0] if results else {}
-            partida = str(res0.get("match_display") or res0.get("match_id") or "Partida").strip()
-            comp = str(res0.get("competition") or "Brasileiro Serie A").strip()
-            plat = str(res0.get("platform") or "Amazon Prime").strip()
-            conf = f"{float(res0.get('confidence_score') or 99.0):.1f}%"
-            event_date = res0.get("date") or res0.get("event_date") or ""
-            event_time = res0.get("time") or res0.get("event_time") or ""
-            iso_date = SharePointReporter.format_iso_datetime(event_date, event_time)
-            SharePointReporter.sync_pdf_to_sharepoint(pdf_path, partida, comp, plat, data_hora_iso=iso_date, confianca=conf)
+            partida = str(res0.get("match_display") or res0.get("match_id") or "").strip()
+            if not partida or partida.lower() in ["partida", "none", "n/a", "sem partida"] or res0.get("error"):
+                print(f"[SharePoint] Ignorando sincronização: resultado sem partida válida ou com erro.")
+            else:
+                comp = str(res0.get("competition") or "Brasileiro Serie A").strip()
+                plat = str(res0.get("platform") or "Amazon Prime").strip()
+                conf = f"{float(res0.get('confidence_score') or 99.0):.1f}%"
+                event_date = res0.get("date") or res0.get("event_date") or ""
+                event_time = res0.get("time") or res0.get("event_time") or ""
+                iso_date = SharePointReporter.format_iso_datetime(event_date, event_time)
+                SharePointReporter.sync_pdf_to_sharepoint(pdf_path, partida, comp, plat, data_hora_iso=iso_date, confianca=conf)
         except Exception as e_sp:
-            pass
+            print(f"[SharePoint WARN] Falha na tentativa de sincronização: {e_sp}")
         return pdf_path
 
 

@@ -294,6 +294,24 @@ class ExpertAssistant:
             if live_end_time and str(live_end_time).strip():
                 res["live_end_time"] = str(live_end_time).strip()
 
+            if not res.get("live_start_time"):
+                plat_u = str(platform or "").upper()
+                if "CAZE" in plat_u or "CAZÉ" in plat_u or "YOUTUBE" in plat_u or video_url:
+                    try:
+                        from modules.youtube_metadata import fetch_youtube_live_details, search_youtube_live_url
+                        target_url = video_url
+                        if not target_url:
+                            target_url = search_youtube_live_url(f"CazéTV {team1} x {team2}")
+                        if target_url:
+                            live_info = fetch_youtube_live_details(target_url)
+                            if live_info and live_info.get("live_start_time"):
+                                res["live_start_time"] = live_info["live_start_time"]
+                                if live_info.get("live_end_time"):
+                                    res["live_end_time"] = live_info["live_end_time"]
+                                print(f"[EXPERT YOUTUBE LIVE] Extraído automaticamente do YouTube ({target_url}): Início {live_info['live_start_time']} | Fim {live_info.get('live_end_time')}")
+                    except Exception as e_yt:
+                        print(f"[EXPERT YOUTUBE LIVE WARN] Falha na busca automática do YouTube: {e_yt}")
+
             if is_final_valid:
                 try:
                     with open(cache_file, "w", encoding="utf-8") as fcache:

@@ -94,6 +94,33 @@ def fetch_youtube_live_details(url: str) -> Dict[str, Optional[str]]:
     return {"live_start_time": None, "live_end_time": None, "duration_sec": None}
 
 
+def search_youtube_live_url(query: str) -> Optional[str]:
+    """
+    Realiza uma busca no YouTube usando yt-dlp e retorna a URL do primeiro resultado relevante de live/vídeo.
+    """
+    if yt_dlp is None or not query:
+        return None
+    try:
+        opts = {
+            "quiet": True,
+            "no_warnings": True,
+            "extract_flat": True,
+            "default_search": "ytsearch1"
+        }
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            info = ydl.extract_info(f"ytsearch1:{query}", download=False)
+            if info and "entries" in info and len(info["entries"]) > 0:
+                entry = info["entries"][0]
+                url = entry.get("webpage_url") or entry.get("url")
+                if url:
+                    if not url.startswith("http"):
+                        url = f"https://www.youtube.com/watch?v={url}"
+                    return url
+    except Exception as e:
+        print(f"[YOUTUBE SEARCH WARN] Falha na busca automática no YouTube por '{query}': {e}")
+    return None
+
+
 def fetch_youtube_title(url: str) -> Optional[str]:
     if yt_dlp is None or not url:
         return None

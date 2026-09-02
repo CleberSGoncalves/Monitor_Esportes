@@ -1,5 +1,5 @@
 {
-  "version": "1.9.9",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.9/Monitor_Esportes.exe",
-  "changelog": "Versão 1.9.9: Correção do erro de DLL do Windows (LoadLibrary python312.dll) no Auto-Updater com pausa de desacoplamento do PyInstaller e esclarecimento sobre transmissões Amazon Prime/Max."
+  "version": "2.0.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.0.1/Monitor_Esportes.exe",
+  "changelog": "Versão 2.0.1: Bloqueio estrito de partidas com erro no SharePoint, extração automática dos horários da live no YouTube e remoção de itens 'Partida' incorretos."
 }
