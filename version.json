@@ -1,5 +1,5 @@
 {
-  "version": "1.9.7",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.7/Monitor_Esportes.exe",
-  "changelog": "Versão 1.9.7: Suporte aos campos dedicados Início Live e Fim Live no formulário da GUI, permitindo registrar o horário real da transmissão nas plataformas (YouTube/CazéTV, Prime Video, etc)."
+  "version": "1.9.8",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.8/Monitor_Esportes.exe",
+  "changelog": "Versão 1.9.8: Rigor total na Cronologia da Live de Transmissão. Eliminadas suposições e fallbacks arbitrários de horários do jogo, integrando a extração exata via metadados de transmissão do YouTube (yt-dlp) e formulário."
 }

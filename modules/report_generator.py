@@ -911,19 +911,16 @@ class ReportGenerator:
             if not inicio_live_txt:
                 for item in to_render:
                     lbl_u = item.get("lbl", "").upper()
-                    if not inicio_live_txt and any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "PRE_JOGO", "INÍCIO"]):
+                    if any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO DA LIVE", "START LIVE"]):
                         inicio_live_txt = item.get("clock")
+                        break
             
             if not fim_live_txt:
                 for item in to_render:
                     lbl_u = item.get("lbl", "").upper()
-                    if any(k in lbl_u for k in ["ENCERRAMENTO", "FIM TRANSMISSÃO", "FIM DE JOGO", "APITO FINAL"]):
+                    if any(k in lbl_u for k in ["ENCERRAMENTO DE TRANSMISSÃO", "ENCERRAMENTO DA LIVE", "END LIVE"]):
                         fim_live_txt = item.get("clock")
-            
-            if not inicio_live_txt and to_render:
-                inicio_live_txt = to_render[0].get("clock")
-            if not fim_live_txt and to_render:
-                fim_live_txt = to_render[-1].get("clock")
+                        break
 
             plat_name = str(m_platform or "Plataforma").strip()
             if "caze" in plat_name.lower() or "cazé" in plat_name.lower():
@@ -1221,19 +1218,16 @@ class ReportGenerator:
             if not inicio_live:
                 for item in to_render:
                     lbl_u = item.get("lbl", "").upper()
-                    if not inicio_live and any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "PRE_JOGO", "INÍCIO"]):
+                    if any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO DA LIVE", "START LIVE"]):
                         inicio_live = item.get("clock")
+                        break
             
             if not fim_live:
                 for item in to_render:
                     lbl_u = item.get("lbl", "").upper()
-                    if any(k in lbl_u for k in ["ENCERRAMENTO", "FIM TRANSMISSÃO", "FIM DE JOGO", "APITO FINAL"]):
+                    if any(k in lbl_u for k in ["ENCERRAMENTO DE TRANSMISSÃO", "ENCERRAMENTO DA LIVE", "END LIVE"]):
                         fim_live = item.get("clock")
-            
-            if not inicio_live and to_render:
-                inicio_live = to_render[0].get("clock")
-            if not fim_live and to_render:
-                fim_live = to_render[-1].get("clock")
+                        break
                 
             plat_name = str(m_platform or "Plataforma").strip()
             if "caze" in plat_name.lower() or "cazé" in plat_name.lower():

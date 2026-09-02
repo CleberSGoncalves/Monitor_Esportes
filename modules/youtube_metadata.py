@@ -49,6 +49,51 @@ def _norm(s: str) -> str:
     return s.strip()
 
 
+def fetch_youtube_live_details(url: str) -> Dict[str, Optional[str]]:
+    """
+    Extrai do YouTube via yt-dlp os horários reais exatos de início e término da transmissão ao vivo.
+    Converte os timestamps UTC para o horário de Brasília (UTC-3).
+    """
+    if yt_dlp is None or not url:
+        return {"live_start_time": None, "live_end_time": None, "duration_sec": None}
+
+    try:
+        import datetime
+        opts = {
+            "quiet": True,
+            "no_warnings": True,
+            "extract_flat": False,
+        }
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            if isinstance(info, dict):
+                start_ts = info.get("release_timestamp") or info.get("timestamp")
+                duration = info.get("duration")
+                
+                live_start_str = None
+                live_end_str = None
+                tz_br = datetime.timezone(datetime.timedelta(hours=-3))
+                
+                if start_ts:
+                    dt_start = datetime.datetime.fromtimestamp(start_ts, tz=datetime.timezone.utc).astimezone(tz_br)
+                    live_start_str = dt_start.strftime("%H:%M:%S")
+                    
+                    if duration and isinstance(duration, (int, float)) and duration > 0:
+                        dt_end = dt_start + datetime.timedelta(seconds=duration)
+                        live_end_str = dt_end.strftime("%H:%M:%S")
+
+                return {
+                    "live_start_time": live_start_str,
+                    "live_end_time": live_end_str,
+                    "duration_sec": duration,
+                    "title": info.get("title")
+                }
+    except Exception as e:
+        print(f"[YOUTUBE METADATA WARN] Falha ao extrair horários reais da live do YouTube: {e}")
+
+    return {"live_start_time": None, "live_end_time": None, "duration_sec": None}
+
+
 def fetch_youtube_title(url: str) -> Optional[str]:
     if yt_dlp is None or not url:
         return None
