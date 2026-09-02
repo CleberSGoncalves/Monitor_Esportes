@@ -161,9 +161,9 @@ class SharePointReporter:
 
         if dt:
             # Compensar o fuso horário de Brasília (UTC-3 -> UTC +3h)
-            # Se for data sem horário (00:00), usa 15:00 UTC (12:00 BRT) para não mudar o dia
+            # Se for data sem horário (00:00), ajusta para horário padrão de transmissão 21:30 BRT (+3h UTC -> 00:30Z do dia seguinte)
             if not has_time and dt.hour == 0 and dt.minute == 0:
-                dt = dt.replace(hour=15, minute=0, second=0)
+                dt = dt.replace(hour=21, minute=30, second=0) + timedelta(hours=3)
             else:
                 dt = dt + timedelta(hours=3)
             return dt.strftime("%Y-%m-%dT%H:%M:%SZ")

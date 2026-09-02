@@ -1187,7 +1187,7 @@ class ExpertAssistant:
 
                     # 1b. Buscar links de times nas tabelas para varrer o histórico
                     team_links = re.findall(r'href=["\'](/futebol-brasileiro/times/[^"\']+)["\']', r_tab.text)
-                    for tl in list(set(team_links))[:10]:
+                    for tl in list(set(team_links)):
                         t_hist_url = "https://www.cbf.com.br" + tl
                         if "?tab=" not in t_hist_url:
                             t_hist_url += "?tab=historico-de-partidas"

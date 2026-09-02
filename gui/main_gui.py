@@ -1464,7 +1464,18 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
 
         rendering_list = sorted(tl, key=sort_key)
 
+        seen_events = set()
+        deduped_list = []
         for entry in rendering_list:
+            lbl = str(entry.get("label", "") or entry.get("type", "")).upper().strip()
+            clk = str(entry.get("clock", "")).strip()
+            event_key = (lbl, clk)
+            if event_key in seen_events:
+                continue
+            seen_events.add(event_key)
+            deduped_list.append(entry)
+
+        for entry in deduped_list:
             etype = str(entry.get("type", "")).lower()
             label = str(entry.get("label", ""))
             if filt == "Banners/IA" and etype not in ("ia_analysis", "banner"): continue

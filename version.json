@@ -1,5 +1,5 @@
 {
-  "version": "1.9.4",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.4/Monitor_Esportes.exe",
-  "changelog": "Versão 1.9.4: Auto-relançamento à prova de falhas com substituição por renomeação e suporte a diretório ativo (/D)."
+  "version": "1.9.5",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.5/Monitor_Esportes.exe",
+  "changelog": "Versão 1.9.5: Correção de busca completa de súmula da CBF sem limitação, eliminação de cards duplicados na GUI e ajuste de horário padrão (21:30) no SharePoint."
 }
