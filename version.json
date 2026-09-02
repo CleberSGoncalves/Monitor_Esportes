@@ -1,5 +1,5 @@
 {
-  "version": "2.0.3",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.0.3/Monitor_Esportes.exe",
-  "changelog": "Versão 2.0.3: Suporte a fallback inteligente de ano da temporada (2025/2026) na busca da súmula CBF e resposta esclarecedora sobre a auditoria automática."
+  "version": "2.0.4",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.0.4/Monitor_Esportes.exe",
+  "changelog": "Versão 2.0.4: Filtragem estrita do letreiro superior para exibir apenas eventos das plataformas monitoradas (CazéTV e Amazon Prime) e remoção de canais irrelevantes."
 }

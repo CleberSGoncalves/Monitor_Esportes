@@ -2015,14 +2015,8 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         )
         self.expert_platform_combo.pack(side="left", padx=(0, 10))
 
-        ctk.CTkLabel(row_inputs, text="Horário Jogo:", font=ctk.CTkFont(size=11, weight="bold")).pack(side="left", padx=(0, 4))
-        ctk.CTkEntry(row_inputs, textvariable=self.expert_time_var, width=70, placeholder_text="21:30").pack(side="left", padx=(0, 8))
-
-        ctk.CTkLabel(row_inputs, text="Início Live:", font=ctk.CTkFont(size=11, weight="bold")).pack(side="left", padx=(0, 4))
-        ctk.CTkEntry(row_inputs, textvariable=self.expert_live_start_var, width=70, placeholder_text="16:55").pack(side="left", padx=(0, 8))
-
-        ctk.CTkLabel(row_inputs, text="Fim Live:", font=ctk.CTkFont(size=11, weight="bold")).pack(side="left", padx=(0, 4))
-        ctk.CTkEntry(row_inputs, textvariable=self.expert_live_end_var, width=70, placeholder_text="21:35").pack(side="left", padx=(0, 8))
+        ctk.CTkLabel(row_inputs, text="Horário (VOD):", font=ctk.CTkFont(size=11, weight="bold")).pack(side="left", padx=(0, 4))
+        ctk.CTkEntry(row_inputs, textvariable=self.expert_time_var, width=75, placeholder_text="Ex: 21:30").pack(side="left", padx=(0, 10))
 
         ctk.CTkLabel(row_inputs, text="Tag:", font=ctk.CTkFont(size=11, weight="bold")).pack(side="left", padx=(0, 4))
         self.expert_tag_combo = ctk.CTkComboBox(
@@ -7077,6 +7071,8 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                 cbf_events = CBFScheduleFetcher.get_upcoming_matches()
         except:
             cbf_events = _load_cbf_streaming_events()
+
+        cbf_events = [e for e in cbf_events if e.get("platform") in ["CazéTV", "Amazon Prime"]]
 
         if not cbf_events:
             msg = "Nenhum jogo finalizado recente encontrado." if is_finished_mode else "Nenhum confronto futuro agendado."

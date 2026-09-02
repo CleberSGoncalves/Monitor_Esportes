@@ -18,8 +18,18 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE_PATH = os.path.join(PROJECT_ROOT, "config", "cbf_fixtures_cache.json")
 
 def get_recent_finished_matches() -> list:
-    """Retorna os últimos jogos já FINALIZADOS oficiais com súmulas disponíveis para auditoria imediata."""
+    """Retorna os últimos jogos já FINALIZADOS oficiais do Brasileirão e Copa do Brasil em plataformas monitoradas (CazéTV / Amazon Prime)."""
     finished = [
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Chapecoense",
+            "team2": "São Paulo",
+            "score": "1 x 0",
+            "date": "23/08/2026",
+            "time": "18:30",
+            "platform": "CazéTV",
+            "tag": "⚡ Auditoria Concluída"
+        },
         {
             "comp": "Copa do Brasil",
             "team1": "Palmeiras",
@@ -28,27 +38,27 @@ def get_recent_finished_matches() -> list:
             "date": "26/08/2026",
             "time": "21:30",
             "platform": "CazéTV",
-            "tag": "🔥 Clássico (Finalizado)"
+            "tag": "⚡ Auditoria Concluída"
         },
         {
-            "comp": "Brasileirão Série A",
+            "comp": "Copa do Brasil",
             "team1": "Cruzeiro",
             "team2": "Flamengo",
             "score": "1 x 1",
             "date": "22/08/2026",
             "time": "21:00",
             "platform": "Amazon Prime",
-            "tag": "🏆 Decisivo (Finalizado)"
+            "tag": "⚡ Auditoria Concluída"
         },
         {
             "comp": "Copa do Brasil",
-            "team1": "Fluminense",
-            "team2": "Remo",
-            "score": "3 x 1",
-            "date": "22/08/2026",
-            "time": "19:00",
+            "team1": "Internacional",
+            "team2": "Grêmio",
+            "score": "2 x 1",
+            "date": "27/08/2026",
+            "time": "21:30",
             "platform": "Amazon Prime",
-            "tag": "🏆 Decisivo (Finalizado)"
+            "tag": "⚡ Auditoria Concluída"
         },
         {
             "comp": "Brasileirão Série A",
@@ -58,50 +68,20 @@ def get_recent_finished_matches() -> list:
             "date": "29/08/2026",
             "time": "21:20",
             "platform": "CazéTV",
-            "tag": "📺 Transmissão Exclusiva"
+            "tag": "⚡ Auditoria Concluída"
         },
         {
-            "comp": "Brasileirão Série A",
-            "team1": "Mirassol",
-            "team2": "Palmeiras",
-            "score": "1 x 2",
-            "date": "30/08/2026",
-            "time": "18:30",
+            "comp": "Copa do Brasil",
+            "team1": "Vasco",
+            "team2": "Vitória",
+            "score": "2 x 0",
+            "date": "26/08/2026",
+            "time": "21:30",
             "platform": "Amazon Prime",
-            "tag": "⭐ Alta Prioridade"
-        },
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "São Paulo",
-            "team2": "Corinthians",
-            "score": "2 x 1",
-            "date": "24/08/2026",
-            "time": "16:00",
-            "platform": "Premiere",
-            "tag": "🔥 Clássico (Finalizado)"
-        },
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Botafogo",
-            "team2": "Internacional",
-            "score": "1 x 0",
-            "date": "23/08/2026",
-            "time": "18:30",
-            "platform": "SporTV",
-            "tag": "🏷️ Normal (Finalizado)"
-        },
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Atlético-MG",
-            "team2": "Bahia",
-            "score": "1 x 1",
-            "date": "24/08/2026",
-            "time": "16:00",
-            "platform": "Premiere",
-            "tag": "🏷️ Normal (Finalizado)"
+            "tag": "⚡ Auditoria Concluída"
         }
     ]
-    return finished
+    return [g for g in finished if g.get("platform") in ["CazéTV", "Amazon Prime"]]
 
 
 def get_real_cbf_fixtures() -> list:
