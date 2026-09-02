@@ -1,5 +1,5 @@
 {
-  "version": "1.9.5",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.5/Monitor_Esportes.exe",
-  "changelog": "Versão 1.9.5: Correção de busca completa de súmula da CBF sem limitação, eliminação de cards duplicados na GUI e ajuste de horário padrão (21:30) no SharePoint."
+  "version": "1.9.6",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.6/Monitor_Esportes.exe",
+  "changelog": "Versão 1.9.6: Nova funcionalidade Cronologia da Live (Início, Fim, Duração e Plataforma CazéTV/YouTube, Amazon Prime Video, Max) adicionada ao relatório PDF e resumo textual."
 }

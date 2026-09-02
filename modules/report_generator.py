@@ -904,6 +904,54 @@ class ReportGenerator:
             
             to_render.sort(key=sort_key)
             
+            # --- Seção: CRONOLOGIA DA LIVE DE TRANSMISSÃO (Texto) ---
+            inicio_live_txt = None
+            fim_live_txt = None
+            for item in to_render:
+                lbl_u = item.get("lbl", "").upper()
+                if not inicio_live_txt and any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "PRE_JOGO", "INÍCIO"]):
+                    inicio_live_txt = item.get("clock")
+                if any(k in lbl_u for k in ["ENCERRAMENTO", "FIM TRANSMISSÃO", "FIM DE JOGO", "APITO FINAL"]):
+                    fim_live_txt = item.get("clock")
+            
+            if not inicio_live_txt and to_render:
+                inicio_live_txt = to_render[0].get("clock")
+            if not fim_live_txt and to_render:
+                fim_live_txt = to_render[-1].get("clock")
+
+            plat_name = str(m_platform or "Plataforma").strip()
+            if "caze" in plat_name.lower() or "cazé" in plat_name.lower():
+                plat_display = f"{plat_name} (YouTube)"
+            elif "prime" in plat_name.lower() or "amazon" in plat_name.lower():
+                plat_display = f"{plat_name} (Prime Video)"
+            elif "max" in plat_name.lower() or "hbo" in plat_name.lower():
+                plat_display = f"{plat_name} (Max)"
+            else:
+                plat_display = plat_name
+
+            dur_str = "N/A"
+            if inicio_live_txt and fim_live_txt:
+                try:
+                    s_parts = [int(p) for p in str(inicio_live_txt).split(":")]
+                    e_parts = [int(p) for p in str(fim_live_txt).split(":")]
+                    s_sec = s_parts[0]*3600 + s_parts[1]*60 + (s_parts[2] if len(s_parts)>2 else 0)
+                    e_sec = e_parts[0]*3600 + e_parts[1]*60 + (e_parts[2] if len(e_parts)>2 else 0)
+                    diff_sec = e_sec - s_sec
+                    if diff_sec < 0: diff_sec += 86400
+                    h_d = diff_sec // 3600
+                    m_d = (diff_sec % 3600) // 60
+                    s_d = diff_sec % 60
+                    dur_str = f"{h_d:02d}h {m_d:02d}min {s_d:02d}s"
+                except Exception:
+                    pass
+
+            lines.append("\nCRONOLOGIA DA LIVE DE TRANSMISSÃO:")
+            lines.append(f"• Plataforma: {plat_display}")
+            lines.append(f"• Horário de Início da Live: {inicio_live_txt or '--:--:--'}")
+            lines.append(f"• Horário de Encerramento da Live: {fim_live_txt or '--:--:--'}")
+            lines.append(f"• Duração Total da Live: {dur_str}")
+            lines.append("\nCRONOLOGIA COMPLETA E AUDITADA:")
+            
             for item in to_render:
                 clk = item["clock"] if item["clock"] else "--:--"
                 try: m_min = int(item.get("min", 0))
@@ -1160,6 +1208,67 @@ class ReportGenerator:
                 enc_item = to_render.pop(enc_indices[0])
                 to_render.append(enc_item)
             
+            # --- Seção: CRONOLOGIA DA LIVE DE TRANSMISSÃO ---
+            inicio_live = None
+            fim_live = None
+            for item in to_render:
+                lbl_u = item.get("lbl", "").upper()
+                if not inicio_live and any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "PRE_JOGO", "INÍCIO"]):
+                    inicio_live = item.get("clock")
+                if any(k in lbl_u for k in ["ENCERRAMENTO", "FIM TRANSMISSÃO", "FIM DE JOGO", "APITO FINAL"]):
+                    fim_live = item.get("clock")
+            
+            if not inicio_live and to_render:
+                inicio_live = to_render[0].get("clock")
+            if not fim_live and to_render:
+                fim_live = to_render[-1].get("clock")
+                
+            plat_name = str(m_platform or "Plataforma").strip()
+            if "caze" in plat_name.lower() or "cazé" in plat_name.lower():
+                plat_display = f"{plat_name} (YouTube)"
+            elif "prime" in plat_name.lower() or "amazon" in plat_name.lower():
+                plat_display = f"{plat_name} (Prime Video)"
+            elif "max" in plat_name.lower() or "hbo" in plat_name.lower():
+                plat_display = f"{plat_name} (Max)"
+            else:
+                plat_display = plat_name
+
+            dur_str = "N/A"
+            if inicio_live and fim_live:
+                try:
+                    s_parts = [int(p) for p in str(inicio_live).split(":")]
+                    e_parts = [int(p) for p in str(fim_live).split(":")]
+                    s_sec = s_parts[0]*3600 + s_parts[1]*60 + (s_parts[2] if len(s_parts)>2 else 0)
+                    e_sec = e_parts[0]*3600 + e_parts[1]*60 + (e_parts[2] if len(e_parts)>2 else 0)
+                    diff_sec = e_sec - s_sec
+                    if diff_sec < 0: diff_sec += 86400
+                    h_d = diff_sec // 3600
+                    m_d = (diff_sec % 3600) // 60
+                    s_d = diff_sec % 60
+                    dur_str = f"{h_d:02d}h {m_d:02d}min {s_d:02d}s"
+                except Exception:
+                    pass
+
+            c.setFont("Helvetica-Bold", 11)
+            c.drawString(40, y, "CRONOLOGIA DA LIVE DE TRANSMISSÃO:")
+            y -= 14
+            
+            # Caixa destacada da Live
+            c.setStrokeColorRGB(0.0, 0.7, 0.7)
+            c.setFillColorRGB(0.96, 0.98, 1.0)
+            c.roundRect(40, y - 44, width - 80, 48, 4, fill=1, stroke=1)
+            c.setFillColorRGB(0, 0, 0)
+            
+            c.setFont("Helvetica-Bold", 9.5)
+            c.drawString(50, y - 14, f"• Plataforma: {plat_display}")
+            c.drawString(290, y - 14, f"• Duração Total da Live: {dur_str}")
+            
+            c.setFont("Helvetica", 9.5)
+            c.drawString(50, y - 32, f"• Horário de Início da Live: {inicio_live or '--:--:--'}")
+            c.drawString(290, y - 32, f"• Horário de Encerramento da Live: {fim_live or '--:--:--'}")
+            
+            y -= 58
+
             # --- Imprimir Marcos ---
             c.setFont("Helvetica-Bold", 11)
             c.drawString(40, y, "CRONOLOGIA COMPLETA E AUDITADA:")
