@@ -557,24 +557,32 @@ class CBFScheduleFetcher:
         date_str = str(date).replace("-", "/")
         parts = date_str.split("/")
         year = parts[2] if len(parts) >= 3 and len(parts[2]) == 4 else parts[0]
+        
+        from datetime import datetime as _dt
+        current_year = str(_dt.now().year)
+        search_years = [year]
+        if current_year not in search_years:
+            search_years.append(current_year)
 
         t1_key = _norm(team1)[:4]
         t2_key = _norm(team2)[:4]
 
         comp_lower = str(competition).lower()
-        primary_url = f"https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/{year}"
-        if "copa" in comp_lower:
-            primary_url = f"https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/{year}"
-        elif "serie b" in comp_lower or "série b" in comp_lower:
-            primary_url = f"https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-b/{year}"
+        table_urls = []
+        for y in search_years:
+            primary_url = f"https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/{y}"
+            if "copa" in comp_lower:
+                primary_url = f"https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/{y}"
+            elif "serie b" in comp_lower or "série b" in comp_lower:
+                primary_url = f"https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-b/{y}"
 
-        table_urls = [
-            primary_url,
-            f"https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/{year}",
-            f"https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/{year}",
-            f"https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-b/{year}"
-        ]
-        # Preserva a ordem colocando o campeonato selecionado primeiro, evitando duplicados
+            table_urls.extend([
+                primary_url,
+                f"https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/{y}",
+                f"https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/{y}",
+                f"https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-b/{y}"
+            ])
+        # Preserva a ordem evitando duplicados
         table_urls = list(dict.fromkeys(table_urls))
 
         ctx = ssl.create_default_context()

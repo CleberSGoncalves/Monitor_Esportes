@@ -1,5 +1,5 @@
 {
-  "version": "2.0.2",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.0.2/Monitor_Esportes.exe",
-  "changelog": "Versão 2.0.2: Correção da busca de súmula na CBF na 1ª tentativa cobrindo 100% dos 20 clubes da Série A e ajuste da competição Chapecoense x SP (Brasileiro Série A)."
+  "version": "2.0.3",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.0.3/Monitor_Esportes.exe",
+  "changelog": "Versão 2.0.3: Suporte a fallback inteligente de ano da temporada (2025/2026) na busca da súmula CBF e resposta esclarecedora sobre a auditoria automática."
 }
