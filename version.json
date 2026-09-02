@@ -1,5 +1,5 @@
 {
-  "version": "1.9.8",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.8/Monitor_Esportes.exe",
-  "changelog": "Versão 1.9.8: Rigor total na Cronologia da Live de Transmissão. Eliminadas suposições e fallbacks arbitrários de horários do jogo, integrando a extração exata via metadados de transmissão do YouTube (yt-dlp) e formulário."
+  "version": "1.9.9",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v1.9.9/Monitor_Esportes.exe",
+  "changelog": "Versão 1.9.9: Correção do erro de DLL do Windows (LoadLibrary python312.dll) no Auto-Updater com pausa de desacoplamento do PyInstaller e esclarecimento sobre transmissões Amazon Prime/Max."
 }

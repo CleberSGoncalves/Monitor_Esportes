@@ -10,7 +10,7 @@ import time
 import urllib.request
 import subprocess
 
-CURRENT_VERSION = "1.9.8"
+CURRENT_VERSION = "1.9.9"
 
 class AutoUpdater:
     def __init__(self, version_url: str = "https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/version.json"):
@@ -100,8 +100,10 @@ class AutoUpdater:
 setlocal
 chcp 65001 > NUL
 
-timeout /t 1 /nobreak > NUL
+timeout /t 3 /nobreak > NUL
 taskkill /F /PID {pid} > NUL 2>&1
+taskkill /F /IM Monitor_Esportes.exe > NUL 2>&1
+timeout /t 1 /nobreak > NUL
 
 if exist "{exe_path}" (
     del /f /q "{old_exe_path}" > NUL 2>&1
@@ -111,6 +113,8 @@ if exist "{exe_path}" (
 if exist "{new_exe_path}" (
     move /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
 )
+
+timeout /t 1 /nobreak > NUL
 
 if exist "{exe_path}" (
     start "" /D "{exe_dir}" "{exe_path}"
