@@ -1,5 +1,5 @@
 {
-  "version": "2.0.6",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.0.6/Monitor_Esportes.exe",
-  "changelog": "Versão 2.0.6: Auto-reset de agendamentos com falha antiga e adição do botão Re-Tentar nos cards da fila."
+  "version": "2.0.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.0.7/Monitor_Esportes.exe",
+  "changelog": "Versão 2.0.7: Suporte ao leitor de PDF pypdfium2 no executável para decodificação 100% determinística de súmulas da CBF."
 }

@@ -334,21 +334,45 @@ class CBFScheduleFetcher:
             print(f"[CBF SUMULA WARN] Não foi possível obter o PDF da súmula para {team1} x {team2} ({date}).")
             return None
 
-        # Extrair texto do PDF com fitz (PyMuPDF)
+        # Extrair texto do PDF com pypdfium2 (primário), fitz ou pypdf
+        raw_text = ""
+        try:
+            import pypdfium2
+            pdf_doc = pypdfium2.PdfDocument(pdf_bytes)
+            pages_txt = []
+            for page in pdf_doc:
+                tp = page.get_textpage()
+                pages_txt.append(tp.get_text_range())
+            raw_text = "\n".join(pages_txt).strip()
+            if raw_text:
+                print(f"[CBF SUMULA] Texto extraído da súmula via pypdfium2 com sucesso ({len(raw_text)} caracteres).")
+                return raw_text
+        except Exception as e_pdfium:
+            print(f"[CBF SUMULA WARN] Falha pypdfium2: {e_pdfium}")
+
         try:
             import fitz
             doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-            raw_text = "\n".join([page.get_text() for page in doc])
+            raw_text = "\n".join([page.get_text() for page in doc]).strip()
             doc.close()
-            if raw_text.strip():
-                print(f"[CBF SUMULA] Texto extraído da súmula com sucesso ({len(raw_text)} caracteres).")
+            if raw_text:
+                print(f"[CBF SUMULA] Texto extraído da súmula via fitz com sucesso ({len(raw_text)} caracteres).")
                 return raw_text
-            else:
-                print(f"[CBF SUMULA WARN] PDF baixado mas texto extraído está vazio.")
-                return None
         except Exception as e_fitz:
             print(f"[CBF SUMULA WARN] Erro ao extrair texto do PDF com fitz: {e_fitz}")
-            return None
+
+        try:
+            import pypdf
+            import io
+            reader = pypdf.PdfReader(io.BytesIO(pdf_bytes))
+            raw_text = "\n".join([p.extract_text() for p in reader.pages]).strip()
+            if raw_text:
+                print(f"[CBF SUMULA] Texto extraído da súmula via pypdf com sucesso ({len(raw_text)} caracteres).")
+                return raw_text
+        except Exception as e_pypdf:
+            print(f"[CBF SUMULA WARN] Falha pypdf: {e_pypdf}")
+
+        return None
 
     @staticmethod
     def fetch_sumula_from_cbf_html(game_page_url: str) -> str:
