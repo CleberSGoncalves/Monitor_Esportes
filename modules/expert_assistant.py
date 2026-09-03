@@ -276,10 +276,11 @@ class ExpertAssistant:
                 time.sleep(3)
                 # Na próxima tentativa, a diretriz de correção guiará o modelo a corrigir os desvios.
 
-        # 3. Salvar no cache (apenas se for um resultado sem erro e totalmente validado)
+        # 3. Salvar no cache e aplicar trava rígida de horários oficiais da Súmula CBF
         if res and "error" not in res:
             if sumula_raw_text:
                 import re as _re
+                # Início do Jogo
                 m_time = _re.search(r'hor[áa]rio(?:\s+de\s+in[íi]cio)?\s*:?\s*(\d{2}:\d{2})', str(sumula_raw_text), _re.IGNORECASE)
                 if not m_time:
                     m_time = _re.search(r'1º\s*Tempo\s*:?\s*(\d{2}:\d{2})', str(sumula_raw_text), _re.IGNORECASE)
@@ -287,12 +288,30 @@ class ExpertAssistant:
                     ext_time = m_time.group(1).strip()
                     res["time"] = ext_time
                     res["event_time"] = ext_time
-                    print(f"[EXPERT PIPELINE] Horário oficial da partida extraído da Súmula: {ext_time}")
+                    if len(ext_time) == 5:
+                        res["first_half_start"] = ext_time + ":00"
+                    print(f"[EXPERT PIPELINE] Horário oficial de início da partida extraído da Súmula: {ext_time}")
+
+                # Apito Final / Fim de Jogo da Súmula
+                m_end = _re.search(r'(?:fim|término|encerramento|apito\s+final).*?(\d{2}:\d{2})', str(sumula_raw_text), _re.IGNORECASE)
+                if m_end:
+                    ext_end = m_end.group(1).strip()
+                    if len(ext_end) == 5:
+                        ext_end = ext_end + ":00"
+                    res["match_end"] = ext_end
+                    print(f"[EXPERT PIPELINE] Horário oficial do apito final extraído da Súmula: {ext_end}")
 
             if live_start_time and str(live_start_time).strip():
                 res["live_start_time"] = str(live_start_time).strip()
             if live_end_time and str(live_end_time).strip():
                 res["live_end_time"] = str(live_end_time).strip()
+
+            # Garantir sincronia da LIVE no post_game_end
+            if res.get("live_end_time"):
+                l_end = str(res["live_end_time"]).strip()
+                if len(l_end) == 5:
+                    l_end += ":00"
+                res["post_game_end"] = l_end
 
             if not res.get("live_start_time"):
                 plat_u = str(platform or "").upper()
@@ -308,6 +327,7 @@ class ExpertAssistant:
                                 res["live_start_time"] = live_info["live_start_time"]
                                 if live_info.get("live_end_time"):
                                     res["live_end_time"] = live_info["live_end_time"]
+                                    res["post_game_end"] = live_info["live_end_time"]
                                 print(f"[EXPERT YOUTUBE LIVE] Extraído automaticamente do YouTube ({target_url}): Início {live_info['live_start_time']} | Fim {live_info.get('live_end_time')}")
                     except Exception as e_yt:
                         print(f"[EXPERT YOUTUBE LIVE WARN] Falha na busca automática do YouTube: {e_yt}")

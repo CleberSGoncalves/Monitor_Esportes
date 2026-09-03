@@ -1,5 +1,5 @@
 {
-  "version": "2.1.1",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.1.1/Monitor_Esportes.exe",
-  "changelog": "v2.1.1: Sincronização completa de todos os destinatários de e-mail selecionados na fila de agendamento automático."
+  "version": "2.1.2",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.1.2/Monitor_Esportes.exe",
+  "changelog": "v2.1.2: Trava rígida de horários oficiais da Súmula CBF, correção da atualização automática (resiliente para DLLs temporárias) e sincronia da LIVE."
 }

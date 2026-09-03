@@ -6113,7 +6113,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         self.after(0, self._load_expert_history_list)
 
     def _load_expert_history_list(self) -> None:
-        """Carrega a lista de arquivos JSON e PDF de relatórios de auditoria com formatação clara e botões de atalho."""
+        """Carrega a lista de relatórios de auditoria agrupados por partida sem duplicar linhas PDF/JSON."""
         for widget in self.expert_hist_scroll.winfo_children():
             widget.destroy()
             
@@ -6127,38 +6127,47 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         for r_dir in search_dirs:
             if os.path.exists(r_dir):
                 all_files.extend(glob.glob(os.path.join(r_dir, "expert_*.json")))
+                all_files.extend(glob.glob(os.path.join(r_dir, "expert_*.pdf")))
                 all_files.extend(glob.glob(os.path.join(r_dir, "Relatorio_*.pdf")))
-                all_files.extend(glob.glob(os.path.join(r_dir, "*.pdf")))
 
-        # Filtrar duplicados mantendo o arquivo mais recente
-        unique_files = {}
+        # Agrupar por nome de chave (partida + timestamp aproximado)
+        audit_groups = {}
         for p in all_files:
-            bname = os.path.basename(p)
-            if bname not in unique_files or os.path.getmtime(p) > os.path.getmtime(unique_files[bname]):
-                unique_files[bname] = p
+            fname = os.path.basename(p)
+            base_key = fname.rsplit(".", 1)[0]
+            # Normalizar chave para unir JSON e PDF gerados no mesmo timestamp
+            norm_key = base_key.replace("_CORRIGIDO", "").replace("_FINAL", "")
+            
+            if norm_key not in audit_groups:
+                audit_groups[norm_key] = {"json": None, "pdf": None, "mtime": 0}
+            
+            mtime = os.path.getmtime(p)
+            if mtime > audit_groups[norm_key]["mtime"]:
+                audit_groups[norm_key]["mtime"] = mtime
                 
-        files = list(unique_files.values())
-        files.sort(key=os.path.getmtime, reverse=True)
+            if fname.lower().endswith(".pdf"):
+                audit_groups[norm_key]["pdf"] = p
+            elif fname.lower().endswith(".json"):
+                audit_groups[norm_key]["json"] = p
+
+        # Ordenar auditorias mais recentes primeiro
+        sorted_groups = sorted(audit_groups.items(), key=lambda x: x[1]["mtime"], reverse=True)
         
-        for path in files[:20]: # Mostrar os últimos 20
-            fname = os.path.basename(path)
-            is_pdf = fname.lower().endswith(".pdf")
+        for norm_key, info in sorted_groups[:20]:
+            pdf_path = info["pdf"]
+            json_path = info["json"]
+            ref_path = pdf_path or json_path
             
             try:
-                mod_dt = datetime.fromtimestamp(os.path.getmtime(path))
+                mod_dt = datetime.fromtimestamp(info["mtime"])
                 date_display = mod_dt.strftime("%d/%m %H:%M")
             except:
                 date_display = "Recente"
 
             match_id = ""
-            if is_pdf:
-                # Extrair o nome da partida do nome do PDF (ex: Relatorio_Auditoria_Vitoria_x_Vasco_da_Gama_...)
-                clean_name = fname.replace("Relatorio_Auditoria_", "").replace("Relatorio_", "").replace(".pdf", "")
-                parts_name = clean_name.split("_202")
-                match_id = parts_name[0].replace("_", " ").title()
-            else:
+            if json_path and os.path.exists(json_path):
                 try:
-                    with open(path, "r", encoding="utf-8") as jf:
+                    with open(json_path, "r", encoding="utf-8") as jf:
                         data = json.load(jf)
                     res_arr = data.get("expert_results", [])
                     if res_arr:
@@ -6167,39 +6176,54 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                         match_id = str(data.get("match_display") or "")
                 except:
                     pass
+                    
+            if not match_id and pdf_path:
+                clean_name = os.path.basename(pdf_path).replace("Relatorio_Auditoria_", "").replace("expert_", "").replace(".pdf", "")
+                parts_name = clean_name.split("_202")
+                match_id = parts_name[0].replace("_", " ").title()
 
-            icon = "📕 PDF" if is_pdf else "📊 JSON"
-            btn_text = f"{icon} {date_display}"
-            if match_id:
-                btn_text += f" - {match_id[:24]}"
+            display_title = f"{match_id[:24]}" if match_id else "Partida Auditada"
 
-            item_frame = ctk.CTkFrame(self.expert_hist_scroll, fg_color="transparent")
-            item_frame.pack(fill="x", padx=2, pady=2)
+            item_frame = ctk.CTkFrame(self.expert_hist_scroll, fg_color="#1e1e1e", corner_radius=6, border_width=1, border_color="#333333")
+            item_frame.pack(fill="x", padx=2, pady=3)
 
-            btn = ctk.CTkButton(
+            # Rótulo de título e data
+            lbl_title = ctk.CTkLabel(
                 item_frame,
-                text=btn_text,
+                text=f"⚽ {display_title} ({date_display})",
                 font=ctk.CTkFont(size=11, weight="bold"),
-                fg_color="#222222",
-                hover_color="#333333",
-                anchor="w",
-                height=28,
-                command=lambda p=path: (os.startfile(p) if p.endswith(".pdf") else self._open_history_report(p))
+                text_color="#00CED1",
+                anchor="w"
             )
-            btn.pack(side="left", fill="x", expand=True)
+            lbl_title.pack(side="left", fill="x", expand=True, padx=6, pady=4)
 
-            if not is_pdf:
+            # Botão PDF
+            if pdf_path and os.path.exists(pdf_path):
                 btn_pdf = ctk.CTkButton(
                     item_frame,
                     text="📄 PDF",
                     font=ctk.CTkFont(size=10, weight="bold"),
-                    width=46,
-                    height=24,
-                    fg_color="#008B8B",
-                    hover_color="#00CED1",
-                    command=lambda p=path: self._regenerate_pdf_from_history(p)
+                    width=48,
+                    height=22,
+                    fg_color="#006400",
+                    hover_color="#004d00",
+                    command=lambda p=pdf_path: os.startfile(p)
                 )
-                btn_pdf.pack(side="right", padx=2)
+                btn_pdf.pack(side="right", padx=(2, 4), pady=4)
+
+            # Botão JSON / Visualizar
+            if json_path and os.path.exists(json_path):
+                btn_json = ctk.CTkButton(
+                    item_frame,
+                    text="📋 JSON",
+                    font=ctk.CTkFont(size=10, weight="bold"),
+                    width=52,
+                    height=22,
+                    fg_color="#2b5b84",
+                    hover_color="#1c3d5a",
+                    command=lambda p=json_path: self._open_history_report(p)
+                )
+                btn_json.pack(side="right", padx=2, pady=4)
 
     def _open_prompt_editor_modal(self) -> None:
         """Abre uma janela modal para visualizar e ajustar o prompt do Gemini antes da busca."""
@@ -6534,7 +6558,11 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
         if not hasattr(self, "schedule_scroll"):
             return
             
-        games = getattr(self, "_scheduled_games", [])
+        raw_games = getattr(self, "_scheduled_games", [])
+        
+        # Ordenar priorizando jogos ativos (running > queued > pending > failed > completed)
+        prio_map = {"running": 0, "queued": 1, "pending": 2, "failed": 3, "completed": 4}
+        games = sorted(raw_games, key=lambda x: prio_map.get(x.get("status", "pending"), 2))
         
         # Caso a fila esteja vazia, garante a exibição da label informativa
         if not games:

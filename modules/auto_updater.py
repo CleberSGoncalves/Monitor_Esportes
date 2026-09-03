@@ -10,7 +10,7 @@ import time
 import urllib.request
 import subprocess
 
-CURRENT_VERSION = "2.1.1"
+CURRENT_VERSION = "2.1.2"
 
 class AutoUpdater:
     def __init__(self, version_url: str = "https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/version.json"):
@@ -49,11 +49,6 @@ class AutoUpdater:
         """
         Baixa o novo executável, cria o script de troca rápida em background e reinicia o app.
         """
-        # Descomente para testes em ambiente de desenvolvimento se necessário, mas mantemos o skip por padrão
-        # if not getattr(sys, 'frozen', False):
-        #     print("[AUTO-UPDATER] Atualização automática desativada em modo de código fonte (desenvolvimento).")
-        #     return False
-
         try:
             exe_path = sys.executable
             exe_dir = os.path.dirname(exe_path)
@@ -71,7 +66,7 @@ class AutoUpdater:
             }
             
             print(f"[AUTO-UPDATER] Baixando atualização via requests stream de {download_url}...")
-            response = requests.get(download_url, headers=headers, stream=True, verify=False, timeout=60, allow_redirects=True)
+            response = requests.get(download_url, headers=headers, stream=True, verify=False, timeout=90, allow_redirects=True)
             response.raise_for_status()
             
             total_size = int(response.headers.get('content-length', 0))
@@ -91,20 +86,24 @@ class AutoUpdater:
                                 mb = downloaded / (1024 * 1024)
                                 progress_callback(f"{mb:.1f} MB")
 
-            # Criar script batch com renomeação garantida e relançamento em seu diretório de trabalho (/D)
             pid = os.getpid()
             old_exe_path = os.path.join(exe_dir, "Monitor_Esportes_old.exe")
             old_exe_name = os.path.basename(old_exe_path)
+            exe_name = os.path.basename(exe_path)
             
+            # Batch resiliente com retries para aguardar o término do processo e garantir a liberação das DLLs no Temp
             bat_content = f"""@echo off
-setlocal
+setlocal enabledelayedexpansion
 chcp 65001 > NUL
 
-timeout /t 3 /nobreak > NUL
-taskkill /F /PID {pid} > NUL 2>&1
-taskkill /F /IM Monitor_Esportes.exe > NUL 2>&1
-timeout /t 1 /nobreak > NUL
+echo Aguardando encerramento do processo antigo (PID {pid})...
+timeout /t 4 /nobreak > NUL
 
+taskkill /F /PID {pid} > NUL 2>&1
+taskkill /F /IM {exe_name} > NUL 2>&1
+timeout /t 2 /nobreak > NUL
+
+:RETRY_MOVE
 if exist "{exe_path}" (
     del /f /q "{old_exe_path}" > NUL 2>&1
     ren "{exe_path}" "{old_exe_name}" > NUL 2>&1
@@ -112,15 +111,27 @@ if exist "{exe_path}" (
 
 if exist "{new_exe_path}" (
     move /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
-)
-
-timeout /t 1 /nobreak > NUL
-
-if exist "{exe_path}" (
-    start "" /D "{exe_dir}" "{exe_path}"
+    if errorlevel 1 (
+        echo Tentando copia direta...
+        copy /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
+        del /f /q "{new_exe_path}" > NUL 2>&1
+    )
 )
 
 timeout /t 2 /nobreak > NUL
+
+if exist "{exe_path}" (
+    echo Iniciando nova versao...
+    start "" /D "{exe_dir}" "{exe_path}"
+) else (
+    if exist "{old_exe_path}" (
+        echo Restaurando versao anterior por precaucao...
+        copy /y "{old_exe_path}" "{exe_path}" > NUL 2>&1
+        start "" /D "{exe_dir}" "{exe_path}"
+    )
+)
+
+timeout /t 3 /nobreak > NUL
 del /f /q "{old_exe_path}" > NUL 2>&1
 (goto) 2>nul & del "%~f0"
 """
@@ -136,7 +147,8 @@ del /f /q "{old_exe_path}" > NUL 2>&1
                 close_fds=True
             )
             
-            # Encerramento imediato para liberar o processo anterior
+            # Encerramento limpo para liberar totalmente o arquivo do sistema
+            time.sleep(0.5)
             os._exit(0)
             return True
         except Exception as e:
