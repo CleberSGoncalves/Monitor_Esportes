@@ -1075,20 +1075,35 @@ class ExpertAssistant:
         print(f"[EXPERT SCHEDULER] Checando disponibilidade real no site da CBF para {team1} x {team2} ({date})...")
         try:
             from modules.cbf_schedule_fetcher import CBFScheduleFetcher
+            import requests
+            import re
             
-            # 1. Tentar encontrar URL do PDF da súmula diretamente
-            pdf_url = self.find_sumula_url_via_gemini(team1, team2, date, comp)
-            if pdf_url and "sumulas" in pdf_url:
-                print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada na CBF: {pdf_url}")
-                return True
-
-            # 2. Tentar encontrar URL da página do jogo e checar se há dados no HTML
+            # 1. Busca direta ultrarrápida da página oficial do jogo na CBF
             game_url = CBFScheduleFetcher.find_game_page_url(team1, team2, date, comp)
             if game_url:
+                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+                for target_url in [game_url, game_url + "?view=documentos"]:
+                    try:
+                        resp = requests.get(target_url, headers=headers, verify=False, timeout=6)
+                        if resp.status_code == 200:
+                            pdf_matches = re.findall(r'https?://conteudo\.cbf\.com\.br/sumulas/\d{4}/[^\s"\'<>]+\.pdf', resp.text, re.IGNORECASE)
+                            if pdf_matches:
+                                print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada no HTML da CBF: {pdf_matches[0]}")
+                                return True
+                    except Exception:
+                        pass
+                
+                # Checar se há dados completos no HTML
                 sumula_text = CBFScheduleFetcher.fetch_sumula_from_cbf_html(game_url)
                 if sumula_text and len(sumula_text.strip()) > 100:
                     print(f"[EXPERT SCHEDULER] ✅ Súmula em HTML confirmada na CBF para {team1} x {team2}!")
                     return True
+
+            # 2. Fallback: Busca via Gemini Grounding
+            pdf_url = self.find_sumula_url_via_gemini(team1, team2, date, comp)
+            if pdf_url and "sumulas" in pdf_url:
+                print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada via Gemini: {pdf_url}")
+                return True
 
             print(f"[EXPERT SCHEDULER] Súmula oficial da CBF ainda NÃO publicada no site para {team1} x {team2}.")
             return False

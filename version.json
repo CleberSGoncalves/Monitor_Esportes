@@ -1,5 +1,5 @@
 {
-  "version": "2.0.8",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.0.8/Monitor_Esportes.exe",
-  "changelog": "Versão 2.0.8: Detecção direta de PDF em is_cbf_sumula_available para disparo imediato da auditoria agendada assim que o PDF da súmula é publicado pela CBF."
+  "version": "2.0.9",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.0.9/Monitor_Esportes.exe",
+  "changelog": "Versão 2.0.9: Busca determinística ultrarrápida direta no HTML da partida da CBF sem dependência de APIs externas para disparo instantâneo no agendador."
 }
