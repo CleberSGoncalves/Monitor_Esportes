@@ -247,6 +247,10 @@ def _load_scheduled_games() -> list:
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 if isinstance(data, list) and len(data) > 0:
+                    for g in data:
+                        if g.get("status") == "failed":
+                            g["status"] = "pending"
+                            g["_last_sumula_check_time"] = 0.0
                     return data
         except:
             pass
@@ -6629,6 +6633,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                 lbl_countdown.pack(anchor="w", padx=8, pady=(0, 4))
                 
                 btn_open = None
+                btn_retry = None
                 if g_status == "completed":
                     pdf_path = g.get("pdf_path")
                     def make_open_cmd(p_path=pdf_path):
@@ -6639,13 +6644,28 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                         command=make_open_cmd()
                     )
                     btn_open.pack(anchor="w", padx=8, pady=(2, 6))
+                elif g_status == "failed":
+                    def make_retry_cmd(target_game=g):
+                        def _do_retry():
+                            target_game["status"] = "pending"
+                            target_game["_last_sumula_check_time"] = 0.0
+                            _save_scheduled_games(getattr(self, "_scheduled_games", []))
+                            self._update_schedule_panel_ui()
+                        return _do_retry
+                    btn_retry = ctk.CTkButton(
+                        card, text="🔄 Re-Tentar", font=ctk.CTkFont(size=11, weight="bold"),
+                        fg_color="#8B0000", hover_color="#A52A2A", height=22, width=100,
+                        command=make_retry_cmd()
+                    )
+                    btn_retry.pack(anchor="w", padx=8, pady=(2, 6))
                     
                 self._schedule_cards_cache[g_id] = {
                     "card": card,
                     "lbl_team": lbl_team,
                     "lbl_st": lbl_st,
                     "lbl_countdown": lbl_countdown,
-                    "btn_open": btn_open
+                    "btn_open": btn_open,
+                    "btn_retry": btn_retry
                 }
             else:
                 # Se o card já existe, nós apenas atualizamos os valores dinâmicos de forma rápida
