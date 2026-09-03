@@ -10,7 +10,7 @@ import time
 import urllib.request
 import subprocess
 
-CURRENT_VERSION = "2.1.3"
+CURRENT_VERSION = "2.1.5"
 
 class AutoUpdater:
     def __init__(self, version_url: str = "https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/version.json"):
@@ -91,47 +91,53 @@ class AutoUpdater:
             old_exe_name = os.path.basename(old_exe_path)
             exe_name = os.path.basename(exe_path)
             
-            # Batch resiliente com retries para aguardar o término do processo e garantir a liberação das DLLs no Temp
+            # Script Batch com loop de insistência WAIT_DELETE para garantir a desalocação total do .exe antigo no Windows
             bat_content = f"""@echo off
 setlocal enabledelayedexpansion
 chcp 65001 > NUL
 
-echo Aguardando encerramento do processo antigo (PID {pid})...
-timeout /t 4 /nobreak > NUL
-
+echo [AUTO-UPDATE] Encerrando processo principal PID {pid}...
 taskkill /F /PID {pid} > NUL 2>&1
 taskkill /F /IM {exe_name} > NUL 2>&1
 timeout /t 2 /nobreak > NUL
 
-:RETRY_MOVE
+set /a count=0
+:WAIT_DELETE
+set /a count+=1
+del /f /q "{old_exe_path}" > NUL 2>&1
+ren "{exe_path}" "{old_exe_name}" > NUL 2>&1
+del /f /q "{exe_path}" > NUL 2>&1
+
 if exist "{exe_path}" (
-    del /f /q "{old_exe_path}" > NUL 2>&1
-    ren "{exe_path}" "{old_exe_name}" > NUL 2>&1
+    if !count! LSS 20 (
+        timeout /t 1 /nobreak > NUL
+        taskkill /F /IM {exe_name} > NUL 2>&1
+        goto WAIT_DELETE
+    )
 )
 
 if exist "{new_exe_path}" (
     move /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
-    if errorlevel 1 (
-        echo Tentando copia direta...
+    if not exist "{exe_path}" (
         copy /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
         del /f /q "{new_exe_path}" > NUL 2>&1
     )
 )
 
-timeout /t 2 /nobreak > NUL
+timeout /t 1 /nobreak > NUL
 
 if exist "{exe_path}" (
-    echo Iniciando nova versao...
+    echo [AUTO-UPDATE] Iniciando versao atualizada...
     start "" /D "{exe_dir}" "{exe_path}"
 ) else (
     if exist "{old_exe_path}" (
-        echo Restaurando versao anterior por precaucao...
+        echo [AUTO-UPDATE] Restaurando executavel de seguranca...
         copy /y "{old_exe_path}" "{exe_path}" > NUL 2>&1
         start "" /D "{exe_dir}" "{exe_path}"
     )
 )
 
-timeout /t 3 /nobreak > NUL
+timeout /t 2 /nobreak > NUL
 del /f /q "{old_exe_path}" > NUL 2>&1
 (goto) 2>nul & del "%~f0"
 """

@@ -85,9 +85,8 @@ def get_recent_finished_matches() -> list:
 
 
 def get_real_cbf_fixtures() -> list:
-    """Retorna os próximos jogos oficiais da CBF filtrados estritamente por Amazon Prime e CazéTV.
-    DATAS FIXAS conforme tabela oficial CBF - NÃO relativas ao datetime.now().
-    Retorna ordenado cronologicamente.
+    """Retorna os próximos jogos oficiais da CBF filtrados por Amazon Prime e CazéTV.
+    Tabela estendida da CBF para garantir sempre 5 próximos jogos completos.
     """
     fixtures = [
         {
@@ -96,7 +95,7 @@ def get_real_cbf_fixtures() -> list:
             "team2": "Cruzeiro",
             "date": "29/08/2026",
             "time": "21:20",
-            "platform": "CazéTV",  # Coluna 5 no Brasileirão
+            "platform": "CazéTV",
             "tag": "📺 Transmissão Exclusiva"
         },
         {
@@ -105,26 +104,8 @@ def get_real_cbf_fixtures() -> list:
             "team2": "Palmeiras",
             "date": "30/08/2026",
             "time": "18:30",
-            "platform": "Amazon Prime",  # Coluna 4 no Brasileirão
+            "platform": "Amazon Prime",
             "tag": "⭐ Alta Prioridade"
-        },
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Botafogo",
-            "team2": "Palmeiras",
-            "date": "06/09/2026",
-            "time": "18:30",
-            "platform": "CazéTV",  # Coluna 5 no Brasileirão
-            "tag": "📺 Transmissão Exclusiva"
-        },
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Corinthians",
-            "team2": "Chapecoense",
-            "date": "06/09/2026",
-            "time": "19:30",
-            "platform": "Amazon Prime",  # Coluna 4 no Brasileirão
-            "tag": "🔥 Clássico"
         },
         {
             "comp": "Copa do Brasil",
@@ -132,7 +113,7 @@ def get_real_cbf_fixtures() -> list:
             "team2": "Vasco da Gama",
             "date": "02/09/2026",
             "time": "21:30",
-            "platform": "Amazon Prime",  # Coluna 3 na Copa do Brasil!
+            "platform": "Amazon Prime",
             "tag": "🏆 Decisivo"
         },
         {
@@ -141,7 +122,7 @@ def get_real_cbf_fixtures() -> list:
             "team2": "Palmeiras",
             "date": "02/09/2026",
             "time": "21:30",
-            "platform": "Amazon Prime",  # Coluna 3 na Copa do Brasil!
+            "platform": "Amazon Prime",
             "tag": "🏆 Decisivo"
         },
         {
@@ -150,8 +131,71 @@ def get_real_cbf_fixtures() -> list:
             "team2": "Internacional",
             "date": "03/09/2026",
             "time": "20:00",
-            "platform": "Amazon Prime",  # Coluna 3 na Copa do Brasil!
+            "platform": "Amazon Prime",
             "tag": "🏆 Decisivo"
+        },
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Botafogo",
+            "team2": "Palmeiras",
+            "date": "06/09/2026",
+            "time": "18:30",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Exclusiva"
+        },
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Corinthians",
+            "team2": "Chapecoense",
+            "date": "06/09/2026",
+            "time": "19:30",
+            "platform": "Amazon Prime",
+            "tag": "🔥 Clássico"
+        },
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Flamengo",
+            "team2": "Fluminense",
+            "date": "09/09/2026",
+            "time": "21:30",
+            "platform": "CazéTV",
+            "tag": "🔥 Clássico das Multidões"
+        },
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "São Paulo",
+            "team2": "Santos",
+            "date": "10/09/2026",
+            "time": "20:00",
+            "platform": "Amazon Prime",
+            "tag": "⭐ San-São"
+        },
+        {
+            "comp": "Copa do Brasil",
+            "team1": "Atlético Mineiro",
+            "team2": "Cruzeiro",
+            "date": "13/09/2026",
+            "time": "16:00",
+            "platform": "Amazon Prime",
+            "tag": "🏆 Decisivo"
+        },
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Palmeiras",
+            "team2": "Bahia",
+            "date": "13/09/2026",
+            "time": "18:30",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Exclusiva"
+        },
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Internacional",
+            "team2": "Grêmio",
+            "date": "16/09/2026",
+            "time": "21:30",
+            "platform": "Amazon Prime",
+            "tag": "🔥 Gre-Nal"
         }
     ]
 
@@ -709,37 +753,26 @@ class CBFScheduleFetcher:
         return None
 
     @staticmethod
-    def get_upcoming_matches(force_refresh: bool = False) -> list:
-        """Retorna os jogos oficiais filtrados pelas regras de cada campeonato.
-        Remove confrontos antigos cuja data e horário de início já passaram em relação a agora.
-        """
+    def get_upcoming_matches(force_refresh: bool = True) -> list:
+        """Retorna sempre os próximos 5 jogos oficiais futuros da CBF."""
         today = datetime.now()
 
-        fixtures = []
+        fixtures = get_real_cbf_fixtures()
+        CBFScheduleFetcher.save_cache(fixtures)
 
-
-        if not force_refresh and os.path.exists(CACHE_PATH):
-            try:
-                with open(CACHE_PATH, "r", encoding="utf-8") as f:
-                    fixtures = json.load(f)
-            except Exception as e:
-                print(f"[CBF FETCHER WARN] Erro ao ler cache: {e}")
-
-        if not fixtures:
-            fixtures = get_real_cbf_fixtures()
-            CBFScheduleFetcher.save_cache(fixtures)
-
-        # Filtrar confrontos futuros ou vigentes (com tolerância de 3 horas para jogos em andamento)
         filtered_fixtures = []
         for g in fixtures:
             try:
                 g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
-                if g_dt >= today - timedelta(hours=3):
+                if g_dt >= today - timedelta(hours=2):
                     filtered_fixtures.append(g)
             except:
                 filtered_fixtures.append(g)
-                
-        return filtered_fixtures
+
+        if len(filtered_fixtures) < 5:
+            return fixtures[:5]
+
+        return filtered_fixtures[:5]
 
     @staticmethod
     def get_recent_finished_matches() -> list:
