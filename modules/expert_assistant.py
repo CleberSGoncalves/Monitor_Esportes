@@ -1068,35 +1068,28 @@ class ExpertAssistant:
                 
         return out_meta
 
-    def is_cbf_sumula_available(self, team1: str, team2: str, date: str) -> bool:
+    def is_cbf_sumula_available(self, team1: str, team2: str, date: str, comp: str = "Brasileiro Serie A") -> bool:
         """
-        Realiza uma busca ativa no Google para verificar se o documento oficial da SÚMULA (PDF)
-        para a partida já está disponível no site da CBF (cbf.com.br) ou portais esportivos oficiais.
+        Verifica DIRETAMENTE no site oficial da CBF (cbf.com.br) se o documento oficial da SÚMULA
+        para a partida já foi publicado e está disponível para extração.
         """
-        print(f"[EXPERT SCHEDULER] Checando disponibilidade da súmula para {team1} x {team2} ({date})...")
-        prompt = f"""
-        Pesquise na internet (especialmente no site oficial da CBF cbf.com.br ou portais esportivos relevantes) se o arquivo oficial da SÚMULA (documento PDF de súmula oficial da partida de futebol) para o jogo entre "{team1}" e "{team2}" realizado na data {date} já foi publicado e está disponível para download.
-        Analise se o link de download da Súmula ou o documento de Súmula Oficial está ativo e disponível para visualização pública no site da CBF.
-        
-        Responda APENAS com a palavra TRUE se a súmula já está disponível, ou FALSE caso a súmula ainda não tenha sido publicada/disponibilizada no site da CBF.
-        Não adicione nenhuma outra palavra ou explicação. Apenas TRUE ou FALSE.
-        """
-        config = types.GenerateContentConfig(
-            temperature=0.0,
-            tools=[types.Tool(google_search=types.GoogleSearch())]
-        )
+        print(f"[EXPERT SCHEDULER] Checando disponibilidade real no site da CBF para {team1} x {team2} ({date})...")
         try:
-            response = self.client.models.generate_content(
-                model=self.model_id,
-                contents=prompt,
-                config=config
-            )
-            txt = response.text.upper().strip()
-            available = "TRUE" in txt and "FALSE" not in txt
-            print(f"[EXPERT SCHEDULER] Disponibilidade da súmula: {available}")
-            return available
+            from modules.cbf_schedule_fetcher import CBFScheduleFetcher
+            game_url = CBFScheduleFetcher.find_game_page_url(team1, team2, date, comp)
+            if not game_url:
+                print(f"[EXPERT SCHEDULER] Página da partida {team1} x {team2} ainda não encontrada na CBF.")
+                return False
+                
+            sumula_text = CBFScheduleFetcher.fetch_sumula_from_cbf_html(game_url)
+            if sumula_text and len(sumula_text.strip()) > 100:
+                print(f"[EXPERT SCHEDULER] ✅ Súmula da CBF CONFIRMADA e DISPONÍVEL para {team1} x {team2}!")
+                return True
+            else:
+                print(f"[EXPERT SCHEDULER] Súmula oficial da CBF ainda NÃO publicada no site para {team1} x {team2}.")
+                return False
         except Exception as e:
-            print(f"[EXPERT SCHEDULER WARN] Erro ao checar súmula: {e}")
+            print(f"[EXPERT SCHEDULER WARN] Erro ao checar súmula no site da CBF: {e}")
             return False
 
     def validate_chronology(self, team1: str, team2: str, date: str, competition: str, chronology_json: Dict[str, Any]) -> Dict[str, Any]:
@@ -1286,6 +1279,15 @@ Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
             print(f"[EXPERT PDF FINDER WARN] Gemini search erro: {e_gem}")
 
         # ETAPA 3: Testar todas as páginas candidatas e extrair o PDF de súmula
+        target_d, target_m = None, None
+        try:
+            d_p = date.split("/")
+            if len(d_p) >= 2:
+                target_d = d_p[0].lstrip("0")
+                target_m = d_p[1].lstrip("0")
+        except Exception:
+            pass
+
         for page_url in list(candidate_pages):
             # Se a página já é o PDF direto
             if "conteudo.cbf.com.br/sumulas" in page_url.lower() and page_url.lower().endswith(".pdf"):
@@ -1300,7 +1302,16 @@ Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
                 try:
                     r_game = requests.get(target_url, headers=headers, verify=False, timeout=8)
                     if r_game.status_code == 200:
-                        # Salvar a URL base da página do jogo para uso posterior como fallback HTML
+                        # Verificar se o HTML da partida bate com a data solicitada
+                        if target_d and target_m:
+                            has_date = (
+                                f"{target_d.zfill(2)}/{target_m.zfill(2)}" in r_game.text or
+                                f"{target_d}/{target_m}" in r_game.text
+                            )
+                            if not has_date:
+                                # Partida de outra rodada / data antiga
+                                continue
+
                         base_page = page_url.split("?")[0]
                         self._last_game_page_url = base_page
 
@@ -1313,7 +1324,7 @@ Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
                 except Exception:
                     continue
 
-        print("[EXPERT PDF FINDER] Nenhuma súmula em PDF encontrada.")
+        print("[EXPERT PDF FINDER] Nenhuma súmula em PDF encontrada para a data solicitada.")
         return None
 
 

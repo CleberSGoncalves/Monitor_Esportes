@@ -577,14 +577,50 @@ class CBFScheduleFetcher:
                 with opener.open(req, timeout=8) as resp:
                     html = resp.read().decode("utf-8", errors="ignore")
                 
+                target_d, target_m, target_y = None, None, None
+                try:
+                    d_p = date.split("/")
+                    if len(d_p) >= 2:
+                        target_d = d_p[0].lstrip("0")
+                        target_m = d_p[1].lstrip("0")
+                        target_y = d_p[2] if len(d_p) >= 3 else "2026"
+                except Exception:
+                    pass
+
+                def _verify_game_page(url_str):
+                    try:
+                        req_g = urllib.request.Request(url_str, headers=headers)
+                        with opener.open(req_g, timeout=6) as resp_g:
+                            html_g = resp_g.read().decode("utf-8", errors="ignore")
+                        
+                        # Se a data for especificada, verificar se o HTML da partida menciona o dia/mês correto
+                        if target_d and target_m:
+                            # Buscar padrões de data no HTML (ex: 02/09, 2/9, 02/09/2026, 2 de setembro)
+                            has_date = (
+                                f"{target_d.zfill(2)}/{target_m.zfill(2)}" in html_g or
+                                f"{target_d}/{target_m}" in html_g or
+                                f"/{target_m.zfill(2)}/{target_y}" in html_g
+                            )
+                            if not has_date:
+                                # Data diferente (jogo de outro mês/rodada passada)
+                                return False
+                                
+                        # Verificar se o HTML possui o documento de súmula vinculado
+                        if "sumula" in html_g.lower() or "súmula" in html_g.lower() or ".pdf" in html_g.lower():
+                            return True
+                    except Exception:
+                        pass
+                    return False
+
                 # 1. Links diretos de jogos na tabela
                 g_links = re.findall(r'href=["\'](/futebol-brasileiro/jogos/[^"\']+)["\']', html)
                 for gl in g_links:
                     gl_norm = _norm(gl)
                     if t1_key in gl_norm and t2_key in gl_norm:
                         game_url = "https://www.cbf.com.br" + gl.split("?")[0]
-                        print(f"[CBF HTML FINDER] Página do jogo encontrada na tabela: {game_url}")
-                        return game_url
+                        if _verify_game_page(game_url):
+                            print(f"[CBF HTML FINDER] Página da partida {date} com súmula confirmada: {game_url}")
+                            return game_url
                 
                 # 2. Links de times na tabela -> varrer histórico de partidas
                 team_links = re.findall(r'href=["\'](/futebol-brasileiro/times/[^"\']+)["\']', html)
@@ -601,14 +637,15 @@ class CBFScheduleFetcher:
                             tg_norm = _norm(tg)
                             if t1_key in tg_norm and t2_key in tg_norm:
                                 game_url = "https://www.cbf.com.br" + tg.split("?")[0]
-                                print(f"[CBF HTML FINDER] Página do jogo encontrada no histórico do time: {game_url}")
-                                return game_url
+                                if _verify_game_page(game_url):
+                                    print(f"[CBF HTML FINDER] Página da partida {date} com súmula confirmada no histórico: {game_url}")
+                                    return game_url
                     except Exception:
                         continue
             except Exception as e:
                 print(f"[CBF HTML FINDER WARN] Falha ao buscar {t_url}: {e}")
 
-        print(f"[CBF HTML FINDER] Página do jogo não encontrada para {team1} x {team2}.")
+        print(f"[CBF HTML FINDER] Súmula da partida {team1} x {team2} ({date}) ainda não disponível na CBF.")
         return None
 
     @staticmethod

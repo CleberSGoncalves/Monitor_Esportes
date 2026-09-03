@@ -6858,7 +6858,8 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                                     is_available = assistant.is_cbf_sumula_available(
                                         team1=_game.get("team1"),
                                         team2=_game.get("team2"),
-                                        date=_game.get("date")
+                                        date=_game.get("date"),
+                                        comp=_game.get("comp", "Brasileiro Serie A")
                                     )
                                     
                                     if is_available:
