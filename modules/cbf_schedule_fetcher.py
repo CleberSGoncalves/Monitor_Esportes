@@ -592,82 +592,118 @@ class CBFScheduleFetcher:
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"}
+        opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx))
 
         for t_url in table_urls:
-            try:
-                req = urllib.request.Request(t_url, headers=headers)
-                opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx))
-                with opener.open(req, timeout=8) as resp:
-                    html = resp.read().decode("utf-8", errors="ignore")
-                
-                target_d, target_m, target_y = None, None, None
+            html = ""
+            for attempt in range(3):
                 try:
-                    d_p = date.split("/")
-                    if len(d_p) >= 2:
-                        target_d = d_p[0].lstrip("0")
-                        target_m = d_p[1].lstrip("0")
-                        target_y = d_p[2] if len(d_p) >= 3 else "2026"
+                    import requests
+                    r_tab = requests.get(t_url, headers=headers, verify=False, timeout=6)
+                    if r_tab.status_code == 200 and len(r_tab.text) > 500:
+                        html = r_tab.text
+                        break
                 except Exception:
                     pass
-
-                def _verify_game_page(url_str):
+                
+                if not html:
                     try:
-                        req_g = urllib.request.Request(url_str, headers=headers)
-                        with opener.open(req_g, timeout=6) as resp_g:
-                            html_g = resp_g.read().decode("utf-8", errors="ignore")
-                        
-                        # Se a data for especificada, verificar se o HTML da partida menciona o dia/mês correto
-                        if target_d and target_m:
-                            # Buscar padrões de data no HTML (ex: 02/09, 2/9, 02/09/2026, 2 de setembro)
-                            has_date = (
-                                f"{target_d.zfill(2)}/{target_m.zfill(2)}" in html_g or
-                                f"{target_d}/{target_m}" in html_g or
-                                f"/{target_m.zfill(2)}/{target_y}" in html_g
-                            )
-                            if not has_date:
-                                # Data diferente (jogo de outro mês/rodada passada)
-                                return False
-                                
-                        # Verificar se o HTML possui o documento de súmula vinculado
-                        if "sumula" in html_g.lower() or "súmula" in html_g.lower() or ".pdf" in html_g.lower():
-                            return True
+                        req = urllib.request.Request(t_url, headers=headers)
+                        with opener.open(req, timeout=6) as resp:
+                            data_u = resp.read().decode("utf-8", errors="ignore")
+                            if len(data_u) > 500:
+                                html = data_u
+                                break
                     except Exception:
                         pass
-                    return False
+                import time
+                time.sleep(0.3)
 
-                # 1. Links diretos de jogos na tabela
-                g_links = re.findall(r'href=["\'](/futebol-brasileiro/jogos/[^"\']+)["\']', html)
-                for gl in g_links:
-                    gl_norm = _norm(gl)
-                    if t1_key in gl_norm and t2_key in gl_norm:
-                        game_url = "https://www.cbf.com.br" + gl.split("?")[0]
-                        if _verify_game_page(game_url):
-                            print(f"[CBF HTML FINDER] Página da partida {date} com súmula confirmada: {game_url}")
-                            return game_url
-                
-                # 2. Links de times na tabela -> varrer histórico de partidas
-                team_links = re.findall(r'href=["\'](/futebol-brasileiro/times/[^"\']+)["\']', html)
-                for tl in list(set(team_links)):
-                    t_hist_url = "https://www.cbf.com.br" + tl
-                    if "?tab=" not in t_hist_url:
-                        t_hist_url += "?tab=historico-de-partidas"
-                    try:
-                        req_t = urllib.request.Request(t_hist_url, headers=headers)
-                        with opener.open(req_t, timeout=6) as resp_t:
-                            html_t = resp_t.read().decode("utf-8", errors="ignore")
-                        t_games = re.findall(r'href=["\'](/futebol-brasileiro/jogos/[^"\']+)["\']', html_t)
-                        for tg in t_games:
-                            tg_norm = _norm(tg)
-                            if t1_key in tg_norm and t2_key in tg_norm:
-                                game_url = "https://www.cbf.com.br" + tg.split("?")[0]
-                                if _verify_game_page(game_url):
-                                    print(f"[CBF HTML FINDER] Página da partida {date} com súmula confirmada no histórico: {game_url}")
-                                    return game_url
-                    except Exception:
-                        continue
-            except Exception as e:
-                print(f"[CBF HTML FINDER WARN] Falha ao buscar {t_url}: {e}")
+            if not html:
+                continue
+
+            target_d, target_m, target_y = None, None, None
+            try:
+                d_p = date.split("/")
+                if len(d_p) >= 2:
+                    target_d = d_p[0].lstrip("0")
+                    target_m = d_p[1].lstrip("0")
+                    target_y = d_p[2] if len(d_p) >= 3 else "2026"
+            except Exception:
+                pass
+
+            def _verify_game_page(url_str):
+                try:
+                    html_g = ""
+                    for _a in range(2):
+                        try:
+                            import requests
+                            r_g = requests.get(url_str, headers=headers, verify=False, timeout=6)
+                            if r_g.status_code == 200:
+                                html_g = r_g.text
+                                break
+                        except Exception:
+                            try:
+                                req_g = urllib.request.Request(url_str, headers=headers)
+                                with opener.open(req_g, timeout=6) as resp_g:
+                                    html_g = resp_g.read().decode("utf-8", errors="ignore")
+                                    if html_g:
+                                        break
+                            except Exception:
+                                pass
+                    
+                    if not html_g:
+                        return False
+
+                    # Se a data for especificada, verificar se o HTML da partida menciona o dia/mês correto
+                    if target_d and target_m:
+                        has_date = (
+                            f"{target_d.zfill(2)}/{target_m.zfill(2)}" in html_g or
+                            f"{target_d}/{target_m}" in html_g or
+                            f"/{target_m.zfill(2)}/{target_y}" in html_g
+                        )
+                        if not has_date:
+                            return False
+                            
+                    # Verificar se o HTML possui o documento de súmula vinculado
+                    clean_g = html_g.replace("\\/", "/")
+                    if "sumula" in clean_g.lower() or "súmula" in clean_g.lower() or ".pdf" in clean_g.lower():
+                        return True
+                except Exception:
+                    pass
+                return False
+
+            # 1. Links diretos de jogos na tabela
+            g_links = re.findall(r'href=["\'](/futebol-brasileiro/jogos/[^"\']+)["\']', html)
+            for gl in g_links:
+                gl_norm = _norm(gl)
+                if t1_key in gl_norm and t2_key in gl_norm:
+                    game_url = "https://www.cbf.com.br" + gl.split("?")[0]
+                    if _verify_game_page(game_url):
+                        print(f"[CBF HTML FINDER] Página da partida {date} com súmula confirmada: {game_url}")
+                        return game_url
+            
+            # 2. Links de times na tabela -> varrer histórico de partidas
+            team_links = re.findall(r'href=["\'](/futebol-brasileiro/times/[^"\']+)["\']', html)
+            for tl in list(set(team_links)):
+                t_hist_url = "https://www.cbf.com.br" + tl
+                if "?tab=" not in t_hist_url:
+                    t_hist_url += "?tab=historico-de-partidas"
+                try:
+                    req_t = urllib.request.Request(t_hist_url, headers=headers)
+                    with opener.open(req_t, timeout=6) as resp_t:
+                        html_t = resp_t.read().decode("utf-8", errors="ignore")
+                    t_games = re.findall(r'href=["\'](/futebol-brasileiro/jogos/[^"\']+)["\']', html_t)
+                    for tg in t_games:
+                        tg_norm = _norm(tg)
+                        if t1_key in tg_norm and t2_key in tg_norm:
+                            game_url = "https://www.cbf.com.br" + tg.split("?")[0]
+                            if _verify_game_page(game_url):
+                                print(f"[CBF HTML FINDER] Página da partida {date} com súmula confirmada no histórico: {game_url}")
+                                return game_url
+                except Exception:
+                    continue
 
         print(f"[CBF HTML FINDER] Súmula da partida {team1} x {team2} ({date}) ainda não disponível na CBF.")
         return None

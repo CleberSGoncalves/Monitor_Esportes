@@ -1077,21 +1077,32 @@ class ExpertAssistant:
             from modules.cbf_schedule_fetcher import CBFScheduleFetcher
             import requests
             import re
+            import time
+            
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"}
             
             # 1. Busca direta ultrarrápida da página oficial do jogo na CBF
             game_url = CBFScheduleFetcher.find_game_page_url(team1, team2, date, comp)
             if game_url:
-                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
                 for target_url in [game_url, game_url + "?view=documentos"]:
-                    try:
-                        resp = requests.get(target_url, headers=headers, verify=False, timeout=6)
-                        if resp.status_code == 200:
-                            pdf_matches = re.findall(r'https?://conteudo\.cbf\.com\.br/sumulas/\d{4}/[^\s"\'<>]+\.pdf', resp.text, re.IGNORECASE)
-                            if pdf_matches:
-                                print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada no HTML da CBF: {pdf_matches[0]}")
-                                return True
-                    except Exception:
-                        pass
+                    for attempt in range(2):
+                        try:
+                            resp = requests.get(target_url, headers=headers, verify=False, timeout=6)
+                            if resp.status_code == 200:
+                                clean_text = resp.text.replace("\\/", "/")
+                                pdf_matches = re.findall(r'https?://conteudo\.cbf\.com\.br/sumulas/\d{4}/[^\s"\'<>]+\.pdf', clean_text, re.IGNORECASE)
+                                for pdf_u in pdf_matches:
+                                    try:
+                                        r_head = requests.head(pdf_u, headers=headers, verify=False, timeout=4)
+                                        if r_head.status_code == 200 and int(r_head.headers.get("Content-Length", 0)) > 5000:
+                                            print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada no CDN: {pdf_u}")
+                                            return True
+                                    except Exception:
+                                        print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada no HTML: {pdf_u}")
+                                        return True
+                                break
+                        except Exception:
+                            time.sleep(0.4)
                 
                 # Checar se há dados completos no HTML
                 sumula_text = CBFScheduleFetcher.fetch_sumula_from_cbf_html(game_url)
@@ -1099,11 +1110,17 @@ class ExpertAssistant:
                     print(f"[EXPERT SCHEDULER] ✅ Súmula em HTML confirmada na CBF para {team1} x {team2}!")
                     return True
 
-            # 2. Fallback: Busca via Gemini Grounding
+            # 2. Fallback: Busca via Gemini Grounding por URLs em conteudo.cbf.com.br
             pdf_url = self.find_sumula_url_via_gemini(team1, team2, date, comp)
             if pdf_url and "sumulas" in pdf_url:
-                print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada via Gemini: {pdf_url}")
-                return True
+                try:
+                    r_head = requests.head(pdf_url, headers=headers, verify=False, timeout=4)
+                    if r_head.status_code == 200 and int(r_head.headers.get("Content-Length", 0)) > 5000:
+                        print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada via Gemini: {pdf_url}")
+                        return True
+                except Exception:
+                    print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF encontrada via Gemini: {pdf_url}")
+                    return True
 
             print(f"[EXPERT SCHEDULER] Súmula oficial da CBF ainda NÃO publicada no site para {team1} x {team2}.")
             return False

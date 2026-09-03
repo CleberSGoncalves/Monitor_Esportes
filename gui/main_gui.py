@@ -6113,75 +6113,93 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         self.after(0, self._load_expert_history_list)
 
     def _load_expert_history_list(self) -> None:
-        """Carrega a lista de arquivos JSON de relatórios do modo Expert com formatação amigável."""
+        """Carrega a lista de arquivos JSON e PDF de relatórios de auditoria com formatação clara e botões de atalho."""
         for widget in self.expert_hist_scroll.winfo_children():
             widget.destroy()
             
-        reports_dir = os.path.join(PROJECT_ROOT, "reports")
-        if not os.path.exists(reports_dir):
-            return
-            
-        # Buscar todos os arquivos de expert (batch e individuais)
+        search_dirs = [
+            os.path.join(PROJECT_ROOT, "reports"),
+            _get_config_read_path("reports")
+        ]
+        
         import glob
-        files = glob.glob(os.path.join(reports_dir, "expert_*.json"))
-        # Filtrar para evitar pegar outros tipos se necessário, mas expert_*.json é o padrão agora
+        all_files = []
+        for r_dir in search_dirs:
+            if os.path.exists(r_dir):
+                all_files.extend(glob.glob(os.path.join(r_dir, "expert_*.json")))
+                all_files.extend(glob.glob(os.path.join(r_dir, "Relatorio_*.pdf")))
+                all_files.extend(glob.glob(os.path.join(r_dir, "*.pdf")))
+
+        # Filtrar duplicados mantendo o arquivo mais recente
+        unique_files = {}
+        for p in all_files:
+            bname = os.path.basename(p)
+            if bname not in unique_files or os.path.getmtime(p) > os.path.getmtime(unique_files[bname]):
+                unique_files[bname] = p
+                
+        files = list(unique_files.values())
         files.sort(key=os.path.getmtime, reverse=True)
         
-        for path in files[:15]: # Mostrar os últimos 15
+        for path in files[:20]: # Mostrar os últimos 20
             fname = os.path.basename(path)
+            is_pdf = fname.lower().endswith(".pdf")
+            
             try:
-                # Tentar extrair data/hora do nome do arquivo (expert_batch_20260325_233145.json)
-                parts = fname.replace(".json", "").split("_")
-                ts_str = parts[-2] + parts[-1]
-                dt = datetime.strptime(ts_str, "%Y%m%d%H%M%S")
-                date_display = dt.strftime("%d/%m %H:%M")
+                mod_dt = datetime.fromtimestamp(os.path.getmtime(path))
+                date_display = mod_dt.strftime("%d/%m %H:%M")
             except:
-                date_display = "Auto"
+                date_display = "Recente"
 
-            try:
-                with open(path, "r", encoding="utf-8") as jf:
-                    data = json.load(jf)
-                
-                res_arr = data.get("expert_results", [])
-                match_id = ""
-                if res_arr:
-                    match_id = str(res_arr[0].get("match_display") or res_arr[0].get("match_id") or "")
-                elif "match_display" in data:
-                    match_id = str(data.get("match_display") or "")
-                
-                # Se não tem match_id, usa o timestamp
-                btn_text = f"📄 {date_display}"
-                if match_id:
-                    btn_text = f"📄 {date_display} - {match_id[:20]}..."
+            match_id = ""
+            if is_pdf:
+                # Extrair o nome da partida do nome do PDF (ex: Relatorio_Auditoria_Vitoria_x_Vasco_da_Gama_...)
+                clean_name = fname.replace("Relatorio_Auditoria_", "").replace("Relatorio_", "").replace(".pdf", "")
+                parts_name = clean_name.split("_202")
+                match_id = parts_name[0].replace("_", " ").title()
+            else:
+                try:
+                    with open(path, "r", encoding="utf-8") as jf:
+                        data = json.load(jf)
+                    res_arr = data.get("expert_results", [])
+                    if res_arr:
+                        match_id = str(res_arr[0].get("match_display") or res_arr[0].get("match_id") or "")
+                    elif "match_display" in data:
+                        match_id = str(data.get("match_display") or "")
+                except:
+                    pass
 
-                item_frame = ctk.CTkFrame(self.expert_hist_scroll, fg_color="transparent")
-                item_frame.pack(fill="x", padx=2, pady=1)
+            icon = "📕 PDF" if is_pdf else "📊 JSON"
+            btn_text = f"{icon} {date_display}"
+            if match_id:
+                btn_text += f" - {match_id[:24]}"
 
-                btn = ctk.CTkButton(
-                    item_frame,
-                    text=btn_text,
-                    font=ctk.CTkFont(size=10),
-                    fg_color="transparent",
-                    hover_color="#333333",
-                    anchor="w",
-                    height=24,
-                    command=lambda p=path: self._open_history_report(p)
-                )
-                btn.pack(side="left", fill="x", expand=True)
+            item_frame = ctk.CTkFrame(self.expert_hist_scroll, fg_color="transparent")
+            item_frame.pack(fill="x", padx=2, pady=2)
 
+            btn = ctk.CTkButton(
+                item_frame,
+                text=btn_text,
+                font=ctk.CTkFont(size=11, weight="bold"),
+                fg_color="#222222",
+                hover_color="#333333",
+                anchor="w",
+                height=28,
+                command=lambda p=path: (os.startfile(p) if p.endswith(".pdf") else self._open_history_report(p))
+            )
+            btn.pack(side="left", fill="x", expand=True)
+
+            if not is_pdf:
                 btn_pdf = ctk.CTkButton(
                     item_frame,
                     text="📄 PDF",
-                    font=ctk.CTkFont(size=9, weight="bold"),
-                    width=42,
-                    height=22,
-                    fg_color="#222222",
+                    font=ctk.CTkFont(size=10, weight="bold"),
+                    width=46,
+                    height=24,
+                    fg_color="#008B8B",
                     hover_color="#00CED1",
                     command=lambda p=path: self._regenerate_pdf_from_history(p)
                 )
                 btn_pdf.pack(side="right", padx=2)
-            except:
-                continue
 
     def _open_prompt_editor_modal(self) -> None:
         """Abre uma janela modal para visualizar e ajustar o prompt do Gemini antes da busca."""
@@ -6424,30 +6442,35 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
             game_rows.append((e_t1, e_t2, e_comp, d_var, e_time, e_plat))
 
-        # Preencher pré-jogo de exemplo se a fila estiver vazia
-        existing = _load_scheduled_games()
-        if existing:
-            for idx, g in enumerate(existing[:5]):
-                game_rows[idx][0].insert(0, g.get("team1", ""))
-                game_rows[idx][1].insert(0, g.get("team2", ""))
-                game_rows[idx][2].insert(0, g.get("comp", ""))
-                game_rows[idx][3].set(g.get("date", datetime.now().strftime("%d/%m/%Y")))
-                game_rows[idx][4].insert(0, g.get("time", ""))
-                game_rows[idx][5].delete(0, "end")
-                game_rows[idx][5].insert(0, g.get("platform", "CazéTV"))
-        else:
-            try:
-                from modules.cbf_schedule_fetcher import CBFScheduleFetcher
-                cbf_evts = CBFScheduleFetcher.get_upcoming_matches()
-                for idx, g in enumerate(cbf_evts[:5]):
-                    game_rows[idx][0].insert(0, g.get("team1", ""))
-                    game_rows[idx][1].insert(0, g.get("team2", ""))
-                    game_rows[idx][2].insert(0, g.get("comp", ""))
-                    game_rows[idx][3].set(g.get("date", datetime.now().strftime("%d/%m/%Y")))
-                    game_rows[idx][4].insert(0, g.get("time", ""))
-                    game_rows[idx][5].delete(0, "end")
-                    game_rows[idx][5].insert(0, g.get("platform", "CazéTV"))
-            except: pass
+        # Preencher linhas de jogos com agendados existentes ou novos eventos oficiais da CBF
+        existing = [g for g in _load_scheduled_games() if g.get("status") == "pending"]
+        try:
+            from modules.cbf_schedule_fetcher import CBFScheduleFetcher
+            cbf_evts = CBFScheduleFetcher.get_upcoming_matches()
+        except:
+            cbf_evts = _load_cbf_streaming_events()
+            
+        combined_list = list(existing)
+        existing_sigs = {f"{g.get('team1')}_{g.get('team2')}_{g.get('date')}".lower() for g in existing}
+        for evt in cbf_evts:
+            sig = f"{evt.get('team1')}_{evt.get('team2')}_{evt.get('date')}".lower()
+            if sig not in existing_sigs:
+                combined_list.append(evt)
+                existing_sigs.add(sig)
+
+        for idx in range(min(5, len(combined_list))):
+            g = combined_list[idx]
+            game_rows[idx][0].delete(0, "end")
+            game_rows[idx][0].insert(0, g.get("team1", ""))
+            game_rows[idx][1].delete(0, "end")
+            game_rows[idx][1].insert(0, g.get("team2", ""))
+            game_rows[idx][2].delete(0, "end")
+            game_rows[idx][2].insert(0, g.get("comp", ""))
+            game_rows[idx][3].set(g.get("date", datetime.now().strftime("%d/%m/%Y")))
+            game_rows[idx][4].delete(0, "end")
+            game_rows[idx][4].insert(0, g.get("time", ""))
+            game_rows[idx][5].delete(0, "end")
+            game_rows[idx][5].insert(0, g.get("platform", "CazéTV"))
 
         btn_bar = ctk.CTkFrame(modal, fg_color="transparent")
         btn_bar.pack(fill="x", padx=15, pady=12)
@@ -6455,6 +6478,10 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
         def _save_schedule():
             target_emails = [em for em, v in email_vars.items() if v.get()]
             emails_str = ";".join(target_emails)
+            if emails_str:
+                self.email_recipients_var.set(emails_str)
+                self._save_general_settings()
+
             new_scheduled_list = []
             
             for idx, row in enumerate(game_rows, 1):
@@ -6783,7 +6810,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                         _game["pdf_path"] = pdf_path
                         self._log(f"⏰ [AGENDAMENTO] Relatório PDF gerado com sucesso em: {pdf_path}")
                         
-                        emails = _game.get("emails", "").strip()
+                        emails = _game.get("emails", "").strip() or self.email_recipients_var.get().strip() or ";".join(_load_saved_emails())
                         if emails:
                             import re
                             recipients = [em.strip() for em in re.split(r'[,;]', emails) if em.strip()]
@@ -6826,6 +6853,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                 finally:
                     _save_scheduled_games(getattr(self, "_scheduled_games", []))
                     self.after(0, self._update_schedule_panel_ui)
+                    self.after(0, self._load_expert_history_list)
                     
         import threading
         threading.Thread(target=run_scheduled_audit_thread, daemon=True).start()
@@ -6855,10 +6883,10 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                     e_dt = k_dt + timedelta(minutes=110)
                     
                     if now >= e_dt:
-                        # Throttle a verificação da súmula para cada 5 minutos
+                        # Throttle a verificação da súmula para a cada 30 segundos se a partida já encerrou
                         last_check_t = g.get("_last_sumula_check_time", 0.0)
                         import time
-                        if time.time() - last_check_t >= 300.0 or last_check_t == 0.0:
+                        if time.time() - last_check_t >= 30.0 or last_check_t == 0.0:
                             g["_last_sumula_check_time"] = time.time()
                             updated = True
                             

@@ -1,5 +1,5 @@
 {
-  "version": "2.0.9",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.0.9/Monitor_Esportes.exe",
-  "changelog": "Versão 2.0.9: Busca determinística ultrarrápida direta no HTML da partida da CBF sem dependência de APIs externas para disparo instantâneo no agendador."
+  "version": "2.1.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.1.1/Monitor_Esportes.exe",
+  "changelog": "v2.1.1: Sincronização completa de todos os destinatários de e-mail selecionados na fila de agendamento automático."
 }
