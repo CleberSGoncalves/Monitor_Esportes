@@ -1,5 +1,5 @@
 {
-  "version": "2.1.6",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.1.6/Monitor_Esportes.exe",
-  "changelog": "v2.1.6: Tabela 100% REAL extraída do PDF oficial da CBF (Rodada 26 e Rodada 27 do Brasileirão e Copa do Brasil)."
+  "version": "2.1.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.1.7/Monitor_Esportes.exe",
+  "changelog": "v2.1.7: Purga automática de jogos salvos inexistentes da Fila lateral, sincronizando instantaneamente a tela principal com a tabela oficial da CBF."
 }

@@ -242,25 +242,46 @@ def _remove_saved_email(email_str: str) -> list:
 
 def _load_scheduled_games() -> list:
     path = _get_config_read_path("scheduled_games.json")
+    
+    # Obter lista de jogos oficiais da CBF para validação estrita
+    try:
+        from modules.cbf_schedule_fetcher import get_real_cbf_fixtures
+        official_fixtures = get_real_cbf_fixtures()
+        official_keys = {f"{g.get('team1','').strip().lower()}_x_{g.get('team2','').strip().lower()}" for g in official_fixtures}
+    except:
+        official_fixtures = []
+        official_keys = set()
+
     if os.path.exists(path) and os.path.getsize(path) > 0:
         try:
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 if isinstance(data, list) and len(data) > 0:
+                    valid_games = []
                     for g in data:
-                        if g.get("status") == "failed":
-                            g["status"] = "pending"
-                            g["_last_sumula_check_time"] = 0.0
-                    return data
+                        t1 = g.get("team1", "").strip().lower()
+                        t2 = g.get("team2", "").strip().lower()
+                        key = f"{t1}_x_{t2}"
+                        # Se o jogo consta na tabela oficial da CBF, mantemos (resetando status failed se necessário)
+                        if not official_keys or key in official_keys:
+                            if g.get("status") == "failed":
+                                g["status"] = "pending"
+                                g["_last_sumula_check_time"] = 0.0
+                            valid_games.append(g)
+                    
+                    if valid_games:
+                        return valid_games
         except:
             pass
             
-    # Se não houver arquivo salvo ou estiver vazio, inicializa automaticamente com os 5 próximos jogos da CBF
+    # Se não houver arquivo salvo ou contiver jogos inválidos/antigos, reinicializa estritamente com os 5 próximos jogos oficiais da CBF
     try:
-        events = _load_cbf_streaming_events()
+        from modules.cbf_schedule_fetcher import CBFScheduleFetcher
+        events = CBFScheduleFetcher.get_upcoming_matches(force_refresh=True)
         initial_games = []
-        for evt in events[:5]:
+        for idx, evt in enumerate(events[:5], 1):
             initial_games.append({
+                "id": f"game_{idx}_{evt.get('date','').replace('/', '')}_{evt.get('time','').replace(':', '')}",
                 "team1": evt.get("team1", ""),
                 "team2": evt.get("team2", ""),
                 "comp": evt.get("comp", ""),
