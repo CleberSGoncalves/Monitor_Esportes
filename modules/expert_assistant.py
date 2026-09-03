@@ -1070,24 +1070,28 @@ class ExpertAssistant:
 
     def is_cbf_sumula_available(self, team1: str, team2: str, date: str, comp: str = "Brasileiro Serie A") -> bool:
         """
-        Verifica DIRETAMENTE no site oficial da CBF (cbf.com.br) se o documento oficial da SÚMULA
-        para a partida já foi publicado e está disponível para extração.
+        Verifica se a súmula oficial (PDF ou HTML) da partida já está publicada no site da CBF.
         """
         print(f"[EXPERT SCHEDULER] Checando disponibilidade real no site da CBF para {team1} x {team2} ({date})...")
         try:
             from modules.cbf_schedule_fetcher import CBFScheduleFetcher
-            game_url = CBFScheduleFetcher.find_game_page_url(team1, team2, date, comp)
-            if not game_url:
-                print(f"[EXPERT SCHEDULER] Página da partida {team1} x {team2} ainda não encontrada na CBF.")
-                return False
-                
-            sumula_text = CBFScheduleFetcher.fetch_sumula_from_cbf_html(game_url)
-            if sumula_text and len(sumula_text.strip()) > 100:
-                print(f"[EXPERT SCHEDULER] ✅ Súmula da CBF CONFIRMADA e DISPONÍVEL para {team1} x {team2}!")
+            
+            # 1. Tentar encontrar URL do PDF da súmula diretamente
+            pdf_url = self.find_sumula_url_via_gemini(team1, team2, date, comp)
+            if pdf_url and "sumulas" in pdf_url:
+                print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada na CBF: {pdf_url}")
                 return True
-            else:
-                print(f"[EXPERT SCHEDULER] Súmula oficial da CBF ainda NÃO publicada no site para {team1} x {team2}.")
-                return False
+
+            # 2. Tentar encontrar URL da página do jogo e checar se há dados no HTML
+            game_url = CBFScheduleFetcher.find_game_page_url(team1, team2, date, comp)
+            if game_url:
+                sumula_text = CBFScheduleFetcher.fetch_sumula_from_cbf_html(game_url)
+                if sumula_text and len(sumula_text.strip()) > 100:
+                    print(f"[EXPERT SCHEDULER] ✅ Súmula em HTML confirmada na CBF para {team1} x {team2}!")
+                    return True
+
+            print(f"[EXPERT SCHEDULER] Súmula oficial da CBF ainda NÃO publicada no site para {team1} x {team2}.")
+            return False
         except Exception as e:
             print(f"[EXPERT SCHEDULER WARN] Erro ao checar súmula no site da CBF: {e}")
             return False
