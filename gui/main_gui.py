@@ -6375,6 +6375,9 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
             ctk.CTkCheckBox(chk_scroll, text=em, variable=var, font=ctk.CTkFont(size=11)).pack(anchor="w", padx=5, pady=2)
 
         def _auto_fill_cbf_events():
+            import time
+            now_t = time.time()
+            self._last_auto_schedule_fetch_time = now_t
             try:
                 from modules.cbf_schedule_fetcher import CBFScheduleFetcher
                 cbf_events = CBFScheduleFetcher.get_upcoming_matches()
@@ -6394,6 +6397,13 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                 game_rows[idx][4].insert(0, evt.get("time", ""))
                 game_rows[idx][5].delete(0, "end")
                 game_rows[idx][5].insert(0, evt.get("platform", ""))
+                
+            last_sync_str = datetime.fromtimestamp(now_t).strftime("%d/%m/%Y %H:%M:%S")
+            if 'lbl_last_sync' in locals() or 'lbl_last_sync' in globals():
+                try:
+                    lbl_last_sync.configure(text=f"🗓️ Última Sincronização da Fila: {last_sync_str}")
+                except:
+                    pass
             self._log("📥 Fila de 5 jogos auto-preenchida com os próximos eventos oficiais da CBF!")
 
         # Switch para Auditoria Automática
@@ -6409,8 +6419,11 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
             command=self._save_general_settings
         ).pack(anchor="w", padx=10, pady=8)
 
+        sync_bar = ctk.CTkFrame(modal, fg_color="transparent")
+        sync_bar.pack(fill="x", padx=15, pady=(0, 8))
+
         btn_autofill = ctk.CTkButton(
-            modal,
+            sync_bar,
             text="📥 Preencher com Próximos Eventos (Brasileirão / Copa do Brasil)",
             font=ctk.CTkFont(size=11, weight="bold"),
             fg_color="#00CED1",
@@ -6419,7 +6432,21 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
             height=30,
             command=_auto_fill_cbf_events
         )
-        btn_autofill.pack(padx=15, pady=(0, 8), anchor="w")
+        btn_autofill.pack(side="left", padx=(0, 10))
+
+        last_t = getattr(self, "_last_auto_schedule_fetch_time", 0.0)
+        if last_t > 0:
+            last_sync_str = datetime.fromtimestamp(last_t).strftime("%d/%m/%Y %H:%M:%S")
+        else:
+            last_sync_str = "Ainda não sincronizado"
+
+        lbl_last_sync = ctk.CTkLabel(
+            sync_bar,
+            text=f"🗓️ Última Sincronização da Fila: {last_sync_str}",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            text_color="#00FF7F"
+        )
+        lbl_last_sync.pack(side="left", pady=4)
 
         scroll = ctk.CTkScrollableFrame(modal, fg_color="transparent")
         scroll.pack(fill="both", expand=True, padx=15, pady=5)
@@ -6560,11 +6587,10 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
             
         raw_games = getattr(self, "_scheduled_games", [])
         
-        # Ordenar priorizando jogos ativos (running > queued > pending > failed > completed)
-        prio_map = {"running": 0, "queued": 1, "pending": 2, "failed": 3, "completed": 4}
-        games = sorted(raw_games, key=lambda x: prio_map.get(x.get("status", "pending"), 2))
+        # A FILA DE AGENDAMENTOS exibe estritamente os jogos ativos (pending, running, queued, failed) - ocultando concluídos
+        games = [g for g in raw_games if g.get("status") in ["pending", "running", "queued", "failed"]]
         
-        # Caso a fila esteja vazia, garante a exibição da label informativa
+        # Caso a fila de agendamentos pendentes esteja vazia, exibe mensagem informativa
         if not games:
             if getattr(self, "_schedule_cards_cache", {}):
                 for w in self.schedule_scroll.winfo_children():
