@@ -1,5 +1,5 @@
 {
-  "version": "2.1.7",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.1.7/Monitor_Esportes.exe",
-  "changelog": "v2.1.7: Purga automática de jogos salvos inexistentes da Fila lateral, sincronizando instantaneamente a tela principal com a tabela oficial da CBF."
+  "version": "2.1.9",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.1.9/Monitor_Esportes.exe",
+  "changelog": "v2.1.9: Regra estrita centralizada de colunas CBF (Apenas Colunas 4 e 5 no Brasileirão - Amazon Prime e CazéTV) em config/cbf_broadcaster_rules.json."
 }

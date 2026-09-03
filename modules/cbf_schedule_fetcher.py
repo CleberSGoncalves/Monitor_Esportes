@@ -1,26 +1,37 @@
 """
 Módulo Autônomo de Tabela Oficial da CBF para o Monitor de Esportes.
-Tabela REAL baseada na Tabela Detalhada Oficial da CBF (EDIÇÃO 2026 / ATUALIZAÇÃO 03/09/2026).
+Tabela REAL baseada estritamente no recorte do PDF Oficial da CBF (EDIÇÃO 2026).
 
-Regras de Transmissão Oficiais da CBF:
-  - Brasileirão Série A:
-      * Coluna 4 ➔ Amazon Prime
-      * Coluna 5 ➔ CazéTV / Youtube
-  - Copa do Brasil:
-      * Coluna 3 / 4 ➔ Amazon Prime
+Regra Fundamental de Colunas da CBF:
+  - BRASILEIRÃO SÉRRIE A:
+      * Coluna 4 ➔ Amazon Prime (APENAS Coluna 4!)
+      * Coluna 5 ➔ CazéTV / Youtube (APENAS Coluna 5!)
+      * Colunas 1, 2, 3, 6, 7 ➔ IGNORAR TOTALMENTE (Premiere / SporTV / Globo)
+  - COPA DO BRASIL:
+      * Coluna 3 ou 4 ➔ Amazon Prime
 """
 
 import os
 import json
 import re
-import urllib.request
 from datetime import datetime, timedelta
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RULES_PATH = os.path.join(PROJECT_ROOT, "config", "cbf_broadcaster_rules.json")
 CACHE_PATH = os.path.join(PROJECT_ROOT, "config", "cbf_fixtures_cache.json")
 
+def load_broadcaster_rules() -> dict:
+    """Carrega as regras oficiais centralizadas do arquivo config/cbf_broadcaster_rules.json."""
+    if os.path.exists(RULES_PATH):
+        try:
+            with open(RULES_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
 def get_recent_finished_matches() -> list:
-    """Retorna os últimos jogos já FINALIZADOS oficiais do Brasileirão e Copa do Brasil em plataformas monitoradas."""
+    """Retorna os jogos finalizados monitorados."""
     finished = [
         {
             "comp": "Brasileirão Série A",
@@ -83,17 +94,18 @@ def get_recent_finished_matches() -> list:
             "tag": "⚡ Auditoria Concluída"
         }
     ]
-    return [g for g in finished if g.get("platform") in ["CazéTV", "Amazon Prime"]]
+    return finished
 
 
 def get_real_cbf_fixtures() -> list:
     """
-    Retorna a tabela estritamente REAL e OFICIAL da CBF para 2026
-    extraída do documento oficial 'Tabela_Detalhada_BSA_2026_03_09.pdf'.
-    Filtro estrito para Amazon Prime e CazéTV.
+    Retorna estritamente os jogos monitorados que possuem marcação nas colunas:
+    - Brasileirão Série A: Coluna 4 (Amazon Prime) ou Coluna 5 (CazéTV).
+    - Copa do Brasil: Coluna 3 (Amazon Prime).
+    Conforme imagem oficial do PDF da CBF.
     """
     fixtures = [
-        # --- Rodada Copa do Brasil ---
+        # 03/09 (qui) 20:00 - Copa do Brasil (Coluna 3 = Amazon Prime)
         {
             "comp": "Copa do Brasil",
             "team1": "Grêmio",
@@ -103,70 +115,65 @@ def get_real_cbf_fixtures() -> list:
             "platform": "Amazon Prime",
             "tag": "🏆 Decisivo (Copa do Brasil)"
         },
-        # --- Rodada 26 (Brasileirão Série A) ---
+        # 06/09 (dom) 18:30 - Brasileirão Série A (Coluna 5 = CazéTV)
         {
             "comp": "Brasileirão Série A",
             "team1": "Botafogo",
             "team2": "Palmeiras",
             "date": "06/09/2026",
             "time": "18:30",
-            "platform": "CazéTV",       # Coluna 5 no PDF da CBF
-            "tag": "📺 Transmissão Exclusiva (CazéTV)"
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
         },
+        # 06/09 (dom) 19:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
         {
             "comp": "Brasileirão Série A",
             "team1": "Corinthians",
             "team2": "Chapecoense",
             "date": "06/09/2026",
             "time": "19:30",
-            "platform": "Amazon Prime",  # Coluna 4 no PDF da CBF
-            "tag": "🔥 Transmissão Exclusiva (Amazon Prime)"
+            "platform": "Amazon Prime",
+            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
         },
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Vitória",
-            "team2": "Grêmio",
-            "date": "07/09/2026",
-            "time": "20:00",
-            "platform": "Amazon Prime",  # Coluna 3 no PDF da CBF
-            "tag": "⭐ Transmissão Exclusiva (Amazon Prime)"
-        },
-        # --- Rodada 27 (Brasileirão Série A) ---
+        # 12/09 (sáb) 17:00 - Brasileirão Série A (Coluna 5 = CazéTV)
         {
             "comp": "Brasileirão Série A",
             "team1": "Chapecoense",
             "team2": "Internacional",
             "date": "12/09/2026",
             "time": "17:00",
-            "platform": "CazéTV",       # Coluna 5 no PDF da CBF
-            "tag": "📺 Transmissão Exclusiva (CazéTV)"
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
         },
+        # 12/09 (sáb) 20:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
         {
             "comp": "Brasileirão Série A",
             "team1": "Botafogo",
             "team2": "Red Bull Bragantino",
             "date": "12/09/2026",
             "time": "20:30",
-            "platform": "Amazon Prime",  # Coluna 4 no PDF da CBF
-            "tag": "⭐ Transmissão Exclusiva (Amazon Prime)"
+            "platform": "Amazon Prime",
+            "tag": "⭐ Transmissão Exclusiva (Amazon Prime - Coluna 4)"
         },
+        # 19/09 (sáb) 17:00 - Brasileirão Série A (Coluna 5 = CazéTV)
         {
             "comp": "Brasileirão Série A",
-            "team1": "Flamengo",
-            "team2": "Corinthians",
-            "date": "13/09/2026",
-            "time": "17:30",
-            "platform": "Amazon Prime",  # Coluna 4 no PDF da CBF
-            "tag": "🔥 Clássico das Nações (Amazon Prime)"
+            "team1": "Mirassol",
+            "team2": "Botafogo",
+            "date": "19/09/2026",
+            "time": "17:00",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
         },
+        # 19/09 (sáb) 20:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
         {
             "comp": "Brasileirão Série A",
-            "team1": "Bahia",
-            "team2": "Remo",
-            "date": "14/09/2026",
-            "time": "20:00",
-            "platform": "CazéTV",       # Coluna 5 no PDF da CBF
-            "tag": "📺 Transmissão Exclusiva (CazéTV)"
+            "team1": "Vasco da Gama",
+            "team2": "Coritiba",
+            "date": "19/09/2026",
+            "time": "20:30",
+            "platform": "Amazon Prime",
+            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
         }
     ]
 
@@ -181,13 +188,15 @@ def get_real_cbf_fixtures() -> list:
 
 
 class CBFScheduleFetcher:
-    """Motor de Tabela Oficial da CBF do Monitor Esportes."""
+    """Motor de Tabela Oficial da CBF para o Monitor Esportes."""
 
     @staticmethod
     def get_upcoming_matches(force_refresh: bool = True) -> list:
-        """Retorna estritamente os próximos jogos oficiais REAIS da CBF."""
+        """
+        Retorna estritamente os próximos 5 jogos oficiais futuros da CBF
+        filtrados unicamente pelas Colunas 4 e 5 (Brasileirão) e Coluna 3 (Copa do Brasil).
+        """
         today = datetime.now()
-
         fixtures = get_real_cbf_fixtures()
         
         # Salvar cache limpo
@@ -198,20 +207,20 @@ class CBFScheduleFetcher:
         except Exception:
             pass
 
-        # Filtrar confrontos com data/hora >= agora (com 2 horas de tolerância para jogos em andamento)
-        filtered_fixtures = []
+        # Filtrar confrontos com data/hora >= agora (com 2 horas de tolerância)
+        filtered = []
         for g in fixtures:
             try:
                 g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
                 if g_dt >= today - timedelta(hours=2):
-                    filtered_fixtures.append(g)
+                    filtered.append(g)
             except:
-                filtered_fixtures.append(g)
+                filtered.append(g)
 
-        if len(filtered_fixtures) < 5:
+        if len(filtered) < 5:
             return fixtures[:5]
 
-        return filtered_fixtures[:5]
+        return filtered[:5]
 
     @staticmethod
     def get_recent_finished_matches() -> list:

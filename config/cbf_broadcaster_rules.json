@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "description": "Regras Oficiais Centralizadas de Mapeamento de Colunas de Transmissão da CBF",
+  "competitions": {
+    "Brasileirão Série A": {
+      "allowed_columns": {
+        "4": "Amazon Prime",
+        "5": "CazéTV"
+      },
+      "ignored_columns": ["1", "2", "3", "6", "7"],
+      "notes": "No Brasileirão Série A, APENAS Coluna 4 (Amazon Prime) e Coluna 5 (CazéTV) são monitoradas. Coluna 3 NÃO é monitorada (é Premiere/SporTV)."
+    },
+    "Copa do Brasil": {
+      "allowed_columns": {
+        "3": "Amazon Prime",
+        "4": "Amazon Prime",
+        "5": "CazéTV"
+      },
+      "ignored_columns": ["1", "2", "6", "7"],
+      "notes": "Na Copa do Brasil, Coluna 3 e Coluna 4 pertencem à Amazon Prime."
+    }
+  }
+}
