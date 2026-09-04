@@ -5917,6 +5917,51 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         y = (screen_h // 2) - (height // 2)
         target.geometry(f"{width}x{height}+{x}+{y}")
 
+    def _async_upload_sharepoint(self, pdf_path: str, meta: Dict[str, Any] = None) -> None:
+        """Dispara upload do relatório PDF para o SharePoint em segundo plano."""
+        if not pdf_path or not os.path.exists(pdf_path):
+            return
+
+        meta = meta or {}
+        campeonato = meta.get("competition") or meta.get("comp") or self.competition_var.get() or "Brasileiro Serie A"
+        
+        partida = meta.get("match_display") or meta.get("partida")
+        if not partida or partida == " x ":
+            home = self.home_team_var.get().strip()
+            away = self.away_team_var.get().strip()
+            if home and away:
+                partida = f"{home} x {away}"
+            else:
+                partida = self.runtime.current_match_display or "Partida Auditada"
+        
+        plataforma = meta.get("platform") or self.platform_var.get() or "Amazon Prime"
+        confianca = meta.get("confidence_score") or meta.get("confianca") or self.runtime.last_visual_confidence or "99.0%"
+        date_str = meta.get("match_date") or meta.get("date") or self.date_var.get() or ""
+        time_str = meta.get("time") or meta.get("time_vod") or self.time_vod_var.get() or ""
+
+        def _worker():
+            try:
+                self._log(f"☁️ [SHAREPOINT] Iniciando envio automático do relatório para o SharePoint...")
+                from modules.sharepoint_reporter import SharePointReporter
+                sp_ok = SharePointReporter.upload_report(
+                    filepath=pdf_path,
+                    campeonato=campeonato,
+                    partida=partida,
+                    plataforma=plataforma,
+                    confianca=confianca,
+                    auditado=True,
+                    date_str=date_str,
+                    time_str=time_str
+                )
+                if sp_ok:
+                    self._log(f"☁️ [SHAREPOINT] Relatório publicado com sucesso no SharePoint!")
+                else:
+                    self._log(f"☁️ [SHAREPOINT WARN] Falha na publicação no SharePoint.")
+            except Exception as e:
+                self._log(f"☁️ [SHAREPOINT ERRO] Exceção no upload para SharePoint: {e}")
+
+        threading.Thread(target=_worker, daemon=True).start()
+
     def _finalize_expert_batch(self, results: List[Dict[str, Any]]) -> None:
         """Gera o relatório final do lote Expert."""
         try:
@@ -5932,6 +5977,10 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                 pdf_path = self.reporter.write_expert_report(results, prefs=prefs)
             self._log(f"[EXPERT] Lote finalizado: {len(results)} eventos processados. PDF: {pdf_path}")
             self._ui_success(f"Análise Expert finalizada para {len(results)} eventos.\nRelatório gerado em: {pdf_path}")
+            
+            # Publicação automática no SharePoint
+            meta_item = results[0] if results else {}
+            self._async_upload_sharepoint(pdf_path, meta=meta_item)
             
             # Restaurar botão
             self.btn_start.configure(state="normal", text="Iniciar (selecionado)", fg_color="#1a5a1a")
@@ -8646,6 +8695,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
             paths = self._generate_report(finalize=True, reason=reason)
             if paths and getattr(paths, "pdf_path", None):
                 pdf_p = paths.pdf_path
+                self._async_upload_sharepoint(pdf_p)
                 self.after(0, lambda p=pdf_p: self._show_report_completed_dialog(p))
                 if self.send_report_email_var.get():
                     self._send_report_via_email(pdf_p)

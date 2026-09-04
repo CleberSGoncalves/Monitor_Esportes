@@ -1,5 +1,5 @@
 {
-  "version": "2.2.2",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.2/Monitor_Esportes.exe",
-  "changelog": "v2.2.2: Integração automática do SharePoint no agendamento e correção da normalização de campeonatos no SharePoint."
+  "version": "2.2.3",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.3/Monitor_Esportes.exe",
+  "changelog": "v2.2.3: Correção do envio automático ao SharePoint na auditoria manual e inclusão do método upload_report."
 }

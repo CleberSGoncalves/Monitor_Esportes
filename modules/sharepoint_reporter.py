@@ -248,3 +248,24 @@ class SharePointReporter:
         except Exception as e:
             logger.error(f"❌ [SharePoint] Falha na sincronização do PDF: {e}")
             return False
+
+    @classmethod
+    def upload_report(cls, filepath: str = None, pdf_path: str = None, partida: str = "", campeonato: str = "", plataforma: str = "", confianca: str = "99.0%", auditado: bool = True, date_str: str = None, time_str: str = None) -> bool:
+        """
+        Método wrapper/alias para envio do relatório PDF e sincronização com o SharePoint.
+        """
+        target_path = filepath or pdf_path
+        if not target_path or not os.path.exists(target_path):
+            logger.error(f"[SharePoint] Caminho do PDF inválido: {target_path}")
+            return False
+            
+        data_hora_iso = cls.format_iso_datetime(date_str, time_str) if date_str else None
+        return cls.sync_pdf_to_sharepoint(
+            pdf_path=target_path,
+            partida=partida,
+            campeonato=campeonato,
+            plataforma=plataforma,
+            data_hora_iso=data_hora_iso,
+            confianca=confianca
+        )
+
