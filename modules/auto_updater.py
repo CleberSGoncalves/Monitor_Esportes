@@ -10,7 +10,7 @@ import time
 import urllib.request
 import subprocess
 
-CURRENT_VERSION = "2.2.5"
+CURRENT_VERSION = "2.2.6"
 
 class AutoUpdater:
     def __init__(self, version_url: str = "https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/version.json"):
@@ -96,6 +96,10 @@ class AutoUpdater:
 setlocal enabledelayedexpansion
 chcp 65001 > NUL
 
+:: Limpar variáveis temporárias do PyInstaller para impedir erro de DLL no reinício
+set "_MEIPASS="
+set "_MEIPASS2="
+
 echo [AUTO-UPDATE] Encerrando processos e aguardando liberação do sistema...
 timeout /t 3 /nobreak > NUL
 
@@ -149,15 +153,19 @@ if exist "{new_exe_path}" (
     )
 )
 
-:: 6. Confirmar substituição e reiniciar a aplicação
+:: 6. Confirmar substituição e reiniciar a aplicação com ambiente PyInstaller limpo
 if exist "{exe_path}" (
     echo [AUTO-UPDATE] Atualização concluída com sucesso! Iniciando aplicativo...
     if exist "{new_exe_path}" del /f /q /a "{new_exe_path}" > NUL 2>&1
     if exist "{old_exe_path}" del /f /q /a "{old_exe_path}" > NUL 2>&1
     timeout /t 1 /nobreak > NUL
+    set "_MEIPASS="
+    set "_MEIPASS2="
     start "" /D "{exe_dir}" "{exe_path}"
 ) else (
     echo [AUTO-UPDATE] ERRO FATAL: Falha ao substituir executável. Restaurando backup...
+    set "_MEIPASS="
+    set "_MEIPASS2="
     if exist "{old_exe_path}" (
         copy /y "{old_exe_path}" "{exe_path}" > NUL 2>&1
         start "" /D "{exe_dir}" "{exe_path}"
@@ -173,13 +181,18 @@ timeout /t 2 /nobreak > NUL
             with open(bat_path, "w", encoding="utf-8") as f:
                 f.write(bat_content)
 
-            # Executar script batch em background desvinculado (CREATE_NO_WINDOW | DETACHED_PROCESS)
+            # Executar script batch em background desvinculado sem herdar _MEIPASS
             DETACHED_PROCESS = 0x00000008
             CREATE_NO_WINDOW = 0x08000000
+            clean_env = os.environ.copy()
+            clean_env.pop("_MEIPASS", None)
+            clean_env.pop("_MEIPASS2", None)
+            
             subprocess.Popen(
                 f'cmd.exe /c "{bat_path}"', 
                 creationflags=CREATE_NO_WINDOW | DETACHED_PROCESS, 
                 close_fds=True,
+                env=clean_env,
                 shell=True
             )
             

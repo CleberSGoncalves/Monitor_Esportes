@@ -1,5 +1,5 @@
 {
-  "version": "2.2.5",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.5/Monitor_Esportes.exe",
-  "changelog": "v2.2.5: Otimização drástica do consumo de API Gemini. Zeradas as chamadas em segundo plano ao checar disponibilidade de súmula no agendador."
+  "version": "2.2.6",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.6/Monitor_Esportes.exe",
+  "changelog": "v2.2.6: Limpeza automática do ambiente temporário _MEIPASS do PyInstaller para evitar erro de DLL no reinício do auto-updater."
 }
