@@ -1,5 +1,5 @@
 {
-  "version": "2.1.7",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.1.7/Monitor_Esportes.exe",
-  "changelog": "v2.1.7: Tabela oficial da CBF com regras estritas centralizadas."
+  "version": "2.2.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.1/Monitor_Esportes.exe",
+  "changelog": "v2.2.1: Correção urgente no motor de detecção de súmulas da CBF. Localização instantânea de PDF/HTML oficial no CDN da CBF."
 }

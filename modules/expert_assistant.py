@@ -1115,10 +1115,10 @@ class ExpertAssistant:
                                     try:
                                         r_head = requests.head(pdf_u, headers=headers, verify=False, timeout=4)
                                         if r_head.status_code == 200 and int(r_head.headers.get("Content-Length", 0)) > 5000:
-                                            print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada no CDN: {pdf_u}")
+                                            print(f"[EXPERT SCHEDULER] Súmula em PDF confirmada no CDN: {pdf_u}")
                                             return True
                                     except Exception:
-                                        print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada no HTML: {pdf_u}")
+                                        print(f"[EXPERT SCHEDULER] Súmula em PDF confirmada no HTML: {pdf_u}")
                                         return True
                                 break
                         except Exception:
@@ -1127,7 +1127,7 @@ class ExpertAssistant:
                 # Checar se há dados completos no HTML
                 sumula_text = CBFScheduleFetcher.fetch_sumula_from_cbf_html(game_url)
                 if sumula_text and len(sumula_text.strip()) > 100:
-                    print(f"[EXPERT SCHEDULER] ✅ Súmula em HTML confirmada na CBF para {team1} x {team2}!")
+                    print(f"[EXPERT SCHEDULER] Súmula em HTML confirmada na CBF para {team1} x {team2}!")
                     return True
 
             # 2. Fallback: Busca via Gemini Grounding por URLs em conteudo.cbf.com.br
@@ -1136,7 +1136,7 @@ class ExpertAssistant:
                 try:
                     r_head = requests.head(pdf_url, headers=headers, verify=False, timeout=4)
                     if r_head.status_code == 200 and int(r_head.headers.get("Content-Length", 0)) > 5000:
-                        print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF confirmada via Gemini: {pdf_url}")
+                        print(f"[EXPERT SCHEDULER] Súmula em PDF confirmada via Gemini: {pdf_url}")
                         return True
                 except Exception:
                     print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF encontrada via Gemini: {pdf_url}")
