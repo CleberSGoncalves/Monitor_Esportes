@@ -1,5 +1,5 @@
 {
-  "version": "2.2.0",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.0/Monitor_Esportes.exe",
-  "changelog": "v2.2.0: Regra estrita centralizada em config/cbf_broadcaster_rules.json (Colunas 4 e 5 para Brasileirão)."
+  "version": "2.1.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.1.7/Monitor_Esportes.exe",
+  "changelog": "v2.1.7: Tabela oficial da CBF com regras estritas centralizadas."
 }
