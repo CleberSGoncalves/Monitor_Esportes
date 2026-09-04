@@ -7038,10 +7038,10 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                     e_dt = k_dt + timedelta(minutes=110)
                     
                     if now >= e_dt:
-                        # Throttle a verificação da súmula para a cada 30 segundos se a partida já encerrou
+                        # Throttle a verificação da súmula para a cada 15 minutos (900s) se a partida já encerrou (via HTTP scraping direto sem Gemini)
                         last_check_t = g.get("_last_sumula_check_time", 0.0)
                         import time
-                        if time.time() - last_check_t >= 30.0 or last_check_t == 0.0:
+                        if time.time() - last_check_t >= 900.0 or last_check_t == 0.0:
                             g["_last_sumula_check_time"] = time.time()
                             updated = True
                             
@@ -7062,7 +7062,8 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                                         team1=_game.get("team1"),
                                         team2=_game.get("team2"),
                                         date=_game.get("date"),
-                                        comp=_game.get("comp", "Brasileiro Serie A")
+                                        comp=_game.get("comp", "Brasileiro Serie A"),
+                                        use_gemini_fallback=False
                                     )
                                     
                                     if is_available:

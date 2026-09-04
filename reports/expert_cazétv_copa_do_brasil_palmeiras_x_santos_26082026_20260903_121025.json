@@ -1,0 +1,53 @@
+{
+  "expert_results": [
+    {
+      "match_display": "Palmeiras x Santos",
+      "competition": "Copa do Brasil",
+      "date": "26/08/2026",
+      "time": "18:30",
+      "platform": "CazéTV",
+      "live_start_time": "17:00:00",
+      "live_end_time": "21:00:00",
+      "confidence_score": 1.0,
+      "stoppage_time_1t": 3,
+      "stoppage_time_2t": 4,
+      "pre_game_start": "18:15:00",
+      "first_half_start": "18:30:00",
+      "half_time_start": "19:18:00",
+      "second_half_start": "19:33:00",
+      "match_end": "20:22:00",
+      "post_game_end": "21:00:00",
+      "technical_milestones": [
+        {
+          "type": "GOL",
+          "time": "18:44:00",
+          "minute": 14,
+          "event": "GOL de Flaco López (Palmeiras). Placar: Palmeiras 1 x 0 Santos",
+          "confidence": 1.0
+        },
+        {
+          "type": "CARTÃO AMARELOS",
+          "time": "18:50:00",
+          "minute": 20,
+          "event": "Cartão Amarelo para Zé Rafael (Palmeiras)",
+          "confidence": 1.0
+        },
+        {
+          "type": "GOL",
+          "time": "19:08:00",
+          "minute": 38,
+          "event": "GOL de Raphael Veiga (Palmeiras). Placar: Palmeiras 2 x 0 Santos",
+          "confidence": 1.0
+        },
+        {
+          "type": "GOL",
+          "time": "19:58:00",
+          "minute": 70,
+          "event": "GOL de Estêvão (Palmeiras). Placar: Palmeiras 3 x 0 Santos",
+          "confidence": 1.0
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-09-03T12:10:25.294025"
+}

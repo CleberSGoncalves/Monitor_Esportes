@@ -1,0 +1,53 @@
+{
+  "expert_results": [
+    {
+      "match_display": "Cruzeiro x Flamengo",
+      "competition": "Copa do Brasil",
+      "date": "22/08/2026",
+      "time": "21:00",
+      "platform": "Amazon Prime",
+      "live_start_time": "20:15:00",
+      "live_end_time": "23:45:00",
+      "confidence_score": 1.0,
+      "stoppage_time_1t": 3,
+      "stoppage_time_2t": 5,
+      "pre_game_start": "20:45:00",
+      "first_half_start": "21:00:00",
+      "half_time_start": "21:48:00",
+      "second_half_start": "22:03:00",
+      "match_end": "22:53:00",
+      "post_game_end": "23:45:00",
+      "technical_milestones": [
+        {
+          "type": "GOL",
+          "time": "21:18:00",
+          "minute": 18,
+          "event": "GOL de Matheus Pereira (Cruzeiro). Placar: Cruzeiro 1 x 0 Flamengo",
+          "confidence": 1.0
+        },
+        {
+          "type": "CARTÃO AMARELOS",
+          "time": "21:32:00",
+          "minute": 32,
+          "event": "Cartão Amarelo para Erick Pulgar (Flamengo)",
+          "confidence": 1.0
+        },
+        {
+          "type": "GOL",
+          "time": "22:25:00",
+          "minute": 67,
+          "event": "GOL de Pedro (Flamengo). Placar: Cruzeiro 1 x 1 Flamengo",
+          "confidence": 1.0
+        },
+        {
+          "type": "CARTÃO AMARELOS",
+          "time": "22:41:00",
+          "minute": 83,
+          "event": "Cartão Amarelo para Marlon (Cruzeiro)",
+          "confidence": 1.0
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-09-03T12:09:57.410094"
+}

@@ -1,5 +1,5 @@
 {
-  "version": "2.2.4",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.4/Monitor_Esportes.exe",
-  "changelog": "v2.2.4: Correção ultrarrobusta do script de auto-update no Windows para garantir a substituição e reinício do executável em produção."
+  "version": "2.2.5",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.5/Monitor_Esportes.exe",
+  "changelog": "v2.2.5: Otimização drástica do consumo de API Gemini. Zeradas as chamadas em segundo plano ao checar disponibilidade de súmula no agendador."
 }

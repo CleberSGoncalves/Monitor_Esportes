@@ -1,0 +1,60 @@
+{
+  "expert_results": [
+    {
+      "match_display": "Chapecoense x São Paulo",
+      "competition": "Copa do Brasil",
+      "date": "23/08/2026",
+      "time": "18:30",
+      "platform": "CazéTV",
+      "live_start_time": "16:55:36",
+      "live_end_time": "21:35:00",
+      "confidence_score": 1.0,
+      "stoppage_time_1t": 3,
+      "stoppage_time_2t": 5,
+      "pre_game_start": "18:25:00",
+      "first_half_start": "18:30:00",
+      "half_time_start": "19:18:00",
+      "second_half_start": "19:33:00",
+      "match_end": "20:24:00",
+      "post_game_end": "21:35:00",
+      "technical_milestones": [
+        {
+          "type": "CARTÃO AMARELOS",
+          "time": "18:46:00",
+          "minute": 16,
+          "event": "Cartão Amarelo para Marcinho (Chapecoense)",
+          "confidence": 1.0
+        },
+        {
+          "type": "GOL",
+          "time": "18:56:00",
+          "minute": 26,
+          "event": "GOL de Bruno Pacheco (Chapecoense). Placar: Chapecoense 1 x 0 São Paulo",
+          "confidence": 1.0
+        },
+        {
+          "type": "CARTÃO AMARELOS",
+          "time": "18:56:00",
+          "minute": 26,
+          "event": "Cartão Amarelo para Anderson Paixão (Chapecoense)",
+          "confidence": 1.0
+        },
+        {
+          "type": "CARTÃO AMARELOS",
+          "time": "18:58:00",
+          "minute": 28,
+          "event": "Cartão Amarelo para Yago Felipe (Chapecoense)",
+          "confidence": 1.0
+        },
+        {
+          "type": "CARTÃO AMARELOS",
+          "time": "19:12:00",
+          "minute": 42,
+          "event": "Cartão Amarelo para Camilo (Chapecoense)",
+          "confidence": 1.0
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-09-03T12:09:43.851063"
+}

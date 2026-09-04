@@ -13,7 +13,8 @@
   "debug_mode": true,
   "email_recipients": "cleber.goncalves@ibope.com;luiz.lemos@ibope.com",
   "send_report_email": true,
+  "auto_schedule_audit": false,
   "auto_stop_pos_mins": 5,
   "show_context_boxes": false,
-  "updated_at": "2026-08-13T14:47:43"
+  "updated_at": "2026-09-01T18:12:16"
 }

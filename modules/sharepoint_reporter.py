@@ -170,6 +170,39 @@ class SharePointReporter:
 
         return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
+    _cached_site_id = "adgbl.sharepoint.com,a3e49747-9bb6-4c93-9930-dda26c8d1050,34c8fe55-2cfe-4efc-8ce0-2958fd775ee0"
+    _cached_drive_id = "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuD6Kj6uN9mtQa9I7NZf2GFD"
+
+    @classmethod
+    def request_with_retry(cls, method: str, url: str, **kwargs) -> requests.Response:
+        """
+        Executa requisições HTTP para a Graph API com suporte a retries automáticos
+        e tratamento de rate limiting (HTTP 429 Retry-After).
+        """
+        import time
+        max_attempts = 4
+        for attempt in range(max_attempts):
+            try:
+                r = requests.request(method, url, **kwargs)
+                if r.status_code == 429:
+                    retry_after = int(r.headers.get("Retry-After", 3 * (attempt + 1)))
+                    logger.warning(f"[SharePoint] Graph API 429 (Rate limited). Aguardando {retry_after}s antes da tentativa {attempt+2}/{max_attempts}...")
+                    time.sleep(retry_after)
+                    continue
+                r.raise_for_status()
+                return r
+            except requests.HTTPError as he:
+                if attempt < max_attempts - 1 and r.status_code in (429, 500, 502, 503, 504):
+                    time.sleep(2 * (attempt + 1))
+                    continue
+                raise he
+            except Exception as e:
+                if attempt < max_attempts - 1:
+                    time.sleep(2 * (attempt + 1))
+                    continue
+                raise e
+        return r
+
     @classmethod
     def sync_pdf_to_sharepoint(cls, pdf_path: str, partida: str, campeonato: str, plataforma: str, data_hora_iso: str = None, confianca: str = "99.0%") -> bool:
         """
@@ -188,23 +221,24 @@ class SharePointReporter:
             token = cls.obter_token_graph()
             headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
             
-            # 1. Resolver Site ID
-            site_url = f"https://graph.microsoft.com/v1.0/sites/{SP_CONFIG['tenant_hostname']}:{SP_CONFIG['site_path']}"
-            r_site = requests.get(site_url, headers=headers, timeout=15)
-            r_site.raise_for_status()
-            site_id = r_site.json()["id"]
+            # 1. Resolver Site ID (utiliza cache para economizar chamadas)
+            if not cls._cached_site_id:
+                site_url = f"https://graph.microsoft.com/v1.0/sites/{SP_CONFIG['tenant_hostname']}:{SP_CONFIG['site_path']}"
+                r_site = cls.request_with_retry("GET", site_url, headers=headers, timeout=15)
+                cls._cached_site_id = r_site.json()["id"]
+            site_id = cls._cached_site_id
             
-            # 2. Localizar a Drive/Biblioteca de Documentos 'Relatorios_de_Jogos'
-            drives_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives"
-            r_drives = requests.get(drives_url, headers=headers, timeout=15)
-            r_drives.raise_for_status()
-            
-            drive_id = None
-            target_names = ["Relatorios_Auditoria_Jogos", "Relatorios_de_Jogos", "Relatórios_de_Jogos"]
-            for d in r_drives.json().get("value", []):
-                if d.get("name") in target_names or "Relatorio" in d.get("name", ""):
-                    drive_id = d.get("id")
-                    break
+            # 2. Localizar a Drive/Biblioteca de Documentos 'Relatorios_de_Jogos' (utiliza cache)
+            if not cls._cached_drive_id:
+                drives_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives"
+                r_drives = cls.request_with_retry("GET", drives_url, headers=headers, timeout=15)
+                
+                target_names = ["Relatorios_Auditoria_Jogos", "Relatorios_de_Jogos", "Relatórios_de_Jogos"]
+                for d in r_drives.json().get("value", []):
+                    if d.get("name") in target_names or "Relatorio" in d.get("name", ""):
+                        cls._cached_drive_id = d.get("id")
+                        break
+            drive_id = cls._cached_drive_id
                     
             if not drive_id:
                 logger.error("[SharePoint] Biblioteca de documentos não encontrada no SharePoint.")
@@ -218,8 +252,7 @@ class SharePointReporter:
             with open(pdf_path, "rb") as f:
                 pdf_bytes = f.read()
                 
-            r_up = requests.put(upload_url, headers=put_headers, data=pdf_bytes, timeout=60)
-            r_up.raise_for_status()
+            r_up = cls.request_with_retry("PUT", upload_url, headers=put_headers, data=pdf_bytes, timeout=60)
             item_id = r_up.json().get("id")
             
             # 4. Atualizar os 7 campos de metadados
@@ -237,7 +270,7 @@ class SharePointReporter:
             }
             
             fields_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{item_id}/listItem/fields"
-            r_fields = requests.patch(fields_url, headers=headers, json=fields_payload, timeout=20)
+            r_fields = cls.request_with_retry("PATCH", fields_url, headers=headers, json=fields_payload, timeout=20)
             if r_fields.status_code in (200, 201):
                 logger.info(f"🎉 [SharePoint] PDF '{sp_filename}' e 7 metadados sincronizados com sucesso!")
                 return True
@@ -246,6 +279,9 @@ class SharePointReporter:
                 return True
                 
         except Exception as e:
+            # Em caso de falha grave, reseta os caches para forçar resolução limpa na próxima tentativa
+            cls._cached_site_id = None
+            cls._cached_drive_id = None
             logger.error(f"❌ [SharePoint] Falha na sincronização do PDF: {e}")
             return False
 

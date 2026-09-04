@@ -1088,9 +1088,10 @@ class ExpertAssistant:
                 
         return out_meta
 
-    def is_cbf_sumula_available(self, team1: str, team2: str, date: str, comp: str = "Brasileiro Serie A") -> bool:
+    def is_cbf_sumula_available(self, team1: str, team2: str, date: str, comp: str = "Brasileiro Serie A", use_gemini_fallback: bool = False) -> bool:
         """
         Verifica se a súmula oficial (PDF ou HTML) da partida já está publicada no site da CBF.
+        Por padrão, realiza apenas scraping HTTP direto (sem consumo de API Gemini).
         """
         print(f"[EXPERT SCHEDULER] Checando disponibilidade real no site da CBF para {team1} x {team2} ({date})...")
         try:
@@ -1130,17 +1131,18 @@ class ExpertAssistant:
                     print(f"[EXPERT SCHEDULER] Súmula em HTML confirmada na CBF para {team1} x {team2}!")
                     return True
 
-            # 2. Fallback: Busca via Gemini Grounding por URLs em conteudo.cbf.com.br
-            pdf_url = self.find_sumula_url_via_gemini(team1, team2, date, comp)
-            if pdf_url and "sumulas" in pdf_url:
-                try:
-                    r_head = requests.head(pdf_url, headers=headers, verify=False, timeout=4)
-                    if r_head.status_code == 200 and int(r_head.headers.get("Content-Length", 0)) > 5000:
-                        print(f"[EXPERT SCHEDULER] Súmula em PDF confirmada via Gemini: {pdf_url}")
+            # 2. Fallback opcional: Busca via Gemini Grounding por URLs em conteudo.cbf.com.br
+            if use_gemini_fallback:
+                pdf_url = self.find_sumula_url_via_gemini(team1, team2, date, comp)
+                if pdf_url and "sumulas" in pdf_url:
+                    try:
+                        r_head = requests.head(pdf_url, headers=headers, verify=False, timeout=4)
+                        if r_head.status_code == 200 and int(r_head.headers.get("Content-Length", 0)) > 5000:
+                            print(f"[EXPERT SCHEDULER] Súmula em PDF confirmada via Gemini: {pdf_url}")
+                            return True
+                    except Exception:
+                        print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF encontrada via Gemini: {pdf_url}")
                         return True
-                except Exception:
-                    print(f"[EXPERT SCHEDULER] ✅ Súmula em PDF encontrada via Gemini: {pdf_url}")
-                    return True
 
             print(f"[EXPERT SCHEDULER] Súmula oficial da CBF ainda NÃO publicada no site para {team1} x {team2}.")
             return False
