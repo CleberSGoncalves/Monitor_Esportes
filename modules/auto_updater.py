@@ -10,7 +10,7 @@ import time
 import urllib.request
 import subprocess
 
-CURRENT_VERSION = "2.2.3"
+CURRENT_VERSION = "2.2.4"
 
 class AutoUpdater:
     def __init__(self, version_url: str = "https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/version.json"):
@@ -91,54 +91,83 @@ class AutoUpdater:
             old_exe_name = os.path.basename(old_exe_path)
             exe_name = os.path.basename(exe_path)
             
-            # Script Batch com loop de insistência WAIT_DELETE para garantir a desalocação total do .exe antigo no Windows
+            # Script Batch ultrarrobusto com desalocação forçada, confirmação de eliminação de processo e substituição garantida no Windows
             bat_content = f"""@echo off
 setlocal enabledelayedexpansion
 chcp 65001 > NUL
 
-echo [AUTO-UPDATE] Encerrando processo principal PID {pid}...
-taskkill /F /PID {pid} > NUL 2>&1
-taskkill /F /IM {exe_name} > NUL 2>&1
+echo [AUTO-UPDATE] Encerrando processos e aguardando liberação do sistema...
+timeout /t 3 /nobreak > NUL
+
+:: 1. Encerrar processo principal pelo PID e por nome
+if not "{pid}"=="" taskkill /F /PID {pid} > NUL 2>&1
+taskkill /F /T /IM "{exe_name}" > NUL 2>&1
 timeout /t 2 /nobreak > NUL
 
-set /a count=0
-:WAIT_DELETE
-set /a count+=1
-del /f /q "{old_exe_path}" > NUL 2>&1
-ren "{exe_path}" "{old_exe_name}" > NUL 2>&1
-del /f /q "{exe_path}" > NUL 2>&1
-
-if exist "{exe_path}" (
-    if !count! LSS 20 (
+:: 2. Loop de verificação se o processo encerrou no Gerenciador de Tarefas
+set /a pcount=0
+:CHECK_PROCESS
+tasklist /FI "IMAGENAME eq {exe_name}" 2>NUL | find /I "{exe_name}" > NUL
+if "%ERRORLEVEL%"=="0" (
+    set /a pcount+=1
+    if !pcount! LSS 10 (
+        taskkill /F /T /IM "{exe_name}" > NUL 2>&1
         timeout /t 1 /nobreak > NUL
-        taskkill /F /IM {exe_name} > NUL 2>&1
-        goto WAIT_DELETE
+        goto CHECK_PROCESS
     )
 )
 
+:: 3. Limpar backup antigo se existir
+if exist "{old_exe_path}" del /f /q /a "{old_exe_path}" > NUL 2>&1
+
+:: 4. Loop de insistência para remover/mover o executável original
+set /a count=0
+:RETRY_SWAP
+set /a count+=1
+
+move /y "{exe_path}" "{old_exe_path}" > NUL 2>&1
+if not exist "{exe_path}" goto DO_REPLACE
+
+ren "{exe_path}" "{old_exe_name}" > NUL 2>&1
+if not exist "{exe_path}" goto DO_REPLACE
+
+del /f /q /a "{exe_path}" > NUL 2>&1
+if not exist "{exe_path}" goto DO_REPLACE
+
+if !count! LSS 30 (
+    timeout /t 1 /nobreak > NUL
+    goto RETRY_SWAP
+)
+
+:DO_REPLACE
+:: 5. Mover o novo executável baixado para o lugar do em produção
 if exist "{new_exe_path}" (
     move /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
     if not exist "{exe_path}" (
         copy /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
-        del /f /q "{new_exe_path}" > NUL 2>&1
+        del /f /q /a "{new_exe_path}" > NUL 2>&1
     )
 )
 
-timeout /t 1 /nobreak > NUL
-
+:: 6. Confirmar substituição e reiniciar a aplicação
 if exist "{exe_path}" (
-    echo [AUTO-UPDATE] Iniciando versao atualizada...
+    echo [AUTO-UPDATE] Atualização concluída com sucesso! Iniciando aplicativo...
+    if exist "{new_exe_path}" del /f /q /a "{new_exe_path}" > NUL 2>&1
+    if exist "{old_exe_path}" del /f /q /a "{old_exe_path}" > NUL 2>&1
+    timeout /t 1 /nobreak > NUL
     start "" /D "{exe_dir}" "{exe_path}"
 ) else (
+    echo [AUTO-UPDATE] ERRO FATAL: Falha ao substituir executável. Restaurando backup...
     if exist "{old_exe_path}" (
-        echo [AUTO-UPDATE] Restaurando executavel de seguranca...
         copy /y "{old_exe_path}" "{exe_path}" > NUL 2>&1
+        start "" /D "{exe_dir}" "{exe_path}"
+    ) else if exist "{new_exe_path}" (
+        copy /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
         start "" /D "{exe_dir}" "{exe_path}"
     )
 )
 
 timeout /t 2 /nobreak > NUL
-del /f /q "{old_exe_path}" > NUL 2>&1
 (goto) 2>nul & del "%~f0"
 """
             with open(bat_path, "w", encoding="utf-8") as f:
@@ -148,9 +177,10 @@ del /f /q "{old_exe_path}" > NUL 2>&1
             DETACHED_PROCESS = 0x00000008
             CREATE_NO_WINDOW = 0x08000000
             subprocess.Popen(
-                ["cmd.exe", "/c", bat_path], 
+                f'cmd.exe /c "{bat_path}"', 
                 creationflags=CREATE_NO_WINDOW | DETACHED_PROCESS, 
-                close_fds=True
+                close_fds=True,
+                shell=True
             )
             
             # Encerramento limpo para liberar totalmente o arquivo do sistema

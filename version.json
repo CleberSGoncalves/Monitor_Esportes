@@ -1,5 +1,5 @@
 {
-  "version": "2.2.3",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.3/Monitor_Esportes.exe",
-  "changelog": "v2.2.3: Correção do envio automático ao SharePoint na auditoria manual e inclusão do método upload_report."
+  "version": "2.2.4",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.4/Monitor_Esportes.exe",
+  "changelog": "v2.2.4: Correção ultrarrobusta do script de auto-update no Windows para garantir a substituição e reinício do executável em produção."
 }
