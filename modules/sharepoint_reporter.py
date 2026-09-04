@@ -63,10 +63,10 @@ class SharePointReporter:
     @staticmethod
     def normalizar_campeonato(comp: str) -> str:
         comp_upper = (comp or "").upper()
-        if "COPA DO BRASIL" in comp_upper or "COPA BRASIL" in comp_upper or "COPA" in comp_upper:
-            return "Copa do Brasil"
-        elif "BRASIL" in comp_upper or "SÉRIE A" in comp_upper or "SERIE A" in comp_upper:
+        if "SERIE A" in comp_upper or "SÉRIE A" in comp_upper or "BRASILEIRO" in comp_upper or "BRASILEIRÃO" in comp_upper:
             return "Brasileiro Serie A"
+        elif "COPA DO BRASIL" in comp_upper or "COPA BRASIL" in comp_upper or "COPA" in comp_upper:
+            return "Copa do Brasil"
         elif "PAULIST" in comp_upper:
             return "Paulista"
         elif "CHAMPIONS" in comp_upper:

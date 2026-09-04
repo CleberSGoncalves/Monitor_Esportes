@@ -1,5 +1,5 @@
 {
-  "version": "2.2.1",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.1/Monitor_Esportes.exe",
-  "changelog": "v2.2.1: Correção completa no motor de busca de súmulas da CBF (Copa do Brasil e Brasileirão)."
+  "version": "2.2.2",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.2/Monitor_Esportes.exe",
+  "changelog": "v2.2.2: Integração automática do SharePoint no agendamento e correção da normalização de campeonatos no SharePoint."
 }

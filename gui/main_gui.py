@@ -240,7 +240,20 @@ def _remove_saved_email(email_str: str) -> list:
         _save_config_file("saved_emails.json", emails)
     return emails
 
+def _ensure_broadcaster_rules_synced():
+    try:
+        appdata_dir = os.path.join(os.environ.get("APPDATA", ""), "Monitor_Esportes", "config")
+        os.makedirs(appdata_dir, exist_ok=True)
+        target_path = os.path.join(appdata_dir, "cbf_broadcaster_rules.json")
+        src_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "cbf_broadcaster_rules.json")
+        if os.path.exists(src_path) and not os.path.exists(target_path):
+            import shutil
+            shutil.copy2(src_path, target_path)
+    except:
+        pass
+
 def _load_scheduled_games() -> list:
+    _ensure_broadcaster_rules_synced()
     path = _get_config_read_path("scheduled_games.json")
     
     # Obter lista de jogos oficiais da CBF para validação estrita
@@ -6884,6 +6897,24 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                         pdf_path = self.reporter.write_expert_report([result], prefs=prefs)
                         _game["pdf_path"] = pdf_path
                         self._log(f"⏰ [AGENDAMENTO] Relatório PDF gerado com sucesso em: {pdf_path}")
+                        
+                        # Upload automático para o SharePoint
+                        try:
+                            from modules.sharepoint_reporter import SharePointReporter
+                            sp_ok = SharePointReporter.upload_report(
+                                filepath=pdf_path,
+                                campeonato=_game.get("comp", "Copa do Brasil"),
+                                partida=f"{_game.get('team1')} x {_game.get('team2')}",
+                                plataforma=_game.get("platform", "Amazon Prime"),
+                                confianca="100.0%",
+                                auditado=True
+                            )
+                            if sp_ok:
+                                self._log(f"☁️ [SHAREPOINT] Relatório publicado no SharePoint com sucesso!")
+                            else:
+                                self._log(f"☁️ [SHAREPOINT WARN] Falha na publicação no SharePoint.")
+                        except Exception as ex_sp:
+                            self._log(f"☁️ [SHAREPOINT ERROR] Erro ao publicar no SharePoint: {ex_sp}")
                         
                         emails = _game.get("emails", "").strip() or self.email_recipients_var.get().strip() or ";".join(_load_saved_emails())
                         if emails:
