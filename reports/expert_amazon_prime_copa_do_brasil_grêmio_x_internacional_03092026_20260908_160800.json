@@ -1,0 +1,56 @@
+{
+  "expert_results": [
+    {
+      "match_display": "Grêmio x Internacional",
+      "team1": "Grêmio",
+      "team2": "Internacional",
+      "competition": "Copa do Brasil",
+      "platform": "Amazon Prime",
+      "date": "03/09/2026",
+      "time": "20:02",
+      "confidence_score": 1.0,
+      "first_half_start": "20:02:00",
+      "half_time_start": "20:57:00",
+      "second_half_start": "21:15:00",
+      "match_end": "22:05:00",
+      "post_game_end": "22:05:00",
+      "stoppage_time_1t": 10,
+      "stoppage_time_2t": 5,
+      "duration": 7380,
+      "technical_milestones": [
+        {
+          "minute": 44,
+          "type": "CARTÃO AMARELO",
+          "time": "20:44:00",
+          "event": "Cartão Amarelo para Carlos Vinicius Alves Morais (Grêmio)",
+          "confidence": 1.0
+        },
+        {
+          "minute": 44,
+          "type": "CARTÃO AMARELO",
+          "time": "20:44:00",
+          "event": "Cartão Amarelo para Matheus Bahia Santos (Internacional)",
+          "confidence": 1.0
+        },
+        {
+          "minute": 57,
+          "type": "SUBSTITUIÇÃO",
+          "time": "21:27:00",
+          "event": "Substituição Grêmio: Entra Braithwaite, Sai Carlos Vinicius",
+          "confidence": 1.0
+        },
+        {
+          "minute": 92,
+          "type": "CARTÃO AMARELO",
+          "time": "22:02:00",
+          "event": "Cartão Amarelo para Walter Kannemann (Grêmio)",
+          "confidence": 1.0
+        }
+      ],
+      "grounding_sources": [
+        "Súmula Eletrônica Oficial - CBF (https://conteudo.cbf.com.br/sumulas/2026/424143se.pdf)"
+      ]
+    }
+  ],
+  "generated_at": "2026-09-08T16:08:00.941567"
+}

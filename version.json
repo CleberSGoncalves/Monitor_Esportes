@@ -1,5 +1,5 @@
 {
-  "version": "2.2.6",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.6/Monitor_Esportes.exe",
-  "changelog": "v2.2.6: Limpeza automática do ambiente temporário _MEIPASS do PyInstaller para evitar erro de DLL no reinício do auto-updater."
+  "version": "2.2.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.7/Monitor_Esportes.exe",
+  "changelog": "v2.2.7: Correção crítica na geração de relatórios (prevenida a troca de arquivos em lote e ajustado o horário de término do 2º tempo da súmula)."
 }

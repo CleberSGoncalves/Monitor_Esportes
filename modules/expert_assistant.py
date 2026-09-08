@@ -280,26 +280,48 @@ class ExpertAssistant:
         if res and "error" not in res:
             if sumula_raw_text:
                 import re as _re
-                # Início do Jogo
-                m_time = _re.search(r'hor[áa]rio(?:\s+de\s+in[íi]cio)?\s*:?\s*(\d{2}:\d{2})', str(sumula_raw_text), _re.IGNORECASE)
-                if not m_time:
-                    m_time = _re.search(r'1º\s*Tempo\s*:?\s*(\d{2}:\d{2})', str(sumula_raw_text), _re.IGNORECASE)
-                if m_time:
-                    ext_time = m_time.group(1).strip()
+                s_text = str(sumula_raw_text)
+                
+                # 1. Início do 1º Tempo
+                m_s1 = _re.search(r'In[íi]cio\s*(?:do\s*)?1º\s*Tempo\s*:?\s*(\d{2}:\d{2})', s_text, _re.IGNORECASE)
+                if not m_s1:
+                    m_s1 = _re.search(r'hor[áa]rio(?:\s+de\s+in[íi]cio)?\s*:?\s*(\d{2}:\d{2})', s_text, _re.IGNORECASE)
+                if m_s1:
+                    ext_time = m_s1.group(1).strip()
                     res["time"] = ext_time
                     res["event_time"] = ext_time
-                    if len(ext_time) == 5:
-                        res["first_half_start"] = ext_time + ":00"
-                    print(f"[EXPERT PIPELINE] Horário oficial de início da partida extraído da Súmula: {ext_time}")
+                    res["first_half_start"] = ext_time + (":00" if len(ext_time) == 5 else "")
+                    print(f"[EXPERT PIPELINE] Horário de Início (1T) extraído da Súmula: {ext_time}")
 
-                # Apito Final / Fim de Jogo da Súmula
-                m_end = _re.search(r'(?:fim|término|encerramento|apito\s+final).*?(\d{2}:\d{2})', str(sumula_raw_text), _re.IGNORECASE)
-                if m_end:
-                    ext_end = m_end.group(1).strip()
-                    if len(ext_end) == 5:
-                        ext_end = ext_end + ":00"
-                    res["match_end"] = ext_end
-                    print(f"[EXPERT PIPELINE] Horário oficial do apito final extraído da Súmula: {ext_end}")
+                # 2. Término do 1º Tempo
+                m_e1 = _re.search(r'T[ée]rmino\s*(?:do\s*)?1º\s*Tempo\s*:?\s*(\d{2}:\d{2})', s_text, _re.IGNORECASE)
+                if m_e1:
+                    ext_e1 = m_e1.group(1).strip()
+                    res["half_time_start"] = ext_e1 + (":00" if len(ext_e1) == 5 else "")
+                    print(f"[EXPERT PIPELINE] Horário de Término (1T) extraído da Súmula: {ext_e1}")
+
+                # 3. Início do 2º Tempo
+                m_s2 = _re.search(r'In[íi]cio\s*(?:do\s*)?2º\s*Tempo\s*:?\s*(\d{2}:\d{2})', s_text, _re.IGNORECASE)
+                if m_s2:
+                    ext_s2 = m_s2.group(1).strip()
+                    res["second_half_start"] = ext_s2 + (":00" if len(ext_s2) == 5 else "")
+                    print(f"[EXPERT PIPELINE] Horário de Início (2T) extraído da Súmula: {ext_s2}")
+
+                # 4. Término do 2º Tempo (Apito Final real da partida)
+                m_e2 = _re.search(r'T[ée]rmino\s*(?:do\s*)?2º\s*Tempo\s*:?\s*(\d{2}:\d{2})', s_text, _re.IGNORECASE)
+                if not m_e2:
+                    # Fallback para buscas genéricas se 2º tempo não especificado
+                    matches_end = _re.findall(r'T[ée]rmino.*?:?\s*(\d{2}:\d{2})', s_text, _re.IGNORECASE)
+                    if matches_end:
+                        ext_end = matches_end[-1].strip()
+                        res["match_end"] = ext_end + (":00" if len(ext_end) == 5 else "")
+                        res["post_game_end"] = ext_end + (":00" if len(ext_end) == 5 else "")
+                        print(f"[EXPERT PIPELINE] Horário do Apito Final extraído da Súmula (último término): {ext_end}")
+                else:
+                    ext_end = m_e2.group(1).strip()
+                    res["match_end"] = ext_end + (":00" if len(ext_end) == 5 else "")
+                    res["post_game_end"] = ext_end + (":00" if len(ext_end) == 5 else "")
+                    print(f"[EXPERT PIPELINE] Horário oficial do Apito Final (2T) extraído da Súmula: {ext_end}")
 
             if live_start_time and str(live_start_time).strip():
                 res["live_start_time"] = str(live_start_time).strip()

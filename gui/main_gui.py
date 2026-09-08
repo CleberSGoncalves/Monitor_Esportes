@@ -5971,10 +5971,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                 "show_secondary": self.expert_show_secondary_var.get(),
                 "show_sources": self.expert_show_sources_var.get()
             }
-            if len(results) == 1 and getattr(self, "_last_generated_pdf_path", None) and os.path.exists(self._last_generated_pdf_path):
-                pdf_path = self._last_generated_pdf_path
-            else:
-                pdf_path = self.reporter.write_expert_report(results, prefs=prefs)
+            pdf_path = self.reporter.write_expert_report(results, prefs=prefs)
             self._log(f"[EXPERT] Lote finalizado: {len(results)} eventos processados. PDF: {pdf_path}")
             self._ui_success(f"Análise Expert finalizada para {len(results)} eventos.\nRelatório gerado em: {pdf_path}")
             
