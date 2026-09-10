@@ -67,20 +67,25 @@ def fetch_youtube_live_details(url: str) -> Dict[str, Optional[str]]:
         with yt_dlp.YoutubeDL(opts) as ydl:
             info = ydl.extract_info(url, download=False)
             if isinstance(info, dict):
-                start_ts = info.get("release_timestamp") or info.get("timestamp")
+                start_ts = info.get("actual_start_time") or info.get("release_timestamp") or info.get("timestamp")
+                end_ts = info.get("actual_end_time")
                 duration = info.get("duration")
                 
                 live_start_str = None
                 live_end_str = None
                 tz_br = datetime.timezone(datetime.timedelta(hours=-3))
                 
-                if start_ts:
+                if start_ts and isinstance(start_ts, (int, float)):
                     dt_start = datetime.datetime.fromtimestamp(start_ts, tz=datetime.timezone.utc).astimezone(tz_br)
                     live_start_str = dt_start.strftime("%H:%M:%S")
                     
-                    if duration and isinstance(duration, (int, float)) and duration > 0:
-                        dt_end = dt_start + datetime.timedelta(seconds=duration)
-                        live_end_str = dt_end.strftime("%H:%M:%S")
+                if end_ts and isinstance(end_ts, (int, float)):
+                    dt_end = datetime.datetime.fromtimestamp(end_ts, tz=datetime.timezone.utc).astimezone(tz_br)
+                    live_end_str = dt_end.strftime("%H:%M:%S")
+                elif start_ts and isinstance(start_ts, (int, float)) and duration and isinstance(duration, (int, float)) and duration > 0:
+                    dt_start = datetime.datetime.fromtimestamp(start_ts, tz=datetime.timezone.utc).astimezone(tz_br)
+                    dt_end = dt_start + datetime.timedelta(seconds=duration)
+                    live_end_str = dt_end.strftime("%H:%M:%S")
 
                 return {
                     "live_start_time": live_start_str,

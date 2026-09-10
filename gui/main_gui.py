@@ -5273,7 +5273,9 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
             "timestamp": start_ts,
             "release_timestamp": None,
             "actual_start_time": None,
-            "duration": None
+            "duration": None,
+            "live_start_time": data.get("live_start_time"),
+            "live_end_time": data.get("live_end_time"),
         }
         self._run_expert_batch_analysis([event])
 
@@ -5450,6 +5452,9 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                             except Exception as e_yt:
                                 self._log(f"[WARN] Erro ao buscar metadados de live do YouTube: {e_yt}")
 
+                    live_start = ev.get("live_start_time") or (self.expert_live_start_var.get().strip() if hasattr(self, "expert_live_start_var") else None) or None
+                    live_end = ev.get("live_end_time") or (self.expert_live_end_var.get().strip() if hasattr(self, "expert_live_end_var") else None) or None
+
                     payload = {
                         "team1": team1,
                         "team2": team2,
@@ -5459,7 +5464,9 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                         "start_timestamp": resolved_start_ts,
                         "duration": ev.get("duration"),
                         "video_url": ev.get("url"),
-                        "transcript_text": transcript_text
+                        "transcript_text": transcript_text,
+                        "live_start_time": live_start,
+                        "live_end_time": live_end,
                     }
                     
                     # 2. Delay para evitar 429 Resource Exhausted (Cota da API)

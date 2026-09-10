@@ -315,12 +315,10 @@ class ExpertAssistant:
                     if matches_end:
                         ext_end = matches_end[-1].strip()
                         res["match_end"] = ext_end + (":00" if len(ext_end) == 5 else "")
-                        res["post_game_end"] = ext_end + (":00" if len(ext_end) == 5 else "")
                         print(f"[EXPERT PIPELINE] Horário do Apito Final extraído da Súmula (último término): {ext_end}")
                 else:
                     ext_end = m_e2.group(1).strip()
                     res["match_end"] = ext_end + (":00" if len(ext_end) == 5 else "")
-                    res["post_game_end"] = ext_end + (":00" if len(ext_end) == 5 else "")
                     print(f"[EXPERT PIPELINE] Horário oficial do Apito Final (2T) extraído da Súmula: {ext_end}")
 
             if live_start_time and str(live_start_time).strip():
@@ -328,14 +326,7 @@ class ExpertAssistant:
             if live_end_time and str(live_end_time).strip():
                 res["live_end_time"] = str(live_end_time).strip()
 
-            # Garantir sincronia da LIVE no post_game_end
-            if res.get("live_end_time"):
-                l_end = str(res["live_end_time"]).strip()
-                if len(l_end) == 5:
-                    l_end += ":00"
-                res["post_game_end"] = l_end
-
-            if not res.get("live_start_time"):
+            if not res.get("live_start_time") or not res.get("live_end_time"):
                 plat_u = str(platform or "").upper()
                 if "CAZE" in plat_u or "CAZÉ" in plat_u or "YOUTUBE" in plat_u or video_url:
                     try:
@@ -345,14 +336,21 @@ class ExpertAssistant:
                             target_url = search_youtube_live_url(f"CazéTV {team1} x {team2}")
                         if target_url:
                             live_info = fetch_youtube_live_details(target_url)
-                            if live_info and live_info.get("live_start_time"):
-                                res["live_start_time"] = live_info["live_start_time"]
-                                if live_info.get("live_end_time"):
+                            if live_info:
+                                if live_info.get("live_start_time") and not res.get("live_start_time"):
+                                    res["live_start_time"] = live_info["live_start_time"]
+                                if live_info.get("live_end_time") and not res.get("live_end_time"):
                                     res["live_end_time"] = live_info["live_end_time"]
-                                    res["post_game_end"] = live_info["live_end_time"]
-                                print(f"[EXPERT YOUTUBE LIVE] Extraído automaticamente do YouTube ({target_url}): Início {live_info['live_start_time']} | Fim {live_info.get('live_end_time')}")
+                                print(f"[EXPERT YOUTUBE LIVE] Extraído automaticamente do YouTube ({target_url}): Início {live_info.get('live_start_time')} | Fim {live_info.get('live_end_time')}")
                     except Exception as e_yt:
                         print(f"[EXPERT YOUTUBE LIVE WARN] Falha na busca automática do YouTube: {e_yt}")
+
+            # Garantir sincronia da LIVE no post_game_end se live_end_time estiver presente
+            if res.get("live_end_time"):
+                l_end = str(res["live_end_time"]).strip()
+                if len(l_end) == 5:
+                    l_end += ":00"
+                res["post_game_end"] = l_end
 
             if is_final_valid:
                 try:
@@ -1066,6 +1064,7 @@ class ExpertAssistant:
                     live_dets = item.get("liveStreamingDetails") or {}
                     dur_iso = (item.get("contentDetails") or {}).get("duration")
                     actual_start = live_dets.get("actualStartTime")
+                    actual_end = live_dets.get("actualEndTime")
                     scheduled = live_dets.get("scheduledStartTime")
                     
                     secs = None
@@ -1076,6 +1075,7 @@ class ExpertAssistant:
                     
                     out_meta = {
                         "actual_start_time": actual_start or scheduled,
+                        "actual_end_time": actual_end,
                         "duration": secs
                     }
         except Exception:
@@ -1094,8 +1094,9 @@ class ExpertAssistant:
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     data = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
                     if data:
-                        actual_start = data.get("actual_start_time")
-                        # No yt-dlp, actual_start_time costuma vir em segundos (timestamp) ou string ISO
+                        actual_start = data.get("actual_start_time") or data.get("release_timestamp") or data.get("timestamp")
+                        actual_end = data.get("actual_end_time")
+                        
                         if actual_start:
                             if isinstance(actual_start, (int, float)):
                                 from datetime import datetime, timezone
@@ -1103,6 +1104,13 @@ class ExpertAssistant:
                             else:
                                 out_meta["actual_start_time"] = str(actual_start)
                         
+                        if actual_end:
+                            if isinstance(actual_end, (int, float)):
+                                from datetime import datetime, timezone
+                                out_meta["actual_end_time"] = datetime.fromtimestamp(int(actual_end), tz=timezone.utc).isoformat()
+                            else:
+                                out_meta["actual_end_time"] = str(actual_end)
+
                         if not out_meta.get("duration") and data.get("duration"):
                             out_meta["duration"] = int(data["duration"])
             except Exception:

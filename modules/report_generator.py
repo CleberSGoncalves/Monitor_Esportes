@@ -918,7 +918,7 @@ class ReportGenerator:
             if not fim_live_txt:
                 for item in to_render:
                     lbl_u = item.get("lbl", "").upper()
-                    if any(k in lbl_u for k in ["ENCERRAMENTO DE TRANSMISSÃO", "ENCERRAMENTO DA LIVE", "ENCERRAMENTO", "END LIVE"]):
+                    if any(k in lbl_u for k in ["ENCERRAMENTO DE TRANSMISSÃO", "ENCERRAMENTO DA LIVE", "ENCERRAMENTO TRANSMISSÃO", "FIM TRANSMISSÃO", "END LIVE"]):
                         fim_live_txt = item.get("clock")
                         break
 
@@ -1225,7 +1225,7 @@ class ReportGenerator:
             if not fim_live:
                 for item in to_render:
                     lbl_u = item.get("lbl", "").upper()
-                    if any(k in lbl_u for k in ["ENCERRAMENTO DE TRANSMISSÃO", "ENCERRAMENTO DA LIVE", "ENCERRAMENTO", "END LIVE"]):
+                    if any(k in lbl_u for k in ["ENCERRAMENTO DE TRANSMISSÃO", "ENCERRAMENTO DA LIVE", "ENCERRAMENTO TRANSMISSÃO", "FIM TRANSMISSÃO", "END LIVE"]):
                         fim_live = item.get("clock")
                         break
                 

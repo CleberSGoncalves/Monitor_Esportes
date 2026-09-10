@@ -1,5 +1,5 @@
 {
-  "version": "2.2.7",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.7/Monitor_Esportes.exe",
-  "changelog": "v2.2.7: Correção crítica na geração de relatórios (prevenida a troca de arquivos em lote e ajustado o horário de término do 2º tempo da súmula)."
+  "version": "2.2.8",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.8/Monitor_Esportes.exe",
+  "changelog": "v2.2.8: Correção nos horários de início e encerramento de transmissão (YouTube/Amazon Prime) garantindo extração de metadados reais sem inferências sintéticas."
 }

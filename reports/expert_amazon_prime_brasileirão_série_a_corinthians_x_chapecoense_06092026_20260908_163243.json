@@ -1,0 +1,28 @@
+{
+  "expert_results": [
+    {
+      "match_display": "Corinthians x Chapecoense",
+      "team1": "Corinthians",
+      "team2": "Chapecoense",
+      "competition": "Brasileirão Série A",
+      "platform": "Amazon Prime",
+      "date": "06/09/2026",
+      "time": "18:30",
+      "confidence_score": 0.99,
+      "first_half_start": "18:30:00",
+      "half_time_start": "19:19:00",
+      "second_half_start": "19:34:00",
+      "match_end": "20:27:00",
+      "post_game_end": "20:27:00",
+      "stoppage_time_1t": 4,
+      "stoppage_time_2t": 3,
+      "duration": 7020,
+      "technical_milestones": [],
+      "grounding_sources": [
+        "Súmula Eletrônica Oficial - CBF (cbf.com.br)",
+        "Cobertura Minuto a Minuto - Globo Esporte (ge.globo.com)"
+      ]
+    }
+  ],
+  "generated_at": "2026-09-08T16:32:43.748250"
+}
