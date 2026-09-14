@@ -6956,11 +6956,13 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                             from modules.sharepoint_reporter import SharePointReporter
                             sp_ok = SharePointReporter.upload_report(
                                 filepath=pdf_path,
-                                campeonato=_game.get("comp", "Copa do Brasil"),
+                                campeonato=_game.get("comp", "Brasileiro Serie A"),
                                 partida=f"{_game.get('team1')} x {_game.get('team2')}",
                                 plataforma=_game.get("platform", "Amazon Prime"),
                                 confianca="100.0%",
-                                auditado=True
+                                auditado=True,
+                                date_str=_game.get("date"),
+                                time_str=_game.get("time")
                             )
                             if sp_ok:
                                 self._log(f"☁️ [SHAREPOINT] Relatório publicado no SharePoint com sucesso!")

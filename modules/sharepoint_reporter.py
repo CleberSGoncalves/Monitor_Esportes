@@ -33,22 +33,52 @@ class SharePointReporter:
     @staticmethod
     def obter_token_graph() -> str:
         token_url = f"https://login.microsoftonline.com/{SP_CONFIG['tenant_id']}/oauth2/v2.0/token"
+        token_cache_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "sp_token_cache.json")
         
-        # 1. Tentar Client Credentials
-        payload_cc = {
-            "client_id": SP_CONFIG["client_id"],
-            "client_secret": SP_CONFIG["client_secret"],
-            "grant_type": "client_credentials",
-            "scope": "https://graph.microsoft.com/.default"
-        }
-        try:
-            r = requests.post(token_url, data=payload_cc, timeout=15)
-            if r.status_code == 200:
-                return r.json()["access_token"]
-        except Exception as e:
-            logger.warning(f"[SharePoint] Falha no login via Client Credentials: {e}")
+        # 1. Tentar Refresh Token em cache
+        if os.path.exists(token_cache_path):
+            try:
+                with open(token_cache_path, "r", encoding="utf-8") as f_c:
+                    c_data = json.load(f_c)
+                rf_token = c_data.get("refresh_token")
+                if rf_token:
+                    payload_rf = {
+                        "client_id": SP_CONFIG["client_id"],
+                        "grant_type": "refresh_token",
+                        "refresh_token": rf_token,
+                        "scope": "https://graph.microsoft.com/.default"
+                    }
+                    r_rf = requests.post(token_url, data=payload_rf, timeout=15)
+                    if r_rf.status_code == 200:
+                        json_rf = r_rf.json()
+                        acc_tok = json_rf.get("access_token")
+                        new_rf = json_rf.get("refresh_token") or rf_token
+                        with open(token_cache_path, "w", encoding="utf-8") as f_w:
+                            json.dump({
+                                "access_token": acc_tok,
+                                "refresh_token": new_rf,
+                                "updated_at": datetime.now().isoformat()
+                            }, f_w, indent=2)
+                        return acc_tok
+            except Exception as e_rf:
+                logger.warning(f"[SharePoint] Renovação por refresh_token falhou: {e_rf}")
+
+        # 2. Tentar Client Credentials
+        if SP_CONFIG.get("client_secret"):
+            payload_cc = {
+                "client_id": SP_CONFIG["client_id"],
+                "client_secret": SP_CONFIG["client_secret"],
+                "grant_type": "client_credentials",
+                "scope": "https://graph.microsoft.com/.default"
+            }
+            try:
+                r = requests.post(token_url, data=payload_cc, timeout=15)
+                if r.status_code == 200:
+                    return r.json()["access_token"]
+            except Exception as e:
+                logger.warning(f"[SharePoint] Falha no login via Client Credentials: {e}")
             
-        # 2. Fallback para Password Grant
+        # 3. Fallback para Password Grant
         payload_pass = {
             "client_id": SP_CONFIG["client_id"],
             "username": SP_CONFIG["username"],
@@ -58,7 +88,19 @@ class SharePointReporter:
         }
         r = requests.post(token_url, data=payload_pass, timeout=15)
         r.raise_for_status()
-        return r.json()["access_token"]
+        res_json = r.json()
+        if "refresh_token" in res_json:
+            try:
+                os.makedirs(os.path.dirname(token_cache_path), exist_ok=True)
+                with open(token_cache_path, "w", encoding="utf-8") as f_w:
+                    json.dump({
+                        "access_token": res_json["access_token"],
+                        "refresh_token": res_json["refresh_token"],
+                        "updated_at": datetime.now().isoformat()
+                    }, f_w, indent=2)
+            except Exception:
+                pass
+        return res_json["access_token"]
 
     @staticmethod
     def normalizar_campeonato(comp: str) -> str:
@@ -295,6 +337,12 @@ class SharePointReporter:
             logger.error(f"[SharePoint] Caminho do PDF inválido: {target_path}")
             return False
             
+        if not date_str and target_path:
+            m = re.search(r'_(\d{8})_', os.path.basename(target_path))
+            if m:
+                d_raw = m.group(1)
+                date_str = f"{d_raw[:2]}/{d_raw[2:4]}/{d_raw[4:]}"
+
         data_hora_iso = cls.format_iso_datetime(date_str, time_str) if date_str else None
         return cls.sync_pdf_to_sharepoint(
             pdf_path=target_path,
