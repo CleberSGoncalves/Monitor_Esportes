@@ -1,5 +1,5 @@
 {
-  "version": "2.2.9",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.2.9/Monitor_Esportes.exe",
-  "changelog": "v2.2.9: Correção na publicação automática do agendador para o SharePoint e suporte a Device Code / Refresh Token caching."
+  "version": "2.3.0",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.0/Monitor_Esportes.exe",
+  "changelog": "v2.3.0: Raspagem dinâmica ao vivo dos PDFs da CBF (EDIÇÃO 2026), remoção de jogos antigos/passados da fila e sincronização com a programação Streaming."
 }

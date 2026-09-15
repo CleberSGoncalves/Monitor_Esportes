@@ -255,6 +255,7 @@ def _ensure_broadcaster_rules_synced():
 def _load_scheduled_games() -> list:
     _ensure_broadcaster_rules_synced()
     path = _get_config_read_path("scheduled_games.json")
+    today_cutoff = datetime.now() - timedelta(hours=2)
     
     # Obter lista de jogos oficiais da CBF para validação estrita
     try:
@@ -275,8 +276,17 @@ def _load_scheduled_games() -> list:
                         t1 = g.get("team1", "").strip().lower()
                         t2 = g.get("team2", "").strip().lower()
                         key = f"{t1}_x_{t2}"
-                        # Se o jogo consta na tabela oficial da CBF, mantemos (resetando status failed se necessário)
-                        if not official_keys or key in official_keys:
+                        
+                        # Validar se o jogo é futuro (date/time >= hoje - 2h)
+                        is_future = True
+                        try:
+                            g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
+                            if g_dt < today_cutoff:
+                                is_future = False
+                        except:
+                            pass
+                            
+                        if is_future and (not official_keys or key in official_keys):
                             if g.get("status") == "failed":
                                 g["status"] = "pending"
                                 g["_last_sumula_check_time"] = 0.0
@@ -287,7 +297,7 @@ def _load_scheduled_games() -> list:
         except:
             pass
             
-    # Se não houver arquivo salvo ou contiver jogos inválidos/antigos, reinicializa estritamente com os 5 próximos jogos oficiais da CBF
+    # Se não houver arquivo salvo ou contiver jogos inválidos/antigos, reinicializa estritamente com os próximos jogos oficiais da CBF
     try:
         from modules.cbf_schedule_fetcher import CBFScheduleFetcher
         events = CBFScheduleFetcher.get_upcoming_matches(force_refresh=True)
@@ -407,7 +417,17 @@ def _load_cbf_streaming_events() -> list:
     except:
         pass
         
-    return events
+    today_cutoff = datetime.now() - timedelta(hours=2)
+    filtered_events = []
+    for evt in events:
+        try:
+            g_dt = datetime.strptime(f"{evt.get('date')} {evt.get('time')}", "%d/%m/%Y %H:%M")
+            if g_dt >= today_cutoff:
+                filtered_events.append(evt)
+        except:
+            filtered_events.append(evt)
+
+    return filtered_events
 
 
 class MonitorApp(MonitorCoreMixin, ctk.CTk):
