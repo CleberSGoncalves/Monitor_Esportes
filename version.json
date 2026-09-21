@@ -1,5 +1,5 @@
 {
-  "version": "2.3.0",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.0/Monitor_Esportes.exe",
-  "changelog": "v2.3.0: Raspagem dinâmica ao vivo dos PDFs da CBF (EDIÇÃO 2026), remoção de jogos antigos/passados da fila e sincronização com a programação Streaming."
+  "version": "2.3.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.1/Monitor_Esportes.exe",
+  "changelog": "v2.3.1: Relatorio PDF completo com todos os marcos (gols, cartoes, substituicoes), agendador nao descarta jogos pendentes, tolerancia de sumula CBF reduzida para 2h30, SharePoint retry robusto."
 }
