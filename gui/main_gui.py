@@ -277,8 +277,9 @@ def _load_scheduled_games() -> list:
                         t2 = g.get("team2", "").strip().lower()
                         key = f"{t1}_x_{t2}"
                         
-                        # Validar se o jogo é futuro (date/time >= hoje - 2h)
+                        # Validar se o jogo é futuro ou se é pendente que ainda precisa ser auditado
                         is_future = True
+                        is_pending = g.get("status") in ("pending", "running", "failed")
                         try:
                             g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
                             if g_dt < today_cutoff:
@@ -286,7 +287,7 @@ def _load_scheduled_games() -> list:
                         except:
                             pass
                             
-                        if is_future and (not official_keys or key in official_keys):
+                        if (is_future or is_pending) and (not official_keys or key in official_keys):
                             if g.get("status") == "failed":
                                 g["status"] = "pending"
                                 g["_last_sumula_check_time"] = 0.0
@@ -7097,15 +7098,15 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                                         self.after(0, lambda: self._trigger_scheduled_audit(_game))
                                     else:
                                         kickoff_dt = datetime.strptime(f"{_game.get('date')} {_game.get('time')}", "%d/%m/%Y %H:%M")
-                                        if datetime.now() - kickoff_dt > timedelta(hours=24):
-                                            self._log(f"⏰ [AGENDAMENTO] Súmula da CBF ainda não disponível após 24h. Iniciando auditoria por tolerância...")
+                                        if datetime.now() - kickoff_dt > timedelta(hours=2, minutes=30):
+                                            self._log(f"⏰ [AGENDAMENTO] Súmula da CBF não disponibilizada no site em 2h30. Iniciando auditoria por tolerância/Gemini...")
                                             self.after(0, lambda: self._trigger_scheduled_audit(_game))
                                         else:
                                             self._log(f"⏰ [AGENDAMENTO] Súmula da CBF para {_game.get('team1')} x {_game.get('team2')} ainda NÃO disponível no site. Aguardando...")
                                 except Exception as ex_check:
                                     self._log(f"⏰ [AGENDAMENTO WARN] Erro ao checar súmula: {ex_check}. Tentará novamente.")
                                     kickoff_dt = datetime.strptime(f"{_game.get('date')} {_game.get('time')}", "%d/%m/%Y %H:%M")
-                                    if datetime.now() - kickoff_dt > timedelta(hours=24):
+                                    if datetime.now() - kickoff_dt > timedelta(hours=2, minutes=30):
                                         self.after(0, lambda: self._trigger_scheduled_audit(_game))
                             
                             import threading

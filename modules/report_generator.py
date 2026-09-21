@@ -1108,35 +1108,25 @@ class ReportGenerator:
                         seen_labels.add(lbl)
                         seen_clocks.add(str(val))
             
+            seen_keys = set()
+            for item in to_render:
+                k = (str(item.get("clock")).strip(), str(item.get("lbl")).strip().upper())
+                seen_keys.add(k)
+            
             for m in res.get("technical_milestones", []):
                 try: 
                     m_min = int(m.get("minute", 0))
                 except: m_min = 0
-                lab = str(m.get("type", "EVENTO")).upper()
-                clk = str(m.get("time") or "")
+                lab = str(m.get("type", "EVENTO")).strip().upper()
+                clk = str(m.get("time") or "").strip()
                 
-                is_milestone = any(k in lab for k in ["GOL", "CARTÃO", "SUBSTITU", "PENAL"])
-                is_secondary = any(k in lab for k in ["VAR", "CHANCE", "TRAVE", "SUBST", "INTERRUP"])
-                
-                if is_milestone and not prefs.get("show_milestones", True): continue
-                if is_secondary and not is_milestone and not prefs.get("show_secondary", True): continue
-                
-                # Descartar marcos estruturais genéricos dos marcos técnicos pois o backbone do chrono_map já os renderiza!
-                m_txt_upper = str(m.get("event") or "").upper()
-                is_structural_generic = any(k in lab or k in m_txt_upper for k in [
-                    "INÍCIO DE TEMPO", "FIM DE TEMPO", "INÍCIO DO 1", "INÍCIO DO 2",
-                    "FIM DO 1", "FIM DO 2", "FIM DO SEGUNDO", "FIM DO PRIMEIRO",
-                    "INÍCIO DA PARTIDA", "FIM DE JOGO", "VOLTA INTERVALO", "INÍCIO INTERVALO"
-                ])
-                if is_structural_generic:
+                # Chave única para evitar duplicidades exatas (horário + rótulo)
+                item_key = (clk, lab)
+                if item_key in seen_keys:
                     continue
-
-                if lab in seen_labels and lab in ("APITO FINAL", "INÍCIO TRANSMISSÃO", "INÍCIO", "ENCERRAMENTO", "FIM DO 1º TEMPO"): continue
-                if "INTERRUPÇÃO TÉCNICA" in lab and clk in seen_clocks: continue
-                
+                    
                 to_render.append({"min": m_min, "lbl": lab, "clock": clk, "txt": m.get("event"), "conf": m.get("confidence") or m_conf})
-                if lab in ("APITO FINAL", "INÍCIO TRANSMISSÃO", "INÍCIO", "ENCERRAMENTO", "FIM DO 1º TEMPO"):
-                    seen_labels.add(lab)
+                seen_keys.add(item_key)
             
             # Encontrar base_sec para suportar virada de meia-noite
             base_sec = None

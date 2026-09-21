@@ -1,0 +1,98 @@
+[
+  {
+    "id": "game_1_19092026_1700",
+    "team1": "Mirassol",
+    "team2": "Botafogo",
+    "comp": "Brasileirão Série A",
+    "date": "19/09/2026",
+    "time": "17:00",
+    "platform": "CazéTV",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_2_19092026_2030",
+    "team1": "Vasco da Gama",
+    "team2": "Coritiba",
+    "comp": "Brasileirão Série A",
+    "date": "19/09/2026",
+    "time": "20:30",
+    "platform": "Amazon Prime",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_3_20092026_1600",
+    "team1": "Flamengo",
+    "team2": "Palmeiras",
+    "comp": "Brasileirão Série A",
+    "date": "20/09/2026",
+    "time": "16:00",
+    "platform": "CazéTV",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_4_20092026_1830",
+    "team1": "São Paulo",
+    "team2": "Corinthians",
+    "comp": "Brasileirão Série A",
+    "date": "20/09/2026",
+    "time": "18:30",
+    "platform": "Amazon Prime",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_5_26092026_1700",
+    "team1": "Internacional",
+    "team2": "Fluminense",
+    "comp": "Brasileirão Série A",
+    "date": "26/09/2026",
+    "time": "17:00",
+    "platform": "CazéTV",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_6_26092026_2100",
+    "team1": "Cruzeiro",
+    "team2": "Botafogo",
+    "comp": "Brasileirão Série A",
+    "date": "26/09/2026",
+    "time": "21:00",
+    "platform": "Amazon Prime",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_7_27092026_1600",
+    "team1": "Palmeiras",
+    "team2": "Grêmio",
+    "comp": "Brasileirão Série A",
+    "date": "27/09/2026",
+    "time": "16:00",
+    "platform": "CazéTV",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_8_27092026_1830",
+    "team1": "Santos",
+    "team2": "Bahia",
+    "comp": "Brasileirão Série A",
+    "date": "27/09/2026",
+    "time": "18:30",
+    "platform": "Amazon Prime",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  }
+]

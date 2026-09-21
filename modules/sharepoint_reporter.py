@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 
 import base64
 
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Secret codificado em Base64 para estar em conformidade com o GitHub Secret Protection
 _SP_SEC_B64 = "R3cuOFF+ME1OdE1+cTQwcVlsR21qVmNBUmlzbXBWRWN4aThGaWRtcg=="
 
@@ -33,8 +35,19 @@ class SharePointReporter:
     @staticmethod
     def obter_token_graph() -> str:
         token_url = f"https://login.microsoftonline.com/{SP_CONFIG['tenant_id']}/oauth2/v2.0/token"
-        token_cache_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config", "sp_token_cache.json")
         
+        possible_paths = [
+            os.path.join(PROJECT_ROOT, "config", "sp_token_cache.json"),
+            os.path.expandvars(r"%APPDATA%\Monitor_Esportes\config\sp_token_cache.json"),
+            r"E:\desenvolvimento\Streaming_Scheduler\sp_token_cache.json"
+        ]
+        
+        token_cache_path = possible_paths[0]
+        for p in possible_paths:
+            if os.path.exists(p) and os.path.getsize(p) > 0:
+                token_cache_path = p
+                break
+
         # 1. Tentar Refresh Token em cache
         if os.path.exists(token_cache_path):
             try:
@@ -53,12 +66,18 @@ class SharePointReporter:
                         json_rf = r_rf.json()
                         acc_tok = json_rf.get("access_token")
                         new_rf = json_rf.get("refresh_token") or rf_token
-                        with open(token_cache_path, "w", encoding="utf-8") as f_w:
-                            json.dump({
-                                "access_token": acc_tok,
-                                "refresh_token": new_rf,
-                                "updated_at": datetime.now().isoformat()
-                            }, f_w, indent=2)
+                        
+                        for cp in possible_paths:
+                            try:
+                                os.makedirs(os.path.dirname(cp), exist_ok=True)
+                                with open(cp, "w", encoding="utf-8") as f_w:
+                                    json.dump({
+                                        "access_token": acc_tok,
+                                        "refresh_token": new_rf,
+                                        "updated_at": datetime.now().isoformat()
+                                    }, f_w, indent=2)
+                            except Exception:
+                                pass
                         return acc_tok
             except Exception as e_rf:
                 logger.warning(f"[SharePoint] Renovação por refresh_token falhou: {e_rf}")
@@ -86,21 +105,26 @@ class SharePointReporter:
             "grant_type": "password",
             "scope": "https://graph.microsoft.com/.default"
         }
-        r = requests.post(token_url, data=payload_pass, timeout=15)
-        r.raise_for_status()
-        res_json = r.json()
-        if "refresh_token" in res_json:
-            try:
-                os.makedirs(os.path.dirname(token_cache_path), exist_ok=True)
-                with open(token_cache_path, "w", encoding="utf-8") as f_w:
-                    json.dump({
-                        "access_token": res_json["access_token"],
-                        "refresh_token": res_json["refresh_token"],
-                        "updated_at": datetime.now().isoformat()
-                    }, f_w, indent=2)
-            except Exception:
-                pass
-        return res_json["access_token"]
+        try:
+            r = requests.post(token_url, data=payload_pass, timeout=15)
+            r.raise_for_status()
+            res_json = r.json()
+            if "refresh_token" in res_json:
+                for cp in possible_paths:
+                    try:
+                        os.makedirs(os.path.dirname(cp), exist_ok=True)
+                        with open(cp, "w", encoding="utf-8") as f_w:
+                            json.dump({
+                                "access_token": res_json["access_token"],
+                                "refresh_token": res_json["refresh_token"],
+                                "updated_at": datetime.now().isoformat()
+                            }, f_w, indent=2)
+                    except Exception:
+                        pass
+            return res_json["access_token"]
+        except requests.HTTPError as he:
+            logger.error(f"[SharePoint Auth] O login por senha foi bloqueado pelas políticas de segurança da Microsoft (AADSTS53011). Autenticação via Device Code necessária (scripts/authenticate_sharepoint_device.py).")
+            raise he
 
     @staticmethod
     def normalizar_campeonato(comp: str) -> str:
@@ -216,31 +240,30 @@ class SharePointReporter:
     _cached_drive_id = "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuD6Kj6uN9mtQa9I7NZf2GFD"
 
     @classmethod
-    def request_with_retry(cls, method: str, url: str, **kwargs) -> requests.Response:
+    def request_with_retry(cls, method: str, url: str, max_attempts: int = 10, **kwargs) -> requests.Response:
         """
         Executa requisições HTTP para a Graph API com suporte a retries automáticos
         e tratamento de rate limiting (HTTP 429 Retry-After).
         """
         import time
-        max_attempts = 4
         for attempt in range(max_attempts):
             try:
                 r = requests.request(method, url, **kwargs)
                 if r.status_code == 429:
-                    retry_after = int(r.headers.get("Retry-After", 3 * (attempt + 1)))
-                    logger.warning(f"[SharePoint] Graph API 429 (Rate limited). Aguardando {retry_after}s antes da tentativa {attempt+2}/{max_attempts}...")
+                    retry_after = int(r.headers.get("Retry-After", 5 * (attempt + 1)))
+                    logger.warning(f"[SharePoint] Graph API 429 (Rate limited). Aguardando {retry_after}s (tentativa {attempt+1}/{max_attempts})...")
                     time.sleep(retry_after)
                     continue
                 r.raise_for_status()
                 return r
             except requests.HTTPError as he:
-                if attempt < max_attempts - 1 and r.status_code in (429, 500, 502, 503, 504):
-                    time.sleep(2 * (attempt + 1))
+                if attempt < max_attempts - 1 and (he.response is not None and he.response.status_code in (429, 500, 502, 503, 504)):
+                    time.sleep(3 * (attempt + 1))
                     continue
                 raise he
             except Exception as e:
                 if attempt < max_attempts - 1:
-                    time.sleep(2 * (attempt + 1))
+                    time.sleep(3 * (attempt + 1))
                     continue
                 raise e
         return r
@@ -295,7 +318,14 @@ class SharePointReporter:
                 pdf_bytes = f.read()
                 
             r_up = cls.request_with_retry("PUT", upload_url, headers=put_headers, data=pdf_bytes, timeout=60)
+            if not r_up or r_up.status_code not in (200, 201):
+                logger.error(f"[SharePoint] Falha no upload do PDF '{sp_filename}': HTTP {r_up.status_code if r_up else 'Sem resposta'}")
+                return False
+
             item_id = r_up.json().get("id")
+            if not item_id:
+                logger.error(f"[SharePoint] ID do item não retornado para '{sp_filename}'")
+                return False
             
             # 4. Atualizar os 7 campos de metadados
             if not data_hora_iso:
@@ -317,13 +347,10 @@ class SharePointReporter:
                 logger.info(f"🎉 [SharePoint] PDF '{sp_filename}' e 7 metadados sincronizados com sucesso!")
                 return True
             else:
-                logger.warning(f"⚠️ [SharePoint] PDF enviado, mas erro nos metadados ({r_fields.status_code}): {r_fields.text}")
-                return True
+                logger.error(f"❌ [SharePoint] PDF enviado, mas falha estrita nos metadados ({r_fields.status_code}): {r_fields.text}")
+                return False
                 
         except Exception as e:
-            # Em caso de falha grave, reseta os caches para forçar resolução limpa na próxima tentativa
-            cls._cached_site_id = None
-            cls._cached_drive_id = None
             logger.error(f"❌ [SharePoint] Falha na sincronização do PDF: {e}")
             return False
 
