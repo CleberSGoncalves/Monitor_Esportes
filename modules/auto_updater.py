@@ -10,7 +10,7 @@ import time
 import urllib.request
 import subprocess
 
-CURRENT_VERSION = "2.3.0"
+CURRENT_VERSION = "2.3.1"
 
 class AutoUpdater:
     def __init__(self, version_url: str = "https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/version.json"):
@@ -23,7 +23,15 @@ class AutoUpdater:
         Retorna (has_update, remote_version, download_url, changelog)
         """
         try:
-            req = urllib.request.Request(self.version_url, headers={'User-Agent': 'Mozilla/5.0'})
+            url = f"{self.version_url}?_t={int(time.time())}"
+            req = urllib.request.Request(
+                url, 
+                headers={
+                    'User-Agent': 'Mozilla/5.0',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache'
+                }
+            )
             with urllib.request.urlopen(req, timeout=5) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode('utf-8'))
