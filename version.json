@@ -1,5 +1,5 @@
 {
-  "version": "2.3.2",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.2/Monitor_Esportes.exe",
-  "changelog": "v2.3.2: Novo Módulo de Auditoria Autônoma do SharePoint com autocorreção 100% CBF, recuperação de jogos faltantes, agendamento diário às 08h e aba de Auditoria na interface."
+  "version": "2.3.3",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.3/Monitor_Esportes.exe",
+  "changelog": "v2.3.3: Módulo de Auditoria Autônoma do SharePoint com validação e conformidade 100% CBF, correção automática de súmula/marcos, recuperação de jogos ausentes, agendamento diário e aba de Auditoria na interface."
 }
