@@ -18,15 +18,13 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.3.5"
-    release_name = "v2.3.5 - Integração SMTP e Auditoria Autônoma CBF"
+    tag = "v2.3.6"
+    release_name = "v2.3.6 - Otimização Definitiva da Auditoria e Validação 100% CBF"
     body = (
-        "### O que há de novo na v2.3.5:\n"
-        "- 📧 **Configuração SMTP Atualizada**: Atualizada a senha de aplicativo do Gmail para `kimsuportecaptacao@gmail.com`, permitindo o envio 100% automático das notificações e resumos de auditoria.\n"
-        "- 🛡️ **Módulo de Auditoria Autônoma do SharePoint**: Varre todos os relatórios publicados, cruza dados com a súmula oficial da CBF e autocorrige divergências imediatamente.\n"
-        "- ⚙️ **Autocorreção e Recuperação de Jogos Faltantes**: Gera e republica relatórios canônicos para partidas ausentes (Brasileirão Série A e Copa do Brasil em CazéTV / Prime Video).\n"
-        "- ⏰ **Agendamento Diário Automático**: Execução programada todo dia às 08h da manhã com notificação por e-mail para cleber.goncalves@gmail.com e cleber.goncalves@ibope.com.\n"
-        "- 🖥️ **Aba de Auditoria na Interface**: 4 cartões de KPIs dinâmicos, console de logs em tempo real e botão para disparo manual."
+        "### O que há de novo na v2.3.6:\n"
+        "- 🎯 **Persistência de Conformidade 100%**: Corrigido mapeamento interno das colunas do SharePoint (`Plataforma` e `Data_Partida`) para reconhecimento imediato dos relatórios conformes sem regeração em loop.\n"
+        "- ⚡ **Matching Inteligente de Jogos CBF**: Reconhecimento aprimorado de confrontos existentes na biblioteca SharePoint, evitando reprocessamento de partidas já publicadas.\n"
+        "- 📧 **Notificações SMTP Operacionais**: Relatório e e-mails enviados com sucesso para `cleber.goncalves@gmail.com` e `cleber.goncalves@ibope.com`."
     )
 
     headers = {

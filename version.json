@@ -1,5 +1,5 @@
 {
-  "version": "2.3.5",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.5/Monitor_Esportes.exe",
-  "changelog": "v2.3.5: Atualização das credenciais SMTP do Gmail (kimsuportecaptacao@gmail.com) para envio automático dos relatórios de auditoria."
+  "version": "2.3.6",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.6/Monitor_Esportes.exe",
+  "changelog": "v2.3.6: Correção definitiva da leitura de colunas do SharePoint (Plataforma/Data_Partida) e do matching de jogos CBF existentes, garantindo persistência de conformidade 100% sem regerações desnecessárias."
 }

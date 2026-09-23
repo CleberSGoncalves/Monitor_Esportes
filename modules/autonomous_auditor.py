@@ -173,9 +173,9 @@ class AutonomousAuditor:
             fields = item.get("listItem", {}).get("fields", {})
             partida_field = fields.get("Partida") or ""
             comp_field = fields.get("Campeonato") or ""
-            plat_field = fields.get("Canal_x0020_de_x0020_Transmiss") or ""
-            data_hora_field = fields.get("Data_x0020_e_x0020_Hor_x00e1_ri") or ""
-            status_field = fields.get("Status_x0020_da_x0020_Auditoria") or ""
+            plat_field = fields.get("Plataforma") or fields.get("Canal_x0020_de_x0020_Transmiss") or ""
+            data_hora_field = fields.get("Data_Partida") or fields.get("Data_x0020_e_x0020_Hor_x00e1_ri") or ""
+            status_field = fields.get("Status_x0020_da_x0020_Auditoria") or ("Auditado" if fields.get("Auditado") else "")
 
             self._log(f"🔎 Auditando: '{name}' | Metadado Partida: '{partida_field or name}'...")
 
@@ -296,11 +296,13 @@ class AutonomousAuditor:
             time_str = m.get("time", "19:30")
 
             # Chaves limpas para checagem estrita
-            clean_match = _clean_key(f"{team1}{team2}")
-            clean_match_rev = _clean_key(f"{team2}{team1}")
+            c_t1 = _clean_key(team1)
+            c_t2 = _clean_key(team2)
+            clean_match_x = _clean_key(f"{team1}x{team2}")
+            clean_match_x_rev = _clean_key(f"{team2}x{team1}")
 
             found_in_sp = any(
-                clean_match in k or clean_match_rev in k
+                (c_t1 in k and c_t2 in k) or (clean_match_x in k) or (clean_match_x_rev in k)
                 for k in existing_sp_clean_keys
             )
 
