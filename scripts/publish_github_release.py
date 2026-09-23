@@ -18,11 +18,11 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.3.4"
-    release_name = "v2.3.4 - Correção e Otimização do Módulo de Auditoria Autônoma"
+    tag = "v2.3.5"
+    release_name = "v2.3.5 - Integração SMTP e Auditoria Autônoma CBF"
     body = (
-        "### O que há de novo na v2.3.4:\n"
-        "- 🛠️ **Correção Crítica de Execução da Auditoria**: Ajustado tratamento de streams de log para operação estável em executável sem janela de console.\n"
+        "### O que há de novo na v2.3.5:\n"
+        "- 📧 **Configuração SMTP Atualizada**: Atualizada a senha de aplicativo do Gmail para `kimsuportecaptacao@gmail.com`, permitindo o envio 100% automático das notificações e resumos de auditoria.\n"
         "- 🛡️ **Módulo de Auditoria Autônoma do SharePoint**: Varre todos os relatórios publicados, cruza dados com a súmula oficial da CBF e autocorrige divergências imediatamente.\n"
         "- ⚙️ **Autocorreção e Recuperação de Jogos Faltantes**: Gera e republica relatórios canônicos para partidas ausentes (Brasileirão Série A e Copa do Brasil em CazéTV / Prime Video).\n"
         "- ⏰ **Agendamento Diário Automático**: Execução programada todo dia às 08h da manhã com notificação por e-mail para cleber.goncalves@gmail.com e cleber.goncalves@ibope.com.\n"

@@ -830,7 +830,7 @@ class AutonomousAuditor:
 
         google_ai_cfg = os.path.join(PROJECT_ROOT, "config", "google_ai.json")
         sender_email = "kimsuportecaptacao@gmail.com"
-        sender_pwd = "pitr xzgj iwrg fejk"
+        sender_pwd = "ufvg yhog yrql vmqb"
 
         if os.path.exists(google_ai_cfg):
             try:
