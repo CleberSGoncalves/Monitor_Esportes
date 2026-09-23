@@ -47,14 +47,16 @@ class AutonomousAuditor:
 
     def _log(self, message: str):
         try:
-            print(f"[AUDITORIA] {message}")
+            if sys.stdout is not None:
+                try:
+                    print(f"[AUDITORIA] {message}")
+                except Exception:
+                    safe_msg = message.encode("ascii", "replace").decode("ascii")
+                    print(f"[AUDITORIA] {safe_msg}")
+                if hasattr(sys.stdout, "flush") and callable(sys.stdout.flush):
+                    sys.stdout.flush()
         except Exception:
-            try:
-                safe_msg = message.encode("ascii", "replace").decode("ascii")
-                print(f"[AUDITORIA] {safe_msg}")
-            except Exception:
-                pass
-        sys.stdout.flush()
+            pass
         if self.status_callback:
             try:
                 self.status_callback(message)
