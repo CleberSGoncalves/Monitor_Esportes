@@ -137,6 +137,7 @@ from modules.email_service import EmailService
 from modules.api_provider import start_api_thread
 from core.monitor_core import MonitorCoreMixin
 from modules.auto_updater import AutoUpdater
+from modules.autonomous_auditor import AutonomousAuditor
 from core.models import (
     DebugSnapshot,
     MonitorRuntime,
@@ -2455,6 +2456,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
 
         self.tab_monitor = self.tabs.add("Monitoramento")
         self.tab_reports = self.tabs.add("📊 Jogos Auditados")
+        self.tab_auditoria = self.tabs.add("🛡️ Auditoria")
         self.tab_dash = self.tabs.add("Dashboard")
         self.tab_logs = self.tabs.add("Logs")
         self.tab_cfg = self.tabs.add("Config")
@@ -2478,6 +2480,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         self._build_tab_ads()
         self._build_tab_dashboard()
         self._build_tab_reports()
+        self._build_tab_auditoria()
 
         self._on_channel_preset(self.channel_var.get())
 
@@ -2614,8 +2617,8 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
             if hasattr(seg_btn, "_buttons_dict"):
                 b_dict = seg_btn._buttons_dict
                 
-                # Ordem Oficial Rígida Solicitada: Monitoramento, Jogos Auditados, Dashboard, Logs, Config
-                ordered_tab_names = ["Monitoramento", "📊 Jogos Auditados", "Dashboard", "Logs", "Config"]
+                # Ordem Oficial Rígida Solicitada: Monitoramento, Jogos Auditados, Auditoria, Dashboard, Logs, Config
+                ordered_tab_names = ["Monitoramento", "📊 Jogos Auditados", "🛡️ Auditoria", "Dashboard", "Logs", "Config"]
                 
                 if is_visual:
                     ordered_tab_names.extend(["Debug Visual", "Fragmentos", "Ads/Merchan"])
@@ -3819,6 +3822,120 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
             fg_color="#2B5B84", hover_color="#1E3F5A", height=32, width=120, command=self._copy_selected_dossier_summary
         )
         self.btn_dossier_copy_summary.pack(side="left", padx=(4, 0))
+
+    def _build_tab_auditoria(self) -> None:
+        """Aba Executiva de Auditoria Autônoma, Autocorreção SharePoint & Conformidade CBF."""
+        container = ctk.CTkFrame(self.tab_auditoria, fg_color="#0d0d0d")
+        container.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # 1. Topo: Header com KPIs da Auditoria
+        kpi_bar = ctk.CTkFrame(container, fg_color="transparent")
+        kpi_bar.pack(fill="x", padx=4, pady=(2, 10))
+
+        # Card 1: Relatórios no SharePoint
+        self.kpi_aud_total_box = ctk.CTkFrame(kpi_bar, fg_color="#181818", corner_radius=10, border_width=1, border_color="#1e88e5", width=220, height=56)
+        self.kpi_aud_total_box.pack(side="left", padx=(0, 8), fill="y")
+        self.kpi_aud_total_box.pack_propagate(False)
+        ctk.CTkLabel(self.kpi_aud_total_box, text="📁 RELATÓRIOS NO SHAREPOINT", font=ctk.CTkFont(size=9, weight="bold"), text_color="#888888").pack(anchor="w", padx=10, pady=(6, 0))
+        self.lbl_kpi_aud_total = ctk.CTkLabel(self.kpi_aud_total_box, text="—", font=ctk.CTkFont(size=14, weight="bold"), text_color="#1e88e5")
+        self.lbl_kpi_aud_total.pack(anchor="w", padx=10, pady=(0, 4))
+
+        # Card 2: 100% Conformes
+        self.kpi_aud_conf_box = ctk.CTkFrame(kpi_bar, fg_color="#181818", corner_radius=10, border_width=1, border_color="#2e7d32", width=200, height=56)
+        self.kpi_aud_conf_box.pack(side="left", padx=6, fill="y")
+        self.kpi_aud_conf_box.pack_propagate(False)
+        ctk.CTkLabel(self.kpi_aud_conf_box, text="✅ 100% CONFORMES", font=ctk.CTkFont(size=9, weight="bold"), text_color="#888888").pack(anchor="w", padx=10, pady=(6, 0))
+        self.lbl_kpi_aud_conf = ctk.CTkLabel(self.kpi_aud_conf_box, text="—", font=ctk.CTkFont(size=14, weight="bold"), text_color="#00FF7F")
+        self.lbl_kpi_aud_conf.pack(anchor="w", padx=10, pady=(0, 4))
+
+        # Card 3: Corrigidos / Republicados
+        self.kpi_aud_corr_box = ctk.CTkFrame(kpi_bar, fg_color="#181818", corner_radius=10, border_width=1, border_color="#f57f17", width=220, height=56)
+        self.kpi_aud_corr_box.pack(side="left", padx=6, fill="y")
+        self.kpi_aud_corr_box.pack_propagate(False)
+        ctk.CTkLabel(self.kpi_aud_corr_box, text="🛠️ CORRIGIDOS & REPUBLICADOS", font=ctk.CTkFont(size=9, weight="bold"), text_color="#888888").pack(anchor="w", padx=10, pady=(6, 0))
+        self.lbl_kpi_aud_corr = ctk.CTkLabel(self.kpi_aud_corr_box, text="—", font=ctk.CTkFont(size=14, weight="bold"), text_color="#FFD700")
+        self.lbl_kpi_aud_corr.pack(anchor="w", padx=10, pady=(0, 4))
+
+        # Card 4: Jogos Faltantes Recuperados
+        self.kpi_aud_rec_box = ctk.CTkFrame(kpi_bar, fg_color="#181818", corner_radius=10, border_width=1, border_color="#00838f", width=220, height=56)
+        self.kpi_aud_rec_box.pack(side="left", padx=6, fill="y")
+        self.kpi_aud_rec_box.pack_propagate(False)
+        ctk.CTkLabel(self.kpi_aud_rec_box, text="🚨 JOGOS RECUPERADOS", font=ctk.CTkFont(size=9, weight="bold"), text_color="#888888").pack(anchor="w", padx=10, pady=(6, 0))
+        self.lbl_kpi_aud_rec = ctk.CTkLabel(self.kpi_aud_rec_box, text="—", font=ctk.CTkFont(size=14, weight="bold"), text_color="#00CED1")
+        self.lbl_kpi_aud_rec.pack(anchor="w", padx=10, pady=(0, 4))
+
+        # 2. Barra de Controle & Agendamento
+        ctrl_bar = ctk.CTkFrame(container, fg_color="#141414", corner_radius=10)
+        ctrl_bar.pack(fill="x", padx=4, pady=(0, 10))
+
+        self.btn_run_audit_now = ctk.CTkButton(
+            ctrl_bar, text="▶️ Executar Auditoria Autônoma Agora", font=ctk.CTkFont(size=12, weight="bold"),
+            fg_color="#008080", hover_color="#005a5a", height=36, width=280,
+            command=self._run_autonomous_audit_manual
+        )
+        self.btn_run_audit_now.pack(side="left", padx=10, pady=8)
+
+        self.lbl_audit_schedule_info = ctk.CTkLabel(
+            ctrl_bar, text="⏰ Agendamento: Diariamente às 08:00:00 (Brasília) • Destinatários: cleber.goncalves@gmail.com; cleber.goncalves@ibope.com",
+            font=ctk.CTkFont(size=11, weight="bold"), text_color="#aaaaaa"
+        )
+        self.lbl_audit_schedule_info.pack(side="left", padx=15, pady=8)
+
+        # 3. Corpo: Console de Atividades em Tempo Real da Auditoria
+        ctk.CTkLabel(
+            container, text="📡 CONSOLE DE AUDITORIA & REGISTRO DE CONFORMIDADE EM TEMPO REAL:",
+            font=ctk.CTkFont(size=11, weight="bold"), text_color="#00CED1"
+        ).pack(anchor="w", padx=6, pady=(4, 4))
+
+        self.txt_audit_console = ctk.CTkTextbox(container, fg_color="#0a0a0a", text_color="#dcdcdc", font=ctk.CTkFont(family="Consolas", size=11))
+        self.txt_audit_console.pack(fill="both", expand=True, padx=4, pady=(0, 4))
+        self.txt_audit_console.insert("end", "[AUDITORIA] Módulo pronto. Agendamento ativo para as 08:00 diariamente ou via execução manual.\n")
+
+    def _run_autonomous_audit_manual(self) -> None:
+        """Dispara a auditoria autônoma em thread separada com log no console."""
+        if getattr(self, "_is_auditing_autonomous", False):
+            self._log("[AUDITORIA] Uma sessão de auditoria já está em execução.")
+            return
+
+        self._is_auditing_autonomous = True
+        if hasattr(self, "btn_run_audit_now"):
+            self.btn_run_audit_now.configure(text="⏳ Auditando SharePoint & CBF...", state="disabled")
+
+        def audit_worker():
+            try:
+                def status_hook(msg: str):
+                    self.after(0, lambda m=msg: self._append_audit_log(m))
+
+                auditor = AutonomousAuditor(status_callback=status_hook)
+                res = auditor.run_full_audit()
+
+                def update_ui_results():
+                    if hasattr(self, "lbl_kpi_aud_total"):
+                        tot = res.get("audit_res", {}).get("total_auditados", 0)
+                        conf = res.get("audit_res", {}).get("total_conformes", 0)
+                        corr = res.get("audit_res", {}).get("total_corrigidos", 0)
+                        rec = len(res.get("recovered_matches", []))
+                        self.lbl_kpi_aud_total.configure(text=f"{tot} Relatórios")
+                        self.lbl_kpi_aud_conf.configure(text=f"{conf} Conformes")
+                        self.lbl_kpi_aud_corr.configure(text=f"{corr} Corrigidos")
+                        self.lbl_kpi_aud_rec.configure(text=f"{rec} Jogos")
+                    if hasattr(self, "btn_run_audit_now"):
+                        self.btn_run_audit_now.configure(text="▶️ Executar Auditoria Autônoma Agora", state="normal")
+                    self._is_auditing_autonomous = False
+
+                self.after(0, update_ui_results)
+            except Exception as e:
+                self.after(0, lambda: self._append_audit_log(f"❌ Erro crítico na auditoria: {e}"))
+                if hasattr(self, "btn_run_audit_now"):
+                    self.after(0, lambda: self.btn_run_audit_now.configure(text="▶️ Executar Auditoria Autônoma Agora", state="normal"))
+                self._is_auditing_autonomous = False
+
+        threading.Thread(target=audit_worker, daemon=True).start()
+
+    def _append_audit_log(self, message: str) -> None:
+        if hasattr(self, "txt_audit_console") and self.txt_audit_console:
+            self.txt_audit_console.insert("end", f"{datetime.now().strftime('%H:%M:%S')} - {message}\n")
+            self.txt_audit_console.see("end")
 
     def _render_audited_games_ui(self) -> None:
         """Carrega e renderiza todos os cards de jogos auditados no mural da esquerda."""
@@ -7125,6 +7242,14 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
             if now_t - last_t >= 600.0 or last_t == 0.0:
                 self._last_auto_schedule_fetch_time = now_t
                 self._run_auto_schedule_fetch()
+
+        # Disparo diário da Auditoria Autônoma às 08:00:00 (Brasília)
+        current_date_str = now.strftime("%Y-%m-%d")
+        if now.hour == 8 and now.minute == 0 and now.second <= 5:
+            if getattr(self, "_last_daily_audit_date", None) != current_date_str:
+                self._last_daily_audit_date = current_date_str
+                self._log("⏰ [AGENDADOR 08:00] Disparando Auditoria Autônoma Diária programada...")
+                self._run_autonomous_audit_manual()
 
         self.after(1000, self._start_schedule_timer_loop)
 

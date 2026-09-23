@@ -1,5 +1,5 @@
 {
-  "version": "2.3.1",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.1/Monitor_Esportes.exe",
-  "changelog": "v2.3.1: Relatorio PDF completo com todos os marcos (gols, cartoes, substituicoes), agendador nao descarta jogos pendentes, tolerancia de sumula CBF reduzida para 2h30, SharePoint retry robusto."
+  "version": "2.3.2",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.2/Monitor_Esportes.exe",
+  "changelog": "v2.3.2: Novo Módulo de Auditoria Autônoma do SharePoint com autocorreção 100% CBF, recuperação de jogos faltantes, agendamento diário às 08h e aba de Auditoria na interface."
 }
