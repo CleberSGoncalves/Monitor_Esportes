@@ -278,18 +278,21 @@ def _load_scheduled_games() -> list:
                         t2 = g.get("team2", "").strip().lower()
                         key = f"{t1}_x_{t2}"
                         
-                        # Validar se o jogo é futuro ou se é pendente que ainda precisa ser auditado
+                        # Validar se o jogo é futuro ou recente pendente de auditoria (< 48h)
                         is_future = True
-                        is_pending = g.get("status") in ("pending", "running", "failed")
+                        is_recent = False
                         try:
                             g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
                             if g_dt < today_cutoff:
                                 is_future = False
+                            if datetime.now() - g_dt <= timedelta(days=2):
+                                is_recent = True
                         except:
                             pass
                             
-                        if (is_future or is_pending) and (not official_keys or key in official_keys):
-                            if g.get("status") == "failed":
+                        # Mantém se for futuro OU se for recente oficial pendente
+                        if is_future or (is_recent and g.get("status") in ("pending", "running")):
+                            if g.get("status") == "failed" and is_future:
                                 g["status"] = "pending"
                                 g["_last_sumula_check_time"] = 0.0
                             valid_games.append(g)
@@ -6608,27 +6611,30 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                 cbf_events = CBFScheduleFetcher.get_upcoming_matches()
             except:
                 cbf_events = _load_cbf_streaming_events()
-                
-            for idx in range(min(5, len(cbf_events))):
-                evt = cbf_events[idx]
+
+            for idx in range(5):
                 game_rows[idx][0].delete(0, "end")
-                game_rows[idx][0].insert(0, evt.get("team1", ""))
                 game_rows[idx][1].delete(0, "end")
-                game_rows[idx][1].insert(0, evt.get("team2", ""))
                 game_rows[idx][2].delete(0, "end")
-                game_rows[idx][2].insert(0, evt.get("comp", ""))
-                game_rows[idx][3].set(evt.get("date", datetime.now().strftime("%d/%m/%Y")))
                 game_rows[idx][4].delete(0, "end")
-                game_rows[idx][4].insert(0, evt.get("time", ""))
                 game_rows[idx][5].delete(0, "end")
-                game_rows[idx][5].insert(0, evt.get("platform", ""))
-                
+                if idx < len(cbf_events):
+                    evt = cbf_events[idx]
+                    game_rows[idx][0].insert(0, evt.get("team1", ""))
+                    game_rows[idx][1].insert(0, evt.get("team2", ""))
+                    game_rows[idx][2].insert(0, evt.get("comp", ""))
+                    game_rows[idx][3].set(evt.get("date", datetime.now().strftime("%d/%m/%Y")))
+                    game_rows[idx][4].insert(0, evt.get("time", ""))
+                    game_rows[idx][5].insert(0, evt.get("platform", "CazéTV"))
+                else:
+                    game_rows[idx][3].set(datetime.now().strftime("%d/%m/%Y"))
+                    game_rows[idx][5].insert(0, "CazéTV")
+
             last_sync_str = datetime.fromtimestamp(now_t).strftime("%d/%m/%Y %H:%M:%S")
-            if 'lbl_last_sync' in locals() or 'lbl_last_sync' in globals():
-                try:
-                    lbl_last_sync.configure(text=f"🗓️ Última Sincronização da Fila: {last_sync_str}")
-                except:
-                    pass
+            try:
+                lbl_last_sync.configure(text=f"🗓️ Última Sincronização da Fila: {last_sync_str}")
+            except:
+                pass
             self._log("📥 Fila de 5 jogos auto-preenchida com os próximos eventos oficiais da CBF!")
 
         # Switch para Auditoria Automática
@@ -6718,35 +6724,35 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
             game_rows.append((e_t1, e_t2, e_comp, d_var, e_time, e_plat))
 
-        # Preencher linhas de jogos com agendados existentes ou novos eventos oficiais da CBF
-        existing = [g for g in _load_scheduled_games() if g.get("status") == "pending"]
+        # Preencher linhas de jogos estritamente com os próximos confrontos oficiais futuros da CBF
         try:
             from modules.cbf_schedule_fetcher import CBFScheduleFetcher
             cbf_evts = CBFScheduleFetcher.get_upcoming_matches()
         except:
             cbf_evts = _load_cbf_streaming_events()
-            
-        combined_list = list(existing)
-        existing_sigs = {f"{g.get('team1')}_{g.get('team2')}_{g.get('date')}".lower() for g in existing}
-        for evt in cbf_evts:
-            sig = f"{evt.get('team1')}_{evt.get('team2')}_{evt.get('date')}".lower()
-            if sig not in existing_sigs:
-                combined_list.append(evt)
-                existing_sigs.add(sig)
 
-        for idx in range(min(5, len(combined_list))):
-            g = combined_list[idx]
-            game_rows[idx][0].delete(0, "end")
-            game_rows[idx][0].insert(0, g.get("team1", ""))
-            game_rows[idx][1].delete(0, "end")
-            game_rows[idx][1].insert(0, g.get("team2", ""))
-            game_rows[idx][2].delete(0, "end")
-            game_rows[idx][2].insert(0, g.get("comp", ""))
-            game_rows[idx][3].set(g.get("date", datetime.now().strftime("%d/%m/%Y")))
-            game_rows[idx][4].delete(0, "end")
-            game_rows[idx][4].insert(0, g.get("time", ""))
-            game_rows[idx][5].delete(0, "end")
-            game_rows[idx][5].insert(0, g.get("platform", "CazéTV"))
+        for idx in range(5):
+            if idx < len(cbf_evts):
+                g = cbf_evts[idx]
+                game_rows[idx][0].delete(0, "end")
+                game_rows[idx][0].insert(0, g.get("team1", ""))
+                game_rows[idx][1].delete(0, "end")
+                game_rows[idx][1].insert(0, g.get("team2", ""))
+                game_rows[idx][2].delete(0, "end")
+                game_rows[idx][2].insert(0, g.get("comp", ""))
+                game_rows[idx][3].set(g.get("date", datetime.now().strftime("%d/%m/%Y")))
+                game_rows[idx][4].delete(0, "end")
+                game_rows[idx][4].insert(0, g.get("time", ""))
+                game_rows[idx][5].delete(0, "end")
+                game_rows[idx][5].insert(0, g.get("platform", "CazéTV"))
+            else:
+                game_rows[idx][0].delete(0, "end")
+                game_rows[idx][1].delete(0, "end")
+                game_rows[idx][2].delete(0, "end")
+                game_rows[idx][3].set(datetime.now().strftime("%d/%m/%Y"))
+                game_rows[idx][4].delete(0, "end")
+                game_rows[idx][5].delete(0, "end")
+                game_rows[idx][5].insert(0, "CazéTV")
 
         btn_bar = ctk.CTkFrame(modal, fg_color="transparent")
         btn_bar.pack(fill="x", padx=15, pady=12)
@@ -7215,16 +7221,21 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                                         self.after(0, lambda: self._trigger_scheduled_audit(_game))
                                     else:
                                         kickoff_dt = datetime.strptime(f"{_game.get('date')} {_game.get('time')}", "%d/%m/%Y %H:%M")
-                                        if datetime.now() - kickoff_dt > timedelta(hours=2, minutes=30):
-                                            self._log(f"⏰ [AGENDAMENTO] Súmula da CBF não disponibilizada no site em 2h30. Iniciando auditoria por tolerância/Gemini...")
+                                        passed_tolerance = (datetime.now() - kickoff_dt > timedelta(hours=2, minutes=30))
+                                        attempts = _game.get("_sumula_attempts", 0)
+                                        if passed_tolerance and attempts < 2:
+                                            _game["_sumula_attempts"] = attempts + 1
+                                            self._log(f"⏰ [AGENDAMENTO] Súmula da CBF não disponibilizada no site em 2h30. Iniciando auditoria por tolerância/Gemini (Tentativa {attempts+1}/2)...")
                                             self.after(0, lambda: self._trigger_scheduled_audit(_game))
+                                        elif passed_tolerance and attempts >= 2:
+                                            _game["status"] = "failed"
+                                            self._log(f"⏰ [AGENDAMENTO AVISO] Súmula da CBF para {_game.get('team1')} x {_game.get('team2')} não encontrada após múltiplas tentativas. Auditoria suspensa para não travar a fila.")
+                                            _save_scheduled_games(getattr(self, "_scheduled_games", []))
+                                            self.after(0, self._update_schedule_panel_ui)
                                         else:
                                             self._log(f"⏰ [AGENDAMENTO] Súmula da CBF para {_game.get('team1')} x {_game.get('team2')} ainda NÃO disponível no site. Aguardando...")
                                 except Exception as ex_check:
                                     self._log(f"⏰ [AGENDAMENTO WARN] Erro ao checar súmula: {ex_check}. Tentará novamente.")
-                                    kickoff_dt = datetime.strptime(f"{_game.get('date')} {_game.get('time')}", "%d/%m/%Y %H:%M")
-                                    if datetime.now() - kickoff_dt > timedelta(hours=2, minutes=30):
-                                        self.after(0, lambda: self._trigger_scheduled_audit(_game))
                             
                             import threading
                             threading.Thread(target=check_sumula_thread, daemon=True).start()

@@ -1,5 +1,5 @@
 {
-  "version": "2.3.6",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.6/Monitor_Esportes.exe",
-  "changelog": "v2.3.6: Correção definitiva da leitura de colunas do SharePoint (Plataforma/Data_Partida) e do matching de jogos CBF existentes, garantindo persistência de conformidade 100% sem regerações desnecessárias."
+  "version": "2.3.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.7/Monitor_Esportes.exe",
+  "changelog": "v2.3.7: Correção definitiva no agendamento e sincronização dos painéis com confrontos futuros oficiais CBF, descarte de partidas expiradas, publicação dos jogos de 07/10/2026 e proteção de limite de tolerância de súmulas para evitar travamentos em loop."
 }
