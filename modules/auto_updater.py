@@ -10,7 +10,7 @@ import time
 import urllib.request
 import subprocess
 
-CURRENT_VERSION = "2.4.1"
+CURRENT_VERSION = "2.4.2"
 
 class AutoUpdater:
     def __init__(self, version_url: str = "https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/version.json"):
@@ -173,7 +173,7 @@ if exist "{exe_path}" (
     set "_MEIPASS2="
     set "PYTHONHOME="
     set "PYTHONPATH="
-    start "" /I /D "{exe_dir}" "{exe_path}"
+    explorer.exe "{exe_path}"
 ) else (
     echo [AUTO-UPDATE] ERRO FATAL: Falha ao substituir executável. Restaurando backup...
     timeout /t 2 /nobreak > NUL
@@ -183,10 +183,10 @@ if exist "{exe_path}" (
     set "PYTHONPATH="
     if exist "{old_exe_path}" (
         copy /y "{old_exe_path}" "{exe_path}" > NUL 2>&1
-        start "" /I /D "{exe_dir}" "{exe_path}"
+        explorer.exe "{exe_path}"
     ) else if exist "{new_exe_path}" (
         copy /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
-        start "" /I /D "{exe_dir}" "{exe_path}"
+        explorer.exe "{exe_path}"
     )
 )
 

@@ -21,6 +21,10 @@ for sp in site.getsitepackages():
                 extra_binaries.append((dll_path, lib_dir))
                 extra_binaries.append((dll_path, '.'))
 
+# Playwright (coletor de horários via navegador): inclui driver node e pacotes
+pw_datas, pw_binaries, pw_hidden = collect_all('playwright')
+extra_binaries += list(pw_binaries)
+
 a = Analysis(
     ['gui/main_gui.py'],
     pathex=['.'],
@@ -30,9 +34,10 @@ a = Analysis(
         ('config', 'config'),
         ('data', 'data'),
         ('version.json', '.'),
-    ] + np_datas,
+    ] + np_datas + pw_datas,
     hiddenimports=[
         'modules',
+        'modules.web_verdict_collector',
         'modules.perf_logger',
         'modules.auto_updater',
         'modules.expert_assistant',
@@ -48,7 +53,7 @@ a = Analysis(
         'requests',
         'fitz',
         'pymupdf',
-    ] + np_hidden,
+    ] + np_hidden + pw_hidden,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
