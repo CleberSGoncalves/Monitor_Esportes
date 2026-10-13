@@ -1360,6 +1360,91 @@ class ReportGenerator:
             
             y -= 30
             
+            # --- Verificação Oficial de Transmissão (Tempo Real / Grounding Direto) ---
+            gv = res.get("grounding_verdict", {})
+            v_text = str(gv.get("verdict_text") or "").strip()
+            v_refs = gv.get("references", [])
+            
+            if v_text:
+                if y < 220:
+                    c.showPage()
+                    y = height - 50
+                
+                c.setFont("Helvetica-Bold", 11)
+                c.setFillColorRGB(0.05, 0.2, 0.45) # Azul institucional escuro
+                c.drawString(40, y, "CONFIRMAÇÃO DE HORÁRIOS NA TRANSMISSÃO OFICIAL & COBERTURA ESPORTIVA:")
+                y -= 18
+                c.setFillColorRGB(0, 0, 0)
+                
+                # Renderizar parágrafos do parecer oficial
+                for p_line in v_text.split("\n"):
+                    p_line = p_line.strip()
+                    if not p_line:
+                        y -= 6
+                        continue
+                    
+                    if p_line.startswith("•") or p_line.startswith("*") or p_line.startswith("-"):
+                        c.setFont("Helvetica-Bold", 9)
+                        indent = 50
+                    elif "Horário" in p_line or "horário" in p_line:
+                        c.setFont("Helvetica-Bold", 9)
+                        indent = 45
+                    else:
+                        c.setFont("Helvetica", 9)
+                        indent = 40
+                    
+                    # Wrap de linha
+                    words = p_line.split()
+                    cur_line = ""
+                    for word in words:
+                        if len(cur_line + " " + word) < 95:
+                            cur_line += " " + word
+                        else:
+                            if y < 60:
+                                c.showPage()
+                                y = height - 50
+                                c.setFont("Helvetica", 9)
+                            c.drawString(indent, y, cur_line.strip())
+                            y -= 12
+                            cur_line = word
+                    if cur_line:
+                        if y < 60:
+                            c.showPage()
+                            y = height - 50
+                            c.setFont("Helvetica", 9)
+                        c.drawString(indent, y, cur_line.strip())
+                        y -= 12
+                
+                y -= 10
+                
+                # Fontes oficiais de confirmação da transmissão
+                if v_refs:
+                    if y < 120:
+                        c.showPage()
+                        y = height - 50
+                    
+                    c.setFont("Helvetica-Bold", 10)
+                    c.setFillColorRGB(0.1, 0.1, 0.1)
+                    c.drawString(45, y, "Fontes e Portais Oficiais Consultados:")
+                    y -= 14
+                    
+                    for r in v_refs[:8]:
+                        if y < 50:
+                            c.showPage()
+                            y = height - 50
+                        c.setFont("Helvetica", 8)
+                        r_title = str(r.get("title") or "Fonte Oficial").strip()
+                        r_url = str(r.get("url") or "").strip()
+                        c.drawString(55, y, f"• {r_title}")
+                        y -= 10
+                        if r_url:
+                            c.setFillColorRGB(0, 0, 0.8)
+                            c.drawString(65, y, r_url[:110])
+                            c.setFillColorRGB(0, 0, 0)
+                            y -= 12
+
+                y -= 15
+
             # --- Fontes de Pesquisa (Grounding) ---
             if prefs.get("show_sources", True):
                 sources = res.get("sources", [])

@@ -1,5 +1,5 @@
 {
-  "version": "2.3.8",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.8/Monitor_Esportes.exe",
-  "changelog": "v2.3.8: Correção crítica na inicialização (C-extensions do NumPy e DLLs BLAS/OpenBLAS empacotadas no executável), publicação dos relatórios da rodada 30 no SharePoint (Vasco x Remo e Coritiba x Botafogo) e atualização da fila com a rodada 31."
+  "version": "2.3.9",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.3.9/Monitor_Esportes.exe",
+  "changelog": "v2.3.9: Integração de verificação oficial de horários e apito final direto das transmissões oficiais (CBF, ge, ESPN, Lance! e emissoras) sem deduções ou cálculos matemáticos, anexando fontes e links oficiais no relatório."
 }

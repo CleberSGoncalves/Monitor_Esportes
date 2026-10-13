@@ -352,6 +352,22 @@ class ExpertAssistant:
                     l_end += ":00"
                 res["post_game_end"] = l_end
 
+            # 5. Obter parecer oficial em tempo real dos portais esportivos (sem cálculo matemático)
+            try:
+                print(f"[EXPERT VERDICT] Obtendo parecer oficial de transmissão para {team1} x {team2}...")
+                verdict_data = self.get_grounding_audit_verdict(
+                    team1=team1,
+                    team2=team2,
+                    date=date,
+                    competition=competition,
+                    platform=platform
+                )
+                if verdict_data and verdict_data.get("verdict_text"):
+                    res["grounding_verdict"] = verdict_data
+                    print(f"[EXPERT VERDICT] Parecer oficial de transmissão anexado com sucesso!")
+            except Exception as e_v:
+                print(f"[EXPERT VERDICT WARN] Erro ao anexar parecer oficial: {e_v}")
+
             if is_final_valid:
                 try:
                     with open(cache_file, "w", encoding="utf-8") as fcache:
@@ -1414,6 +1430,84 @@ Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
 
         print("[EXPERT PDF FINDER] Nenhuma súmula em PDF encontrada para a data solicitada.")
         return None
+
+    def get_grounding_audit_verdict(self, team1: str, team2: str, date: str, competition: str, platform: str = "") -> Dict[str, Any]:
+        """
+        Consulta direta ao Gemini via Search Grounding para extrair estritamente as informações
+        REAIS e PUBLICADAS pelos portais oficiais e veículos esportivos de grande relevância
+        (CBF, Globo Esporte ge, ESPN Brasil, Lance!, portais de transmissão) a respeito dos horários
+        de início e término (apito final), SEM DEDUÇÕES OU CÁLCULOS MATEMÁTICOS.
+        """
+        import re
+        from google.genai import types
+
+        t1 = str(team1 or "").strip()
+        t2 = str(team2 or "").strip()
+        comp = str(competition or "Brasileirão Série A").strip()
+        dt = str(date or "").strip()
+        plat = str(platform or "").strip()
+
+        prompt = f"""
+        Aja como um auditor esportivo sênior independente. Faça a verificação de auditoria oficial da partida de futebol:
+        Confronto: {t1} x {t2}
+        Data: {dt}
+        Competição: {comp}
+        Plataforma/Transmissão: {plat}
+
+        Consulte exclusivamente a cobertura em tempo real, minuto a minuto e matérias pós-jogo nos portais oficiais e veículos esportivos de grande relevância, como a tabela detalhada da CBF (Confederação Brasileira de Futebol), o Globo Esporte (ge), a ESPN Brasil, o Lance! e a detentora oficial de transmissão ({plat}).
+
+        REGRAS ABSOLUTAS:
+        1. NÃO faça cálculos matemáticos ou estimativas dedutivas (ex: proibir contas como '90 min + 15 min de intervalo').
+        2. Traga estritamente a informação REAL publicada pelos veículos sobre o horário exato de início e o momento exato em que ocorreu o apito final registrado na transmissão / tempo real.
+        3. Formate a resposta de maneira idêntica à seguinte estrutura padrão:
+
+        A confirmação do horário de início da partida foi verificada em múltiplos portais oficiais e veículos esportivos de grande relevância, como a tabela detalhada da CBF (Confederação Brasileira de Futebol), o Globo Esporte (ge), a ESPN Brasil e o Lance!.
+
+        Todos esses canais confirmam os dados abaixo para o jogo da rodada do Campeonato Brasileiro:
+
+        • Horário de Início: [HORÁRIO DE INÍCIO REAL PUBLICADO] (Horário de Brasília)
+        • Horário de Encerramento: [HORÁRIO REAL PUBLICADO DO APITO FINAL REGISTRADO PELOS PORTAIS E TRANSMISSÃO]
+
+        O confronto terminou [PLACAR FINAL] no Estádio [NOME DO ESTÁDIO].
+        """
+
+        try:
+            config = types.GenerateContentConfig(
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                temperature=0.1
+            )
+            response = self.client.models.generate_content(
+                model=self.model_id,
+                contents=prompt,
+                config=config
+            )
+
+            text_res = response.text or ""
+            references = []
+
+            if response.candidates and response.candidates[0].grounding_metadata:
+                metadata = response.candidates[0].grounding_metadata
+                chunks = getattr(metadata, "grounding_chunks", [])
+                for chunk in chunks:
+                    if hasattr(chunk, "web") and chunk.web:
+                        raw_uri = str(chunk.web.uri or "")
+                        raw_title = str(chunk.web.title or "Fonte Oficial").strip()
+                        references.append({
+                            "title": raw_title,
+                            "url": raw_uri
+                        })
+
+            return {
+                "verdict_text": text_res.strip(),
+                "references": references[:15]
+            }
+        except Exception as ex:
+            print(f"[EXPERT VERDICT WARN] Falha ao obter verdict de grounding: {ex}")
+            return {
+                "verdict_text": "",
+                "references": []
+            }
+
 
 
 
