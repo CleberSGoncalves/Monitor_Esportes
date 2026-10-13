@@ -1,18 +1,62 @@
 [
-    {
-        "home_team": "Botafogo",
-        "away_team": "Chapecoense",
-        "start_time": "17/10/2026 18:00",
-        "channel_profile": "cazetv",
-        "status": "scheduled",
-        "competition": "Brasileirão Série A 2026"
-    },
-    {
-        "home_team": "Athletico-PR",
-        "away_team": "Palmeiras",
-        "start_time": "18/10/2026 19:30",
-        "channel_profile": "amazon_prime",
-        "status": "scheduled",
-        "competition": "Brasileirão Série A 2026"
-    }
+  {
+    "id": "game_1_17102026_1800",
+    "team1": "Botafogo",
+    "team2": "Chapecoense",
+    "comp": "Brasileirão Série A",
+    "date": "17/10/2026",
+    "time": "18:00",
+    "platform": "CazéTV",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_2_18102026_1930",
+    "team1": "Athletico-PR",
+    "team2": "Palmeiras",
+    "comp": "Brasileirão Série A",
+    "date": "18/10/2026",
+    "time": "19:30",
+    "platform": "Amazon Prime",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_3_24102026_1830",
+    "team1": "Cruzeiro",
+    "team2": "Fortaleza",
+    "comp": "Brasileirão Série A",
+    "date": "24/10/2026",
+    "time": "18:30",
+    "platform": "CazéTV",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_4_25102026_1930",
+    "team1": "Grêmio",
+    "team2": "Internacional",
+    "comp": "Brasileirão Série A",
+    "date": "25/10/2026",
+    "time": "19:30",
+    "platform": "Amazon Prime",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  },
+  {
+    "id": "game_5_31102026_1800",
+    "team1": "Flamengo",
+    "team2": "Corinthians",
+    "comp": "Brasileirão Série A",
+    "date": "31/10/2026",
+    "time": "18:00",
+    "platform": "CazéTV",
+    "status": "pending",
+    "last_run": null,
+    "report_file": null
+  }
 ]

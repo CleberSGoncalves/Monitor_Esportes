@@ -10,7 +10,7 @@ import time
 import urllib.request
 import subprocess
 
-CURRENT_VERSION = "2.3.6"
+CURRENT_VERSION = "2.4.0"
 
 class AutoUpdater:
     def __init__(self, version_url: str = "https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/version.json"):
@@ -104,19 +104,21 @@ class AutoUpdater:
 setlocal enabledelayedexpansion
 chcp 65001 > NUL
 
-:: Limpar variáveis temporárias do PyInstaller para impedir erro de DLL no reinício
+:: 1. Limpar variáveis de ambiente herdadas do PyInstaller
 set "_MEIPASS="
 set "_MEIPASS2="
+set "PYTHONHOME="
+set "PYTHONPATH="
 
 echo [AUTO-UPDATE] Encerrando processos e aguardando liberação do sistema...
 timeout /t 3 /nobreak > NUL
 
-:: 1. Encerrar processo principal pelo PID e por nome
+:: 2. Encerrar processo principal pelo PID e por nome
 if not "{pid}"=="" taskkill /F /PID {pid} > NUL 2>&1
 taskkill /F /T /IM "{exe_name}" > NUL 2>&1
 timeout /t 2 /nobreak > NUL
 
-:: 2. Loop de verificação se o processo encerrou no Gerenciador de Tarefas
+:: 3. Loop de verificação se o processo encerrou no Gerenciador de Tarefas
 set /a pcount=0
 :CHECK_PROCESS
 tasklist /FI "IMAGENAME eq {exe_name}" 2>NUL | find /I "{exe_name}" > NUL
@@ -129,10 +131,10 @@ if "%ERRORLEVEL%"=="0" (
     )
 )
 
-:: 3. Limpar backup antigo se existir
+:: 4. Limpar backup antigo se existir
 if exist "{old_exe_path}" del /f /q /a "{old_exe_path}" > NUL 2>&1
 
-:: 4. Loop de insistência para remover/mover o executável original
+:: 5. Loop de insistência para remover/mover o executável original
 set /a count=0
 :RETRY_SWAP
 set /a count+=1
@@ -152,7 +154,7 @@ if !count! LSS 30 (
 )
 
 :DO_REPLACE
-:: 5. Mover o novo executável baixado para o lugar do em produção
+:: 6. Mover o novo executável baixado para o lugar do em produção
 if exist "{new_exe_path}" (
     move /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
     if not exist "{exe_path}" (
@@ -161,25 +163,30 @@ if exist "{new_exe_path}" (
     )
 )
 
-:: 6. Confirmar substituição e reiniciar a aplicação com ambiente PyInstaller limpo
+:: 7. Confirmar substituição e reiniciar a aplicação com ambiente de processo 100% limpo
 if exist "{exe_path}" (
     echo [AUTO-UPDATE] Atualização concluída com sucesso! Iniciando aplicativo...
     if exist "{new_exe_path}" del /f /q /a "{new_exe_path}" > NUL 2>&1
     if exist "{old_exe_path}" del /f /q /a "{old_exe_path}" > NUL 2>&1
-    timeout /t 1 /nobreak > NUL
+    timeout /t 3 /nobreak > NUL
     set "_MEIPASS="
     set "_MEIPASS2="
-    start "" /D "{exe_dir}" "{exe_path}"
+    set "PYTHONHOME="
+    set "PYTHONPATH="
+    start "" /I /D "{exe_dir}" "{exe_path}"
 ) else (
     echo [AUTO-UPDATE] ERRO FATAL: Falha ao substituir executável. Restaurando backup...
+    timeout /t 2 /nobreak > NUL
     set "_MEIPASS="
     set "_MEIPASS2="
+    set "PYTHONHOME="
+    set "PYTHONPATH="
     if exist "{old_exe_path}" (
         copy /y "{old_exe_path}" "{exe_path}" > NUL 2>&1
-        start "" /D "{exe_dir}" "{exe_path}"
+        start "" /I /D "{exe_dir}" "{exe_path}"
     ) else if exist "{new_exe_path}" (
         copy /y "{new_exe_path}" "{exe_path}" > NUL 2>&1
-        start "" /D "{exe_dir}" "{exe_path}"
+        start "" /I /D "{exe_dir}" "{exe_path}"
     )
 )
 
@@ -189,12 +196,19 @@ timeout /t 2 /nobreak > NUL
             with open(bat_path, "w", encoding="utf-8") as f:
                 f.write(bat_content)
 
-            # Executar script batch em background desvinculado sem herdar _MEIPASS
+            # Executar script batch em background totalmente desvinculado sem herdar caminhos _MEI
             DETACHED_PROCESS = 0x00000008
             CREATE_NO_WINDOW = 0x08000000
             clean_env = os.environ.copy()
             clean_env.pop("_MEIPASS", None)
             clean_env.pop("_MEIPASS2", None)
+            clean_env.pop("PYTHONHOME", None)
+            clean_env.pop("PYTHONPATH", None)
+            
+            # Limpar qualquer referência a pastas temporárias do PyInstaller (_MEI) da variável PATH
+            if "PATH" in clean_env:
+                clean_paths = [p for p in clean_env["PATH"].split(os.pathsep) if "_MEI" not in p]
+                clean_env["PATH"] = os.pathsep.join(clean_paths)
             
             subprocess.Popen(
                 f'cmd.exe /c "{bat_path}"', 

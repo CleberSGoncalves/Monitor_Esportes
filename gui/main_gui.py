@@ -253,19 +253,70 @@ def _ensure_broadcaster_rules_synced():
     except:
         pass
 
+def _normalize_scheduled_game_dict(g: dict, idx: int = 1) -> dict:
+    """Normaliza formatos legados/alternativos de jogos salvos para o schema oficial da UI."""
+    if not isinstance(g, dict):
+        return {}
+    item = dict(g)
+    
+    # 1. Times
+    team1 = item.get("team1") or item.get("home_team") or ""
+    team2 = item.get("team2") or item.get("away_team") or ""
+    item["team1"] = str(team1).strip()
+    item["team2"] = str(team2).strip()
+    
+    # 2. Competição
+    comp = item.get("comp") or item.get("competition") or "Brasileirão Série A"
+    item["comp"] = str(comp).strip()
+    
+    # 3. Data e Hora
+    date = item.get("date", "")
+    time_str = item.get("time", "")
+    if not date or not time_str:
+        start_time = item.get("start_time", "")
+        if " " in start_time:
+            parts = start_time.split(" ", 1)
+            date = date or parts[0].strip()
+            time_str = time_str or parts[1].strip()
+        elif "/" in start_time:
+            date = date or start_time.strip()
+        elif ":" in start_time:
+            time_str = time_str or start_time.strip()
+    item["date"] = date or datetime.now().strftime("%d/%m/%Y")
+    item["time"] = time_str or "20:00"
+    
+    # 4. Plataforma
+    platform = item.get("platform") or item.get("channel_profile") or "CazéTV"
+    plat_lower = str(platform).lower()
+    if "caze" in plat_lower or "cazétv" in plat_lower:
+        platform = "CazéTV"
+    elif "prime" in plat_lower or "amazon" in plat_lower:
+        platform = "Amazon Prime"
+    item["platform"] = platform
+    
+    # 5. Status
+    status = item.get("status", "pending")
+    if status in ("scheduled", "novo", "criado", ""):
+        status = "pending"
+    item["status"] = status
+    
+    # 6. ID
+    if not item.get("id"):
+        d_clean = str(item["date"]).replace("/", "")
+        t_clean = str(item["time"]).replace(":", "")
+        item["id"] = f"game_{idx}_{d_clean}_{t_clean}"
+        
+    if "last_run" not in item:
+        item["last_run"] = None
+    if "report_file" not in item:
+        item["report_file"] = None
+        
+    return item
+
 def _load_scheduled_games() -> list:
     _ensure_broadcaster_rules_synced()
     path = _get_config_read_path("scheduled_games.json")
     today_cutoff = datetime.now() - timedelta(hours=2)
-    
-    # Obter lista de jogos oficiais da CBF para validação estrita
-    try:
-        from modules.cbf_schedule_fetcher import get_real_cbf_fixtures
-        official_fixtures = get_real_cbf_fixtures()
-        official_keys = {f"{g.get('team1','').strip().lower()}_x_{g.get('team2','').strip().lower()}" for g in official_fixtures}
-    except:
-        official_fixtures = []
-        official_keys = set()
 
     if os.path.exists(path) and os.path.getsize(path) > 0:
         try:
@@ -273,10 +324,10 @@ def _load_scheduled_games() -> list:
                 data = json.load(f)
                 if isinstance(data, list) and len(data) > 0:
                     valid_games = []
-                    for g in data:
-                        t1 = g.get("team1", "").strip().lower()
-                        t2 = g.get("team2", "").strip().lower()
-                        key = f"{t1}_x_{t2}"
+                    for idx, raw_g in enumerate(data, 1):
+                        g = _normalize_scheduled_game_dict(raw_g, idx)
+                        if not g.get("team1") or not g.get("team2"):
+                            continue
                         
                         # Validar se o jogo é futuro ou recente pendente de auditoria (< 48h)
                         is_future = True
@@ -298,8 +349,9 @@ def _load_scheduled_games() -> list:
                             valid_games.append(g)
                     
                     if valid_games:
+                        _save_scheduled_games(valid_games)
                         return valid_games
-        except:
+        except Exception:
             pass
             
     # Se não houver arquivo salvo ou contiver jogos inválidos/antigos, reinicializa estritamente com os próximos jogos oficiais da CBF
@@ -6725,15 +6777,25 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
             game_rows.append((e_t1, e_t2, e_comp, d_var, e_time, e_plat))
 
         # Preencher linhas de jogos estritamente com os próximos confrontos oficiais futuros da CBF
+        # Obter jogos: se houver jogos na fila agendada atual, exibe-os; se faltar para 5, completa com os próximos oficiais da CBF
+        current_sched = [g for g in getattr(self, "_scheduled_games", []) if g.get("status") in ("pending", "running", "queued", "failed")]
         try:
             from modules.cbf_schedule_fetcher import CBFScheduleFetcher
             cbf_evts = CBFScheduleFetcher.get_upcoming_matches()
         except:
             cbf_evts = _load_cbf_streaming_events()
 
+        games_to_show = list(current_sched)
+        existing_signatures = {f"{g.get('team1')}_{g.get('team2')}".lower() for g in games_to_show}
+        for evt in cbf_evts:
+            sig = f"{evt.get('team1')}_{evt.get('team2')}".lower()
+            if sig not in existing_signatures:
+                games_to_show.append(evt)
+                existing_signatures.add(sig)
+
         for idx in range(5):
-            if idx < len(cbf_evts):
-                g = cbf_evts[idx]
+            if idx < len(games_to_show):
+                g = games_to_show[idx]
                 game_rows[idx][0].delete(0, "end")
                 game_rows[idx][0].insert(0, g.get("team1", ""))
                 game_rows[idx][1].delete(0, "end")

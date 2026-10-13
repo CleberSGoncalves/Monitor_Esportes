@@ -243,6 +243,36 @@ def get_real_cbf_fixtures() -> list:
             "time": "19:30",
             "platform": "Amazon Prime",
             "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
+        },
+        # 24/10 (sáb) 18:30 - Brasileirão Série A (Coluna 5 = CazéTV)
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Cruzeiro",
+            "team2": "Fortaleza",
+            "date": "24/10/2026",
+            "time": "18:30",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
+        },
+        # 25/10 (dom) 19:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Grêmio",
+            "team2": "Internacional",
+            "date": "25/10/2026",
+            "time": "19:30",
+            "platform": "Amazon Prime",
+            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
+        },
+        # 31/10 (sáb) 18:00 - Brasileirão Série A (Coluna 5 = CazéTV)
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Flamengo",
+            "team2": "Corinthians",
+            "date": "31/10/2026",
+            "time": "18:00",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
         }
     ]
 
@@ -341,44 +371,67 @@ class CBFScheduleFetcher:
         """
         Retorna estritamente os próximos jogos oficiais futuros da CBF (data/hora >= agora)
         filtrados unicamente pelas Colunas 4 e 5 (Brasileirão) e Coluna 3 (Copa do Brasil).
-        Tenta buscar ao vivo do PDF atualizado da CBF e nunca retorna jogos do passado.
+        Mescla dados ao vivo com a tabela oficial garantindo sempre os próximos jogos disponíveis.
         """
         today = datetime.now()
         
         # 1. Tentar buscar dinamicamente do PDF da CBF
-        fixtures = fetch_live_cbf_pdf_fixtures()
+        live_fixtures = []
+        try:
+            live_fixtures = fetch_live_cbf_pdf_fixtures()
+        except Exception:
+            pass
+
+        # Filtrar jogos futuros do PDF ao vivo
+        future_live = []
+        for g in live_fixtures:
+            try:
+                g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
+                if g_dt >= today - timedelta(hours=2):
+                    future_live.append(g)
+            except:
+                pass
         
-        # 2. Se a busca ao vivo retornar vazia, usa a tabela estática oficial
-        if not fixtures:
-            fixtures = get_real_cbf_fixtures()
-        
+        # 2. Obter confrontos oficiais de contingência futuros
+        real_fixtures = get_real_cbf_fixtures()
+        future_real = []
+        for g in real_fixtures:
+            try:
+                g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
+                if g_dt >= today - timedelta(hours=2):
+                    future_real.append(g)
+            except:
+                future_real.append(g)
+
+        # Mesclar mantendo unicidade por (time1, time2, data)
+        seen = set()
+        combined = []
+        for g in (future_live + future_real):
+            key = f"{g.get('team1','').strip().lower()}_{g.get('team2','').strip().lower()}_{g.get('date','').strip()}"
+            if key not in seen:
+                seen.add(key)
+                combined.append(g)
+
+        if not combined:
+            combined = real_fixtures
+
         # Ordenar por data/hora
         def parse_dt(g):
             try:
                 return datetime.strptime(f"{g.get('date', '')} {g.get('time', '')}", "%d/%m/%Y %H:%M")
             except:
                 return datetime.max
-        fixtures.sort(key=parse_dt)
+        combined.sort(key=parse_dt)
         
         # Salvar cache limpo
         try:
             os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
             with open(CACHE_PATH, "w", encoding="utf-8") as f:
-                json.dump(fixtures, f, indent=2, ensure_ascii=False)
+                json.dump(combined, f, indent=2, ensure_ascii=False)
         except Exception:
             pass
 
-        # Filtrar confrontos com data/hora >= agora (com 2 horas de tolerância)
-        filtered = []
-        for g in fixtures:
-            try:
-                g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
-                if g_dt >= today - timedelta(hours=2):
-                    filtered.append(g)
-            except:
-                filtered.append(g)
-
-        return filtered[:5]
+        return combined[:5]
 
     @staticmethod
     def get_recent_finished_matches() -> list:
