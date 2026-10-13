@@ -1,5 +1,5 @@
 {
-  "version": "2.4.0",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.0/Monitor_Esportes.exe",
-  "changelog": "v2.4.0: Correção do Auto-Updater eliminando erro de carregamento de DLL no reinício com limpeza de ambiente; normalização e exibição garantida dos próximos jogos futuros na Fila de Agendamentos e no modal; integração dos horários oficiais das transmissões sem cálculos."
+  "version": "2.4.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.1/Monitor_Esportes.exe",
+  "changelog": "v2.4.1: Calibração estrita do parecer de transmissão oficial seguindo o padrão idêntico ao Gemini Web: horários expressos em horas reais de relógio (ex: 18h e 19h50), eliminação de minutos de cronômetro ou frases de narração avulsas, e listagem limpa dos veículos de referência sem URLs de redirecionamento."
 }

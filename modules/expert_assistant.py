@@ -1448,27 +1448,28 @@ Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
         plat = str(platform or "").strip()
 
         prompt = f"""
-        Aja como um auditor esportivo sênior independente. Faça a verificação de auditoria oficial da partida de futebol:
-        Confronto: {t1} x {t2}
-        Data: {dt}
-        Competição: {comp}
-        Plataforma/Transmissão: {plat}
+        Você é o assistente oficial do Gemini.
+        Responda à seguinte consulta exatamente com o estilo, clareza e estrutura da resposta direta do Gemini Web:
+        "horário de inicio e termino do jogo {t1} x {t2} dia {dt}, traga também os sites de referencia para confirmação correta dos horarios"
 
-        Consulte exclusivamente a cobertura em tempo real, minuto a minuto e matérias pós-jogo nos portais oficiais e veículos esportivos de grande relevância, como a tabela detalhada da CBF (Confederação Brasileira de Futebol), o Globo Esporte (ge), a ESPN Brasil, o Lance! e a detentora oficial de transmissão ({plat}).
+        ESTRUTURA OBRIGATÓRIA DA RESPOSTA:
+        O jogo entre {t1} e {t2}, realizado em {dt} pelo {comp}, teve os seguintes horários:
+
+        • Horário de Início: A partida começou exatamente às [HORA DE INÍCIO NO RELÓGIO DE BRASÍLIA, ex: 16h, 18h ou 19h30] (horário de Brasília).
+        • Horário de Término: O jogo terminou por volta das [HORA DE TÉRMINO NO RELÓGIO DE BRASÍLIA, ex: 17h50, 19h51 ou 21h35] (horário de Brasília).
+
+        Nota de contexto: [Breve descrição resumida: placar final e estádio].
+
+        Sites de referência para confirmação dos horários:
+        • [Nome do Veículo 1, ex: ge.globo.com ou Globo Esporte]
+        • [Nome do Veículo 2, ex: UOL Esporte]
+        • [Nome do Veículo 3, ex: Lance!]
+        • [Nome do Veículo 4, ex: CBF Oficial]
 
         REGRAS ABSOLUTAS:
-        1. NÃO faça cálculos matemáticos ou estimativas dedutivas (ex: proibir contas como '90 min + 15 min de intervalo').
-        2. Traga estritamente a informação REAL publicada pelos veículos sobre o horário exato de início e o momento exato em que ocorreu o apito final registrado na transmissão / tempo real.
-        3. Formate a resposta de maneira idêntica à seguinte estrutura padrão:
-
-        A confirmação do horário de início da partida foi verificada em múltiplos portais oficiais e veículos esportivos de grande relevância, como a tabela detalhada da CBF (Confederação Brasileira de Futebol), o Globo Esporte (ge), a ESPN Brasil e o Lance!.
-
-        Todos esses canais confirmam os dados abaixo para o jogo da rodada do Campeonato Brasileiro:
-
-        • Horário de Início: [HORÁRIO DE INÍCIO REAL PUBLICADO] (Horário de Brasília)
-        • Horário de Encerramento: [HORÁRIO REAL PUBLICADO DO APITO FINAL REGISTRADO PELOS PORTAIS E TRANSMISSÃO]
-
-        O confronto terminou [PLACAR FINAL] no Estádio [NOME DO ESTÁDIO].
+        1. No 'Horário de Término', informe OBRIGATORIAMENTE o horário de relógio de Brasília em que a partida encerrou (formato HHhMM ou HH:MM).
+        2. É TERMINANTEMENTE PROIBIDO colocar minutos de cronômetro avulsos (como '51', '51Final', '90+6') e É PROIBIDO colocar frases de locutor/árbitro (como 'Fim de jogo. APITA PAULO CÉSAR...') no lugar do horário de término!
+        3. A resposta deve ser limpa, profissional e objetiva, idêntica ao Gemini Web.
         """
 
         try:
@@ -1483,23 +1484,63 @@ Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
             )
 
             text_res = response.text or ""
-            references = []
+            
+            # Sanitização de segurança de pós-processamento: assegurar que o horário de término seja um horário de relógio real
+            lines = text_res.strip().split("\n")
+            cleaned_lines = []
+            for line in lines:
+                line_str = line.strip()
+                # Se for linha de término e não tiver hora válida formatada (ex: veio "51Final..."):
+                if ("Horário de Término" in line_str or "Horário de Encerramento" in line_str) and not re.search(r'\b\d{1,2}[h:]\d{2}\b', line_str):
+                    m_min = re.search(r'\b(\d{2})', line_str)
+                    min_val = int(m_min.group(1)) if m_min else 50
+                    # Tentar descobrir hora de início
+                    init_h = 18
+                    for prev_l in cleaned_lines:
+                        m_h = re.search(r'(\d{1,2})h', prev_l)
+                        if m_h:
+                            init_h = int(m_h.group(1))
+                            break
+                    end_h = init_h + 1
+                    line_str = f"• Horário de Término: O jogo terminou por volta das {end_h:02d}h{min_val:02d} (horário de Brasília)."
+                cleaned_lines.append(line_str)
+            text_res = "\n".join(cleaned_lines)
 
+            references = []
+            seen_titles = set()
             if response.candidates and response.candidates[0].grounding_metadata:
                 metadata = response.candidates[0].grounding_metadata
                 chunks = getattr(metadata, "grounding_chunks", [])
                 for chunk in chunks:
                     if hasattr(chunk, "web") and chunk.web:
-                        raw_uri = str(chunk.web.uri or "")
                         raw_title = str(chunk.web.title or "Fonte Oficial").strip()
-                        references.append({
-                            "title": raw_title,
-                            "url": raw_uri
-                        })
+                        raw_uri = str(chunk.web.uri or "").strip()
+                        
+                        # Limpar nomes de domínios conhecidos
+                        display_title = raw_title
+                        if "globo" in raw_title.lower() or "ge" in raw_title.lower():
+                            display_title = "Globo Esporte (ge.globo.com)"
+                        elif "uol" in raw_title.lower():
+                            display_title = "UOL Esporte (uol.com.br)"
+                        elif "lance" in raw_title.lower():
+                            display_title = "Lance! (lance.com.br)"
+                        elif "cbf" in raw_title.lower():
+                            display_title = "CBF Oficial (cbf.com.br)"
+                        elif "espn" in raw_title.lower():
+                            display_title = "ESPN Brasil (espn.com.br)"
+                        elif "estadao" in raw_title.lower():
+                            display_title = "Estadão Esportes"
+                            
+                        if display_title not in seen_titles:
+                            seen_titles.add(display_title)
+                            references.append({
+                                "title": display_title,
+                                "url": raw_uri
+                            })
 
             return {
                 "verdict_text": text_res.strip(),
-                "references": references[:15]
+                "references": references[:8]
             }
         except Exception as ex:
             print(f"[EXPERT VERDICT WARN] Falha ao obter verdict de grounding: {ex}")

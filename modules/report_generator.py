@@ -1417,36 +1417,30 @@ class ReportGenerator:
                 
                 y -= 10
                 
-                # Fontes oficiais de confirmação da transmissão
-                if v_refs:
-                    if y < 120:
+                # Fontes oficiais de confirmação da transmissão (nomes limpos e legíveis, sem URLs de redirect)
+                if v_refs and "Sites de referência" not in v_text:
+                    if y < 100:
                         c.showPage()
                         y = height - 50
                     
                     c.setFont("Helvetica-Bold", 10)
                     c.setFillColorRGB(0.1, 0.1, 0.1)
-                    c.drawString(45, y, "Fontes e Portais Oficiais Consultados:")
+                    c.drawString(45, y, "Sites e Veículos Oficiais de Referência:")
                     y -= 14
                     
-                    for r in v_refs[:8]:
+                    for r in v_refs[:6]:
                         if y < 50:
                             c.showPage()
                             y = height - 50
-                        c.setFont("Helvetica", 8)
+                        c.setFont("Helvetica", 9)
                         r_title = str(r.get("title") or "Fonte Oficial").strip()
-                        r_url = str(r.get("url") or "").strip()
                         c.drawString(55, y, f"• {r_title}")
-                        y -= 10
-                        if r_url:
-                            c.setFillColorRGB(0, 0, 0.8)
-                            c.drawString(65, y, r_url[:110])
-                            c.setFillColorRGB(0, 0, 0)
-                            y -= 12
+                        y -= 12
 
                 y -= 15
 
-            # --- Fontes de Pesquisa (Grounding) ---
-            if prefs.get("show_sources", True):
+            # --- Fontes de Pesquisa adicionais (apenas se a confirmação oficial não estiver presente) ---
+            elif prefs.get("show_sources", True):
                 sources = res.get("sources", [])
                 if sources:
                     if y < 150:
