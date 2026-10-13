@@ -1,16 +1,16 @@
 [
     {
-        "home_team": "Vasco da Gama",
-        "away_team": "Remo",
-        "start_time": "10/10/2026 17:00",
+        "home_team": "Botafogo",
+        "away_team": "Chapecoense",
+        "start_time": "17/10/2026 18:00",
         "channel_profile": "cazetv",
         "status": "scheduled",
         "competition": "Brasileirão Série A 2026"
     },
     {
-        "home_team": "Coritiba",
-        "away_team": "Botafogo",
-        "start_time": "11/10/2026 19:30",
+        "home_team": "Athletico-PR",
+        "away_team": "Palmeiras",
+        "start_time": "18/10/2026 19:30",
         "channel_profile": "amazon_prime",
         "status": "scheduled",
         "competition": "Brasileirão Série A 2026"

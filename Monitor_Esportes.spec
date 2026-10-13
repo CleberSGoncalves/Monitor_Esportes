@@ -2,19 +2,35 @@
 
 import os
 import sys
+import glob
+import site
+from PyInstaller.utils.hooks import collect_all
 
 block_cipher = None
+
+# Coleta completa do numpy (datas, binaries e hiddenimports)
+np_datas, np_binaries, np_hidden = collect_all('numpy')
+
+# Localizar e incluir explicitamente as bibliotecas dinâmicas do numpy e openblas
+extra_binaries = list(np_binaries)
+for sp in site.getsitepackages():
+    for lib_dir in ['numpy.libs', 'scipy.libs']:
+        full_dir = os.path.join(sp, lib_dir)
+        if os.path.exists(full_dir):
+            for dll_path in glob.glob(os.path.join(full_dir, '*.dll')):
+                extra_binaries.append((dll_path, lib_dir))
+                extra_binaries.append((dll_path, '.'))
 
 a = Analysis(
     ['gui/main_gui.py'],
     pathex=['.'],
-    binaries=[],
+    binaries=extra_binaries,
     datas=[
         ('modules', 'modules'),
         ('config', 'config'),
         ('data', 'data'),
         ('version.json', '.'),
-    ],
+    ] + np_datas,
     hiddenimports=[
         'modules',
         'modules.perf_logger',
@@ -32,7 +48,7 @@ a = Analysis(
         'requests',
         'fitz',
         'pymupdf',
-    ],
+    ] + np_hidden,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -66,7 +82,7 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
     console=False,
@@ -76,4 +92,3 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
-

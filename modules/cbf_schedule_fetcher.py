@@ -191,6 +191,26 @@ def get_recent_finished_matches() -> list:
             "time": "20:30",
             "platform": "Amazon Prime",
             "tag": "⚡ Auditoria Concluída"
+        },
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Vasco da Gama",
+            "team2": "Remo",
+            "score": "0 x 0",
+            "date": "10/10/2026",
+            "time": "17:00",
+            "platform": "CazéTV",
+            "tag": "⚡ Auditoria Concluída"
+        },
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Coritiba",
+            "team2": "Botafogo",
+            "score": "1 x 1",
+            "date": "11/10/2026",
+            "time": "19:30",
+            "platform": "Amazon Prime",
+            "tag": "⚡ Auditoria Concluída"
         }
     ]
     return finished
@@ -204,22 +224,22 @@ def get_real_cbf_fixtures() -> list:
     Conforme imagem oficial do PDF da CBF (Tabela Detalhada 2026).
     """
     fixtures = [
-        # 10/10 (sáb) 17:00 - Brasileirão Série A (Coluna 5 = CazéTV)
+        # 17/10 (sáb) 18:00 - Brasileirão Série A (Coluna 5 = CazéTV)
         {
             "comp": "Brasileirão Série A",
-            "team1": "Vasco da Gama",
-            "team2": "Remo",
-            "date": "10/10/2026",
-            "time": "17:00",
+            "team1": "Botafogo",
+            "team2": "Chapecoense",
+            "date": "17/10/2026",
+            "time": "18:00",
             "platform": "CazéTV",
             "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
         },
-        # 11/10 (dom) 19:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
+        # 18/10 (dom) 19:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
         {
             "comp": "Brasileirão Série A",
-            "team1": "Coritiba",
-            "team2": "Botafogo",
-            "date": "11/10/2026",
+            "team1": "Athletico-PR",
+            "team2": "Palmeiras",
+            "date": "18/10/2026",
             "time": "19:30",
             "platform": "Amazon Prime",
             "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
