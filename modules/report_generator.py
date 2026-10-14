@@ -1376,11 +1376,20 @@ class ReportGenerator:
                 y -= 18
                 c.setFillColorRGB(0, 0, 0)
                 
-                # Renderizar parágrafos do parecer oficial
+                # Renderizar parágrafos do parecer oficial (com filtro de badges residuais da UI web)
                 for p_line in v_text.split("\n"):
                     p_line = p_line.strip()
                     if not p_line:
                         y -= 6
+                        continue
+
+                    # Ignora chips/badges residuais de citação do Google (ex: '+ 1', '+ 2', nomes de fontes isolados)
+                    import re
+                    if re.match(r'^\+\s*\d+$', p_line):
+                        continue
+                    if p_line.lower() in {"lance!", "lance", "gzh", "uol", "uol esporte", "ge", "globo esporte", "cbf", "espn", "band", "terra", "agência brasil - ebc", "agencia brasil - ebc"}:
+                        continue
+                    if len(p_line) < 35 and " - Site Oficial" in p_line:
                         continue
                     
                     if p_line.startswith("•") or p_line.startswith("*") or p_line.startswith("-"):

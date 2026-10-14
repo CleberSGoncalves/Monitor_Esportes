@@ -1,5 +1,5 @@
 {
-  "version": "2.4.6",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.6/Monitor_Esportes.exe",
-  "changelog": "v2.4.6: Inclusão do testador rápido testar_gemini_web.bat e flag CLI --test-gemini; geração automática dos scripts na pasta do executável."
+  "version": "2.4.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.7/Monitor_Esportes.exe",
+  "changelog": "v2.4.7: Limpeza e formatação executiva do texto do parecer oficial no PDF (remoção de chips +1 e badges residuais da UI web); exibição de progresso em tempo real no console para o testador testar_gemini_web.bat."
 }

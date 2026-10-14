@@ -207,7 +207,19 @@ def ask_gemini_web(query: str, headless: bool = True, timeout_s: int = 120,
                 else:
                     stable, last = 0, txt
 
-            result["text"] = last.strip()
+            raw_text = last.strip()
+            # Limpeza de chips/badges visuais da interface web do Google (+ 1, badges de fontes isoladas)
+            clean_lines = []
+            for r_line in raw_text.splitlines():
+                s_l = r_line.strip()
+                if re.match(r'^\+\s*\d+$', s_l):
+                    continue
+                if s_l.lower() in {"lance!", "lance", "gzh", "uol", "uol esporte", "ge", "globo esporte", "cbf", "espn", "band", "terra", "agência brasil - ebc", "agencia brasil - ebc"}:
+                    continue
+                if len(s_l) < 35 and " - Site Oficial" in s_l:
+                    continue
+                clean_lines.append(r_line)
+            result["text"] = "\n".join(clean_lines).strip()
             try:
                 hrefs = page.locator("message-content a[href^='http'], .model-response-text a[href^='http']") \
                             .evaluate_all("els => els.map(e => e.href)")

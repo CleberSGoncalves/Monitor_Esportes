@@ -9191,36 +9191,45 @@ def _ensure_login_bat_exists():
 
 
 def main() -> None:
+    if "--login-gemini" in sys.argv or "--test-gemini" in sys.argv:
+        try:
+            import ctypes
+            # Anexa ao console do CMD pai que disparou o comando
+            if ctypes.windll.kernel32.AttachConsole(-1) != 0:
+                sys.stdout = open("CONOUT$", "w", encoding="utf-8", errors="replace")
+                sys.stderr = open("CONOUT$", "w", encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
     if "--login-gemini" in sys.argv:
         try:
             from modules.web_verdict_collector import login_interactive
             login_interactive(wait_s=600)
         except Exception as e_login:
-            print(f"[ERRO LOGIN GEMINI] {e_login}")
+            print(f"[ERRO LOGIN GEMINI] {e_login}", flush=True)
         sys.exit(0)
 
     if "--test-gemini" in sys.argv:
         try:
             from modules.web_verdict_collector import get_web_verdict
-            print("\n" + "="*60)
-            print("  TESTANDO CONSULTA NO GEMINI WEB (HEADLESS)")
-            print("="*60)
-            print("Enviando pergunta teste sobre Vasco x Remo (10/10/2026)...")
+            print("\n" + "="*60, flush=True)
+            print("  TESTANDO CONSULTA NO GEMINI WEB (HEADLESS)", flush=True)
+            print("="*60, flush=True)
+            print("Enviando pergunta teste sobre Vasco x Remo (10/10/2026)...", flush=True)
+            print("Aguardando retorno do navegador em segundo plano (até 30s)...", flush=True)
             res = get_web_verdict("Vasco", "Remo", "10/10/2026", "Brasileirão Série A")
             if res and res.get("verdict_text"):
-                print("\n✅ SUCESSO! RESPOSTA RECEBIDA DO GEMINI WEB:")
-                print(res["verdict_text"])
-                print("\nHorários extraídos:", res.get("times"))
-                print("\nSites de referência:")
+                print("\n✅ SUCESSO! RESPOSTA RECEBIDA DO GEMINI WEB:", flush=True)
+                print(res["verdict_text"], flush=True)
+                print("\nHorários extraídos:", res.get("times"), flush=True)
+                print("\nSites de referência:", flush=True)
                 for r in res.get("references", []):
-                    print(f"  • {r.get('title')}: {r.get('url')}")
+                    print(f"  • {r.get('title')}: {r.get('url')}", flush=True)
             else:
-                print("\n⚠️ Não foi possível obter resposta do Gemini Web. Verifique se o login foi concluído com sucesso.")
+                print("\n⚠️ A sessão Google não está logada ou o Gemini Web não respondeu.", flush=True)
+                print("Execute o arquivo 'conectar_gemini_web.bat' para fazer o login da sua Conta Google.", flush=True)
         except Exception as e_test:
-            print(f"[ERRO NO TESTE] {e_test}")
-        print("\nPressione qualquer tecla para encerrar...")
-        import os
-        os.system("pause >nul")
+            print(f"[ERRO NO TESTE] {e_test}", flush=True)
         sys.exit(0)
 
     _ensure_login_bat_exists()
