@@ -374,6 +374,25 @@ class ExpertAssistant:
                 if verdict_data and verdict_data.get("verdict_text"):
                     res["grounding_verdict"] = verdict_data
                     print(f"[EXPERT VERDICT] Parecer oficial de transmissão anexado com sucesso!")
+                    
+                    # Calibração dos marcos oficiais com os horários extraídos do parecer oficial (Gemini Web / Grounding)
+                    try:
+                        from modules.web_verdict_collector import extract_times
+                        v_times = extract_times(verdict_data.get("verdict_text", ""))
+                        if v_times.get("inicio"):
+                            ini_str = v_times["inicio"].replace("h", ":").strip()
+                            if len(ini_str.split(":")) == 2:
+                                ini_str += ":00"
+                            res["first_half_start"] = ini_str
+                            print(f"[EXPERT VERDICT] first_half_start calibrado via parecer oficial: {ini_str}")
+                        if v_times.get("termino"):
+                            end_str = v_times["termino"].replace("h", ":").strip()
+                            if len(end_str.split(":")) == 2:
+                                end_str += ":00"
+                            res["match_end"] = end_str
+                            print(f"[EXPERT VERDICT] match_end calibrado via parecer oficial: {end_str}")
+                    except Exception as e_calib:
+                        print(f"[EXPERT VERDICT WARN] Erro ao calibrar horários do veredito: {e_calib}")
             except Exception as e_v:
                 print(f"[EXPERT VERDICT WARN] Erro ao anexar parecer oficial: {e_v}")
 
@@ -1458,8 +1477,11 @@ Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
 
         prompt = f"""
         Você é o assistente oficial do Gemini.
-        Responda à seguinte consulta exatamente com o estilo, clareza e estrutura da resposta direta do Gemini Web:
-        "horário de inicio e termino do jogo {t1} x {t2} dia {dt}, traga também os sites de referencia para confirmação correta dos horarios"
+        Consulte prioritariamente a SÚMULA ELETRÔNICA OFICIAL DA CBF e os relatos de TEMPO REAL / MINUTO A MINUTO (ge.globo.com, Lance, UOL Esporte, Flashscore) da partida:
+        {t1} x {t2} realizada em {dt} pelo {comp}.
+
+        Objetivo:
+        Identifique o horário exato de relógio de Brasília em que a bola começou a rolar (apito inicial do 1º tempo) e em que a partida encerrou (apito final do 2º tempo).
 
         ESTRUTURA OBRIGATÓRIA DA RESPOSTA:
         O jogo entre {t1} e {t2}, realizado em {dt} pelo {comp}, teve os seguintes horários:
@@ -1475,10 +1497,12 @@ Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
         • [Nome do Veículo 3]
 
         REGRAS ABSOLUTAS:
-        1. Informe o horário EXATO publicado pelos veículos. NÃO use as palavras "por volta", "cerca de", "aproximadamente" ou "exatamente às" — escreva somente o horário (ex: 17h55).
-        2. NÃO faça cálculos, somas ou estimativas. Se um veículo não publicou o horário de término, escreva exatamente: "não informado pelas fontes consultadas".
-        3. É PROIBIDO colocar minutos de cronômetro (como '51', '90+6') ou frases de narração ('Fim de jogo. APITA...') no lugar do horário.
-        4. Não inclua nota de contexto sobre duração regulamentar de partidas.
+        1. Priorize os horários de início e término registrados na SÚMULA OFICIAL DA CBF ou no relato de TEMPO REAL da transmissão (relógio oficial do apito inicial e apito final).
+        2. NÃO utilize horários previstos em agendas preliminares de tabela se o relato ao vivo ou a súmula registrou outro horário efetivo de bola rolando.
+        3. Informe o horário EXATO publicado pelos veículos. NÃO use as palavras "por volta", "cerca de", "aproximadamente" ou "exatamente às" — escreva somente o horário (ex: 16h04).
+        4. NÃO faça cálculos, somas ou estimativas sintéticas. Se um veículo não publicou o horário de término, escreva exatamente: "não informado pelas fontes consultadas".
+        5. É PROIBIDO colocar minutos de cronômetro (como '51', '90+6') ou frases de narração ('Fim de jogo. APITA...') no lugar do horário.
+        6. Não inclua nota de contexto sobre duração regulamentar de partidas.
         """
 
         _clock_re = re.compile(r'\b\d{1,2}\s*[h:]\s*\d{2}\b', re.I)

@@ -3930,11 +3930,18 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         )
         self.btn_run_audit_now.pack(side="left", padx=10, pady=8)
 
+        self.btn_login_gemini_web = ctk.CTkButton(
+            ctrl_bar, text="🌐 Login Gemini Web (Google)", font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#1a237e", hover_color="#283593", height=36, width=210,
+            command=self._launch_gemini_web_login
+        )
+        self.btn_login_gemini_web.pack(side="left", padx=4, pady=8)
+
         self.lbl_audit_schedule_info = ctk.CTkLabel(
             ctrl_bar, text="⏰ Agendamento: Diariamente às 08:00:00 (Brasília) • Destinatários: cleber.goncalves@gmail.com; cleber.goncalves@ibope.com",
             font=ctk.CTkFont(size=11, weight="bold"), text_color="#aaaaaa"
         )
-        self.lbl_audit_schedule_info.pack(side="left", padx=15, pady=8)
+        self.lbl_audit_schedule_info.pack(side="left", padx=10, pady=8)
 
         # 3. Corpo: Console de Atividades em Tempo Real da Auditoria
         ctk.CTkLabel(
@@ -3991,6 +3998,29 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         if hasattr(self, "txt_audit_console") and self.txt_audit_console:
             self.txt_audit_console.insert("end", f"{datetime.now().strftime('%H:%M:%S')} - {message}\n")
             self.txt_audit_console.see("end")
+
+    def _launch_gemini_web_login(self) -> None:
+        """Abre janela do navegador para o usuário autenticar na conta Google no Gemini Web."""
+        import threading
+        if hasattr(self, "btn_login_gemini_web"):
+            self.btn_login_gemini_web.configure(text="⏳ Aguardando Login...", state="disabled")
+        self._append_audit_log("[GEMINI WEB] Abrindo navegador para login na conta Google...")
+
+        def login_worker():
+            try:
+                from modules.web_verdict_collector import login_interactive
+                ok = login_interactive(wait_s=300)
+                if ok:
+                    self.after(0, lambda: self._append_audit_log("✅ Sessão Google conectada com sucesso! O Gemini Web agora responderá em modo headless."))
+                    self.after(0, lambda: self.btn_login_gemini_web.configure(text="✅ Gemini Web Conectado", fg_color="#2e7d32", state="normal"))
+                else:
+                    self.after(0, lambda: self._append_audit_log("⚠️ Login no Gemini Web não foi concluído ou tempo esgotado."))
+                    self.after(0, lambda: self.btn_login_gemini_web.configure(text="🌐 Login Gemini Web (Google)", fg_color="#1a237e", state="normal"))
+            except Exception as ex:
+                self.after(0, lambda: self._append_audit_log(f"❌ Erro ao abrir navegador para login: {ex}"))
+                self.after(0, lambda: self.btn_login_gemini_web.configure(text="🌐 Login Gemini Web (Google)", fg_color="#1a237e", state="normal"))
+
+        threading.Thread(target=login_worker, daemon=True).start()
 
     def _render_audited_games_ui(self) -> None:
         """Carrega e renderiza todos os cards de jogos auditados no mural da esquerda."""
@@ -9101,7 +9131,53 @@ class LoginWindow(ctk.CTk):
             self.lbl_msg.configure(text="❌ Usuário ou senha incorretos.")
 
 
+def _ensure_login_bat_exists():
+    try:
+        app_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+        bat_path = os.path.join(app_dir, "conectar_gemini_web.bat")
+        if not os.path.exists(bat_path):
+            with open(bat_path, "w", encoding="utf-8") as f:
+                f.write(
+                    '@echo off\n'
+                    'title Conectar Gemini Web - Monitor de Esportes\n'
+                    'cd /d "%~dp0"\n'
+                    'echo ==========================================================\n'
+                    'echo   CONECTAR SESSAO GOOGLE NO GEMINI WEB (PLAYWRIGHT)\n'
+                    'echo ==========================================================\n'
+                    'echo.\n'
+                    'echo Uma janela do navegador sera aberta para voce fazer login\n'
+                    'echo na sua Conta Google no Gemini (gemini.google.com).\n'
+                    'echo.\n'
+                    'echo O login precisa ser feito apenas UMA VEZ.\n'
+                    'echo A sessao ficara salva no perfil dedicado para coletas headless.\n'
+                    'echo.\n'
+                    'echo Pressione qualquer tecla para abrir o navegador...\n'
+                    'pause >nul\n'
+                    'if exist "Monitor_Esportes.exe" (\n'
+                    '    "Monitor_Esportes.exe" --login-gemini\n'
+                    ') else if exist ".venv\\Scripts\\python.exe" (\n'
+                    '    .venv\\Scripts\\python.exe -m modules.web_verdict_collector --login\n'
+                    ') else (\n'
+                    '    python -m modules.web_verdict_collector --login\n'
+                    ')\n'
+                    'echo.\n'
+                    'echo Pressione qualquer tecla para encerrar...\n'
+                    'pause >nul\n'
+                )
+    except Exception:
+        pass
+
+
 def main() -> None:
+    if "--login-gemini" in sys.argv:
+        try:
+            from modules.web_verdict_collector import login_interactive
+            login_interactive(wait_s=300)
+        except Exception as e_login:
+            print(f"[ERRO LOGIN GEMINI] {e_login}")
+        sys.exit(0)
+
+    _ensure_login_bat_exists()
     app = MonitorApp()
     app.mainloop()
 
