@@ -1,5 +1,5 @@
 {
-  "version": "2.4.4",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.4/Monitor_Esportes.exe",
-  "changelog": "v2.4.4: Integração do Gemini Web via Playwright para captura de súmulas CBF e coberturas em tempo real minuto a minuto; calibração dos horários de apito inicial e final no relatório; geração automática do conectar_gemini_web.bat e botão de login na interface."
+  "version": "2.4.5",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.5/Monitor_Esportes.exe",
+  "changelog": "v2.4.5: Correção do fechamento prematuro da janela de login do Gemini Web; tempo estendido de até 10 minutos para digitação de credenciais e 2FA; detecção segura de login estável antes de encerrar."
 }

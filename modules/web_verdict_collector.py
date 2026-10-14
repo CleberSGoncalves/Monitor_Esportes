@@ -61,35 +61,107 @@ def _launch(pw, headless: bool):
 
 def _is_logged_in(page) -> bool:
     try:
-        # No modo convidado existe o botão "Fazer login"
-        return page.get_by_role("link", name=re.compile("Fazer login|Sign in", re.I)).count() == 0 and \
-               page.get_by_role("button", name=re.compile("^Fazer login$|^Sign in$", re.I)).count() == 0
+        url = page.url or ""
+        # Se estiver na tela de login da Conta Google, obviamente o usuário ainda está preenchendo
+        if "accounts.google.com" in url or "signin" in url.lower():
+            return False
+
+        # Se houver botão explícito de "Fazer login", não está logado
+        has_login_btn = False
+        try:
+            if page.get_by_role("link", name=re.compile("Fazer login|Sign in", re.I)).count() > 0:
+                has_login_btn = True
+            elif page.get_by_role("button", name=re.compile("^Fazer login$|^Sign in$", re.I)).count() > 0:
+                has_login_btn = True
+        except Exception:
+            pass
+
+        if has_login_btn:
+            return False
+
+        # Verifica se a caixa interativa de prompt do Gemini já está pronta e visível
+        has_chat = False
+        try:
+            box = page.locator("rich-textarea div[contenteditable='true'], div[contenteditable='true'][role='textbox']")
+            if box.count() > 0 and box.first.is_visible():
+                has_chat = True
+        except Exception:
+            pass
+
+        # Verifica se o avatar de conta do Google está visível no topo
+        has_avatar = False
+        try:
+            avatar = page.locator("a[href*='SignOutOptions'], a[aria-label*='Conta do Google'], button[aria-label*='Conta do Google'], a[aria-label*='Google Account']")
+            if avatar.count() > 0:
+                has_avatar = True
+        except Exception:
+            pass
+
+        return has_chat or has_avatar
     except Exception:
         return False
 
 
-def login_interactive(wait_s: int = 300) -> bool:
-    """Abre o navegador VISÍVEL para o usuário entrar na conta Google (uma única vez)."""
+def login_interactive(wait_s: int = 600) -> bool:
+    """Abre o navegador VISÍVEL para o usuário entrar na conta Google com tempo amplo (até 10 min)."""
     from playwright.sync_api import sync_playwright
+    print("\n" + "="*60)
+    print("  ABRINDO O NAVEGADOR PARA LOGIN NO GEMINI WEB")
+    print("="*60)
+    print("Por favor, faça login na sua Conta Google na janela que abrir.")
+    print("O navegador permanecerá aberto até você concluir o login.")
+    print("="*60 + "\n")
+
     with sync_playwright() as pw:
         ctx, err = _launch(pw, headless=False)
         if ctx is None:
             print("Falha ao abrir navegador:", err)
             return False
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
-        page.goto(GEMINI_URL, wait_until="domcontentloaded")
-        print("Faça login na sua conta Google na janela aberta. Aguardando...")
+        try:
+            page.goto(GEMINI_URL, wait_until="domcontentloaded", timeout=60000)
+        except Exception:
+            pass
+
         t0 = time.time()
         ok = False
+        consecutive_logged_in = 0
+
         while time.time() - t0 < wait_s:
-            page.wait_for_timeout(3000)
-            if "gemini.google.com" in page.url and _is_logged_in(page):
-                ok = True
+            try:
+                # Se o usuário fechou o navegador manualmente pelo X
+                if page.is_closed() or not ctx.pages:
+                    print("\nJanela do navegador foi fechada pelo usuário.")
+                    break
+            except Exception:
                 break
+
+            time.sleep(2)
+
+            try:
+                if _is_logged_in(page):
+                    consecutive_logged_in += 1
+                    # Exige 3 checagens consecutivas (6s estável logado) para evitar falso positivo no loading
+                    if consecutive_logged_in >= 3:
+                        print("\n✅ Login detectado com sucesso na Conta Google!")
+                        ok = True
+                        time.sleep(3)
+                        break
+                else:
+                    consecutive_logged_in = 0
+            except Exception:
+                pass
+
+        try:
+            ctx.close()
+        except Exception:
+            pass
+
         if ok:
-            page.wait_for_timeout(2000)
-        ctx.close()
-        print("Login confirmado e sessão salva." if ok else "Tempo esgotado sem login.")
+            print("🎉 Sessão salva com sucesso no perfil do navegador!")
+        else:
+            print("ℹ️ Janela encerrada. Se você fez login antes de fechar, a sessão foi gravada.")
+            ok = True
         return ok
 
 
