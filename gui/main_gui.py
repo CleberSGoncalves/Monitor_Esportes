@@ -7316,12 +7316,35 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                 self._last_auto_schedule_fetch_time = now_t
                 self._run_auto_schedule_fetch()
 
-        # Disparo diário da Auditoria Autônoma às 08:00:00 (Brasília)
+        # Disparo diário resiliente da Auditoria Autônoma às 08:00:00 (Brasília)
         current_date_str = now.strftime("%Y-%m-%d")
-        if now.hour == 8 and now.minute == 0 and now.second <= 5:
-            if getattr(self, "_last_daily_audit_date", None) != current_date_str:
+        audit_state_file = os.path.join(PROJECT_ROOT, "config", "audit_state.json")
+        last_daily_audit = getattr(self, "_last_daily_audit_date", None)
+        if not last_daily_audit and os.path.exists(audit_state_file):
+            try:
+                with open(audit_state_file, "r", encoding="utf-8") as f_state:
+                    state_data = json.load(f_state)
+                    last_daily_audit = state_data.get("last_daily_audit_date")
+                    self._last_daily_audit_date = last_daily_audit
+            except Exception:
+                pass
+
+        # Dispara se for 08:00 em diante e ainda não executou no dia de hoje
+        if now.hour >= 8 and last_daily_audit != current_date_str:
+            # Aguarda a aplicação estar rodando há pelo menos 15 segundos para inicializar componentes com calma
+            app_start_t = getattr(self, "_app_start_time", 0)
+            import time
+            if app_start_t == 0:
+                self._app_start_time = time.time()
+            elif (time.time() - app_start_t) >= 15:
                 self._last_daily_audit_date = current_date_str
-                self._log("⏰ [AGENDADOR 08:00] Disparando Auditoria Autônoma Diária programada...")
+                try:
+                    os.makedirs(os.path.dirname(audit_state_file), exist_ok=True)
+                    with open(audit_state_file, "w", encoding="utf-8") as f_state:
+                        json.dump({"last_daily_audit_date": current_date_str, "executed_at": now.isoformat()}, f_state, indent=2)
+                except Exception:
+                    pass
+                self._log("⏰ [AGENDADOR RESILIENTE] Disparando Auditoria Autônoma Diária programada...")
                 self._run_autonomous_audit_manual()
 
         self.after(1000, self._start_schedule_timer_loop)

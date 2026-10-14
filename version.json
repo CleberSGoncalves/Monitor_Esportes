@@ -1,5 +1,5 @@
 {
-  "version": "2.4.2",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.2/Monitor_Esportes.exe",
-  "changelog": "v2.4.2: Reinicialização desacoplada nativa via Explorer para eliminar contaminação de DLL temporária do PyInstaller no Windows; horários estritos de relógio (sem 'por volta') e fontes de referência oficiais limpas."
+  "version": "2.4.3",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.3/Monitor_Esportes.exe",
+  "changelog": "v2.4.3: Agendador diário resiliente de auditoria autônoma CBF & SharePoint (disparo garantido mesmo com inicialização após as 08:00); persistência de estado em audit_state.json; revalidação completa do envio de relatórios e e-mails consolidados para os gestores."
 }

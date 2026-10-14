@@ -355,13 +355,22 @@ class ExpertAssistant:
             # 5. Obter parecer oficial em tempo real dos portais esportivos (sem cálculo matemático)
             try:
                 print(f"[EXPERT VERDICT] Obtendo parecer oficial de transmissão para {team1} x {team2}...")
-                verdict_data = self.get_grounding_audit_verdict(
-                    team1=team1,
-                    team2=team2,
-                    date=date,
-                    competition=competition,
-                    platform=platform
-                )
+                verdict_data = {}
+                # 1) Preferencial: resposta idêntica à do Gemini web (Playwright, sessão Google do usuário)
+                try:
+                    from modules.web_verdict_collector import get_web_verdict
+                    verdict_data = get_web_verdict(team1, team2, date)
+                except Exception as e_web:
+                    print(f"[WEB VERDICT WARN] {e_web}")
+                # 2) Fallback: API com Search Grounding
+                if not (verdict_data and verdict_data.get("verdict_text")):
+                    verdict_data = self.get_grounding_audit_verdict(
+                        team1=team1,
+                        team2=team2,
+                        date=date,
+                        competition=competition,
+                        platform=platform
+                    )
                 if verdict_data and verdict_data.get("verdict_text"):
                     res["grounding_verdict"] = verdict_data
                     print(f"[EXPERT VERDICT] Parecer oficial de transmissão anexado com sucesso!")
@@ -1455,56 +1464,58 @@ Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
         ESTRUTURA OBRIGATÓRIA DA RESPOSTA:
         O jogo entre {t1} e {t2}, realizado em {dt} pelo {comp}, teve os seguintes horários:
 
-        • Horário de Início: A partida começou exatamente às [HORA DE INÍCIO NO RELÓGIO DE BRASÍLIA, ex: 16h, 18h ou 19h30] (horário de Brasília).
-        • Horário de Término: O jogo terminou por volta das [HORA DE TÉRMINO NO RELÓGIO DE BRASÍLIA, ex: 17h50, 19h51 ou 21h35] (horário de Brasília).
+        • Horário de Início: [HH]h[MM] (horário de Brasília)
+        • Horário de Término: [HH]h[MM] (horário de Brasília)
 
-        Nota de contexto: [Breve descrição resumida: placar final e estádio].
+        Nota de contexto: [placar final e estádio].
 
         Sites de referência para confirmação dos horários:
-        • [Nome do Veículo 1, ex: ge.globo.com ou Globo Esporte]
-        • [Nome do Veículo 2, ex: UOL Esporte]
-        • [Nome do Veículo 3, ex: Lance!]
-        • [Nome do Veículo 4, ex: CBF Oficial]
+        • [Nome do Veículo 1]
+        • [Nome do Veículo 2]
+        • [Nome do Veículo 3]
 
         REGRAS ABSOLUTAS:
-        1. No 'Horário de Término', informe OBRIGATORIAMENTE o horário de relógio de Brasília em que a partida encerrou (formato HHhMM ou HH:MM).
-        2. É TERMINANTEMENTE PROIBIDO colocar minutos de cronômetro avulsos (como '51', '51Final', '90+6') e É PROIBIDO colocar frases de locutor/árbitro (como 'Fim de jogo. APITA PAULO CÉSAR...') no lugar do horário de término!
-        3. A resposta deve ser limpa, profissional e objetiva, idêntica ao Gemini Web.
+        1. Informe o horário EXATO publicado pelos veículos. NÃO use as palavras "por volta", "cerca de", "aproximadamente" ou "exatamente às" — escreva somente o horário (ex: 17h55).
+        2. NÃO faça cálculos, somas ou estimativas. Se um veículo não publicou o horário de término, escreva exatamente: "não informado pelas fontes consultadas".
+        3. É PROIBIDO colocar minutos de cronômetro (como '51', '90+6') ou frases de narração ('Fim de jogo. APITA...') no lugar do horário.
+        4. Não inclua nota de contexto sobre duração regulamentar de partidas.
         """
+
+        _clock_re = re.compile(r'\b\d{1,2}\s*[h:]\s*\d{2}\b', re.I)
+        _end_label_re = re.compile(r'(Hor[áa]rio de (?:T[ée]rmino|Encerramento))\s*:?', re.I)
+
+        def _end_line_has_clock(txt: str) -> bool:
+            for ln in txt.split("\n"):
+                if _end_label_re.search(ln):
+                    return bool(_clock_re.search(ln))
+            return False
+
+        def _strip_approx(txt: str) -> str:
+            # Apenas remove palavras de aproximação (sem alterar nenhum horário)
+            txt = re.sub(r'(?i)\b(terminou|come[cç]ou|encerrou)\s+(por volta d[ao]s|exatamente [àa]s|cerca d[ao]s|aproximadamente [àa]s)\s+', '', txt)
+            txt = re.sub(r'(?i)\b(por volta d[ao]s|cerca d[ao]s|aproximadamente [àa]s|exatamente [àa]s)\s+', '', txt)
+            return txt
 
         try:
             config = types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
-                temperature=0.1
+                temperature=0.0
             )
-            response = self.client.models.generate_content(
-                model=self.model_id,
-                contents=prompt,
-                config=config
-            )
+            response = None
+            text_res = ""
+            # Até 3 tentativas: exige horário de relógio real na linha de término (sem inventar nada)
+            for _attempt in range(3):
+                response = self.client.models.generate_content(
+                    model=self.model_id,
+                    contents=prompt,
+                    config=config
+                )
+                text_res = (response.text or "").strip()
+                if _end_line_has_clock(text_res):
+                    break
 
-            text_res = response.text or ""
-            
-            # Sanitização de segurança de pós-processamento: assegurar que o horário de término seja um horário de relógio real
-            lines = text_res.strip().split("\n")
-            cleaned_lines = []
-            for line in lines:
-                line_str = line.strip()
-                # Se for linha de término e não tiver hora válida formatada (ex: veio "51Final..."):
-                if ("Horário de Término" in line_str or "Horário de Encerramento" in line_str) and not re.search(r'\b\d{1,2}[h:]\d{2}\b', line_str):
-                    m_min = re.search(r'\b(\d{2})', line_str)
-                    min_val = int(m_min.group(1)) if m_min else 50
-                    # Tentar descobrir hora de início
-                    init_h = 18
-                    for prev_l in cleaned_lines:
-                        m_h = re.search(r'(\d{1,2})h', prev_l)
-                        if m_h:
-                            init_h = int(m_h.group(1))
-                            break
-                    end_h = init_h + 1
-                    line_str = f"• Horário de Término: O jogo terminou por volta das {end_h:02d}h{min_val:02d} (horário de Brasília)."
-                cleaned_lines.append(line_str)
-            text_res = "\n".join(cleaned_lines)
+            text_res = _strip_approx(text_res)
+            text_res = re.sub(r'\*\*', '', text_res)
 
             references = []
             seen_titles = set()
