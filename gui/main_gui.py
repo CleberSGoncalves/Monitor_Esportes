@@ -9164,6 +9164,28 @@ def _ensure_login_bat_exists():
                     'echo Pressione qualquer tecla para encerrar...\n'
                     'pause >nul\n'
                 )
+
+        test_bat = os.path.join(app_dir, "testar_gemini_web.bat")
+        if not os.path.exists(test_bat):
+            with open(test_bat, "w", encoding="utf-8") as f_test:
+                f_test.write(
+                    '@echo off\n'
+                    'title Testar Gemini Web - Monitor de Esportes\n'
+                    'cd /d "%~dp0"\n'
+                    'echo ==========================================================\n'
+                    'echo       TESTE DE CONSULTA HEADLESS NO GEMINI WEB\n'
+                    'echo ==========================================================\n'
+                    'echo.\n'
+                    'if exist "Monitor_Esportes.exe" (\n'
+                    '    "Monitor_Esportes.exe" --test-gemini\n'
+                    ') else if exist ".venv\\Scripts\\python.exe" (\n'
+                    '    .venv\\Scripts\\python.exe -c "from modules.web_verdict_collector import get_web_verdict; print(get_web_verdict(\'Vasco\', \'Remo\', \'10/10/2026\', \'Brasileirão Série A\'))"\n'
+                    '    pause\n'
+                    ') else (\n'
+                    '    python -c "from modules.web_verdict_collector import get_web_verdict; print(get_web_verdict(\'Vasco\', \'Remo\', \'10/10/2026\', \'Brasileirão Série A\'))"\n'
+                    '    pause\n'
+                    ')\n'
+                )
     except Exception:
         pass
 
@@ -9172,9 +9194,33 @@ def main() -> None:
     if "--login-gemini" in sys.argv:
         try:
             from modules.web_verdict_collector import login_interactive
-            login_interactive(wait_s=300)
+            login_interactive(wait_s=600)
         except Exception as e_login:
             print(f"[ERRO LOGIN GEMINI] {e_login}")
+        sys.exit(0)
+
+    if "--test-gemini" in sys.argv:
+        try:
+            from modules.web_verdict_collector import get_web_verdict
+            print("\n" + "="*60)
+            print("  TESTANDO CONSULTA NO GEMINI WEB (HEADLESS)")
+            print("="*60)
+            print("Enviando pergunta teste sobre Vasco x Remo (10/10/2026)...")
+            res = get_web_verdict("Vasco", "Remo", "10/10/2026", "Brasileirão Série A")
+            if res and res.get("verdict_text"):
+                print("\n✅ SUCESSO! RESPOSTA RECEBIDA DO GEMINI WEB:")
+                print(res["verdict_text"])
+                print("\nHorários extraídos:", res.get("times"))
+                print("\nSites de referência:")
+                for r in res.get("references", []):
+                    print(f"  • {r.get('title')}: {r.get('url')}")
+            else:
+                print("\n⚠️ Não foi possível obter resposta do Gemini Web. Verifique se o login foi concluído com sucesso.")
+        except Exception as e_test:
+            print(f"[ERRO NO TESTE] {e_test}")
+        print("\nPressione qualquer tecla para encerrar...")
+        import os
+        os.system("pause >nul")
         sys.exit(0)
 
     _ensure_login_bat_exists()

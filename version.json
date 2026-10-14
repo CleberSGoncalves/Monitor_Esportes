@@ -1,5 +1,5 @@
 {
-  "version": "2.4.5",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.5/Monitor_Esportes.exe",
-  "changelog": "v2.4.5: Correção do fechamento prematuro da janela de login do Gemini Web; tempo estendido de até 10 minutos para digitação de credenciais e 2FA; detecção segura de login estável antes de encerrar."
+  "version": "2.4.6",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.6/Monitor_Esportes.exe",
+  "changelog": "v2.4.6: Inclusão do testador rápido testar_gemini_web.bat e flag CLI --test-gemini; geração automática dos scripts na pasta do executável."
 }
