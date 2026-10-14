@@ -1,5 +1,5 @@
 {
-  "version": "2.4.7",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.7/Monitor_Esportes.exe",
-  "changelog": "v2.4.7: Limpeza e formatação executiva do texto do parecer oficial no PDF (remoção de chips +1 e badges residuais da UI web); exibição de progresso em tempo real no console para o testador testar_gemini_web.bat."
+  "version": "2.4.8",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.8/Monitor_Esportes.exe",
+  "changelog": "v2.4.8: Correção do testador testar_gemini_web.bat e conectar_gemini_web.bat com start /wait e popup nativo de confirmação; botão Testar Conexão na interface de Auditoria; limpeza executiva de badges de citação."
 }

@@ -3931,17 +3931,24 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         self.btn_run_audit_now.pack(side="left", padx=10, pady=8)
 
         self.btn_login_gemini_web = ctk.CTkButton(
-            ctrl_bar, text="🌐 Login Gemini Web (Google)", font=ctk.CTkFont(size=11, weight="bold"),
-            fg_color="#1a237e", hover_color="#283593", height=36, width=210,
+            ctrl_bar, text="🌐 Login Gemini Web", font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#1a237e", hover_color="#283593", height=36, width=170,
             command=self._launch_gemini_web_login
         )
         self.btn_login_gemini_web.pack(side="left", padx=4, pady=8)
+
+        self.btn_test_gemini_web = ctk.CTkButton(
+            ctrl_bar, text="🧪 Testar Conexão", font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#37474f", hover_color="#455a64", height=36, width=140,
+            command=self._test_gemini_web_now
+        )
+        self.btn_test_gemini_web.pack(side="left", padx=4, pady=8)
 
         self.lbl_audit_schedule_info = ctk.CTkLabel(
             ctrl_bar, text="⏰ Agendamento: Diariamente às 08:00:00 (Brasília) • Destinatários: cleber.goncalves@gmail.com; cleber.goncalves@ibope.com",
             font=ctk.CTkFont(size=11, weight="bold"), text_color="#aaaaaa"
         )
-        self.lbl_audit_schedule_info.pack(side="left", padx=10, pady=8)
+        self.lbl_audit_schedule_info.pack(side="left", padx=8, pady=8)
 
         # 3. Corpo: Console de Atividades em Tempo Real da Auditoria
         ctk.CTkLabel(
@@ -4021,6 +4028,34 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                 self.after(0, lambda: self.btn_login_gemini_web.configure(text="🌐 Login Gemini Web (Google)", fg_color="#1a237e", state="normal"))
 
         threading.Thread(target=login_worker, daemon=True).start()
+
+    def _test_gemini_web_now(self) -> None:
+        """Executa um teste imediato de consulta ao Gemini Web em segundo plano com feedback no console."""
+        import threading
+        if hasattr(self, "btn_test_gemini_web"):
+            self.btn_test_gemini_web.configure(text="⏳ Testando...", state="disabled")
+        self._append_audit_log("[GEMINI WEB TESTE] Consultando Gemini Web em segundo plano (headless)...")
+
+        def test_worker():
+            try:
+                from modules.web_verdict_collector import get_web_verdict
+                res = get_web_verdict("Coritiba", "Botafogo", "12/10/2026", "Brasileirão Série A")
+                if res and res.get("verdict_text"):
+                    v_txt = res['verdict_text'][:300]
+                    t_times = res.get('times', {})
+                    self.after(0, lambda: self._append_audit_log(f"✅ SUCESSO! Gemini Web respondeu com precisão:\nInício: {t_times.get('inicio')} | Término: {t_times.get('termino')}\n{v_txt}..."))
+                    if hasattr(self, "btn_test_gemini_web"):
+                        self.after(0, lambda: self.btn_test_gemini_web.configure(text="✅ Conexão OK", fg_color="#2e7d32", state="normal"))
+                else:
+                    self.after(0, lambda: self._append_audit_log("⚠️ A sessão Google não está logada no Gemini Web. Clique em '🌐 Login Gemini Web' para autenticar."))
+                    if hasattr(self, "btn_test_gemini_web"):
+                        self.after(0, lambda: self.btn_test_gemini_web.configure(text="❌ Não Logado", fg_color="#c62828", state="normal"))
+            except Exception as ex:
+                self.after(0, lambda: self._append_audit_log(f"❌ Erro ao testar Gemini Web: {ex}"))
+                if hasattr(self, "btn_test_gemini_web"):
+                    self.after(0, lambda: self.btn_test_gemini_web.configure(text="🧪 Testar Conexão", fg_color="#37474f", state="normal"))
+
+        threading.Thread(target=test_worker, daemon=True).start()
 
     def _render_audited_games_ui(self) -> None:
         """Carrega e renderiza todos os cards de jogos auditados no mural da esquerda."""
@@ -9154,7 +9189,7 @@ def _ensure_login_bat_exists():
                     'echo Pressione qualquer tecla para abrir o navegador...\n'
                     'pause >nul\n'
                     'if exist "Monitor_Esportes.exe" (\n'
-                    '    "Monitor_Esportes.exe" --login-gemini\n'
+                    '    start /wait "" "Monitor_Esportes.exe" --login-gemini\n'
                     ') else if exist ".venv\\Scripts\\python.exe" (\n'
                     '    .venv\\Scripts\\python.exe -m modules.web_verdict_collector --login\n'
                     ') else (\n'
@@ -9176,15 +9211,19 @@ def _ensure_login_bat_exists():
                     'echo       TESTE DE CONSULTA HEADLESS NO GEMINI WEB\n'
                     'echo ==========================================================\n'
                     'echo.\n'
+                    'echo Consultando o Gemini Web em segundo plano...\n'
+                    'echo Aguarde a confirmacao na tela...\n'
+                    'echo.\n'
                     'if exist "Monitor_Esportes.exe" (\n'
-                    '    "Monitor_Esportes.exe" --test-gemini\n'
+                    '    start /wait "" "Monitor_Esportes.exe" --test-gemini\n'
                     ') else if exist ".venv\\Scripts\\python.exe" (\n'
-                    '    .venv\\Scripts\\python.exe -c "from modules.web_verdict_collector import get_web_verdict; print(get_web_verdict(\'Vasco\', \'Remo\', \'10/10/2026\', \'Brasileirão Série A\'))"\n'
-                    '    pause\n'
+                    '    .venv\\Scripts\\python.exe -c "import ctypes; from modules.web_verdict_collector import get_web_verdict; r=get_web_verdict(\'Coritiba\', \'Botafogo\', \'12/10/2026\', \'Brasileirão Série A\'); txt=r.get(\'verdict_text\') or \'Sessao Google nao esta logada.\'; ctypes.windll.user32.MessageBoxW(0, txt[:400], \'Monitor de Esportes - Teste Gemini Web\', 0x40 if r else 0x30)"\n'
                     ') else (\n'
-                    '    python -c "from modules.web_verdict_collector import get_web_verdict; print(get_web_verdict(\'Vasco\', \'Remo\', \'10/10/2026\', \'Brasileirão Série A\'))"\n'
-                    '    pause\n'
+                    '    python -c "import ctypes; from modules.web_verdict_collector import get_web_verdict; r=get_web_verdict(\'Coritiba\', \'Botafogo\', \'12/10/2026\', \'Brasileirão Série A\'); txt=r.get(\'verdict_text\') or \'Sessao Google nao esta logada.\'; ctypes.windll.user32.MessageBoxW(0, txt[:400], \'Monitor de Esportes - Teste Gemini Web\', 0x40 if r else 0x30)"\n'
                     ')\n'
+                    'echo.\n'
+                    'echo Pressione qualquer tecla para encerrar...\n'
+                    'pause >nul\n'
                 )
     except Exception:
         pass
@@ -9215,21 +9254,30 @@ def main() -> None:
             print("\n" + "="*60, flush=True)
             print("  TESTANDO CONSULTA NO GEMINI WEB (HEADLESS)", flush=True)
             print("="*60, flush=True)
-            print("Enviando pergunta teste sobre Vasco x Remo (10/10/2026)...", flush=True)
-            print("Aguardando retorno do navegador em segundo plano (até 30s)...", flush=True)
-            res = get_web_verdict("Vasco", "Remo", "10/10/2026", "Brasileirão Série A")
+            print("Enviando pergunta teste sobre Coritiba x Botafogo (12/10/2026)...", flush=True)
+            print("Aguardando retorno do navegador em segundo plano...", flush=True)
+            res = get_web_verdict("Coritiba", "Botafogo", "12/10/2026", "Brasileirão Série A")
             if res and res.get("verdict_text"):
-                print("\n✅ SUCESSO! RESPOSTA RECEBIDA DO GEMINI WEB:", flush=True)
-                print(res["verdict_text"], flush=True)
-                print("\nHorários extraídos:", res.get("times"), flush=True)
-                print("\nSites de referência:", flush=True)
-                for r in res.get("references", []):
-                    print(f"  • {r.get('title')}: {r.get('url')}", flush=True)
+                t_times = res.get('times', {})
+                msg_box = (
+                    "✅ Gemini Web conectado com sucesso!\n\n"
+                    f"Jogo: Coritiba x Botafogo\n"
+                    f"Início identificado: {t_times.get('inicio', 'N/D')}\n"
+                    f"Término identificado: {t_times.get('termino', 'N/D')}\n\n"
+                    f"Resumo da Transmissão:\n{res['verdict_text'][:250]}..."
+                )
+                print("\n" + msg_box, flush=True)
+                import ctypes
+                ctypes.windll.user32.MessageBoxW(0, msg_box, "Monitor de Esportes - Teste Gemini Web", 0x40)
             else:
-                print("\n⚠️ A sessão Google não está logada ou o Gemini Web não respondeu.", flush=True)
-                print("Execute o arquivo 'conectar_gemini_web.bat' para fazer o login da sua Conta Google.", flush=True)
+                msg_box = "⚠️ A sessão do Google não está logada no Gemini Web.\n\nPor favor, execute 'conectar_gemini_web.bat' para fazer o login da sua Conta Google."
+                print("\n" + msg_box, flush=True)
+                import ctypes
+                ctypes.windll.user32.MessageBoxW(0, msg_box, "Monitor de Esportes - Teste Gemini Web", 0x30)
         except Exception as e_test:
             print(f"[ERRO NO TESTE] {e_test}", flush=True)
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(0, f"Erro no teste: {e_test}", "Monitor de Esportes", 0x10)
         sys.exit(0)
 
     _ensure_login_bat_exists()
