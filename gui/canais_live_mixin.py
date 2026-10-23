@@ -27,6 +27,8 @@ class CanaisLiveMixin:
         """Inicializa variáveis e o serviço de monitoramento em segundo plano."""
         self._canais_search_var = ctk.StringVar(value="")
         self._auto_email_live_var = ctk.BooleanVar(value=True)
+        self._incoming_cb_vars: Dict[str, ctk.BooleanVar] = {}
+        self._user_toggling: bool = False
         self._live_cards_cache: Dict[str, Any] = {}
         self._live_incoming_cache: Dict[str, Any] = {}
 
@@ -34,10 +36,16 @@ class CanaisLiveMixin:
             reporter=self.reporter,
             config_provider=self._get_live_service_config,
             log=self._log,
-            on_change=lambda: self.after(0, self._refresh_canais_tab_ui)
+            on_change=lambda: self.after(0, self._on_service_state_changed)
         )
         self._auto_email_live_var.set(self.live_service.get_setting("auto_email", True))
         self.live_service.start()
+
+    def _on_service_state_changed(self) -> None:
+        """Callback acionado pelo serviço de monitoramento em background."""
+        if getattr(self, "_user_toggling", False):
+            return
+        self._refresh_canais_tab_ui()
 
     def _get_live_service_config(self) -> Dict[str, Any]:
         """Lê credenciais e configurações para transcrição, cronologia e e-mail."""
@@ -138,14 +146,17 @@ class CanaisLiveMixin:
         self.lbl_live_status_hint.pack(side="right", padx=15, pady=8)
 
         # ---------------------------------------------------------------------
-        # 2. CORPO PRINCIPAL (2 COLUNAS)
+        # 2. CORPO PRINCIPAL (2 COLUNAS VIA GRID EQUILIBRADO)
         # ---------------------------------------------------------------------
         body = ctk.CTkFrame(container, fg_color="transparent")
         body.pack(fill="both", expand=True, padx=2, pady=2)
+        body.grid_rowconfigure(0, weight=1)
+        body.grid_columnconfigure(0, weight=1)
+        body.grid_columnconfigure(1, weight=1)
 
         # ---------------------- COLUNA ESQUERDA (CANAIS & EVENTOS) ----------------------
         col_left = ctk.CTkFrame(body, fg_color="#121212", corner_radius=10, border_width=1, border_color="#222222")
-        col_left.pack(side="left", fill="both", expand=True, padx=(0, 6), pady=2)
+        col_left.grid(row=0, column=0, sticky="nsew", padx=(0, 4), pady=2)
 
         # SEÇÃO A: CADASTRO DE CANAIS
         sec_ch_hdr = ctk.CTkFrame(col_left, fg_color="transparent")
@@ -222,25 +233,27 @@ class CanaisLiveMixin:
 
         # ---------------------- COLUNA DIREITA (FILA DE ANÁLISE) ----------------------
         col_right = ctk.CTkFrame(body, fg_color="#121212", corner_radius=10, border_width=1, border_color="#222222")
-        col_right.pack(side="left", fill="both", expand=True, padx=(6, 0), pady=2)
+        col_right.grid(row=0, column=1, sticky="nsew", padx=(4, 0), pady=2)
 
         sec_queue_hdr = ctk.CTkFrame(col_right, fg_color="transparent")
         sec_queue_hdr.pack(fill="x", padx=12, pady=(10, 4))
 
         ctk.CTkLabel(
             sec_queue_hdr,
-            text="🎙️ FILA DE ANÁLISE E CRONOLOGIA DE NARRAÇÃO",
+            text="🎙️ FILA DE ANÁLISE E CRONOLOGIA",
             font=ctk.CTkFont(size=13, weight="bold"),
-            text_color="#00FF7F"
+            text_color="#00FF7F",
+            anchor="w"
         ).pack(side="left")
 
         self.lbl_queue_sub = ctk.CTkLabel(
             col_right,
             text="Fluxo: Upcoming ➔ Ao Vivo ➔ Término ➔ Transcrição Áudio (.txt) ➔ Cronologia Técnica (PDF)",
             font=ctk.CTkFont(size=10),
-            text_color="#777777"
+            text_color="#777777",
+            anchor="w"
         )
-        self.lbl_queue_sub.pack(anchor="w", padx=12, pady=(0, 6))
+        self.lbl_queue_sub.pack(fill="x", padx=12, pady=(0, 6))
 
         # Scroll de Cards da Fila
         self.scroll_fila = ctk.CTkScrollableFrame(col_right, fg_color="#0a0a0a", corner_radius=8)
@@ -253,24 +266,34 @@ class CanaisLiveMixin:
     # REFRESH E ATUALIZAÇÃO DOS CARDS
     # =========================================================================
     def _refresh_canais_tab_ui(self) -> None:
-        """Atualiza KPIs, lista de canais, eventos incoming e cards da fila de análise."""
+        """Atualiza KPIs, canais, lista incoming e cards da fila de análise."""
         if not hasattr(self, "scroll_canais") or not hasattr(self, "scroll_fila"):
             return
 
+        self._refresh_kpis()
+        self._render_canais_list()
+        self._render_incoming_list()
+        self._render_fila_cards()
+
+    def _refresh_kpis(self) -> None:
+        """Atualiza os contadores numéricos superiores."""
         channels = self.live_service.list_channels()
         events = self.live_service.list_events()
-
-        # KPIs
         selected_events = [e for e in events if e.get("selected")]
         done_events = [e for e in selected_events if e.get("pipeline") in ("transcribed", "done")]
 
-        self.lbl_kpi_canais_count.configure(text=str(len(channels)))
-        self.lbl_kpi_eventos_count.configure(text=str(len(events)))
-        self.lbl_kpi_fila_count.configure(text=str(len(selected_events)))
+        if hasattr(self, "lbl_kpi_canais_count"):
+            self.lbl_kpi_canais_count.configure(text=str(len(channels)))
+        if hasattr(self, "lbl_kpi_eventos_count"):
+            self.lbl_kpi_eventos_count.configure(text=str(len(events)))
+        if hasattr(self, "lbl_kpi_fila_count"):
+            self.lbl_kpi_fila_count.configure(text=str(len(selected_events)))
         if hasattr(self, "lbl_kpi_prontos_count"):
             self.lbl_kpi_prontos_count.configure(text=str(len(done_events)))
 
-        # 1. Renderiza Canais
+    def _render_canais_list(self) -> None:
+        """Renderiza a lista de canais cadastrados."""
+        channels = self.live_service.list_channels()
         for w in self.scroll_canais.winfo_children():
             w.destroy()
 
@@ -281,46 +304,46 @@ class CanaisLiveMixin:
                 font=ctk.CTkFont(size=11),
                 text_color="#666666"
             ).pack(pady=15)
-        else:
-            for ch in channels:
-                row = ctk.CTkFrame(self.scroll_canais, fg_color="#181818", corner_radius=6, height=36)
-                row.pack(fill="x", pady=2, padx=2)
-                row.pack_propagate(False)
+            return
 
-                ctk.CTkLabel(row, text="📺", font=ctk.CTkFont(size=12)).pack(side="left", padx=(8, 4))
-                ctk.CTkLabel(
-                    row,
-                    text=ch.get("name", "Canal"),
-                    font=ctk.CTkFont(size=11, weight="bold"),
-                    text_color="#ffffff"
-                ).pack(side="left", padx=4)
+        for ch in channels:
+            row = ctk.CTkFrame(self.scroll_canais, fg_color="#181818", corner_radius=6, height=36)
+            row.pack(fill="x", pady=2, padx=2)
+            row.pack_propagate(False)
 
-                ctk.CTkLabel(
-                    row,
-                    text=f"({ch.get('url', '')})",
-                    font=ctk.CTkFont(size=9),
-                    text_color="#777777"
-                ).pack(side="left", padx=4)
+            ctk.CTkLabel(row, text="📺", font=ctk.CTkFont(size=12)).pack(side="left", padx=(8, 4))
+            ctk.CTkLabel(
+                row,
+                text=ch.get("name", "Canal"),
+                font=ctk.CTkFont(size=11, weight="bold"),
+                text_color="#ffffff"
+            ).pack(side="left", padx=4)
 
-                def make_del(cid=ch["id"], cname=ch.get("name")):
-                    return lambda: self._on_remove_channel(cid, cname)
+            ctk.CTkLabel(
+                row,
+                text=f"({ch.get('url', '')})",
+                font=ctk.CTkFont(size=9),
+                text_color="#777777"
+            ).pack(side="left", padx=4)
 
-                ctk.CTkButton(
-                    row,
-                    text="🗑️",
-                    width=28,
-                    height=24,
-                    fg_color="transparent",
-                    hover_color="#550000",
-                    font=ctk.CTkFont(size=11),
-                    command=make_del()
-                ).pack(side="right", padx=6)
+            def make_del(cid=ch["id"], cname=ch.get("name")):
+                return lambda: self._on_remove_channel(cid, cname)
 
-        # 2. Renderiza Próximos Eventos (Incoming / Ao Vivo)
-        for w in self.scroll_incoming.winfo_children():
-            w.destroy()
+            ctk.CTkButton(
+                row,
+                text="🗑️",
+                width=28,
+                height=24,
+                fg_color="transparent",
+                hover_color="#550000",
+                font=ctk.CTkFont(size=11),
+                command=make_del()
+            ).pack(side="right", padx=6)
 
-        # Ordenação: Ao Vivo primeiro, depois Upcoming por data
+    def _render_incoming_list(self) -> None:
+        """Renderiza a lista de eventos encontrados à esquerda com checkboxes reativos."""
+        events = self.live_service.list_events()
+
         def incoming_sort_key(ev):
             st = ev.get("status")
             prio = 0 if st == "live" else (1 if st == "upcoming" else 2)
@@ -329,6 +352,11 @@ class CanaisLiveMixin:
 
         sorted_events = sorted(events, key=incoming_sort_key)
 
+        for w in self.scroll_incoming.winfo_children():
+            w.destroy()
+
+        self._incoming_cb_vars.clear()
+
         if not sorted_events:
             ctk.CTkLabel(
                 self.scroll_incoming,
@@ -336,76 +364,88 @@ class CanaisLiveMixin:
                 font=ctk.CTkFont(size=11),
                 text_color="#666666"
             ).pack(pady=20)
-        else:
-            for ev in sorted_events:
-                vid = ev["video_id"]
-                card = ctk.CTkFrame(self.scroll_incoming, fg_color="#161616", corner_radius=8)
-                card.pack(fill="x", pady=3, padx=2)
+            return
 
-                top_line = ctk.CTkFrame(card, fg_color="transparent")
-                top_line.pack(fill="x", padx=8, pady=(6, 2))
+        for ev in sorted_events:
+            vid = ev["video_id"]
+            card = ctk.CTkFrame(self.scroll_incoming, fg_color="#161616", corner_radius=8)
+            card.pack(fill="x", pady=3, padx=2)
 
-                # Checkbox de Seleção
-                is_sel = bool(ev.get("selected"))
-                cb_var = ctk.BooleanVar(value=is_sel)
+            top_line = ctk.CTkFrame(card, fg_color="transparent")
+            top_line.pack(fill="x", padx=8, pady=(6, 2))
 
-                def make_toggle(v_id=vid, v_var=cb_var):
-                    return lambda: self._on_toggle_event(v_id, v_var.get())
+            # Checkbox de Seleção
+            is_sel = bool(ev.get("selected"))
+            cb_var = ctk.BooleanVar(value=is_sel)
+            self._incoming_cb_vars[vid] = cb_var
 
-                cb = ctk.CTkCheckBox(
-                    top_line,
-                    text="",
-                    variable=cb_var,
-                    width=20,
-                    checkbox_width=18,
-                    checkbox_height=18,
-                    command=make_toggle(),
-                    checkmark_color="#000000",
-                    fg_color="#00CED1"
-                )
-                cb.pack(side="left", padx=(0, 6))
+            def make_toggle(v_id=vid, v_var=cb_var):
+                return lambda: self._on_toggle_event(v_id, v_var.get())
 
-                # Badge Status
-                st = ev.get("status")
-                if st == "live":
-                    badge_txt, badge_color = "🔴 AO VIVO", "#FF4C4C"
-                elif st == "upcoming":
-                    sched = ev.get("scheduled_epoch")
-                    t_str = datetime.fromtimestamp(sched).strftime("%d/%m %H:%M") if sched else "Futuro"
-                    badge_txt, badge_color = f"⏳ {t_str}", "#FFD700"
-                else:
-                    badge_txt, badge_color = "🏁 Encerrado", "#888888"
+            cb = ctk.CTkCheckBox(
+                top_line,
+                text="",
+                variable=cb_var,
+                width=20,
+                checkbox_width=18,
+                checkbox_height=18,
+                command=make_toggle(),
+                checkmark_color="#000000",
+                fg_color="#00CED1"
+            )
+            cb.pack(side="left", padx=(0, 6))
 
-                ctk.CTkLabel(
-                    top_line,
-                    text=badge_txt,
-                    font=ctk.CTkFont(size=10, weight="bold"),
-                    text_color=badge_color
-                ).pack(side="left", padx=4)
+            # Badge Status
+            st = ev.get("status")
+            if st == "live":
+                badge_txt, badge_color = "🔴 AO VIVO", "#FF4C4C"
+            elif st == "upcoming":
+                sched = ev.get("scheduled_epoch")
+                try:
+                    t_str = datetime.fromtimestamp(float(sched)).strftime("%d/%m %H:%M") if sched else "Futuro"
+                except Exception:
+                    t_str = "Futuro"
+                badge_txt, badge_color = f"⏳ {t_str}", "#FFD700"
+            else:
+                badge_txt, badge_color = "🏁 Encerrado", "#888888"
 
-                ctk.CTkLabel(
-                    top_line,
-                    text=f"• {ev.get('channel_name', 'YouTube')}",
-                    font=ctk.CTkFont(size=10),
-                    text_color="#aaaaaa"
-                ).pack(side="left", padx=4)
+            ctk.CTkLabel(
+                top_line,
+                text=badge_txt,
+                font=ctk.CTkFont(size=10, weight="bold"),
+                text_color=badge_color
+            ).pack(side="left", padx=4)
 
-                # Título do Vídeo
-                title_txt = ev.get("title", vid)
-                lbl_title = ctk.CTkLabel(
-                    card,
-                    text=title_txt,
-                    font=ctk.CTkFont(size=11, weight="bold"),
-                    text_color="#ffffff",
-                    anchor="w",
-                    justify="left",
-                    wraplength=480
-                )
-                lbl_title.pack(fill="x", padx=32, pady=(0, 6))
+            ctk.CTkLabel(
+                top_line,
+                text=f"• {ev.get('channel_name', 'YouTube')}",
+                font=ctk.CTkFont(size=10),
+                text_color="#aaaaaa"
+            ).pack(side="left", padx=4)
 
-        # 3. Renderiza Fila de Análise (Coluna Direita)
+            # Título do Vídeo
+            title_txt = ev.get("title", vid)
+            lbl_title = ctk.CTkLabel(
+                card,
+                text=title_txt,
+                font=ctk.CTkFont(size=11, weight="bold"),
+                text_color="#ffffff",
+                anchor="w",
+                justify="left",
+                wraplength=420
+            )
+            lbl_title.pack(fill="x", padx=32, pady=(0, 6))
+
+    def _render_fila_cards(self) -> None:
+        """Renderiza os cards da fila de análise (coluna direita)."""
+        if not hasattr(self, "scroll_fila"):
+            return
+
         for w in self.scroll_fila.winfo_children():
             w.destroy()
+
+        events = self.live_service.list_events()
+        selected_events = [e for e in events if e.get("selected")]
 
         if not selected_events:
             ctk.CTkLabel(
@@ -414,193 +454,225 @@ class CanaisLiveMixin:
                 font=ctk.CTkFont(size=11),
                 text_color="#666666"
             ).pack(pady=40)
-        else:
-            for ev in selected_events:
-                vid = ev["video_id"]
-                pipe = ev.get("pipeline", "waiting")
-                badge_info = PIPELINE_LABELS.get(pipe, ("⏳ Na Fila", "#FFD700"))
+            return
 
-                card = ctk.CTkFrame(self.scroll_fila, fg_color="#181818", corner_radius=10, border_width=1, border_color="#2a2a2a")
-                card.pack(fill="x", pady=5, padx=4)
+        for ev in selected_events:
+            vid = ev.get("video_id", "")
+            try:
+                self._render_single_fila_card(ev)
+            except Exception as ex:
+                self._log(f"⚠️ Erro ao renderizar card da fila ({vid}): {ex}")
+                traceback.print_exc()
 
-                # Cabeçalho do Card
-                hdr = ctk.CTkFrame(card, fg_color="transparent")
-                hdr.pack(fill="x", padx=10, pady=(8, 2))
+    def _render_single_fila_card(self, ev: Dict[str, Any]) -> None:
+        """Renderiza um card individual na fila de análise da coluna direita."""
+        vid = ev["video_id"]
+        pipe = ev.get("pipeline", "waiting")
+        badge_info = PIPELINE_LABELS.get(pipe, ("⏳ Na Fila", "#FFD700"))
 
-                ctk.CTkLabel(
-                    hdr,
-                    text=badge_info[0],
-                    font=ctk.CTkFont(size=11, weight="bold"),
-                    text_color=badge_info[1]
-                ).pack(side="left")
+        card = ctk.CTkFrame(self.scroll_fila, fg_color="#181818", corner_radius=10, border_width=1, border_color="#2a2a2a")
+        card.pack(fill="x", pady=6, padx=4)
 
-                ctk.CTkLabel(
-                    hdr,
-                    text=f"• {ev.get('channel_name', 'YouTube')}",
-                    font=ctk.CTkFont(size=11),
-                    text_color="#999999"
-                ).pack(side="left", padx=6)
+        # Cabeçalho do Card
+        hdr = ctk.CTkFrame(card, fg_color="transparent")
+        hdr.pack(fill="x", padx=10, pady=(8, 2))
 
-                # Botão Remover da Fila
-                def make_remove_sel(v_id=vid):
-                    return lambda: self.live_service.set_selected(v_id, False)
+        ctk.CTkLabel(
+            hdr,
+            text=badge_info[0],
+            font=ctk.CTkFont(size=11, weight="bold"),
+            text_color=badge_info[1]
+        ).pack(side="left")
 
-                ctk.CTkButton(
-                    hdr,
-                    text="✕",
-                    width=22,
-                    height=20,
-                    fg_color="transparent",
-                    hover_color="#550000",
-                    font=ctk.CTkFont(size=11),
-                    command=make_remove_sel()
-                ).pack(side="right")
+        ctk.CTkLabel(
+            hdr,
+            text=f"• {ev.get('channel_name') or 'YouTube'}",
+            font=ctk.CTkFont(size=11),
+            text_color="#999999"
+        ).pack(side="left", padx=6)
 
-                # Título
-                ctk.CTkLabel(
-                    card,
-                    text=ev.get("title", vid),
-                    font=ctk.CTkFont(size=12, weight="bold"),
-                    text_color="#ffffff",
-                    anchor="w",
-                    justify="left",
-                    wraplength=520
-                ).pack(fill="x", padx=10, pady=(2, 4))
+        # Botão Superior de Remover da Fila (DESTACADO E CLARO)
+        def make_remove_sel(v_id=vid):
+            return lambda: self._on_remove_from_queue(v_id)
 
-                # Mensagem de Progresso / Erro
-                prog = ev.get("progress") or ""
-                err = ev.get("error") or ""
-                if err:
-                    ctk.CTkLabel(
-                        card,
-                        text=f"⚠️ {err}",
-                        font=ctk.CTkFont(size=10),
-                        text_color="#FF6B6B",
-                        anchor="w",
-                        justify="left",
-                        wraplength=520
-                    ).pack(fill="x", padx=10, pady=(0, 4))
-                elif prog:
-                    ctk.CTkLabel(
-                        card,
-                        text=f"ℹ️ {prog}",
-                        font=ctk.CTkFont(size=10, slant="italic"),
-                        text_color="#00CED1",
-                        anchor="w"
-                    ).pack(fill="x", padx=10, pady=(0, 4))
+        ctk.CTkButton(
+            hdr,
+            text="✕ Remover da Fila",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#3a1414",
+            hover_color="#5f1d1d",
+            text_color="#ff8888",
+            height=24,
+            width=125,
+            command=make_remove_sel()
+        ).pack(side="right")
 
-                # Metadados de Linha (Início, Duração, Narração)
-                meta_row = ctk.CTkFrame(card, fg_color="transparent")
-                meta_row.pack(fill="x", padx=10, pady=(2, 6))
+        # Título
+        ctk.CTkLabel(
+            card,
+            text=ev.get("title") or vid,
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color="#ffffff",
+            anchor="w",
+            justify="left",
+            wraplength=440
+        ).pack(fill="x", padx=10, pady=(2, 4))
 
-                start_epoch = ev.get("actual_start_epoch") or ev.get("scheduled_epoch")
-                s_txt = datetime.fromtimestamp(start_epoch).strftime("%d/%m %H:%M") if start_epoch else "N/D"
-                dur = ev.get("duration") or 0
-                dur_txt = f"{dur//3600:02d}:{(dur%3600)//60:02d}:{dur%60:02d}" if dur else "N/D"
+        # Mensagem de Progresso / Erro
+        prog = str(ev.get("progress") or "").strip()
+        err = str(ev.get("error") or "").strip()
+        if err:
+            ctk.CTkLabel(
+                card,
+                text=f"⚠️ {err}",
+                font=ctk.CTkFont(size=10),
+                text_color="#FF6B6B",
+                anchor="w",
+                justify="left",
+                wraplength=440
+            ).pack(fill="x", padx=10, pady=(0, 4))
+        elif prog:
+            ctk.CTkLabel(
+                card,
+                text=f"ℹ️ {prog}",
+                font=ctk.CTkFont(size=10, slant="italic"),
+                text_color="#00CED1",
+                anchor="w"
+            ).pack(fill="x", padx=10, pady=(0, 4))
 
-                details = f"Início: {s_txt}  •  Duração: {dur_txt}"
-                if ev.get("narration_lines"):
-                    details += f"  •  Trechos: {ev['narration_lines']}"
-                if ev.get("transcript_source_label"):
-                    details += f"  •  Fonte: {ev['transcript_source_label']}"
+        # Metadados de Linha (Início, Duração, Narração)
+        meta_row = ctk.CTkFrame(card, fg_color="transparent")
+        meta_row.pack(fill="x", padx=10, pady=(2, 6))
 
-                ctk.CTkLabel(
-                    meta_row,
-                    text=details,
-                    font=ctk.CTkFont(size=9.5),
-                    text_color="#888888"
-                ).pack(side="left")
+        start_epoch = ev.get("actual_start_epoch") or ev.get("scheduled_epoch")
+        try:
+            s_txt = datetime.fromtimestamp(float(start_epoch)).strftime("%d/%m %H:%M") if start_epoch else "N/D"
+        except Exception:
+            s_txt = "N/D"
 
-                # Linha de Ações / Botões
-                btn_row = ctk.CTkFrame(card, fg_color="transparent")
-                btn_row.pack(fill="x", padx=10, pady=(4, 10))
+        dur = ev.get("duration")
+        try:
+            dur_sec = int(dur) if dur is not None else 0
+        except Exception:
+            dur_sec = 0
+        dur_txt = f"{dur_sec // 3600:02d}:{(dur_sec % 3600) // 60:02d}:{dur_sec % 60:02d}" if dur_sec > 0 else "N/D"
 
-                has_narr = bool(ev.get("narration_path") and os.path.exists(ev.get("narration_path")))
-                has_pdf = bool(ev.get("pdf_path") and os.path.exists(ev.get("pdf_path")))
+        details = f"Início: {s_txt}  •  Duração: {dur_txt}"
+        if ev.get("narration_lines"):
+            details += f"  •  Trechos: {ev['narration_lines']}"
+        if ev.get("transcript_source_label"):
+            details += f"  •  Fonte: {ev['transcript_source_label']}"
 
-                # 1. Botão Gerar Cronologia
-                def make_chrono(v_id=vid):
-                    return lambda: self._open_generate_chronology_modal(v_id)
+        ctk.CTkLabel(
+            meta_row,
+            text=details,
+            font=ctk.CTkFont(size=10),
+            text_color="#888888"
+        ).pack(side="left")
 
-                chrono_btn = ctk.CTkButton(
-                    btn_row,
-                    text="🧠 Gerar Cronologia",
-                    font=ctk.CTkFont(size=11, weight="bold"),
-                    fg_color="#008080" if has_narr else "#333333",
-                    hover_color="#005a5a" if has_narr else "#333333",
-                    state="normal" if has_narr else "disabled",
-                    height=28,
-                    width=140,
-                    command=make_chrono()
-                )
-                chrono_btn.pack(side="left", padx=(0, 6))
+        # Linha de Ações / Botões
+        btn_row = ctk.CTkFrame(card, fg_color="transparent")
+        btn_row.pack(fill="x", padx=10, pady=(4, 10))
 
-                # 2. Botão Baixar Narração (.txt)
-                def make_open_narr(v_id=vid):
-                    return lambda: self._open_narration_file(v_id)
+        has_narr = bool(ev.get("narration_path") and os.path.exists(ev.get("narration_path")))
+        has_pdf = bool(ev.get("pdf_path") and os.path.exists(ev.get("pdf_path")))
 
-                narr_btn = ctk.CTkButton(
-                    btn_row,
-                    text="💾 Narração (.txt)",
-                    font=ctk.CTkFont(size=11),
-                    fg_color="#2b5b84" if has_narr else "#222222",
-                    hover_color="#1d3e5a" if has_narr else "#222222",
-                    state="normal" if has_narr else "disabled",
-                    height=28,
-                    width=120,
-                    command=make_open_narr()
-                )
-                narr_btn.pack(side="left", padx=4)
+        # 1. Botão Gerar Cronologia
+        def make_chrono(v_id=vid):
+            return lambda: self._open_generate_chronology_modal(v_id)
 
-                # 3. Botão Abrir Relatório PDF
-                def make_open_pdf(v_id=vid):
-                    return lambda: self._open_live_pdf(v_id)
+        chrono_btn = ctk.CTkButton(
+            btn_row,
+            text="🧠 Gerar Cronologia",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#008080" if has_narr else "#222222",
+            hover_color="#005a5a" if has_narr else "#222222",
+            state="normal" if has_narr else "disabled",
+            height=28,
+            width=135,
+            command=make_chrono()
+        )
+        chrono_btn.pack(side="left", padx=(0, 4))
 
-                pdf_btn = ctk.CTkButton(
-                    btn_row,
-                    text="📄 Abrir Relatório",
-                    font=ctk.CTkFont(size=11, weight="bold"),
-                    fg_color="#2e7d32" if has_pdf else "#222222",
-                    hover_color="#1b5e20" if has_pdf else "#222222",
-                    state="normal" if has_pdf else "disabled",
-                    height=28,
-                    width=130,
-                    command=make_open_pdf()
-                )
-                pdf_btn.pack(side="left", padx=4)
+        # 2. Botão Baixar Narração (.txt)
+        def make_open_narr(v_id=vid):
+            return lambda: self._open_narration_file(v_id)
 
-                # 4. Botão E-mail
-                def make_send_mail(v_id=vid):
-                    return lambda: self._on_send_email_clicked(v_id)
+        narr_btn = ctk.CTkButton(
+            btn_row,
+            text="💾 Narração (.txt)",
+            font=ctk.CTkFont(size=11),
+            fg_color="#2b5b84" if has_narr else "#222222",
+            hover_color="#1d3e5a" if has_narr else "#222222",
+            state="normal" if has_narr else "disabled",
+            height=28,
+            width=115,
+            command=make_open_narr()
+        )
+        narr_btn.pack(side="left", padx=4)
 
-                mail_btn = ctk.CTkButton(
-                    btn_row,
-                    text="✉️ E-mail",
-                    font=ctk.CTkFont(size=11),
-                    fg_color="#455a64" if (has_pdf or has_narr) else "#222222",
-                    hover_color="#546e7a" if (has_pdf or has_narr) else "#222222",
-                    state="normal" if (has_pdf or has_narr) else "disabled",
-                    height=28,
-                    width=85,
-                    command=make_send_mail()
-                )
-                mail_btn.pack(side="left", padx=4)
+        # 3. Botão Abrir Relatório PDF
+        def make_open_pdf(v_id=vid):
+            return lambda: self._open_live_pdf(v_id)
 
-                # Botão Forçar Transcrição de Áudio se falhou ou aguardando
-                if pipe in ("ended", "failed"):
-                    def make_force(v_id=vid):
-                        return lambda: self.live_service.run_transcription_async(v_id, force_audio=True)
+        pdf_btn = ctk.CTkButton(
+            btn_row,
+            text="📄 Relatório PDF",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#2e7d32" if has_pdf else "#222222",
+            hover_color="#1b5e20" if has_pdf else "#222222",
+            state="normal" if has_pdf else "disabled",
+            height=28,
+            width=115,
+            command=make_open_pdf()
+        )
+        pdf_btn.pack(side="left", padx=4)
 
-                    ctk.CTkButton(
-                        btn_row,
-                        text="🔊 Transcrever Áudio",
-                        font=ctk.CTkFont(size=10),
-                        fg_color="#8d6e63",
-                        hover_color="#6d4c41",
-                        height=28,
-                        width=120,
-                        command=make_force()
-                    ).pack(side="left", padx=4)
+        # 4. Botão E-mail
+        def make_send_mail(v_id=vid):
+            return lambda: self._on_send_email_clicked(v_id)
+
+        mail_btn = ctk.CTkButton(
+            btn_row,
+            text="✉️ E-mail",
+            font=ctk.CTkFont(size=11),
+            fg_color="#455a64" if (has_pdf or has_narr) else "#222222",
+            hover_color="#546e7a" if (has_pdf or has_narr) else "#222222",
+            state="normal" if (has_pdf or has_narr) else "disabled",
+            height=28,
+            width=75,
+            command=make_send_mail()
+        )
+        mail_btn.pack(side="left", padx=4)
+
+        # 5. Botão Forçar Áudio
+        if pipe in ("ended", "failed"):
+            def make_force(v_id=vid):
+                return lambda: self.live_service.run_transcription_async(v_id, force_audio=True)
+
+            ctk.CTkButton(
+                btn_row,
+                text="🔊 Áudio",
+                font=ctk.CTkFont(size=10),
+                fg_color="#8d6e63",
+                hover_color="#6d4c41",
+                height=28,
+                width=70,
+                command=make_force()
+            ).pack(side="left", padx=4)
+
+        # 6. Botão Remover da Fila no Rodapé do Card
+        ctk.CTkButton(
+            btn_row,
+            text="🗑️ Remover",
+            font=ctk.CTkFont(size=11),
+            fg_color="#2b1111",
+            hover_color="#4a1919",
+            text_color="#ff8888",
+            height=28,
+            width=80,
+            command=make_remove_sel()
+        ).pack(side="right", padx=(4, 0))
 
     # =========================================================================
     # HANDLERS DE AÇÃO
@@ -666,7 +738,32 @@ class CanaisLiveMixin:
         threading.Thread(target=_do_add_vid, daemon=True).start()
 
     def _on_toggle_event(self, vid: str, selected: bool) -> None:
-        self.live_service.set_selected(vid, selected)
+        """Chamado ao marcar/desmarcar o checkbox de um evento na coluna esquerda."""
+        try:
+            self._user_toggling = True
+            self.live_service.set_selected(vid, selected)
+        finally:
+            self._user_toggling = False
+        self._refresh_kpis()
+        self._render_fila_cards()
+
+    def _on_remove_from_queue(self, vid: str) -> None:
+        """Remove o evento da fila de análise com 1 clique direto na coluna direita."""
+        if hasattr(self, "_incoming_cb_vars") and vid in self._incoming_cb_vars:
+            try:
+                self._incoming_cb_vars[vid].set(False)
+            except Exception:
+                pass
+
+        try:
+            self._user_toggling = True
+            self.live_service.set_selected(vid, False)
+        finally:
+            self._user_toggling = False
+
+        self._refresh_kpis()
+        self._render_fila_cards()
+        self._log(f"Evento {vid} removido da fila de análise.")
 
     def _open_narration_file(self, vid: str) -> None:
         ev = self.live_service.get_event(vid)
@@ -720,7 +817,7 @@ class CanaisLiveMixin:
         ctk.CTkLabel(
             modal,
             text=f"Live: {ev.get('title', '')[:70]}...\nCanal: {ev.get('channel_name', '')}",
-            font=ctk.CTkFont(size=10.5),
+            font=ctk.CTkFont(size=11),
             text_color="#aaaaaa",
             justify="left"
         ).pack(padx=15, pady=(0, 10), anchor="w")

@@ -1,5 +1,5 @@
 {
-  "version": "2.4.9",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.9/Monitor_Esportes.exe",
-  "changelog": "v2.4.9: Nova aba Canais Live (YouTube) para monitoramento de narrações de estúdio, transcrição de áudio (.txt), cronologia técnica com Gemini Web, download e e-mail sem envio ao SharePoint."
+  "version": "2.4.10",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.10/Monitor_Esportes.exe",
+  "changelog": "v2.4.10: Correção na fila de análise da aba Canais Live - renderização fluida e instantânea dos cards ao selecionar na coluna esquerda, botões explícitos para remover eventos da fila (no cabeçalho e na barra de ações) e desmarcação sincronizada."
 }
