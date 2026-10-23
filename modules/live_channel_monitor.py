@@ -43,6 +43,15 @@ PIPELINE_LABELS = {
     "failed": ("❌ Falhou", "#FF6B6B"),
 }
 
+DEFAULT_SEED_CHANNELS: List[Dict[str, str]] = [
+    {"id": "UCRC3upGcj_decdPi7JXT7Bg", "url": "https://www.youtube.com/@gaucha", "name": "Gaúcha"},
+    {"id": "UCVuih8U_4y1E8ecZZoZw_hw", "url": "https://www.youtube.com/@gauchaesportes", "name": "Gaúcha Esportes"},
+    {"id": "UCXWOg5HNDYANCSkNeDw9iYg", "url": "https://www.youtube.com/@atlantida_tv", "name": "ATL TV"},
+    {"id": "UC4QpkZzN08pFibmJAl213-w", "url": "https://www.youtube.com/@BaldassoTV", "name": "BALDASSO TV"},
+    {"id": "UCg6ONDqJLO_G2kJuxDPxTaA", "url": "https://www.youtube.com/@Bag%C3%A9TvOficial", "name": "Bagé TV"},
+    {"id": "UCrmnzU5nF4-DBtTx114r_hw", "url": "https://www.youtube.com/@EsporteBandRS", "name": "Esporte Band RS"},
+]
+
 
 def _data_dir() -> str:
     base = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "Monitor_Esportes", "live_channels")
@@ -168,6 +177,17 @@ class LiveNarrationService:
                         ev["pipeline"] = "transcribed"
         except Exception as ex:  # noqa: BLE001
             print(f"[CANAIS LIVE] Erro ao ler estado: {ex}")
+
+        # Auto-seed canais padrão
+        existing_urls = {c.get("url", "").lower() for c in self.state.get("channels", [])}
+        added_seeds = False
+        for seed in DEFAULT_SEED_CHANNELS:
+            if seed["url"].lower() not in existing_urls:
+                self.state.setdefault("channels", []).append(dict(seed))
+                existing_urls.add(seed["url"].lower())
+                added_seeds = True
+        if added_seeds:
+            self._save()
 
     def _save(self) -> None:
         with self.lock:
