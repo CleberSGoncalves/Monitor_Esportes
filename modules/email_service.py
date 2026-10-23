@@ -19,7 +19,7 @@ class EmailService:
         self.sender_email = sender_email
         self.sender_password = sender_password
 
-    def send_report(self, recipients: List[str], subject: str, body: str, pdf_path: Optional[str] = None) -> bool:
+    def send_report(self, recipients: List[str], subject: str, body: str, pdf_path: Optional[str] = None, extra_attachments: Optional[List[str]] = None) -> bool:
         if not recipients:
             return False
         
@@ -31,20 +31,23 @@ class EmailService:
 
             msg.attach(MIMEText(body, 'plain'))
 
+            attachments_to_add = []
             if pdf_path and os.path.exists(pdf_path):
-                filename = os.path.basename(pdf_path)
-                if not filename.lower().endswith(".pdf"):
-                    filename += ".pdf"
-                
-                with open(pdf_path, "rb") as attachment:
-                    # v10.6.1: Nome do anexo em múltiplos locais para compatibilidade total
-                    part = MIMEBase("application", "pdf")
+                attachments_to_add.append(pdf_path)
+            if extra_attachments:
+                for att in extra_attachments:
+                    if att and os.path.exists(att) and att not in attachments_to_add:
+                        attachments_to_add.append(att)
+
+            for file_path in attachments_to_add:
+                filename = os.path.basename(file_path)
+                with open(file_path, "rb") as attachment:
+                    subtype = "pdf" if filename.lower().endswith(".pdf") else "octet-stream"
+                    part = MIMEBase("application", subtype)
                     part.set_payload(attachment.read())
                     encoders.encode_base64(part)
-                    
-                    # Tenta forçar o nome em todos os padrões conhecidos
                     part.add_header("Content-Disposition", "attachment", filename=filename)
-                    part.set_param("name", filename) # Padrão antigo mas compatível
+                    part.set_param("name", filename)
                     msg.attach(part)
 
             server = smtplib.SMTP(self.smtp_server, self.smtp_port)

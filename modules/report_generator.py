@@ -978,7 +978,7 @@ class ReportGenerator:
             
         return "\n".join(lines)
 
-    def write_expert_report(self, results: List[Dict[str, Any]], prefs: Dict[str, bool] = None) -> str:
+    def write_expert_report(self, results: List[Dict[str, Any]], prefs: Dict[str, bool] = None, sync_sharepoint: bool = True, name_prefix: str = "expert") -> str:
         """
         Gera um relatório PDF consolidado para múltiplas análises Expert (cronologia)
         E também salva um JSON para histórico na GUI.
@@ -986,7 +986,7 @@ class ReportGenerator:
         if prefs is None:
             prefs = {"show_chrono": True, "show_milestones": True, "show_secondary": True, "show_sources": True}
         # Tentar gerar um nome descritivo baseado no primeiro resultado
-        base_name = "expert_batch"
+        base_name = f"{name_prefix}_batch"
         if results:
             res0 = results[0]
             channel = _safe_filename(str(res0.get("platform") or "monitor")).lower()
@@ -996,7 +996,7 @@ class ReportGenerator:
             date_raw = str(res0.get("date") or "").replace("/", "").replace("-", "")
             date_str = _safe_filename(date_raw) if date_raw else "date"
             
-            base_name = f"expert_{channel}_{comp}_{match}_{date_str}"
+            base_name = f"{name_prefix}_{channel}_{comp}_{match}_{date_str}"
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         report_name = f"{base_name}_{timestamp}.pdf"
@@ -1015,7 +1015,8 @@ class ReportGenerator:
         y = height - 50
         
         c.setFont("Helvetica-Bold", 16)
-        c.drawString(40, y, "Relatório Consolidado de Cronologia Técnica (Expert)")
+        rep_header_title = (results[0].get("report_title") if results else None) or "Relatório Consolidado de Cronologia Técnica (Expert)"
+        c.drawString(40, y, rep_header_title)
         y -= 20
         c.setFont("Helvetica", 10)
         c.drawString(40, y, f"Data de Emissão: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
@@ -1245,7 +1246,43 @@ class ReportGenerator:
                 except Exception:
                     pass
 
-            c.setFont("Helvetica-Bold", 11)
+            b_info = res.get("broadcast_info")
+            if b_info:
+                c.setFont("Helvetica-Bold", 11)
+                c.drawString(40, y, "EVENTO & CANAL DE TRANSMISSAO (NARRACAO AO VIVO):")
+                y -= 14
+                
+                c.setStrokeColorRGB(0.0, 0.7, 0.7)
+                c.setFillColorRGB(0.96, 0.98, 1.0)
+                box_h = 58
+                c.roundRect(40, y - box_h, width - 80, box_h + 4, 4, fill=1, stroke=1)
+                c.setFillColorRGB(0, 0, 0)
+                
+                c.setFont("Helvetica-Bold", 9)
+                c.drawString(50, y - 13, f"• Canal: {b_info.get('channel_name') or plat_display}")
+                c.drawString(290, y - 13, f"• Duracao da Live: {b_info.get('duration') or dur_str}")
+                
+                c.setFont("Helvetica", 8.5)
+                v_title = str(b_info.get('video_title') or '')[:75]
+                c.drawString(50, y - 27, f"• Live: {v_title}")
+                c.drawString(50, y - 41, f"• Inicio: {b_info.get('live_start') or inicio_live or '--:--'}  |  Fim: {b_info.get('live_end') or fim_live or '--:--'}")
+                c.drawString(290, y - 41, f"• Transcricao: {b_info.get('transcript_source') or 'YouTube'}")
+                c.drawString(50, y - 53, f"• Arquivo: {b_info.get('narration_file') or 'narracao.txt'}")
+                y -= (box_h + 16)
+                
+                b_sum = str(b_info.get("summary") or "").strip()
+                if b_sum:
+                    c.setFont("Helvetica-Oblique", 8.5)
+                    c.setFillColorRGB(0.25, 0.25, 0.25)
+                    c.drawString(45, y, f"Contexto: {b_sum[:110]}")
+                    y -= 12
+                    if len(b_sum) > 110:
+                        c.drawString(45, y, b_sum[110:220])
+                        y -= 12
+                    c.setFillColorRGB(0, 0, 0)
+                    y -= 6
+            else:
+                c.setFont("Helvetica-Bold", 11)
             c.drawString(40, y, "CRONOLOGIA DA LIVE DE TRANSMISSÃO:")
             y -= 14
             
@@ -1477,6 +1514,8 @@ class ReportGenerator:
             y -= 30
             
         c.save()
+        if not sync_sharepoint:
+            return pdf_path
         try:
             from modules.sharepoint_reporter import SharePointReporter
             res0 = results[0] if results else {}

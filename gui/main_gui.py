@@ -136,6 +136,7 @@ from modules.report_generator import ReportGenerator
 from modules.email_service import EmailService
 from modules.api_provider import start_api_thread
 from core.monitor_core import MonitorCoreMixin
+from gui.canais_live_mixin import CanaisLiveMixin
 from modules.auto_updater import AutoUpdater
 from modules.autonomous_auditor import AutonomousAuditor
 from core.models import (
@@ -487,7 +488,7 @@ def _load_cbf_streaming_events() -> list:
     return filtered_events
 
 
-class MonitorApp(MonitorCoreMixin, ctk.CTk):
+class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, ctk.CTk):
     def _load_ui_scale_preference(self) -> float:
         path = _get_config_read_path("ui_settings.json")
         default_scale = 1.15
@@ -619,6 +620,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         _reports_dir = os.path.join(PROJECT_ROOT, "reports")
         os.makedirs(_reports_dir, exist_ok=True)
         self.reporter = ReportGenerator(reports_dir=_reports_dir)
+        self._init_canais_live()
 
         # 3. Definições de Preview / Canvas
         self._preview_display_size: Tuple[int, int] = (920, 560)
@@ -1843,11 +1845,11 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         
         self.mode_switch = ctk.CTkSegmentedButton(
             mode_bar,
-            values=["Expert (API-Only)", "Visual (OBS)", "Ads & Merchan", "Config IA"],
+            values=["Expert (API-Only)", "Visual (OBS)", "Ads & Merchan", "Canais Live", "Config IA"],
             variable=self.monitoring_mode_var,
             command=self._on_mode_change,
             height=32,
-            width=560,
+            width=680,
             selected_color="#00CED1",
             selected_hover_color="#008B8B"
         )
@@ -2512,6 +2514,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         self.tab_monitor = self.tabs.add("Monitoramento")
         self.tab_reports = self.tabs.add("📊 Jogos Auditados")
         self.tab_auditoria = self.tabs.add("🛡️ Auditoria")
+        self.tab_canais = self.tabs.add("📡 Canais Live")
         self.tab_dash = self.tabs.add("Dashboard")
         self.tab_logs = self.tabs.add("Logs")
         self.tab_cfg = self.tabs.add("Config")
@@ -2536,6 +2539,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         self._build_tab_dashboard()
         self._build_tab_reports()
         self._build_tab_auditoria()
+        self._build_tab_canais_live()
 
         self._on_channel_preset(self.channel_var.get())
 
@@ -2647,6 +2651,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
         is_expert = (mode == "Expert (API-Only)")
         is_visual = (mode == "Visual (OBS)")
         is_ads    = (mode == "Ads & Merchan")
+        is_canais = (mode == "Canais Live")
         is_ia     = (mode == "Config IA")
 
         # 1. Barra de Pesquisa do YouTube / Canais (self.top)
@@ -2673,7 +2678,7 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                 b_dict = seg_btn._buttons_dict
                 
                 # Ordem Oficial Rígida Solicitada: Monitoramento, Jogos Auditados, Auditoria, Dashboard, Logs, Config
-                ordered_tab_names = ["Monitoramento", "📊 Jogos Auditados", "🛡️ Auditoria", "Dashboard", "Logs", "Config"]
+                ordered_tab_names = ["Monitoramento", "📊 Jogos Auditados", "🛡️ Auditoria", "📡 Canais Live", "Dashboard", "Logs", "Config"]
                 
                 if is_visual:
                     ordered_tab_names.extend(["Debug Visual", "Fragmentos", "Ads/Merchan"])
@@ -2696,7 +2701,11 @@ class MonitorApp(MonitorCoreMixin, ctk.CTk):
                         col_idx += 1
 
         # Seleciona a aba principal automaticamente ao trocar de modo
-        if is_ads and hasattr(self, "tabs"):
+        if is_canais and hasattr(self, "tabs"):
+            try:
+                self.tabs.set("📡 Canais Live")
+            except: pass
+        elif is_ads and hasattr(self, "tabs"):
             try:
                 self.tabs.set("Ads/Merchan")
             except: pass
@@ -9076,6 +9085,11 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
     # =========================================================
 
     def _on_close(self) -> None:
+        try:
+            if hasattr(self, "live_service") and self.live_service:
+                self.live_service.stop()
+        except Exception:
+            pass
         try:
             self._save_roi_enabled_profile()
             self._save_general_settings()

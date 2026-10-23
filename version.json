@@ -1,5 +1,5 @@
 {
-  "version": "2.4.8",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.8/Monitor_Esportes.exe",
-  "changelog": "v2.4.8: Correção do testador testar_gemini_web.bat e conectar_gemini_web.bat com start /wait e popup nativo de confirmação; botão Testar Conexão na interface de Auditoria; limpeza executiva de badges de citação."
+  "version": "2.4.9",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.9/Monitor_Esportes.exe",
+  "changelog": "v2.4.9: Nova aba Canais Live (YouTube) para monitoramento de narrações de estúdio, transcrição de áudio (.txt), cronologia técnica com Gemini Web, download e e-mail sem envio ao SharePoint."
 }
