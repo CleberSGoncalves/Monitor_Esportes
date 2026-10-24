@@ -792,7 +792,7 @@ class LiveNarrationService:
         if not ev:
             return False
         cfg = self.config_provider() or {}
-        recipients = recipients or cfg.get("emails") or []
+        recipients = recipients or self.get_setting("emails") or cfg.get("emails") or []
         if not recipients:
             self.log("⚠️ Nenhum destinatário de e-mail configurado.")
             return False

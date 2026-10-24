@@ -74,12 +74,50 @@ class CanaisLiveMixin:
                 cfg["model_id"] = data.get("model") or "gemini-2.5-flash"
                 cfg["sender"] = data.get("email") or ""
                 cfg["password"] = data.get("senha") or ""
-            cfg["emails"] = _load_saved_emails()
+            cfg["emails"] = self._get_configured_emails()
             cfg["smtp_server"] = EMAIL_SMTP_SERVER
             cfg["smtp_port"] = EMAIL_SMTP_PORT
         except Exception as ex:
             self._log(f"⚠️ [CANAIS LIVE] Erro ao ler configurações: {ex}")
         return cfg
+
+    def _get_configured_emails(self) -> List[str]:
+        """Retorna a lista atual de e-mails configurados para recebimento."""
+        from gui.main_gui import _load_saved_emails
+        emails = self.live_service.get_setting("emails")
+        if emails and isinstance(emails, list):
+            res = [str(e).strip() for e in emails if str(e).strip()]
+            if res:
+                return res
+        return _load_saved_emails() or []
+
+    def _save_configured_emails(self, emails: List[str]) -> None:
+        """Salva a lista de e-mails no serviço e sincroniza com saved_emails.json."""
+        from gui.main_gui import _save_config_file
+        cleaned = []
+        for e in emails:
+            s = str(e).strip()
+            if s and s not in cleaned:
+                cleaned.append(s)
+        self.live_service.set_setting("emails", cleaned)
+        try:
+            _save_config_file("saved_emails.json", cleaned)
+        except Exception:
+            pass
+        self._update_emails_button_text()
+        self._log(f"👥 Destinatários de e-mail atualizados ({len(cleaned)}): {', '.join(cleaned)}")
+
+    def _update_emails_button_text(self) -> None:
+        """Atualiza o texto dos botões de destinatários com a contagem atual."""
+        try:
+            emails = self._get_configured_emails()
+            n = len(emails)
+            if hasattr(self, "btn_manage_emails"):
+                self.btn_manage_emails.configure(text=f"👥 Destinatários ({n})")
+            if hasattr(self, "btn_queue_emails"):
+                self.btn_queue_emails.configure(text=f"👥 Destinatários ({n})")
+        except Exception:
+            pass
 
     # =========================================================================
     # CONSTRUÇÃO DA ABA
@@ -153,6 +191,20 @@ class CanaisLiveMixin:
             command=self._on_auto_report_toggle
         )
         self.switch_auto_report.pack(side="left", padx=10, pady=8)
+
+        # Botão: Gerenciar Destinatários de E-mail
+        self.btn_manage_emails = ctk.CTkButton(
+            kpi_bar,
+            text="👥 Destinatários (0)",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#1f538d",
+            hover_color="#14375e",
+            height=32,
+            width=150,
+            command=self._open_email_recipients_modal
+        )
+        self.btn_manage_emails.pack(side="left", padx=8, pady=8)
+        self._update_emails_button_text()
 
         self.lbl_live_status_hint = ctk.CTkLabel(
             kpi_bar,
@@ -263,9 +315,22 @@ class CanaisLiveMixin:
             anchor="w"
         ).pack(side="left")
 
+        # Botão rápido de gerenciar destinatários no topo da fila
+        self.btn_queue_emails = ctk.CTkButton(
+            sec_queue_hdr,
+            text="👥 Destinatários",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#1f538d",
+            hover_color="#14375e",
+            height=26,
+            width=135,
+            command=self._open_email_recipients_modal
+        )
+        self.btn_queue_emails.pack(side="right")
+
         self.lbl_queue_sub = ctk.CTkLabel(
             col_right,
-            text="Fluxo: Upcoming ➔ Ao Vivo ➔ Término ➔ Transcrição Áudio (.txt) ➔ Cronologia Técnica (PDF)",
+            text="Fluxo: Upcoming ➔ Ao Vivo ➔ Término ➔ Transcrição Áudio (.txt) ➔ Cronologia Técnica (PDF) ➔ Envio por E-mail",
             font=ctk.CTkFont(size=10),
             text_color="#777777",
             anchor="w"
@@ -307,6 +372,7 @@ class CanaisLiveMixin:
             self.lbl_kpi_fila_count.configure(text=str(len(selected_events)))
         if hasattr(self, "lbl_kpi_prontos_count"):
             self.lbl_kpi_prontos_count.configure(text=str(len(done_events)))
+        self._update_emails_button_text()
 
     def _render_canais_list(self) -> None:
         """Renderiza a lista de canais cadastrados."""
@@ -893,13 +959,173 @@ class CanaisLiveMixin:
         self._open_pdf_or_folder(ev["pdf_path"])
 
     def _on_send_email_clicked(self, vid: str) -> None:
+        recipients = self._get_configured_emails()
+        if not recipients:
+            if messagebox.askyesno("Destinatários Não Cadastrados", "Nenhum destinatário de e-mail foi cadastrado ainda nesta aba.\nDeseja cadastrar agora?"):
+                self._open_email_recipients_modal()
+            return
+
         def _send():
-            ok = self.live_service.send_email(vid)
+            ok = self.live_service.send_email(vid, recipients=recipients)
             if ok:
-                self.after(0, lambda: messagebox.showinfo("E-mail Enviado", "Relatório PDF e Narração (.txt) enviados com sucesso por e-mail!"))
+                self.after(0, lambda: messagebox.showinfo("E-mail Enviado", f"Relatório PDF e Narração (.txt) enviados com sucesso para:\n{', '.join(recipients)}"))
             else:
-                self.after(0, lambda: messagebox.showwarning("Falha no Envio", "Não foi possível enviar o e-mail. Verifique os destinatários e credenciais SMTP na aba Config."))
+                self.after(0, lambda: messagebox.showwarning("Falha no Envio", "Não foi possível enviar o e-mail. Verifique suas credenciais SMTP na aba Config."))
         threading.Thread(target=_send, daemon=True).start()
+
+    # =========================================================================
+    # MODAL DE CADASTRO E GERENCIAMENTO DE DESTINATÁRIOS DE E-MAIL
+    # =========================================================================
+    def _open_email_recipients_modal(self) -> None:
+        """Abre modal elegante para cadastrar, visualizar e remover destinatários de e-mail."""
+        modal = ctk.CTkToplevel(self)
+        modal.title("👥 Destinatários dos E-mails Automáticos")
+        modal.geometry("540x510")
+        modal.transient(self)
+        modal.grab_set()
+
+        # Cabeçalho
+        ctk.CTkLabel(
+            modal,
+            text="👥 Destinatários de E-mails Automáticos",
+            font=ctk.CTkFont(size=14, weight="bold"),
+            text_color="#00CED1"
+        ).pack(padx=16, pady=(16, 4), anchor="w")
+
+        ctk.CTkLabel(
+            modal,
+            text="Cadastre quem receberá automaticamente o Relatório Técnico (PDF) e a narração completa (.txt) assim que uma partida narrada ao vivo for encerrada e analisada.",
+            font=ctk.CTkFont(size=11),
+            text_color="#aaaaaa",
+            justify="left",
+            wraplength=500
+        ).pack(padx=16, pady=(0, 12), anchor="w")
+
+        # Linha de Cadastro (Entry + Botão)
+        add_frame = ctk.CTkFrame(modal, fg_color="#181818", corner_radius=8, border_width=1, border_color="#2b2b2b")
+        add_frame.pack(fill="x", padx=16, pady=(0, 8))
+
+        e_input = ctk.CTkEntry(
+            add_frame,
+            placeholder_text="Digite o e-mail (ex: cleber.goncalves@ibope.com)...",
+            font=ctk.CTkFont(size=11),
+            height=32
+        )
+        e_input.pack(side="left", fill="x", expand=True, padx=(8, 6), pady=8)
+
+        lbl_status = ctk.CTkLabel(modal, text="", font=ctk.CTkFont(size=10), text_color="#00FF7F")
+        lbl_status.pack(padx=16, pady=(0, 4), anchor="w")
+
+        # Frame de Lista de E-mails
+        list_container = ctk.CTkFrame(modal, fg_color="#141414", corner_radius=8, border_width=1, border_color="#262626")
+        list_container.pack(fill="both", expand=True, padx=16, pady=(0, 10))
+
+        list_hdr = ctk.CTkFrame(list_container, fg_color="transparent")
+        list_hdr.pack(fill="x", padx=10, pady=(8, 4))
+        ctk.CTkLabel(list_hdr, text="E-MAILS CADASTRADOS", font=ctk.CTkFont(size=10, weight="bold"), text_color="#888888").pack(side="left")
+        lbl_count = ctk.CTkLabel(list_hdr, text="0 cadastrado(s)", font=ctk.CTkFont(size=10), text_color="#00CED1")
+        lbl_count.pack(side="right")
+
+        scroll_emails = ctk.CTkScrollableFrame(list_container, fg_color="#0a0a0a", corner_radius=6)
+        scroll_emails.pack(fill="both", expand=True, padx=8, pady=(0, 8))
+
+        def _refresh_list():
+            for w in scroll_emails.winfo_children():
+                w.destroy()
+            cur_emails = self._get_configured_emails()
+            lbl_count.configure(text=f"{len(cur_emails)} cadastrado(s)")
+            self._update_emails_button_text()
+            if not cur_emails:
+                ctk.CTkLabel(
+                    scroll_emails,
+                    text="Nenhum destinatário cadastrado ainda.\nDigite um e-mail acima e clique em '➕ Adicionar E-mail'.",
+                    font=ctk.CTkFont(size=11),
+                    text_color="#666666"
+                ).pack(pady=30)
+                return
+
+            for em in cur_emails:
+                row = ctk.CTkFrame(scroll_emails, fg_color="#181818", corner_radius=6, height=36)
+                row.pack(fill="x", pady=2, padx=2)
+                row.pack_propagate(False)
+
+                ctk.CTkLabel(row, text="✉️", font=ctk.CTkFont(size=12)).pack(side="left", padx=(8, 4))
+                ctk.CTkLabel(
+                    row,
+                    text=em,
+                    font=ctk.CTkFont(size=11, weight="bold"),
+                    text_color="#ffffff"
+                ).pack(side="left", padx=4)
+
+                def make_del(target_email=em):
+                    def _do_del():
+                        curr = self._get_configured_emails()
+                        if target_email in curr:
+                            curr.remove(target_email)
+                            self._save_configured_emails(curr)
+                            lbl_status.configure(text=f"✓ E-mail '{target_email}' removido com sucesso.", text_color="#FF8888")
+                            _refresh_list()
+                    return _do_del
+
+                ctk.CTkButton(
+                    row,
+                    text="🗑️ Remover",
+                    width=75,
+                    height=24,
+                    fg_color="#3a1414",
+                    hover_color="#5f1d1d",
+                    text_color="#ff8888",
+                    font=ctk.CTkFont(size=10, weight="bold"),
+                    command=make_del()
+                ).pack(side="right", padx=6)
+
+        def _add_email():
+            raw = e_input.get().strip()
+            if not raw:
+                lbl_status.configure(text="⚠️ Digite um endereço de e-mail.", text_color="#FFB74D")
+                return
+            if "@" not in raw or "." not in raw.split("@")[-1] or len(raw) < 6:
+                lbl_status.configure(text="⚠️ Formato de e-mail inválido. Ex: nome@empresa.com", text_color="#FF6B6B")
+                return
+            curr = self._get_configured_emails()
+            if any(e.lower() == raw.lower() for e in curr):
+                lbl_status.configure(text="ℹ️ Este e-mail já está cadastrado.", text_color="#FFD700")
+                return
+            curr.append(raw)
+            self._save_configured_emails(curr)
+            e_input.delete(0, "end")
+            lbl_status.configure(text=f"✓ E-mail '{raw}' adicionado com sucesso!", text_color="#00FF7F")
+            _refresh_list()
+
+        btn_add = ctk.CTkButton(
+            add_frame,
+            text="➕ Adicionar E-mail",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#1f77b4",
+            hover_color="#155584",
+            width=135,
+            height=32,
+            command=_add_email
+        )
+        btn_add.pack(side="right", padx=(0, 8), pady=8)
+        e_input.bind("<Return>", lambda e: _add_email())
+
+        # Barra inferior
+        b_bar = ctk.CTkFrame(modal, fg_color="transparent")
+        b_bar.pack(fill="x", padx=16, pady=(0, 14))
+
+        ctk.CTkButton(
+            b_bar,
+            text="✓ Concluir / Fechar",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#008080",
+            hover_color="#005a5a",
+            width=130,
+            height=32,
+            command=modal.destroy
+        ).pack(side="right")
+
+        _refresh_list()
 
     # =========================================================================
     # MODAL DE GERAÇÃO DE CRONOLOGIA (COM CONFERÊNCIA DE TIMES/DATA)

@@ -1,5 +1,5 @@
 {
-  "version": "2.4.12",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.12/Monitor_Esportes.exe",
-  "changelog": "v2.4.12: Nova chave 'Auto-Detect Jogo' na aba Canais Live (enfileira e avalia automaticamente todas as lives dos canais cadastrados sem precisar marcar manualmente), com filtro inteligente anti-24h e otimização de consumo de tokens."
+  "version": "2.4.13",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.13/Monitor_Esportes.exe",
+  "changelog": "v2.4.13: Gerenciamento direto de Destinatários de E-mail na aba Canais Live (botão com contador de cadastrados, modal para adicionar e remover e-mails com validação, e sincronização automática com os envios de relatórios)."
 }
