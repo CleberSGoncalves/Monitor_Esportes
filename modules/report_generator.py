@@ -1394,8 +1394,96 @@ class ReportGenerator:
                     y -= 16
                 
                 y -= 15
+
+            # --- Menções de Marcas, Anúncios e Merchandising na Narração ---
+            brand_mentions = res.get("brand_mentions") or []
+            brands_summary = str(res.get("brands_summary") or "").strip()
+            if brand_mentions or brands_summary or res.get("report_kind") == "narration":
+                if y < 160:
+                    c.showPage()
+                    y = height - 50
+
+                c.setFont("Helvetica-Bold", 11)
+                c.setFillColorRGB(0.55, 0.25, 0.0)
+                c.drawString(40, y, "MENÇÕES DE MARCAS, ANÚNCIOS E MERCHANDISING NA NARRAÇÃO:")
+                y -= 16
+                c.setFillColorRGB(0, 0, 0)
+
+                if brands_summary:
+                    c.setFont("Helvetica-Bold", 9)
+                    words = f"Resumo Comercial: {brands_summary}".split()
+                    line = ""
+                    for word in words:
+                        if len(line + " " + word) < 100:
+                            line += " " + word
+                        else:
+                            if y < 60:
+                                c.showPage()
+                                y = height - 50
+                                c.setFont("Helvetica-Bold", 9)
+                            c.drawString(50, y, line.strip())
+                            y -= 12
+                            line = word
+                    if line:
+                        if y < 60:
+                            c.showPage()
+                            y = height - 50
+                            c.setFont("Helvetica-Bold", 9)
+                        c.drawString(50, y, line.strip())
+                        y -= 14
+
+                if brand_mentions:
+                    for bm in brand_mentions:
+                        if not isinstance(bm, dict):
+                            continue
+                        if y < 80:
+                            c.showPage()
+                            y = height - 50
+
+                        b_name = str(bm.get("brand") or "Marca").strip()
+                        b_vtime = str(bm.get("video_time") or "--:--").strip()
+                        b_rtime = str(bm.get("real_time") or "--:--").strip()
+                        b_type = str(bm.get("type") or "Menção Comercial").strip()
+                        b_quote = str(bm.get("quote") or bm.get("description") or "").strip()
+
+                        c.setFont("Helvetica-Bold", 9.5)
+                        c.drawString(50, y, f"[{b_vtime} | Relógio: {b_rtime}] {b_name.upper()} — {b_type}")
+                        y -= 12
+                        if b_quote:
+                            c.setFont("Helvetica", 8.5)
+                            c.setFillColorRGB(0.25, 0.25, 0.25)
+                            words = b_quote.split()
+                            line = ""
+                            for word in words:
+                                if len(line + " " + word) < 105:
+                                    line += " " + word
+                                else:
+                                    if y < 60:
+                                        c.showPage()
+                                        y = height - 50
+                                        c.setFont("Helvetica", 8.5)
+                                    c.drawString(65, y, line.strip())
+                                    y -= 10
+                                    line = word
+                            if line:
+                                if y < 60:
+                                    c.showPage()
+                                    y = height - 50
+                                    c.setFont("Helvetica", 8.5)
+                                c.drawString(65, y, line.strip())
+                                y -= 12
+                            c.setFillColorRGB(0, 0, 0)
+                        y -= 6
+                elif not brands_summary:
+                    c.setFont("Helvetica-Oblique", 9)
+                    c.setFillColorRGB(0.35, 0.35, 0.35)
+                    c.drawString(50, y, "Nenhuma menção explícita a marcas, patrocinadores ou anúncios comerciais detectada na narração.")
+                    c.setFillColorRGB(0, 0, 0)
+                    y -= 14
+
+                y -= 10
             
-            y -= 30
+            y -= 20
             
             # --- Verificação Oficial de Transmissão (Tempo Real / Grounding Direto) ---
             gv = res.get("grounding_verdict", {})
@@ -1421,7 +1509,6 @@ class ReportGenerator:
                         continue
 
                     # Ignora chips/badges residuais de citação do Google (ex: '+ 1', '+ 2', nomes de fontes isolados)
-                    import re
                     if re.match(r'^\+\s*\d+$', p_line):
                         continue
                     if p_line.lower() in {"lance!", "lance", "gzh", "uol", "uol esporte", "ge", "globo esporte", "cbf", "espn", "band", "terra", "agência brasil - ebc", "agencia brasil - ebc"}:

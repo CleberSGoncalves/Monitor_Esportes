@@ -1,5 +1,5 @@
 {
-  "version": "2.4.10",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.10/Monitor_Esportes.exe",
-  "changelog": "v2.4.10: Correção na fila de análise da aba Canais Live - renderização fluida e instantânea dos cards ao selecionar na coluna esquerda, botões explícitos para remover eventos da fila (no cabeçalho e na barra de ações) e desmarcação sincronizada."
+  "version": "2.4.11",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.11/Monitor_Esportes.exe",
+  "changelog": "v2.4.11: Análise automática da transcrição (identificação de partida narrada vs programa/debate), detecção de marcas/anúncios durante a narração no relatório PDF, geração direta sem modal, tela cheia na aba Canais Live (ocultando painel lateral esquerdo) e chave Auto-Relatório + E-mail."
 }

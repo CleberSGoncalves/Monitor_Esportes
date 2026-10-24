@@ -26,6 +26,7 @@ class CanaisLiveMixin:
     def _init_canais_live(self) -> None:
         """Inicializa variáveis e o serviço de monitoramento em segundo plano."""
         self._canais_search_var = ctk.StringVar(value="")
+        self._auto_report_live_var = ctk.BooleanVar(value=True)
         self._auto_email_live_var = ctk.BooleanVar(value=True)
         self._incoming_cb_vars: Dict[str, ctk.BooleanVar] = {}
         self._user_toggling: bool = False
@@ -38,6 +39,8 @@ class CanaisLiveMixin:
             log=self._log,
             on_change=lambda: self.after(0, self._on_service_state_changed)
         )
+        auto_rep = self.live_service.get_setting("auto_report", True)
+        self._auto_report_live_var.set(auto_rep)
         self._auto_email_live_var.set(self.live_service.get_setting("auto_email", True))
         self.live_service.start()
 
@@ -126,22 +129,22 @@ class CanaisLiveMixin:
         )
         self.btn_scan_all_canais.pack(side="left", padx=12, pady=8)
 
-        # Switch: Auto Envio de E-mail
-        self.switch_auto_email = ctk.CTkSwitch(
+        # Switch Principal: Auto-Relatório + E-mail (Faz tudo ao encerrar)
+        self.switch_auto_report = ctk.CTkSwitch(
             kpi_bar,
-            text="✉️ Auto E-mail ao Concluir (PDF + .txt)",
+            text="⚡ Auto-Relatório + E-mail (Faz tudo ao encerrar)",
             font=ctk.CTkFont(size=11, weight="bold"),
-            variable=self._auto_email_live_var,
-            progress_color="#00CED1",
-            command=self._on_auto_email_toggle
+            variable=self._auto_report_live_var,
+            progress_color="#00FF7F",
+            command=self._on_auto_report_toggle
         )
-        self.switch_auto_email.pack(side="left", padx=12, pady=8)
+        self.switch_auto_report.pack(side="left", padx=12, pady=8)
 
         self.lbl_live_status_hint = ctk.CTkLabel(
             kpi_bar,
-            text="Varredura automática ativa (a cada 10 min) • Sem SharePoint",
+            text="Transcrição ➔ Análise IA (Jogo + Marcas) ➔ Relatório Oficial + E-mail • Sem SharePoint",
             font=ctk.CTkFont(size=10),
-            text_color="#777777"
+            text_color="#888888"
         )
         self.lbl_live_status_hint.pack(side="right", padx=15, pady=8)
 
@@ -515,8 +518,57 @@ class CanaisLiveMixin:
             text_color="#ffffff",
             anchor="w",
             justify="left",
-            wraplength=440
+            wraplength=560
         ).pack(fill="x", padx=10, pady=(2, 4))
+
+        # Diagnóstico da Análise da Transcrição (Partida + Marcas/Anúncios)
+        t_analysis = ev.get("transcript_analysis") or {}
+        is_match = ev.get("is_match_narration")
+        meta = ev.get("meta") or {}
+        if is_match is True and (meta.get("team1") or meta.get("team2")):
+            score_str = f" ({t_analysis.get('detected_score')})" if t_analysis.get("detected_score") else ""
+            match_txt = f"⚽ Partida Identificada: {meta.get('team1', '')} x {meta.get('team2', '')}{score_str} • {meta.get('competition', '')}"
+            ctk.CTkLabel(
+                card,
+                text=match_txt,
+                font=ctk.CTkFont(size=11, weight="bold"),
+                text_color="#00FF7F",
+                anchor="w",
+                justify="left",
+                wraplength=560
+            ).pack(fill="x", padx=10, pady=(0, 2))
+        elif is_match is False:
+            cat_txt = t_analysis.get("event_category") or "Programa / Debate"
+            reason_txt = t_analysis.get("classification_summary") or "Não foi identificada narração de partida em tempo real."
+            ctk.CTkLabel(
+                card,
+                text=f"ℹ️ {cat_txt}: {reason_txt}",
+                font=ctk.CTkFont(size=10),
+                text_color="#90A4AE",
+                anchor="w",
+                justify="left",
+                wraplength=560
+            ).pack(fill="x", padx=10, pady=(0, 2))
+
+        brand_mentions = ev.get("brand_mentions") or t_analysis.get("brand_mentions") or []
+        brands_summary = str(ev.get("brands_summary") or t_analysis.get("brands_summary") or "").strip()
+        if brand_mentions or brands_summary:
+            b_names = []
+            for bm in brand_mentions:
+                if isinstance(bm, dict) and bm.get("brand"):
+                    bn = str(bm["brand"]).strip()
+                    if bn and bn not in b_names:
+                        b_names.append(bn)
+            b_display = f"📢 Marcas/Anúncios na Narração ({len(brand_mentions)}): {', '.join(b_names[:8])}" if b_names else f"📢 Marcas/Anúncios: {brands_summary[:110]}"
+            ctk.CTkLabel(
+                card,
+                text=b_display,
+                font=ctk.CTkFont(size=10, weight="bold"),
+                text_color="#FFB74D",
+                anchor="w",
+                justify="left",
+                wraplength=560
+            ).pack(fill="x", padx=10, pady=(0, 3))
 
         # Mensagem de Progresso / Erro
         prog = str(ev.get("progress") or "").strip()
@@ -529,15 +581,17 @@ class CanaisLiveMixin:
                 text_color="#FF6B6B",
                 anchor="w",
                 justify="left",
-                wraplength=440
+                wraplength=560
             ).pack(fill="x", padx=10, pady=(0, 4))
-        elif prog:
+        elif prog and is_match is not False:
             ctk.CTkLabel(
                 card,
                 text=f"ℹ️ {prog}",
                 font=ctk.CTkFont(size=10, slant="italic"),
                 text_color="#00CED1",
-                anchor="w"
+                anchor="w",
+                justify="left",
+                wraplength=560
             ).pack(fill="x", padx=10, pady=(0, 4))
 
         # Metadados de Linha (Início, Duração, Narração)
@@ -577,19 +631,30 @@ class CanaisLiveMixin:
         has_narr = bool(ev.get("narration_path") and os.path.exists(ev.get("narration_path")))
         has_pdf = bool(ev.get("pdf_path") and os.path.exists(ev.get("pdf_path")))
 
-        # 1. Botão Gerar Cronologia
+        # Habilita o botão de Relatório Cronológico SOMENTE quando a análise da transcrição confirmou Partida Narrada!
+        can_generate_chrono = bool(has_narr and is_match is True and pipe not in ("generating", "analyzing", "transcribing"))
+        if pipe == "not_match" or is_match is False:
+            chrono_text = "🚫 Não é Partida Narrada"
+        elif pipe in ("analyzing", "transcribed") and has_narr:
+            chrono_text = "🔍 Analisando Transcrição..."
+        elif pipe == "generating":
+            chrono_text = "⏳ Gerando Relatório..."
+        else:
+            chrono_text = "🧠 Gerar Relatório Cronológico"
+
+        # 1. Botão Gerar Relatório Cronológico (Direto, sem abrir quadro manual!)
         def make_chrono(v_id=vid):
-            return lambda: self._open_generate_chronology_modal(v_id)
+            return lambda: self._on_generate_chronology_direct(v_id)
 
         chrono_btn = ctk.CTkButton(
             btn_row,
-            text="🧠 Gerar Cronologia",
+            text=chrono_text,
             font=ctk.CTkFont(size=11, weight="bold"),
-            fg_color="#008080" if has_narr else "#222222",
-            hover_color="#005a5a" if has_narr else "#222222",
-            state="normal" if has_narr else "disabled",
+            fg_color="#008080" if can_generate_chrono else "#222222",
+            hover_color="#005a5a" if can_generate_chrono else "#222222",
+            state="normal" if can_generate_chrono else "disabled",
             height=28,
-            width=135,
+            width=190,
             command=make_chrono()
         )
         chrono_btn.pack(side="left", padx=(0, 4))
@@ -606,7 +671,7 @@ class CanaisLiveMixin:
             hover_color="#1d3e5a" if has_narr else "#222222",
             state="normal" if has_narr else "disabled",
             height=28,
-            width=115,
+            width=120,
             command=make_open_narr()
         )
         narr_btn.pack(side="left", padx=4)
@@ -623,7 +688,7 @@ class CanaisLiveMixin:
             hover_color="#1b5e20" if has_pdf else "#222222",
             state="normal" if has_pdf else "disabled",
             height=28,
-            width=115,
+            width=120,
             command=make_open_pdf()
         )
         pdf_btn.pack(side="left", padx=4)
@@ -640,7 +705,7 @@ class CanaisLiveMixin:
             hover_color="#546e7a" if (has_pdf or has_narr) else "#222222",
             state="normal" if (has_pdf or has_narr) else "disabled",
             height=28,
-            width=75,
+            width=80,
             command=make_send_mail()
         )
         mail_btn.pack(side="left", padx=4)
@@ -670,7 +735,7 @@ class CanaisLiveMixin:
             hover_color="#4a1919",
             text_color="#ff8888",
             height=28,
-            width=80,
+            width=85,
             command=make_remove_sel()
         ).pack(side="right", padx=(4, 0))
 
@@ -688,10 +753,31 @@ class CanaisLiveMixin:
         finally:
             self.after(0, lambda: self.btn_scan_all_canais.configure(state="normal", text="🔄 Atualizar Canais Agora"))
 
+    def _on_auto_report_toggle(self) -> None:
+        val = bool(self._auto_report_live_var.get())
+        self.live_service.set_setting("auto_report", val)
+        self.live_service.set_setting("auto_email", val)
+        self._auto_email_live_var.set(val)
+        self._log(f"⚡ Auto-Relatório + E-mail automático: {'ATIVADO' if val else 'DESATIVADO'}")
+        if val:
+            # Se houver partidas narradas prontas na fila ainda sem PDF, dispara automaticamente
+            for ev in self.live_service.list_events():
+                if ev.get("selected") and ev.get("pipeline") == "ready_match" and not ev.get("pdf_path"):
+                    self.live_service.run_generation_async(ev["video_id"], meta=None, auto=True)
+
     def _on_auto_email_toggle(self) -> None:
         val = bool(self._auto_email_live_var.get())
         self.live_service.set_setting("auto_email", val)
         self._log(f"Configuração de e-mail automático atualizada: {'ATIVADO' if val else 'DESATIVADO'}")
+
+    def _on_generate_chronology_direct(self, vid: str) -> None:
+        """Gera diretamente o relatório cronológico usando os dados extraídos na análise da transcrição (sem abrir modal)."""
+        ev = self.live_service.get_event(vid)
+        if not ev:
+            return
+        meta = self.live_service.default_meta(ev)
+        self._log(f"🧠 Gerando Relatório Cronológico direto para {meta.get('team1', '')} x {meta.get('team2', '')}...")
+        self.live_service.run_generation_async(vid, meta=meta, auto=False)
 
     def _on_add_channel_clicked(self) -> None:
         raw = self.entry_add_channel.get().strip()

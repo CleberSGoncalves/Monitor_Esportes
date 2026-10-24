@@ -2330,7 +2330,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, ctk.CTk):
         main = ctk.CTkFrame(self, corner_radius=14)
         main.pack(fill="both", expand=True, padx=12, pady=(0, 6))
 
-        left = ctk.CTkFrame(main, corner_radius=14)
+        self.left_sidebar = left = ctk.CTkFrame(main, corner_radius=14)
         left.pack(side="left", fill="y", padx=(12, 8), pady=12)
         left.configure(width=400)
         left.pack_propagate(False)
@@ -2505,10 +2505,10 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, ctk.CTk):
         self.btn_refresh_hist.pack(pady=(4, 8))
 
         # --- COLUNA CENTRAL: TABS ---
-        right = ctk.CTkFrame(main, corner_radius=14)
+        self.center_panel = right = ctk.CTkFrame(main, corner_radius=14)
         right.pack(side="left", fill="both", expand=True, padx=8, pady=12)
 
-        self.tabs = ctk.CTkTabview(right, corner_radius=14)
+        self.tabs = ctk.CTkTabview(right, corner_radius=14, command=self._on_main_tab_changed)
         self.tabs.pack(fill="both", expand=True, padx=12, pady=12)
 
         self.tab_monitor = self.tabs.add("Monitoramento")
@@ -2716,9 +2716,41 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, ctk.CTk):
         elif (is_expert or is_visual) and hasattr(self, "tabs"):
             try:
                 current = self.tabs.get()
-                if current in ["Ads/Merchan", "Dashboard"]:
+                if current in ["Ads/Merchan", "Dashboard", "📡 Canais Live"]:
                     self.tabs.set("Monitoramento")
             except: pass
+
+        self._on_main_tab_changed()
+
+    def _on_main_tab_changed(self) -> None:
+        """Oculta os painéis laterais e barras legadas quando a aba '📡 Canais Live' está ativa para ampliar a área útil."""
+        if not hasattr(self, "tabs"):
+            return
+        try:
+            active_tab = self.tabs.get()
+        except Exception:
+            return
+
+        if active_tab == "📡 Canais Live":
+            if hasattr(self, "left_sidebar") and self.left_sidebar and self.left_sidebar.winfo_ismapped():
+                self.left_sidebar.pack_forget()
+            if hasattr(self, "right_sidebar") and self.right_sidebar and self.right_sidebar.winfo_ismapped():
+                self.right_sidebar.pack_forget()
+            if hasattr(self, "top") and self.top and self.top.winfo_ismapped():
+                self.top.pack_forget()
+            if hasattr(self, "expert_manual_frame") and self.expert_manual_frame and self.expert_manual_frame.winfo_ismapped():
+                self.expert_manual_frame.pack_forget()
+        else:
+            if hasattr(self, "left_sidebar") and self.left_sidebar and not self.left_sidebar.winfo_ismapped():
+                if hasattr(self, "center_panel") and self.center_panel:
+                    self.left_sidebar.pack(side="left", fill="y", padx=(12, 8), pady=12, before=self.center_panel)
+                else:
+                    self.left_sidebar.pack(side="left", fill="y", padx=(12, 8), pady=12)
+            if hasattr(self, "right_sidebar") and self.right_sidebar and not self.right_sidebar.winfo_ismapped():
+                if hasattr(self, "center_panel") and self.center_panel:
+                    self.right_sidebar.pack(side="right", fill="y", padx=(8, 12), pady=12, before=self.center_panel)
+                else:
+                    self.right_sidebar.pack(side="right", fill="y", padx=(8, 12), pady=12)
 
     def _build_tab_debug(self) -> None:
         wrap = ctk.CTkFrame(self.tab_debug, corner_radius=14)

@@ -37,9 +37,12 @@ PIPELINE_LABELS = {
     "live": ("🔴 AO VIVO — acompanhando", "#FF4C4C"),
     "ended": ("⌛ Encerrada — aguardando transcrição", "#FFA500"),
     "transcribing": ("🎙️ Transcrevendo narração...", "#00BFFF"),
-    "transcribed": ("✅ Narração pronta", "#00FF7F"),
-    "generating": ("🧠 Gerando cronologia...", "#00BFFF"),
-    "done": ("📄 Relatório pronto", "#00FF7F"),
+    "analyzing": ("🔍 Analisando transcrição (IA)...", "#00CED1"),
+    "transcribed": ("🔍 Transcrição pronta (em análise)", "#00CED1"),
+    "ready_match": ("✅ Partida Narrada — Pronta p/ Relatório", "#00FF7F"),
+    "not_match": ("ℹ️ Programa/Debate (Não é jogo narrado)", "#90A4AE"),
+    "generating": ("🧠 Gerando relatório cronológico...", "#00BFFF"),
+    "done": ("📄 Relatório Cronológico Pronto", "#00FF7F"),
     "failed": ("❌ Falhou", "#FF6B6B"),
 }
 
@@ -173,8 +176,16 @@ class LiveNarrationService:
                     if ev.get("pipeline") == "transcribing":
                         ev["pipeline"] = "ended"
                         ev["next_attempt"] = 0
-                    elif ev.get("pipeline") == "generating":
+                    elif ev.get("pipeline") == "analyzing":
                         ev["pipeline"] = "transcribed"
+                    elif ev.get("pipeline") == "generating":
+                        ev["pipeline"] = "ready_match" if ev.get("is_match_narration") else "transcribed"
+                    # Limpa erro antigo de escopo 're' e reclassifica se necessário
+                    if "cannot access free variable 're'" in str(ev.get("error") or ""):
+                        ev["error"] = ""
+                        if ev.get("narration_path") and os.path.exists(ev["narration_path"]):
+                            ev["pipeline"] = "transcribed"
+                            ev["auto_generated"] = False
         except Exception as ex:  # noqa: BLE001
             print(f"[CANAIS LIVE] Erro ao ler estado: {ex}")
 
@@ -433,16 +444,104 @@ class LiveNarrationService:
                     self.update_event(vid, last_check=now)
             elif pipe == "ended" and now >= (ev.get("next_attempt") or 0) and vid not in self._busy:
                 self.run_transcription_async(vid)
-            elif pipe == "transcribed" and not ev.get("auto_generated") and vid not in self._busy:
+            elif pipe == "transcribed" and vid not in self._busy:
+                self.run_analysis_async(vid)
+            elif pipe == "ready_match" and self.get_setting("auto_report", True) and not ev.get("auto_generated") and vid not in self._busy:
                 self.update_event(vid, auto_generated=True)
                 self.run_generation_async(vid, meta=None, auto=True)
 
-    # ---------------------------------------------------------- transcrição
+    # ---------------------------------------------------------- transcrição & análise
     def run_transcription_async(self, vid: str, force_audio: bool = False) -> None:
         if vid in self._busy:
             return
         self._busy.add(vid)
         threading.Thread(target=self._transcribe_job, args=(vid, force_audio), daemon=True).start()
+
+    def run_analysis_async(self, vid: str) -> None:
+        if vid in self._busy:
+            return
+        self._busy.add(vid)
+        threading.Thread(target=self._analyze_job, args=(vid,), daemon=True).start()
+
+    def _analyze_job(self, vid: str) -> None:
+        try:
+            with self._job_lock:
+                self._analyze_transcript_locked(vid)
+        finally:
+            self._busy.discard(vid)
+
+    def _analyze_transcript_locked(self, vid: str) -> None:
+        from modules.narration_chronology import analyze_narration_transcript
+        ev = self.get_event(vid)
+        if not ev or not ev.get("narration_path") or not os.path.exists(ev["narration_path"]):
+            return
+
+        cfg = self.config_provider() or {}
+        self.update_event(vid, pipeline="analyzing", progress="Analisando transcrição (identificando partida, times e menções de marcas)...", error="")
+
+        def plog(m: str) -> None:
+            self.log(f"[{ev.get('title', vid)[:40]}] {m}")
+            self.update_event(vid, progress=m)
+
+        analysis = analyze_narration_transcript(
+            ev,
+            api_key=cfg.get("api_key"),
+            model_id=cfg.get("model_id") or "gemini-2.5-flash",
+            log=plog,
+        )
+        is_match = bool(analysis.get("is_match_narration"))
+        meta = dict(ev.get("meta") or {})
+        if analysis.get("team1"):
+            meta["team1"] = analysis["team1"]
+        if analysis.get("team2"):
+            meta["team2"] = analysis["team2"]
+        if analysis.get("competition"):
+            meta["competition"] = analysis["competition"]
+        if analysis.get("date"):
+            meta["date"] = analysis["date"]
+
+        brand_mentions = analysis.get("brand_mentions") or []
+        brands_summary = analysis.get("brands_summary") or ""
+        summary_txt = analysis.get("classification_summary") or ""
+
+        if is_match:
+            jogo_str = f"{meta.get('team1', '')} x {meta.get('team2', '')}".strip(" x")
+            prog_msg = f"⚽ Partida identificada: {jogo_str} ({meta.get('competition', '')})"
+            if brand_mentions:
+                prog_msg += f" • 📢 {len(brand_mentions)} menções de marcas"
+            self.update_event(
+                vid,
+                pipeline="ready_match",
+                is_match_narration=True,
+                transcript_analysis=analysis,
+                meta=meta,
+                brand_mentions=brand_mentions,
+                brands_summary=brands_summary,
+                progress=prog_msg,
+                error="",
+            )
+            self.log(f"✅ [{ev.get('title', vid)[:45]}] Classificado como PARTIDA NARRADA: {jogo_str}")
+            # Se a chave Auto-Relatório estiver ativa, já gera o relatório cronológico e envia e-mail!
+            if self.get_setting("auto_report", True) and not ev.get("auto_generated"):
+                self.update_event(vid, auto_generated=True)
+                self._generate_locked(vid, meta=meta, auto=True, progress_cb=None)
+        else:
+            cat = analysis.get("event_category") or "Programa / Debate"
+            prog_msg = f"ℹ️ {cat}: {summary_txt}" if summary_txt else f"ℹ️ {cat} (Não houve narração de partida em tempo real)."
+            if brand_mentions:
+                prog_msg += f" • 📢 {len(brand_mentions)} marcas citadas"
+            self.update_event(
+                vid,
+                pipeline="not_match",
+                is_match_narration=False,
+                transcript_analysis=analysis,
+                meta=meta,
+                brand_mentions=brand_mentions,
+                brands_summary=brands_summary,
+                progress=prog_msg,
+                error="",
+            )
+            self.log(f"ℹ️ [{ev.get('title', vid)[:45]}] Classificado como '{cat}' (Não é partida narrada).")
 
     def _transcribe_job(self, vid: str, force_audio: bool) -> None:
         from modules.narration_transcriber import transcribe_event
@@ -464,7 +563,7 @@ class LiveNarrationService:
                 waited = now - ended_at
                 vod_ready = (ev.get("live_status") == "was_live")
                 allow_audio = force_audio or (vod_ready and waited >= AUDIO_FALLBACK_AFTER_S) or waited >= AUDIO_FORCE_AFTER_S
-                self.update_event(vid, pipeline="transcribing", progress="Iniciando...")
+                self.update_event(vid, pipeline="transcribing", progress="Iniciando transcrição...")
 
                 def plog(m: str) -> None:
                     self.log(f"[{ev.get('title', vid)[:40]}] {m}")
@@ -477,8 +576,10 @@ class LiveNarrationService:
                 if res.get("ok"):
                     label = "Legendas do YouTube" if res["source"] == "youtube_captions" else "Áudio transcrito pelo Gemini"
                     self.update_event(vid, pipeline="transcribed", narration_path=res["path"], transcript_source=res["source"],
-                                      transcript_source_label=label, narration_lines=res["lines"], error="", progress="",
+                                      transcript_source_label=label, narration_lines=res["lines"], error="", progress="Transcrição concluída. Iniciando análise...",
                                       auto_generated=False)
+                    # Entra automaticamente no processo de análise da transcrição!
+                    self._analyze_transcript_locked(vid)
                     return
                 attempts = int(ev.get("audio_attempts") or 0) + (1 if allow_audio else 0)
                 if allow_audio and attempts >= MAX_AUDIO_ATTEMPTS:
@@ -499,12 +600,14 @@ class LiveNarrationService:
     def default_meta(self, ev: Dict[str, Any]) -> Dict[str, str]:
         from modules.narration_chronology import guess_match_from_title
         meta = dict(ev.get("meta") or {})
+        analysis = ev.get("transcript_analysis") or {}
         g = guess_match_from_title(ev.get("title", ""))
         for k in ("team1", "team2", "competition"):
-            meta.setdefault(k, g.get(k, ""))
+            if not meta.get(k):
+                meta[k] = analysis.get(k) or g.get(k, "")
         if not meta.get("date"):
             ref = ev.get("actual_start_epoch") or ev.get("scheduled_epoch")
-            meta["date"] = datetime.fromtimestamp(ref).strftime("%d/%m/%Y") if ref else ""
+            meta["date"] = analysis.get("date") or (datetime.fromtimestamp(ref).strftime("%d/%m/%Y") if ref else "")
         return meta
 
     def run_generation_async(self, vid: str, meta: Optional[Dict[str, str]] = None, auto: bool = False,
@@ -516,47 +619,50 @@ class LiveNarrationService:
         threading.Thread(target=self._generate_job, args=(vid, meta, auto, progress_cb, done_cb), daemon=True).start()
         return True
 
-    def _generate_job(self, vid, meta, auto, progress_cb, done_cb) -> None:
+    def _generate_locked(self, vid: str, meta: Optional[Dict[str, str]], auto: bool,
+                         progress_cb: Optional[Callable[[str], None]]) -> Dict[str, Any]:
         from modules.narration_chronology import generate_narration_chronology
+        ev = self.get_event(vid)
+        if not ev or not ev.get("narration_path"):
+            return {"error": "Narração ainda não disponível."}
+        prev_pipe = ev.get("pipeline") if ev.get("pipeline") in ("ready_match", "transcribed", "done") else "ready_match"
+        meta = meta or self.default_meta(ev)
+        self.update_event(vid, pipeline="generating", meta=meta, progress="Iniciando geração do relatório cronológico...", error="")
+        cfg = self.config_provider() or {}
+
+        def plog(m: str) -> None:
+            self.log(f"[{ev.get('title', vid)[:40]}] {m}")
+            self.update_event(vid, progress=m)
+            if progress_cb:
+                try:
+                    progress_cb(m)
+                except Exception:
+                    pass
+
+        result = generate_narration_chronology(ev, meta, api_key=cfg.get("api_key"),
+                                               model_id=cfg.get("model_id") or "gemini-2.5-flash", log=plog)
+        if result.get("error"):
+            self.update_event(vid, pipeline=prev_pipe, error=result["error"], progress="")
+            plog(f"❌ {result['error']}")
+            return result
+        plog("📄 Gerando PDF oficial do relatório cronológico...")
+        prefs = {"show_chrono": True, "show_milestones": True, "show_secondary": True, "show_sources": True}
+        pdf = self.reporter.write_expert_report([result], prefs=prefs, sync_sharepoint=False, name_prefix="narracao")
+        self.update_event(vid, pipeline="done", pdf_path=pdf, error="", progress=f"Relatório PDF gerado ({os.path.basename(pdf)})",
+                          generated_at=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+        plog(f"✅ Relatório pronto: {os.path.basename(pdf)}")
+        if auto or self.get_setting("auto_report", True) or self.get_setting("auto_email", True):
+            self.send_email(vid)
+        return {"ok": True, "pdf_path": pdf}
+
+    def _generate_job(self, vid, meta, auto, progress_cb, done_cb) -> None:
         out: Dict[str, Any] = {}
-        prev_pipe = "transcribed"
         try:
             with self._job_lock:
-                ev = self.get_event(vid)
-                if not ev or not ev.get("narration_path"):
-                    out = {"error": "Narração ainda não disponível."}
-                    return
-                prev_pipe = ev.get("pipeline") if ev.get("pipeline") in ("transcribed", "done") else "transcribed"
-                meta = meta or self.default_meta(ev)
-                self.update_event(vid, pipeline="generating", meta=meta, progress="Iniciando...")
-                cfg = self.config_provider() or {}
-
-                def plog(m: str) -> None:
-                    self.log(f"[{ev.get('title', vid)[:40]}] {m}")
-                    self.update_event(vid, progress=m)
-                    if progress_cb:
-                        try:
-                            progress_cb(m)
-                        except Exception:
-                            pass
-
-                result = generate_narration_chronology(ev, meta, api_key=cfg.get("api_key"),
-                                                       model_id=cfg.get("model_id") or "gemini-2.5-flash", log=plog)
-                if result.get("error"):
-                    self.update_event(vid, pipeline=prev_pipe, error=result["error"], progress="")
-                    plog(f"❌ {result['error']}")
-                    out = result
-                    return
-                plog("📄 Gerando PDF do relatório...")
-                prefs = {"show_chrono": True, "show_milestones": True, "show_secondary": True, "show_sources": True}
-                pdf = self.reporter.write_expert_report([result], prefs=prefs, sync_sharepoint=False, name_prefix="narracao")
-                self.update_event(vid, pipeline="done", pdf_path=pdf, error="", progress="",
-                                  generated_at=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
-                plog(f"✅ Relatório pronto: {os.path.basename(pdf)}")
-                out = {"ok": True, "pdf_path": pdf}
-                if auto and self.get_setting("auto_email", True):
-                    self.send_email(vid)
+                out = self._generate_locked(vid, meta, auto, progress_cb)
         except Exception as ex:  # noqa: BLE001
+            ev = self.get_event(vid) or {}
+            prev_pipe = "ready_match" if ev.get("is_match_narration") else "transcribed"
             self.update_event(vid, pipeline=prev_pipe, error=str(ex), progress="")
             self.log(f"⚠️ Erro ao gerar cronologia: {traceback.format_exc()[-400:]}")
             out = {"error": str(ex)}
