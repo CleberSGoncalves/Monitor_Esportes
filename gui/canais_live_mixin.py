@@ -26,6 +26,7 @@ class CanaisLiveMixin:
     def _init_canais_live(self) -> None:
         """Inicializa variáveis e o serviço de monitoramento em segundo plano."""
         self._canais_search_var = ctk.StringVar(value="")
+        self._auto_detect_match_var = ctk.BooleanVar(value=True)
         self._auto_report_live_var = ctk.BooleanVar(value=True)
         self._auto_email_live_var = ctk.BooleanVar(value=True)
         self._incoming_cb_vars: Dict[str, ctk.BooleanVar] = {}
@@ -39,7 +40,9 @@ class CanaisLiveMixin:
             log=self._log,
             on_change=lambda: self.after(0, self._on_service_state_changed)
         )
+        auto_det = self.live_service.get_setting("auto_detect_match", True)
         auto_rep = self.live_service.get_setting("auto_report", True)
+        self._auto_detect_match_var.set(auto_det)
         self._auto_report_live_var.set(auto_rep)
         self._auto_email_live_var.set(self.live_service.get_setting("auto_email", True))
         self.live_service.start()
@@ -124,12 +127,23 @@ class CanaisLiveMixin:
             fg_color="#008080",
             hover_color="#005a5a",
             height=34,
-            width=180,
+            width=175,
             command=self._on_scan_all_clicked
         )
-        self.btn_scan_all_canais.pack(side="left", padx=12, pady=8)
+        self.btn_scan_all_canais.pack(side="left", padx=8, pady=8)
 
-        # Switch Principal: Auto-Relatório + E-mail (Faz tudo ao encerrar)
+        # Switch 1: Auto-Detect Jogo (Avalia automaticamente todas as lives dos canais)
+        self.switch_auto_detect_match = ctk.CTkSwitch(
+            kpi_bar,
+            text="🎯 Auto-Detect Jogo (Avalia todas as lives)",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            variable=self._auto_detect_match_var,
+            progress_color="#00CED1",
+            command=self._on_auto_detect_toggle
+        )
+        self.switch_auto_detect_match.pack(side="left", padx=10, pady=8)
+
+        # Switch 2: Auto-Relatório + E-mail (Faz tudo ao encerrar)
         self.switch_auto_report = ctk.CTkSwitch(
             kpi_bar,
             text="⚡ Auto-Relatório + E-mail (Faz tudo ao encerrar)",
@@ -138,15 +152,15 @@ class CanaisLiveMixin:
             progress_color="#00FF7F",
             command=self._on_auto_report_toggle
         )
-        self.switch_auto_report.pack(side="left", padx=12, pady=8)
+        self.switch_auto_report.pack(side="left", padx=10, pady=8)
 
         self.lbl_live_status_hint = ctk.CTkLabel(
             kpi_bar,
-            text="Transcrição ➔ Análise IA (Jogo + Marcas) ➔ Relatório Oficial + E-mail • Sem SharePoint",
+            text="Sem SharePoint",
             font=ctk.CTkFont(size=10),
             text_color="#888888"
         )
-        self.lbl_live_status_hint.pack(side="right", padx=15, pady=8)
+        self.lbl_live_status_hint.pack(side="right", padx=12, pady=8)
 
         # ---------------------------------------------------------------------
         # 2. CORPO PRINCIPAL (2 COLUNAS VIA GRID EQUILIBRADO)
@@ -752,6 +766,16 @@ class CanaisLiveMixin:
             self.live_service.scan_channels()
         finally:
             self.after(0, lambda: self.btn_scan_all_canais.configure(state="normal", text="🔄 Atualizar Canais Agora"))
+
+    def _on_auto_detect_toggle(self) -> None:
+        val = bool(self._auto_detect_match_var.get())
+        self.live_service.set_setting("auto_detect_match", val)
+        self._log(f"🎯 Auto-Detect Jogo (avaliação automática de todas as lives): {'ATIVADO' if val else 'DESATIVADO'}")
+        if val:
+            self.live_service.apply_auto_detect_all(silent=False)
+        else:
+            self.live_service.unapply_auto_detect_waiting()
+        self._refresh_canais_tab_ui()
 
     def _on_auto_report_toggle(self) -> None:
         val = bool(self._auto_report_live_var.get())

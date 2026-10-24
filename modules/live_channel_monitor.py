@@ -125,6 +125,20 @@ def _status_from_live(ls: str) -> str:
     return "video"
 
 
+def _is_24h_or_continuous_stream(title: str, info: Optional[Dict[str, Any]] = None) -> bool:
+    """Detecta lives permanentes 24h (ex: Rádio Gaúcha 24 Horas) para não poluir o Auto-Detect."""
+    t = (title or "").strip()
+    if re.search(r"\b24\s*h(?:oras)?\b", t, re.I) or re.search(r"ao\s+vivo\s+24", t, re.I):
+        return True
+    if info:
+        st = info.get("status") or _status_from_live(info.get("live_status") or "")
+        start_ep = info.get("actual_start_epoch") or info.get("release_timestamp") or 0
+        if st == "live" and start_ep and (time.time() - float(start_ep)) > 18 * 3600:
+            return True
+    return False
+
+
+
 class LiveNarrationService:
     def __init__(self, reporter, config_provider: Callable[[], Dict[str, Any]],
                  log: Optional[Callable[[str], None]] = None, on_change: Optional[Callable[[], None]] = None):
@@ -136,7 +150,11 @@ class LiveNarrationService:
         self.state_path = os.path.join(_data_dir(), "state.json")
         self.narr_dir = os.path.join(_data_dir(), "narracoes")
         os.makedirs(self.narr_dir, exist_ok=True)
-        self.state: Dict[str, Any] = {"channels": [], "events": {}, "settings": {"auto_email": True}}
+        self.state: Dict[str, Any] = {
+            "channels": [],
+            "events": {},
+            "settings": {"auto_email": True, "auto_report": True, "auto_detect_match": True},
+        }
         self._load()
         self._job_lock = threading.Lock()   # um job pesado por vez
         self._busy: set = set()
@@ -197,6 +215,10 @@ class LiveNarrationService:
                 self.state.setdefault("channels", []).append(dict(seed))
                 existing_urls.add(seed["url"].lower())
                 added_seeds = True
+        self.state.setdefault("settings", {}).setdefault("auto_detect_match", True)
+        self.state.setdefault("settings", {}).setdefault("auto_report", True)
+        if self.get_setting("auto_detect_match", True):
+            self.apply_auto_detect_all(silent=True)
         if added_seeds:
             self._save()
 
@@ -277,12 +299,18 @@ class LiveNarrationService:
             ev["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self._changed()
 
-    def set_selected(self, vid: str, selected: bool) -> None:
+    def set_selected(self, vid: str, selected: bool, by_user: bool = True) -> None:
         with self.lock:
             ev = self.state["events"].get(vid)
             if not ev:
                 return
             ev["selected"] = bool(selected)
+            if by_user:
+                ev["user_unselected"] = not bool(selected)
+                if selected:
+                    ev["auto_queued"] = False
+            else:
+                ev["auto_queued"] = bool(selected)
             if selected and ev.get("pipeline") in (None, "", "idle"):
                 st = ev.get("status")
                 ev["pipeline"] = "live" if st == "live" else ("ended" if st == "ended" else "waiting")
@@ -292,6 +320,47 @@ class LiveNarrationService:
                 ev["pipeline"] = "idle"
         self.log(("✅ Evento selecionado para análise: " if selected else "Evento removido da análise: ") + ev.get("title", vid))
         self._changed()
+
+    def apply_auto_detect_all(self, silent: bool = False) -> int:
+        """Enfileira automaticamente todos os eventos elegíveis dos canais cadastrados quando Auto-Detect está ativo."""
+        added = 0
+        with self.lock:
+            if not self.get_setting("auto_detect_match", True):
+                return 0
+            for vid, ev in self.state["events"].items():
+                if ev.get("selected") or ev.get("user_unselected"):
+                    continue
+                if _is_24h_or_continuous_stream(ev.get("title", ""), ev):
+                    continue
+                st = ev.get("status")
+                if st in ("upcoming", "live", "ended"):
+                    ev["selected"] = True
+                    ev["auto_queued"] = True
+                    if ev.get("pipeline") in (None, "", "idle"):
+                        ev["pipeline"] = "live" if st == "live" else ("ended" if st == "ended" else "waiting")
+                        ev["next_attempt"] = 0
+                        ev["last_check"] = 0
+                    added += 1
+        if added and not silent:
+            self.log(f"🎯 [Auto-Detect Jogo] {added} evento(s) incluído(s) automaticamente na fila de avaliação.")
+            self._changed()
+        elif added and silent:
+            self._save()
+        return added
+
+    def unapply_auto_detect_waiting(self) -> int:
+        """Remove da fila apenas os eventos que entraram automaticamente e ainda não iniciaram transcrição."""
+        removed = 0
+        with self.lock:
+            for vid, ev in self.state["events"].items():
+                if ev.get("selected") and ev.get("auto_queued") and ev.get("pipeline") in ("waiting", "live"):
+                    ev["selected"] = False
+                    ev["pipeline"] = "idle"
+                    removed += 1
+        if removed:
+            self.log(f"🎯 [Auto-Detect Jogo] {removed} evento(s) automático(s) aguardando foram desmarcados da fila.")
+            self._changed()
+        return removed
 
     def add_video_manually(self, url: str) -> Dict[str, Any]:
         """Permite incluir uma live já encerrada (ou futura) pela URL do vídeo."""
@@ -303,11 +372,12 @@ class LiveNarrationService:
         if not info.get("ok"):
             raise ValueError(f"Não consegui ler o vídeo: {info.get('error')}")
         ev = self._upsert_event(vid, info, channel=None)
-        self.set_selected(vid, True)
+        self.set_selected(vid, True, by_user=True)
         return ev
 
     def _upsert_event(self, vid: str, info: Dict[str, Any], channel: Optional[Dict[str, Any]]) -> Dict[str, Any]:
         status = _status_from_live(info.get("live_status") or "")
+        auto_added = False
         with self.lock:
             ev = self.state["events"].get(vid)
             if ev is None:
@@ -332,7 +402,24 @@ class LiveNarrationService:
                 ev["actual_start_epoch"] = int(rts)
             if info.get("duration"):
                 ev["duration"] = int(info["duration"])
-            return ev
+            # Se a chave 🎯 Auto-Detect Jogo estiver ativa, inclui automaticamente na fila (exceto lives 24h ou desmarcadas pelo usuário)
+            if (
+                self.get_setting("auto_detect_match", True)
+                and not ev.get("selected")
+                and not ev.get("user_unselected")
+                and status in ("upcoming", "live")
+                and not _is_24h_or_continuous_stream(ev.get("title", ""), ev)
+            ):
+                ev["selected"] = True
+                ev["auto_queued"] = True
+                if ev.get("pipeline") in (None, "", "idle"):
+                    ev["pipeline"] = "live" if status == "live" else "waiting"
+                    ev["next_attempt"] = 0
+                    ev["last_check"] = 0
+                auto_added = True
+        if auto_added:
+            self.log(f"🎯 [Auto-Detect Jogo] Evento monitorado automaticamente: {ev.get('title', vid)}")
+        return ev
 
     def scan_channels(self, only: Optional[str] = None) -> int:
         """Varre os canais e atualiza a lista de eventos futuros/ao vivo. Retorna nº de eventos novos."""
@@ -557,12 +644,36 @@ class LiveNarrationService:
                     ev = self.get_event(vid) or ev
                 if not ev.get("actual_start_epoch") and ev.get("scheduled_epoch"):
                     ev["actual_start_epoch"] = ev["scheduled_epoch"]
+                dur_s = int(ev.get("duration") or 0)
+                if ev.get("auto_queued") and not force_audio and 0 < dur_s < 900:
+                    self.update_event(
+                        vid,
+                        pipeline="not_match",
+                        is_match_narration=False,
+                        transcript_analysis={
+                            "is_match_narration": False,
+                            "event_category": "Boletim / Vídeo Curto",
+                            "classification_summary": f"Duração curta ({dur_s // 60} min) incompatível com transmissão de partida completa (0 tokens gastos).",
+                        },
+                        progress=f"ℹ️ Boletim/Vídeo curto ({dur_s // 60} min) — ignorado sem gastar tokens.",
+                        error="",
+                    )
+                    self.log(f"ℹ️ [{ev.get('title', vid)[:45]}] Vídeo curto ({dur_s // 60} min) classificado sem gasto de tokens.")
+                    return
                 cfg = self.config_provider() or {}
                 now = time.time()
                 ended_at = ev.get("ended_detected_at") or now
                 waited = now - ended_at
                 vod_ready = (ev.get("live_status") == "was_live")
                 allow_audio = force_audio or (vod_ready and waited >= AUDIO_FALLBACK_AFTER_S) or waited >= AUDIO_FORCE_AFTER_S
+                if allow_audio and ev.get("auto_queued") and not force_audio:
+                    from modules.narration_chronology import guess_match_from_title
+                    g_title = guess_match_from_title(ev.get("title", ""))
+                    has_match_hint = bool(g_title.get("team1") and g_title.get("team2")) or bool(
+                        re.search(r"\b(jornada|narra[cç][aã]o|transmiss[aã]o|futebol|gauch[aã]o|brasileir[aã]o|libertadores|copa|grenal|gre-nal)\b", ev.get("title", ""), re.I)
+                    )
+                    if not has_match_hint or dur_s > 6 * 3600:
+                        allow_audio = False
                 self.update_event(vid, pipeline="transcribing", progress="Iniciando transcrição...")
 
                 def plog(m: str) -> None:
