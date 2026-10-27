@@ -1,5 +1,5 @@
 {
-  "version": "2.4.13",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.13/Monitor_Esportes.exe",
-  "changelog": "v2.4.13: Gerenciamento direto de Destinatários de E-mail na aba Canais Live (botão com contador de cadastrados, modal para adicionar e remover e-mails com validação, e sincronização automática com os envios de relatórios)."
+  "version": "2.4.14",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.14/Monitor_Esportes.exe",
+  "changelog": "v2.4.14: Sincronização SharePoint em Canais Live, Relatório Técnico de Ocorrências (debates/programas), botão mestre de Relatório Geral de Auditoria, reprocessamento de lives, fallback robusto de SMTP e resolução de corte no botão de destinatários."
 }

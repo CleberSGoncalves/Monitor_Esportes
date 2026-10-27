@@ -212,18 +212,24 @@ def _save_config_file(filename: str, data: Any) -> None:
 
 def _load_saved_emails() -> list:
     path = _get_config_read_path("saved_emails.json")
-    default_emails = ["cleber.goncalves@ibope.com"]
+    default_emails = ["cleber.goncalves@ibope.com", "arthur@mediadna.com.br"]
     if not os.path.exists(path):
         _save_config_file("saved_emails.json", default_emails)
         return default_emails
     try:
         with open(path, "r", encoding="utf-8") as f:
             emails = json.load(f)
-            if "arthur@mediadna.com.br" in emails:
-                emails.remove("arthur@mediadna.com.br")
+            if not isinstance(emails, list):
+                emails = default_emails
+            changed = False
+            for de in default_emails:
+                if de not in emails:
+                    emails.append(de)
+                    changed = True
+            if changed:
                 _save_config_file("saved_emails.json", emails)
             return emails
-    except:
+    except Exception:
         return default_emails
 
 def _save_email(email_str: str) -> list:
