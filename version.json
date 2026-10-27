@@ -1,5 +1,5 @@
 {
-  "version": "2.4.14",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.14/Monitor_Esportes.exe",
-  "changelog": "v2.4.14: Sincronização SharePoint em Canais Live, Relatório Técnico de Ocorrências (debates/programas), botão mestre de Relatório Geral de Auditoria, reprocessamento de lives, fallback robusto de SMTP e resolução de corte no botão de destinatários."
+  "version": "2.4.15",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.15/Monitor_Esportes.exe",
+  "changelog": "v2.4.15: Otimização profunda de performance na aba Canais Live (debounce reativo de renderização, virtualização/paginação de cards a 60 FPS, filtros rápidos Ativas/Prontas, botão de limpeza de fila antiga, abertura imediata de relatórios PDF na tela sem congelamento e novo painel Central de Relatórios)."
 }

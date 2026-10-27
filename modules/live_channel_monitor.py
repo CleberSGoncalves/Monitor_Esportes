@@ -290,14 +290,32 @@ class LiveNarrationService:
             ev = self.state["events"].get(vid)
             return dict(ev) if ev else None
 
-    def update_event(self, vid: str, **fields) -> None:
+    def update_event(self, vid: str, notify: bool = True, **fields) -> None:
         with self.lock:
             ev = self.state["events"].get(vid)
             if ev is None:
                 return
+            pipe_changed = "pipeline" in fields and fields["pipeline"] != ev.get("pipeline")
+            pdf_changed = "pdf_path" in fields and fields["pdf_path"] != ev.get("pdf_path")
+            sel_changed = "selected" in fields and fields["selected"] != ev.get("selected")
+            err_changed = "error" in fields and fields["error"] != ev.get("error")
             ev.update(fields)
             ev["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self._changed()
+        
+        # Só notifica a interface e salva o disco imediatamente se houver mudança de estado estrutural
+        is_structural = pipe_changed or pdf_changed or sel_changed or err_changed
+        if notify and is_structural:
+            self._changed()
+        elif notify and "progress" in fields:
+            # Progresso simples: salva com throttle e avisa suavemente
+            now = time.time()
+            if now - getattr(self, "_last_prog_notify", 0) > 1.0:
+                self._last_prog_notify = now
+                if self.on_change:
+                    try:
+                        self.on_change()
+                    except Exception:
+                        pass
 
     def set_selected(self, vid: str, selected: bool, by_user: bool = True) -> None:
         with self.lock:
@@ -322,8 +340,9 @@ class LiveNarrationService:
         self._changed()
 
     def apply_auto_detect_all(self, silent: bool = False) -> int:
-        """Enfileira automaticamente todos os eventos elegíveis dos canais cadastrados quando Auto-Detect está ativo."""
+        """Enfileira automaticamente apenas eventos ativos, futuros e recém-encerrados (últimas 24h)."""
         added = 0
+        now = time.time()
         with self.lock:
             if not self.get_setting("auto_detect_match", True):
                 return 0
@@ -333,7 +352,14 @@ class LiveNarrationService:
                 if _is_24h_or_continuous_stream(ev.get("title", ""), ev):
                     continue
                 st = ev.get("status")
-                if st in ("upcoming", "live", "ended"):
+                # Apenas enfileirar se for ao vivo, futuro ou se encerrou nas últimas 24h
+                is_recent_ended = False
+                if st == "ended":
+                    ref_time = ev.get("ended_detected_at") or ev.get("actual_start_epoch") or 0
+                    if ref_time and (now - ref_time) <= 86400:
+                        is_recent_ended = True
+                
+                if st in ("upcoming", "live") or is_recent_ended:
                     ev["selected"] = True
                     ev["auto_queued"] = True
                     if ev.get("pipeline") in (None, "", "idle"):
@@ -347,6 +373,27 @@ class LiveNarrationService:
         elif added and silent:
             self._save()
         return added
+
+
+    def clean_queue_keep_active(self) -> int:
+        """Remove da fila eventos encerrados antigos que não possuem PDF gerado nem narração ativa."""
+        with self.lock:
+            removed = 0
+            for vid, ev in list(self.state["events"].items()):
+                if ev.get("selected"):
+                    now = time.time()
+                    is_live = ev.get("pipeline") in ("live", "transcribing", "analyzing", "generating") or ev.get("status") == "live"
+                    sched = float(ev.get("scheduled_epoch") or 0)
+                    is_future = ev.get("status") == "upcoming" and sched > now
+                    is_active = is_live or is_future
+                    has_result = bool(ev.get("pdf_path") or ev.get("narration_path"))
+                    if not is_active and not has_result:
+                        ev["selected"] = False
+                        removed += 1
+            if removed:
+                self._changed()
+                self.log(f"🧹 [Fila] Limpeza concluída: {removed} eventos antigos removidos da fila de análise.")
+            return removed
 
     def unapply_auto_detect_waiting(self) -> int:
         """Remove da fila apenas os eventos que entraram automaticamente e ainda não iniciaram transcrição."""
