@@ -25,9 +25,31 @@ from modules.narration_transcriber import gemini_generate_text, read_narration_b
 
 MAX_NARRATION_CHARS = 600_000
 
+NON_MATCH_PATTERNS = [
+    r"\b(debate|elei[çc][õo]es?|lula|bolsonaro|sabatina|governador|prefeito|senado)\b",
+    r"\b(night\s*show|resenha|bate[- ]bola|radar\s*de\s*bagre|bom\s*dia|boa\s*noite)\b",
+    r"\b(resenha\s*fora\s*da\s*sala|mesa\s*redonda|coletiva|entrevista\s*coletiva)\b",
+    r"\b(p[óo]s[- ]jogo|pre[- ]jogo|pr[ée][- ]jogo|bastidores|treino|boletim|not[íi]cias?)\b",
+    r"\b(react|opini[ãa]o|coment[áa]rios?|pos\s*jogo|pre\s*jogo|an[áa]lise)\b",
+]
+
+def is_definitely_non_match(title: str, text: str = "") -> tuple[bool, str]:
+    """Identifica cirurgicamente se o título ou conteúdo NÃO é uma partida narrada ao vivo."""
+    t_lower = (title or "").lower()
+    for pat in NON_MATCH_PATTERNS:
+        m = re.search(pat, t_lower, re.IGNORECASE)
+        if m:
+            matched = m.group(0).upper()
+            return True, f"Identificado como programa/debate/conteúdo não-jogo ({matched})"
+    return False, ""
+
+
 
 def guess_match_from_title(title: str) -> Dict[str, str]:
     """Extrai 'Time A x Time B' e competição de títulos como 'AO VIVO: ATHLETICO X VASCO | BRASILEIRÃO 2026'."""
+    is_non, _ = is_definitely_non_match(title)
+    if is_non:
+        return {"team1": "", "team2": "", "competition": ""}
     t = re.sub(r"(?i)^\s*(ao vivo|live|narra[cç][aã]o|pr[eé]-jogo|p[oó]s-jogo)[^:]*:\s*", "", title or "").strip()
     parts = [p.strip() for p in re.split(r"\s*[|•\-–]\s+", t) if p.strip()]
     team1 = team2 = comp = ""
@@ -145,26 +167,38 @@ def analyze_narration_transcript(
         narration=_compact_narration(body, limit=400_000),
     )
 
+    is_non, reason = is_definitely_non_match(event.get("title", ""))
+    if is_non:
+        log(f"🚫 [Classificação Cirúrgica] Evento descartado de partida ao vivo por formato: {reason}")
+        return {
+            "ok": True,
+            "is_match_narration": False,
+            "event_category": "Programa / Debate / Noticiário",
+            "classification_summary": f"Descartado como partida ao vivo: {reason}.",
+            "team1": "",
+            "team2": "",
+            "competition": "",
+            "date": live_date,
+            "detected_score": "",
+            "narrator_info": "",
+            "brands_summary": "",
+            "brand_mentions": [],
+        }
     log("🔍 Analisando transcrição com IA (verificando partida narrada, times e menções de marcas)...")
     try:
         raw = gemini_generate_text(api_key, model_id, [prompt], json_mode=True, log=log)
         data = _parse_json(raw)
     except Exception as ex:
         log(f"⚠️ Falha na análise inteligente da transcrição: {ex}")
-        # Fallback por título caso a API oscile
-        guessed = guess_match_from_title(event.get("title", ""))
-        has_vs = bool(guessed.get("team1") and guessed.get("team2"))
+        # FALLBACK 100% SEGURO: NUNCA presuma que é partida em caso de erro!
         return {
             "ok": True,
-            "is_match_narration": has_vs,
-            "event_category": "Partida Narrada ao Vivo" if has_vs else "Programa / Transmissão",
-            "classification_summary": (
-                f"Partida identificada pelo título: {guessed.get('team1')} x {guessed.get('team2')}"
-                if has_vs else "Não foi identificada uma partida narrada em tempo real no título."
-            ),
-            "team1": guessed.get("team1", ""),
-            "team2": guessed.get("team2", ""),
-            "competition": guessed.get("competition", "Brasileirão Série A"),
+            "is_match_narration": False,
+            "event_category": "Pendente de Classificação (Erro de API)",
+            "classification_summary": f"Falha na consulta ao Gemini ({ex}). Não classificado como jogo para evitar falsos positivos.",
+            "team1": "",
+            "team2": "",
+            "competition": "",
             "date": live_date,
             "detected_score": "",
             "narrator_info": "",

@@ -7401,11 +7401,10 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                                             _game["_sumula_attempts"] = attempts + 1
                                             self._log(f"⏰ [AGENDAMENTO] Súmula da CBF não disponibilizada no site em 2h30. Iniciando auditoria por tolerância/Gemini (Tentativa {attempts+1}/2)...")
                                             self.after(0, lambda: self._trigger_scheduled_audit(_game))
-                                        elif passed_tolerance and attempts >= 2:
-                                            _game["status"] = "failed"
-                                            self._log(f"⏰ [AGENDAMENTO AVISO] Súmula da CBF para {_game.get('team1')} x {_game.get('team2')} não encontrada após múltiplas tentativas. Auditoria suspensa para não travar a fila.")
-                                            _save_scheduled_games(getattr(self, "_scheduled_games", []))
-                                            self.after(0, self._update_schedule_panel_ui)
+                                        elif passed_tolerance:
+                                              _game["_sumula_attempts"] = attempts + 1
+                                              self._log(f"📋 [AGENDAMENTO] Súmula da CBF ainda não disponível. Ativando auditoria autônoma via Web/Gemini Grounding para {_game.get('team1')} x {_game.get('team2')}...")
+                                              self.after(0, lambda: self._trigger_scheduled_audit(_game))
                                         else:
                                             self._log(f"⏰ [AGENDAMENTO] Súmula da CBF para {_game.get('team1')} x {_game.get('team2')} ainda NÃO disponível no site. Aguardando...")
                                 except Exception as ex_check:

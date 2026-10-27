@@ -39,7 +39,20 @@ class AutonomousAuditor:
         reports_dir: Optional[str] = None,
         status_callback: Optional[Callable[[str], None]] = None
     ):
-        self.email_recipients = email_recipients or ["cleber.goncalves@gmail.com", "cleber.goncalves@ibope.com"]
+        if not email_recipients:
+            for conf_p in (
+                os.path.join(os.environ.get("APPDATA", ""), "Monitor_Esportes", "config", "saved_emails.json"),
+                os.path.join(PROJECT_ROOT, "config", "saved_emails.json")
+            ):
+                if os.path.exists(conf_p):
+                    try:
+                        with open(conf_p, "r", encoding="utf-8") as f_em:
+                            email_recipients = json.load(f_em)
+                            if email_recipients:
+                                break
+                    except Exception:
+                        pass
+        self.email_recipients = email_recipients or ["cleber.goncalves@ibope.com", "arthur@mediadna.com.br"]
         self.reports_dir = reports_dir or os.path.join(PROJECT_ROOT, "reports")
         os.makedirs(self.reports_dir, exist_ok=True)
         self.status_callback = status_callback

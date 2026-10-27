@@ -1,5 +1,5 @@
 {
-  "version": "2.4.15",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.15/Monitor_Esportes.exe",
-  "changelog": "v2.4.15: Otimização profunda de performance na aba Canais Live (debounce reativo de renderização, virtualização/paginação de cards a 60 FPS, filtros rápidos Ativas/Prontas, botão de limpeza de fila antiga, abertura imediata de relatórios PDF na tela sem congelamento e novo painel Central de Relatórios)."
+  "version": "2.4.16",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.16/Monitor_Esportes.exe",
+  "changelog": "v2.4.16: Classificação cirúrgica de partidas ao vivo com bloqueio estrito de debates/notícias (0 falsos positivos), botão dedicado para geração de Relatório Posterior de Partida sob demanda, inclusão manual de links de jogos passados, tolerância definitiva a atrasos de súmula da CBF com ativação automática do Gemini Grounding e destinatários de e-mail sincronizados (Cleber + Arthur)."
 }

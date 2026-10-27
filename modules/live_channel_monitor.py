@@ -777,6 +777,51 @@ class LiveNarrationService:
         threading.Thread(target=self._generate_job, args=(vid, meta, auto, progress_cb, done_cb), daemon=True).start()
         return True
 
+
+    def generate_posterior_match_report_async(self, vid: str, meta: Optional[Dict[str, str]] = None,
+                                              progress_cb: Optional[Callable[[str], None]] = None,
+                                              done_cb: Optional[Callable[[Dict[str, Any]], None]] = None) -> bool:
+        """Gera o relatório cronológico de partida para um evento já encerrado (posterior ao evento),
+        transcrevendo o áudio se necessário e gerando o relatório oficial com SharePoint e E-mail."""
+        def _job():
+            try:
+                ev = self.get_event(vid)
+                if not ev:
+                    if done_cb: done_cb({"error": "Evento não encontrado na base de dados."})
+                    return
+
+                narr_path = ev.get("narration_path")
+                if not narr_path or not os.path.exists(narr_path):
+                    self.log(f"🎙️ [Posterior] Transcrevendo áudio do evento encerrado: {ev.get('title')[:45]}...")
+                    if progress_cb: progress_cb("Extraindo áudio completo e gerando transcrição...")
+                    cfg = self.config_provider() or {}
+                    fname = f"narracao_{_safe(ev.get('channel_name'), 25)}_{_safe(ev.get('title'), 50)}_{vid}.txt"
+                    out_path = os.path.join(self.narr_dir, fname)
+                    from modules.narration_transcriber import transcribe_event
+                    res = transcribe_event(ev, out_path, api_key=cfg.get("api_key"), model_id=cfg.get("model_id") or "gemini-2.5-flash",
+                                           allow_audio=True, log=progress_cb or self.log)
+                    if not res.get("ok"):
+                        err = res.get("error", "Falha na transcrição de áudio.")
+                        self.update_event(vid, error=err, pipeline="failed")
+                        if done_cb: done_cb({"error": err})
+                        return
+                    self.update_event(vid, narration_path=res["path"], narration_lines=res.get("lines", 0),
+                                      transcript_source="audio_gemini", transcript_source_label="Áudio transcrito (Sob Demanda)",
+                                      pipeline="ready_match", is_match_narration=True, error="")
+
+                final_meta = meta or self.default_meta(ev)
+                self.log(f"📊 [Posterior] Gerando cronologia de jogo para {final_meta.get('team1', '')} x {final_meta.get('team2', '')}...")
+                if progress_cb: progress_cb(f"Gerando cronologia oficial de {final_meta.get('team1', '')} x {final_meta.get('team2', '')}...")
+                res_gen = self._generate_locked(vid, meta=final_meta, auto=False, progress_cb=progress_cb)
+                if done_cb:
+                    done_cb(res_gen)
+            except Exception as ex:
+                self.log(f"⚠️ [Posterior] Erro ao gerar relatório posterior: {ex}")
+                if done_cb: done_cb({"error": str(ex)})
+
+        threading.Thread(target=_job, daemon=True).start()
+        return True
+
     def _generate_locked(self, vid: str, meta: Optional[Dict[str, str]], auto: bool,
                          progress_cb: Optional[Callable[[str], None]]) -> Dict[str, Any]:
         from modules.narration_chronology import generate_narration_chronology
