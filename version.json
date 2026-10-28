@@ -1,5 +1,5 @@
 {
-  "version": "2.4.19",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.19/Monitor_Esportes.exe",
-  "changelog": "v2.4.19: Correção definitiva e comprovada por teste real do erro 'Expecting , delimiter' na cronologia do Gemini (reparo automático de vírgulas faltantes em transmissões longas), geração com sucesso de 27 marcos e 46 inserções comerciais com PDF completo, e despoluição total da fila da direita."
+  "version": "2.4.20",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.20/Monitor_Esportes.exe",
+  "changelog": "v2.4.20: Feedback visual em tempo real por etapas no botão de geração e no card (barra de progresso com porcentagem e descrição da etapa ativa 1/4 Transcrição, 2/4 Gemini Lances/Marcas, 3/4 Renderizando PDF, 4/4 Nuvem), desacoplamento assíncrono do SharePoint/E-mail que disponibiliza o PDF instantaneamente em 1 clique e botão de abertura direta '✅ Abrir Relatório PDF (Pronto)'."
 }
