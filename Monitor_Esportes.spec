@@ -4,13 +4,15 @@ from PyInstaller.utils.hooks import collect_all
 
 datas = [('E:\\desenvolvimento\\Monitor_Esportes\\.venv\\Lib\\site-packages\\customtkinter', 'customtkinter/'), ('config', 'config'), ('modules', 'modules'), ('core', 'core'), ('gui', 'gui'), ('templates', 'templates'), ('version.json', '.')]
 binaries = []
-hiddenimports = ['gui', 'gui.canais_live_mixin', 'gui.nba_events_mixin', 'canais_live_mixin', 'nba_events_mixin', 'obsws_python', 'websocket']
+hiddenimports = ['gui', 'gui.canais_live_mixin', 'gui.nba_events_mixin', 'canais_live_mixin', 'nba_events_mixin', 'obsws_python', 'websocket', 'pdfplumber', 'pymupdf', 'fitz']
 hiddenimports += collect_submodules('obsws_python')
 hiddenimports += collect_submodules('yt_dlp')
 hiddenimports += collect_submodules('reportlab')
 hiddenimports += collect_submodules('google.genai')
 hiddenimports += collect_submodules('paddleocr')
 tmp_ret = collect_all('numpy')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('pdfplumber')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 

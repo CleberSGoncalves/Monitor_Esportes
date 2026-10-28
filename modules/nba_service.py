@@ -15,7 +15,18 @@ import time
 import urllib.request
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List, Optional
-import pdfplumber
+try:
+    import pdfplumber
+except ImportError:
+    pdfplumber = None
+
+try:
+    import pymupdf as fitz
+except ImportError:
+    try:
+        import fitz
+    except ImportError:
+        fitz = None
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NBA_CACHE_DIR = os.path.join(PROJECT_ROOT, "config", "nba_cache")
@@ -228,44 +239,56 @@ class NBAService:
         }
 
         try:
-            with pdfplumber.open(pdf_path) as p:
-                full_text_p1 = p.pages[0].extract_text() or ""
-                
-                # 1. Duração e Público
-                m_dur = re.search(r"Game Duration:\s*([\d:]+)", full_text_p1)
-                if m_dur: parsed["game_duration"] = m_dur.group(1)
+            pages_text = []
+            if pdfplumber is not None:
+                with pdfplumber.open(pdf_path) as p:
+                    pages_text = [page.extract_text() or "" for page in p.pages]
+            elif fitz is not None:
+                doc = fitz.open(pdf_path)
+                pages_text = [page.get_text() or "" for page in doc]
+            else:
+                print("⚠️ [NBA] Nenhum parser de PDF disponível (pdfplumber ou pymupdf).")
+                return parsed
 
-                m_att = re.search(r"Attendance:\s*(\d+)", full_text_p1)
-                if m_att: parsed["attendance"] = m_att.group(1)
+            if not pages_text:
+                return parsed
 
-                m_off = re.search(r"Officials:\s*(.+)", full_text_p1)
-                if m_off:
-                    parsed["officials"] = [o.strip() for o in m_off.group(1).split(",")]
+            full_text_p1 = pages_text[0]
+            
+            # 1. Duração e Público
+            m_dur = re.search(r"Game Duration:\s*([\d:]+)", full_text_p1)
+            if m_dur: parsed["game_duration"] = m_dur.group(1)
 
-                # 2. Local / Data na linha superior
-                lines_p1 = full_text_p1.split("\n")
-                if len(lines_p1) > 2:
-                    parsed["arena"] = lines_p1[2].strip()
+            m_att = re.search(r"Attendance:\s*(\d+)", full_text_p1)
+            if m_att: parsed["attendance"] = m_att.group(1)
 
-                # 3. Extração dos marcos temporais reais (Start of Period / End of Period)
-                period_events = []
-                for idx, page in enumerate(p.pages):
-                    txt = page.extract_text() or ""
-                    for line in txt.split("\n"):
-                        m_start = re.search(r"Start of Period\s*\(([\d:]+\s*(?:AM|PM))\)", line, re.I)
-                        m_end = re.search(r"End of Period\s*\(([\d:]+\s*(?:AM|PM))\)", line, re.I)
-                        
-                        period_name = ""
-                        if "1st QUARTER" in txt: period_name = "1º Quarto"
-                        elif "2nd QUARTER" in txt: period_name = "2º Quarto"
-                        elif "3rd QUARTER" in txt: period_name = "3º Quarto"
-                        elif "4th QUARTER" in txt: period_name = "4º Quarto"
-                        elif "OVERTIME" in txt or "OT" in txt: period_name = "Prorrogação (OT)"
+            m_off = re.search(r"Officials:\s*(.+)", full_text_p1)
+            if m_off:
+                parsed["officials"] = [o.strip() for o in m_off.group(1).split(",")]
 
-                        if m_start:
-                            period_events.append({"type": "start", "period": period_name, "time": m_start.group(1)})
-                        if m_end:
-                            period_events.append({"type": "end", "period": period_name, "time": m_end.group(1)})
+            # 2. Local / Data na linha superior
+            lines_p1 = full_text_p1.split("\n")
+            if len(lines_p1) > 2:
+                parsed["arena"] = lines_p1[2].strip()
+
+            # 3. Extração dos marcos temporais reais (Start of Period / End of Period)
+            period_events = []
+            for txt in pages_text:
+                for line in txt.split("\n"):
+                    m_start = re.search(r"Start of Period\s*\(([\d:]+\s*(?:AM|PM))\)", line, re.I)
+                    m_end = re.search(r"End of Period\s*\(([\d:]+\s*(?:AM|PM))\)", line, re.I)
+                    
+                    period_name = ""
+                    if "1st QUARTER" in txt: period_name = "1º Quarto"
+                    elif "2nd QUARTER" in txt: period_name = "2º Quarto"
+                    elif "3rd QUARTER" in txt: period_name = "3º Quarto"
+                    elif "4th QUARTER" in txt: period_name = "4º Quarto"
+                    elif "OVERTIME" in txt or "OT" in txt: period_name = "Prorrogação (OT)"
+
+                    if m_start:
+                        period_events.append({"type": "start", "period": period_name, "time": m_start.group(1)})
+                    if m_end:
+                        period_events.append({"type": "end", "period": period_name, "time": m_end.group(1)})
 
                 # Deduplicar e estruturar marcos em ordem cronológica
                 seen = set()
