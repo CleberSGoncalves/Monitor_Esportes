@@ -50,6 +50,10 @@ class CanaisLiveMixin:
         self._auto_report_live_var.set(auto_rep)
         self._auto_email_live_var.set(self.live_service.get_setting("auto_email", True))
         self.live_service.start()
+        try:
+            self.live_service.clean_non_matches_from_queue()
+        except Exception:
+            pass
 
     def _on_service_state_changed(self) -> None:
         """Callback acionado pelo serviço de monitoramento em background com debounce suave."""
@@ -225,6 +229,18 @@ class CanaisLiveMixin:
             command=self._open_recent_reports_modal
         )
         self.btn_view_recent_reports.pack(side="left", padx=5, pady=2)
+        # Botão: Limpar Não-Jogos da Fila (Anti-Poluição)
+        self.btn_clean_non_matches = ctk.CTkButton(
+            kpi_row1,
+            text="🧹 Limpar Não-Jogos",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            fg_color="#b71c1c",
+            hover_color="#d32f2f",
+            height=34,
+            width=150,
+            command=self._on_clean_non_matches_clicked
+        )
+        self.btn_clean_non_matches.pack(side="left", padx=5, pady=2)
 
         # Status SharePoint
         self.lbl_live_status_hint = ctk.CTkLabel(
@@ -434,7 +450,12 @@ class CanaisLiveMixin:
         """Atualiza os contadores numéricos superiores."""
         channels = self.live_service.list_channels()
         events = self.live_service.list_events()
-        selected_events = [e for e in events if e.get("selected")]
+        selected_events = [
+            e for e in events
+            if e.get("selected")
+            and e.get("pipeline") != "not_match"
+            and e.get("is_match_narration") is not False
+        ]
         done_events = [e for e in selected_events if e.get("pipeline") in ("transcribed", "done")]
 
         if hasattr(self, "lbl_kpi_canais_count"):
@@ -626,7 +647,12 @@ class CanaisLiveMixin:
             w.destroy()
 
         events = self.live_service.list_events()
-        selected_events = [e for e in events if e.get("selected")]
+        selected_events = [
+            e for e in events
+            if e.get("selected")
+            and e.get("pipeline") != "not_match"
+            and e.get("is_match_narration") is not False
+        ]
 
         if not selected_events:
             ctk.CTkLabel(
@@ -1797,3 +1823,12 @@ class CanaisLiveMixin:
                 self.after(0, lambda: self.btn_add_posterior_video.configure(state="normal", text="⚽ Incluir Jogo Passado"))
 
         threading.Thread(target=_do_add_post, daemon=True).start()
+
+    def _on_clean_non_matches_clicked(self) -> None:
+        """Executa a limpeza cirúrgica de eventos que não são jogos da fila."""
+        rem = self.live_service.clean_non_matches_from_queue()
+        messagebox.showinfo(
+            "Limpeza Concluída",
+            f"Foram eliminados {rem} eventos que não eram partidas de futebol da fila.\n\nA fila agora exibe exclusivamente partidas reais!"
+        )
+        self._refresh_canais_tab_ui()

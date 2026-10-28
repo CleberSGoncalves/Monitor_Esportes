@@ -1,5 +1,5 @@
 {
-  "version": "2.4.17",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.17/Monitor_Esportes.exe",
-  "changelog": "v2.4.17: Correção definitiva do JSONDecodeError na cronologia do Gemini (parser ultra-robusto com reparo de aspas internas e quebras de linha em narrações longas), blindagem no envio de e-mails de relatórios PDF com diagnóstico real de erro SMTP e proteção preventiva para eventos sem PDF gerado."
+  "version": "2.4.18",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.18/Monitor_Esportes.exe",
+  "changelog": "v2.4.18: Despoluição radical da fila na aba Canais Live (eliminação automática sumária de programas diários, notícias, debates e boletins da fila de análise), filtro inteligente de inclusão que só aceita partidas reais com times em campo, botão 'Limpar Não-Jogos' na barra superior e resgate das transmissões de 24/10 (Inter x Botafogo) prontas para relatório."
 }
