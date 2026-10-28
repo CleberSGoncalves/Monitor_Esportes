@@ -8,8 +8,12 @@ import ssl
 # --- BOOTSTRAP DE SYS.PATH (Garantia de importação para 'modules' em Script e Executável PyInstaller) ---
 if getattr(sys, "frozen", False):
     meipass = getattr(sys, "_MEIPASS", None)
-    if meipass and meipass not in sys.path:
-        sys.path.insert(0, meipass)
+    if meipass:
+        if meipass not in sys.path:
+            sys.path.insert(0, meipass)
+        gui_dir = os.path.join(meipass, "gui")
+        if os.path.exists(gui_dir) and gui_dir not in sys.path:
+            sys.path.insert(0, gui_dir)
     exe_dir = str(Path(sys.executable).parent)
     if exe_dir not in sys.path:
         sys.path.insert(0, exe_dir)
@@ -22,6 +26,9 @@ else:
     root_dir = str(file_dir.parent) if file_dir.name == "gui" else str(file_dir)
     if root_dir not in sys.path:
         sys.path.insert(0, root_dir)
+    gui_dir = os.path.join(root_dir, "gui")
+    if os.path.exists(gui_dir) and gui_dir not in sys.path:
+        sys.path.insert(0, gui_dir)
 
 try:
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -136,8 +143,15 @@ from modules.report_generator import ReportGenerator
 from modules.email_service import EmailService
 from modules.api_provider import start_api_thread
 from core.monitor_core import MonitorCoreMixin
-from gui.canais_live_mixin import CanaisLiveMixin
-from gui.nba_events_mixin import NBAEventsMixin
+try:
+    from gui.canais_live_mixin import CanaisLiveMixin
+except (ImportError, ModuleNotFoundError):
+    from canais_live_mixin import CanaisLiveMixin
+
+try:
+    from gui.nba_events_mixin import NBAEventsMixin
+except (ImportError, ModuleNotFoundError):
+    from nba_events_mixin import NBAEventsMixin
 from modules.auto_updater import AutoUpdater
 from modules.autonomous_auditor import AutonomousAuditor
 from core.models import (

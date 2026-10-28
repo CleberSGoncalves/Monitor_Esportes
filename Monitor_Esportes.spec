@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_submodules
 
-hiddenimports = ['obsws_python', 'websocket']
+hiddenimports = ['obsws_python', 'websocket', 'gui', 'gui.canais_live_mixin', 'gui.nba_events_mixin', 'canais_live_mixin', 'nba_events_mixin']
 hiddenimports += collect_submodules('obsws_python')
 hiddenimports += collect_submodules('yt_dlp')
 hiddenimports += collect_submodules('reportlab')
@@ -11,9 +11,16 @@ hiddenimports += collect_submodules('paddleocr')
 
 a = Analysis(
     ['gui\\main_gui.py'],
-    pathex=[],
+    pathex=['.', 'E:\\desenvolvimento\\Monitor_Esportes', 'gui'],
     binaries=[],
-    datas=[('C:\\Python312\\Lib\\site-packages\\customtkinter', 'customtkinter/'), ('config', 'config'), ('modules', 'modules'), ('core', 'core'), ('templates', 'templates')],
+    datas=[
+        ('C:\\Python312\\Lib\\site-packages\\customtkinter', 'customtkinter/'),
+        ('config', 'config'),
+        ('modules', 'modules'),
+        ('core', 'core'),
+        ('gui', 'gui'),
+        ('templates', 'templates')
+    ],
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
