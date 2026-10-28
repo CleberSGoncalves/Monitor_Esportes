@@ -22,14 +22,12 @@ def main():
         print("Erro: .venv não encontrado.")
         sys.exit(1)
 
-    # Pegar o caminho do customtkinter
-    try:
-        import customtkinter
-        ctk_path = Path(customtkinter.__path__[0])
-    except ImportError:
-        # Tentar via subprocess se não estiver no env atual
-        output = subprocess.check_output([str(venv_python), "-c", "import customtkinter; print(customtkinter.__path__[0])"], text=True).strip()
-        ctk_path = Path(output)
+    # Obter caminho do customtkinter diretamente do ambiente .venv
+    output = subprocess.check_output(
+        [str(venv_python), "-c", "import customtkinter; print(customtkinter.__path__[0])"],
+        text=True
+    ).strip()
+    ctk_path = Path(output)
 
     print(f"CustomTkinter encontrado em: {ctk_path}")
 
@@ -47,14 +45,24 @@ def main():
         "--noconsole",
         "--onefile",
         f"--name={app_name}",
+        f"--paths={project_root}",
+        f"--paths={project_root / 'gui'}",
         f"--add-data=\"{ctk_path};customtkinter/\"",
         f"--add-data=\"config;config\"",
         f"--add-data=\"modules;modules\"",
         f"--add-data=\"core;core\"",
+        f"--add-data=\"gui;gui\"",
         f"--add-data=\"templates;templates\"",
+        f"--add-data=\"version.json;.\"",
         # Hidden imports and submodules
+        "--hidden-import=gui",
+        "--hidden-import=gui.canais_live_mixin",
+        "--hidden-import=gui.nba_events_mixin",
+        "--hidden-import=canais_live_mixin",
+        "--hidden-import=nba_events_mixin",
         "--hidden-import=obsws_python",
         "--hidden-import=websocket",
+        "--collect-all=numpy",
         "--collect-submodules=obsws_python",
         "--collect-submodules=yt_dlp",
         "--collect-submodules=reportlab",
