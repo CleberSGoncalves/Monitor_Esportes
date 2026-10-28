@@ -966,7 +966,7 @@ class CanaisLiveMixin:
                 btn_hover = "#388e3c"
                 btn_cmd = make_open_live_pdf()
                 btn_state = "normal"
-                btn_width = 220
+                btn_width = 175
             elif pipe == "generating":
                 # ETAPA ATIVA: Mostra exatamente o que a IA está fazendo em laranja pulsante
                 chrono_text = stage_title
@@ -974,28 +974,28 @@ class CanaisLiveMixin:
                 btn_hover = "#ef6c00"
                 btn_cmd = lambda: None
                 btn_state = "disabled"
-                btn_width = 220
+                btn_width = 175
             elif pipe in ("analyzing", "transcribed") and has_narr:
-                chrono_text = "🔍 Analisando Transcrição..."
+                chrono_text = "🔍 Analisando..."
                 btn_color = "#5c6bc0"
                 btn_hover = "#7986cb"
                 btn_cmd = lambda: None
                 btn_state = "disabled"
-                btn_width = 200
+                btn_width = 140
             elif pipe == "transcribing":
-                chrono_text = "🎙️ Extraindo Áudio..."
+                chrono_text = "🎙️ Áudio..."
                 btn_color = "#0277bd"
                 btn_hover = "#0288d1"
                 btn_cmd = lambda: None
                 btn_state = "disabled"
-                btn_width = 200
+                btn_width = 130
             else:
-                chrono_text = "📊 Gerar Relatório Cronológico"
+                chrono_text = "📊 Gerar Relatório"
                 btn_color = "#008080"
                 btn_hover = "#005a5a"
                 btn_cmd = make_chrono()
                 btn_state = "normal" if has_narr else "disabled"
-                btn_width = 200
+                btn_width = 145
 
             ctk.CTkButton(
                 btn_row,
@@ -1047,13 +1047,13 @@ class CanaisLiveMixin:
 
         ctk.CTkButton(
             btn_row,
-            text="📝 Narração (.txt)",
+            text="📝 Narração",
             font=ctk.CTkFont(size=11),
             fg_color="#2b5b84" if has_narr else "#222222",
             hover_color="#1d3e5a" if has_narr else "#222222",
             state="normal" if has_narr else "disabled",
             height=28,
-            width=115,
+            width=90,
             command=make_open_narr()
         ).pack(side="left", padx=3)
 
@@ -1063,13 +1063,13 @@ class CanaisLiveMixin:
 
         ctk.CTkButton(
             btn_row,
-            text="📑 Relatório PDF",
+            text="📑 PDF",
             font=ctk.CTkFont(size=11, weight="bold"),
             fg_color="#2e7d32" if has_pdf else "#222222",
             hover_color="#1b5e20" if has_pdf else "#222222",
             state="normal" if has_pdf else "disabled",
             height=28,
-            width=115,
+            width=80,
             command=make_open_pdf()
         ).pack(side="left", padx=3)
 
@@ -1090,7 +1090,7 @@ class CanaisLiveMixin:
             text_color="#00FF7F" if sp_synced else "#ffffff",
             state="normal" if has_pdf else "disabled",
             height=28,
-            width=115,
+            width=95,
             command=make_sync_sp()
         ).pack(side="left", padx=3)
 
@@ -1126,18 +1126,7 @@ class CanaisLiveMixin:
                 command=make_reprocess()
             ).pack(side="left", padx=3)
 
-        # 7. Botão Remover da Fila no Rodapé do Card
-        ctk.CTkButton(
-            btn_row,
-            text="🗑️ Remover",
-            font=ctk.CTkFont(size=11),
-            fg_color="#2b1111",
-            hover_color="#4a1919",
-            text_color="#ff8888",
-            height=28,
-            width=80,
-            command=make_remove_sel()
-        ).pack(side="right", padx=(4, 0))
+        # O botão '✕ Remover da Fila' já existe de forma destacada e perfeita no topo do card (hdr)
 
 
 

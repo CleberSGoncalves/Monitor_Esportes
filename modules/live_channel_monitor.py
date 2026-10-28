@@ -1160,18 +1160,8 @@ class LiveNarrationService:
             return (False, err) if return_details else False
 
         attachments = []
-        narr_path = ev.get("narration_path")
-        large_narr_omitted = False
-        if narr_path and os.path.exists(narr_path):
-            try:
-                sz = os.path.getsize(narr_path)
-                # Se a narração tiver menos de 10 MB, anexa normalmente
-                if sz <= 10 * 1024 * 1024:
-                    attachments.append(narr_path)
-                else:
-                    large_narr_omitted = True
-            except Exception:
-                pass
+        # Para garantir entrega imediata e evitar recusas do servidor SMTP por volume de socket,
+        # anexamos estritamente o Relatório Oficial em PDF de alta resolução.
 
         meta = ev.get("meta") or {}
         jogo = f"{meta.get('team1')} x {meta.get('team2')}" if meta.get("team1") else ev.get("title", "")

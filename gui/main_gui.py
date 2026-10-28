@@ -350,7 +350,7 @@ def _load_scheduled_games() -> list:
                             pass
                             
                         # Mantém se for futuro OU se for recente oficial pendente
-                        if is_future or (is_recent and g.get("status") in ("pending", "running")):
+                        if is_future or g.get("status") in ("pending", "running"):
                             if g.get("status") == "failed" and is_future:
                                 g["status"] = "pending"
                                 g["_last_sumula_check_time"] = 0.0
