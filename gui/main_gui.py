@@ -800,21 +800,17 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
             try:
                 has_update, remote_ver, download_url, changelog = updater.check_for_update()
                 if has_update:
-                    def ask_user():
-                        # Atualizar a UI do cabeçalho com o alerta de atualização pendente
+                    def notify_header():
                         if hasattr(self, "btn_header_update"):
                             self.btn_header_update.configure(
                                 text=f"⚠️ Atualizar para v{remote_ver}", 
                                 fg_color="#FF4500", 
-                                hover_color="#CD3700"
+                                hover_color="#CD3700",
+                                state="normal"
                             )
                         if hasattr(self, "lbl_header_version"):
-                            self.lbl_header_version.configure(text_color="#00FF00")
-                            
-                        msg = f"Uma nova versão ({remote_ver}) está disponível!\n\nChangelog:\n{changelog}\n\nDeseja baixar e atualizar agora automaticamente?"
-                        if messagebox.askyesno("Atualização Disponível", msg):
-                            self._start_self_update(download_url, remote_ver)
-                    self.after(0, ask_user)
+                            self.lbl_header_version.configure(text_color="#FFD700")
+                    self.after(0, notify_header)
             except Exception as e_up:
                 print(f"[AUTO-UPDATER WARN] Erro ao verificar atualizações: {e_up}")
 

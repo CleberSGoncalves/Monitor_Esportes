@@ -10,7 +10,24 @@ import time
 import urllib.request
 import subprocess
 
-CURRENT_VERSION = "2.4.20"
+def _load_current_version() -> str:
+    possible_paths = [
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "version.json"),
+        os.path.join(os.path.dirname(sys.executable), "version.json") if getattr(sys, 'frozen', False) else None,
+        os.path.join(os.getcwd(), "version.json")
+    ]
+    for p in possible_paths:
+        if p and os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    v = json.load(f).get("version")
+                    if v:
+                        return v
+            except Exception:
+                pass
+    return "2.4.23"
+
+CURRENT_VERSION = _load_current_version()
 
 class AutoUpdater:
     def __init__(self, version_url: str = "https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/version.json"):
@@ -74,7 +91,7 @@ class AutoUpdater:
             }
             
             print(f"[AUTO-UPDATER] Baixando atualização via requests stream de {download_url}...")
-            response = requests.get(download_url, headers=headers, stream=True, verify=False, timeout=90, allow_redirects=True)
+            response = requests.get(download_url, headers=headers, stream=True, verify=False, timeout=600, allow_redirects=True)
             response.raise_for_status()
             
             total_size = int(response.headers.get('content-length', 0))
