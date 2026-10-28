@@ -1,5 +1,5 @@
 {
-  "version": "2.4.16",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.16/Monitor_Esportes.exe",
-  "changelog": "v2.4.16: Classificação cirúrgica de partidas ao vivo com bloqueio estrito de debates/notícias (0 falsos positivos), botão dedicado para geração de Relatório Posterior de Partida sob demanda, inclusão manual de links de jogos passados, tolerância definitiva a atrasos de súmula da CBF com ativação automática do Gemini Grounding e destinatários de e-mail sincronizados (Cleber + Arthur)."
+  "version": "2.4.17",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.17/Monitor_Esportes.exe",
+  "changelog": "v2.4.17: Correção definitiva do JSONDecodeError na cronologia do Gemini (parser ultra-robusto com reparo de aspas internas e quebras de linha em narrações longas), blindagem no envio de e-mails de relatórios PDF com diagnóstico real de erro SMTP e proteção preventiva para eventos sem PDF gerado."
 }

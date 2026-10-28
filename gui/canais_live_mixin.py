@@ -1194,12 +1194,37 @@ class CanaisLiveMixin:
                 self._open_email_recipients_modal()
             return
 
-        def _send():
-            ok = self.live_service.send_email(vid, recipients=recipients)
-            if ok:
-                self.after(0, lambda: messagebox.showinfo("E-mail Enviado", f"Relatório PDF e Narração (.txt) enviados com sucesso para:\n{', '.join(recipients)}"))
+        ev = self.live_service.get_event(vid)
+        if not ev:
+            messagebox.showerror("Erro", "Evento não encontrado na fila.")
+            return
+
+        pdf_path = ev.get("pdf_path")
+        if not pdf_path or not os.path.exists(pdf_path):
+            err = ev.get("error")
+            if err:
+                ans = messagebox.askyesno(
+                    "Relatório PDF Não Gerado",
+                    f"O relatório PDF deste evento ainda não foi gerado com sucesso devido a um erro durante a análise:\n\n{err}\n\nDeseja reprocessar a geração do relatório agora?"
+                )
+                if ans:
+                    self._generate_chronology(vid)
+                return
             else:
-                self.after(0, lambda: messagebox.showwarning("Falha no Envio", "Não foi possível enviar o e-mail. Verifique suas credenciais SMTP na aba Config."))
+                ans = messagebox.askyesno(
+                    "Relatório PDF Pendente",
+                    "O relatório PDF desta partida ainda não foi gerado.\n\nDeseja gerar o relatório cronológico agora antes de enviar por e-mail?"
+                )
+                if ans:
+                    self._generate_chronology(vid)
+                return
+
+        def _send():
+            ok, msg = self.live_service.send_email(vid, recipients=recipients, return_details=True)
+            if ok:
+                self.after(0, lambda: messagebox.showinfo("E-mail Enviado", f"Relatório PDF enviado com sucesso para:\n{', '.join(recipients)}"))
+            else:
+                self.after(0, lambda: messagebox.showwarning("Falha no Envio de E-mail", f"Não foi possível enviar o e-mail.\n\nDetalhes do erro:\n{msg}"))
         threading.Thread(target=_send, daemon=True).start()
 
     # =========================================================================
