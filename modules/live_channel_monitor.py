@@ -380,6 +380,19 @@ class LiveNarrationService:
         return added
 
 
+    def remove_from_queue(self, vid: str) -> bool:
+        """Remove explicitamente um evento da fila de monitoramento e análise."""
+        with self.lock:
+            ev = self.state["events"].get(vid)
+            if ev:
+                ev["selected"] = False
+                ev["user_unselected"] = True
+                ev["auto_queued"] = False
+            if "active_queue" in self.state and vid in self.state["active_queue"]:
+                self.state["active_queue"].remove(vid)
+            self._changed()
+            return True
+
     def clean_queue_keep_active(self) -> int:
         """Remove da fila eventos encerrados antigos que não possuem PDF gerado nem narração ativa."""
         with self.lock:
@@ -682,7 +695,10 @@ class LiveNarrationService:
                 selected=False,
                 user_unselected=True
             )
-            self.remove_from_queue(vid)
+            try:
+                self.remove_from_queue(vid)
+            except Exception as ex_rm:
+                self.log(f"⚠️ Aviso ao remover da fila: {ex_rm}")
             self.log(f"🗑️ [Auto-Eliminação] '{ev.get('title', vid)[:45]}' não é jogo e foi removido da fila.")
 
     def _transcribe_job(self, vid: str, force_audio: bool) -> None:

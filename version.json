@@ -1,5 +1,5 @@
 {
-  "version": "2.4.21",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.21/Monitor_Esportes.exe",
-  "changelog": "v2.4.21: Correção estrita de mapeamento de plataforma no SharePoint (canais alternativos/YouTube salvos obrigatoriamente como 'Outro', preservando Amazon Prime e CazéTV exclusivamente para transmissões oficiais CBF), blindagem de fallback contra inconsistências de metadados e envio certificado dos relatórios das Rodadas 31 e 32 do Brasileirão Série A."
+  "version": "2.4.22",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.22/Monitor_Esportes.exe",
+  "changelog": "v2.4.22: Adicionada a nova aba '🏀 Eventos NBA' com monitoramento de jogos da temporada regular, download automático do Game Book oficial da NBA (statsdmz.nba.com), geração do relatório técnico em duas seções (Cronologia do Jogo + Auditoria Streaming Amazon Prime/Disney) e sincronização com SharePoint/E-mail. Correção crítica do AttributeError em remove_from_queue na transcrição de canais live."
 }

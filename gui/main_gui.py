@@ -137,6 +137,7 @@ from modules.email_service import EmailService
 from modules.api_provider import start_api_thread
 from core.monitor_core import MonitorCoreMixin
 from gui.canais_live_mixin import CanaisLiveMixin
+from gui.nba_events_mixin import NBAEventsMixin
 from modules.auto_updater import AutoUpdater
 from modules.autonomous_auditor import AutonomousAuditor
 from core.models import (
@@ -494,7 +495,7 @@ def _load_cbf_streaming_events() -> list:
     return filtered_events
 
 
-class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, ctk.CTk):
+class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
     def _load_ui_scale_preference(self) -> float:
         path = _get_config_read_path("ui_settings.json")
         default_scale = 1.15
@@ -2521,6 +2522,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, ctk.CTk):
         self.tab_reports = self.tabs.add("📊 Jogos Auditados")
         self.tab_auditoria = self.tabs.add("🛡️ Auditoria")
         self.tab_canais = self.tabs.add("📡 Canais Live")
+        self.tab_nba = self.tabs.add("🏀 Eventos NBA")
         self.tab_dash = self.tabs.add("Dashboard")
         self.tab_logs = self.tabs.add("Logs")
         self.tab_cfg = self.tabs.add("Config")
@@ -2546,6 +2548,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, ctk.CTk):
         self._build_tab_reports()
         self._build_tab_auditoria()
         self._build_tab_canais_live()
+        self._build_tab_nba()
 
         self._on_channel_preset(self.channel_var.get())
 
