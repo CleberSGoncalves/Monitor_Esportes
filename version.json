@@ -1,5 +1,5 @@
 {
-  "version": "2.4.18",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.18/Monitor_Esportes.exe",
-  "changelog": "v2.4.18: Despoluição radical da fila na aba Canais Live (eliminação automática sumária de programas diários, notícias, debates e boletins da fila de análise), filtro inteligente de inclusão que só aceita partidas reais com times em campo, botão 'Limpar Não-Jogos' na barra superior e resgate das transmissões de 24/10 (Inter x Botafogo) prontas para relatório."
+  "version": "2.4.19",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.19/Monitor_Esportes.exe",
+  "changelog": "v2.4.19: Correção definitiva e comprovada por teste real do erro 'Expecting , delimiter' na cronologia do Gemini (reparo automático de vírgulas faltantes em transmissões longas), geração com sucesso de 27 marcos e 46 inserções comerciais com PDF completo, e despoluição total da fila da direita."
 }
