@@ -1,5 +1,5 @@
 {
-  "version": "2.4.23",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.23/Monitor_Esportes.exe",
-  "changelog": "v2.4.23: Correção do fluxo de auditoria autônoma CBF (jogos das Rodadas 31 e 32 integrados canonicamente, migração dinâmica de partidas encerradas e preservação de jogos pendentes sem expurgo de 48h). Blindagem do EmailService contra SMTPServerDisconnected (fallback automático entre portas 587 STARTTLS e 465 SSL, retries e timeout) e correção de layout anti-cortes de botões na aba Canais Live."
+  "version": "2.4.24",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.24/Monitor_Esportes.exe",
+  "changelog": "v2.4.24: Auditoria de Eventos NBA multi-plataforma completa. Seções dedicadas exclusivas de transmissão em streaming (1. Cronologia NBA Game Book/League Pass, 2. Disney / Amazon Prime / ESPN, 3. Parecer de Governança). Seletor interativo de plataformas na GUI e sincronização automatizada com a nova biblioteca do SharePoint 'Relatorios_de_Jogos_NBA' com preenchimento correto das colunas."
 }

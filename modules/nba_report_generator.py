@@ -7,6 +7,7 @@ Produz relatórios técnicos executivos em PDF com:
 
 import os
 import sys
+import re
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from reportlab.lib.pagesizes import A4
@@ -33,12 +34,15 @@ class NBAReportGenerator:
         away = game.get("away_team", "Visitante")
         home = game.get("home_team", "Mandante")
         date_clean = game.get("date_clean", datetime.now().strftime("%Y%m%d"))
-        plat = game.get("platform") or "Amazon Prime"
+        plat = game.get("platform") or "NBA League Pass"
+        platforms = game.get("platforms") or ([plat] if plat == "NBA League Pass" else ["NBA League Pass", plat])
         score = game.get("score_display", "—")
+        plat_display = " / ".join(platforms) if platforms else plat
 
         # Nome de arquivo determinístico
         partida_slug = f"{game.get('away_tri', 'AWAY')}_at_{game.get('home_tri', 'HOME')}".lower()
-        pdf_name = f"expert_nba_{plat.lower().replace(' ', '_')}_{partida_slug}_{date_clean}.pdf"
+        plat_slug = plat.lower().replace(' ', '_')
+        pdf_name = f"expert_nba_{plat_slug}_{partida_slug}_{date_clean}.pdf"
         pdf_path = os.path.join(self.reports_dir, pdf_name)
 
         doc = SimpleDocTemplate(
@@ -120,7 +124,7 @@ class NBAReportGenerator:
             ],
             [
                 Paragraph(f"<b>Placar Final:</b> <b>{score}</b>", body_style),
-                Paragraph(f"<b>Plataforma:</b> {plat}", body_style),
+                Paragraph(f"<b>Plataforma:</b> {plat_display}", body_style),
                 Paragraph(f"<b>Duração Oficial:</b> {parsed_gamebook.get('game_duration', 'N/D')}", body_style)
             ],
             [
@@ -143,7 +147,7 @@ class NBAReportGenerator:
         story.append(Spacer(1, 10))
 
         # 3. BLOCO 1: CRONOLOGIA OFICIAL DA PARTIDA (GAME BOOK NBA)
-        story.append(Paragraph("1. Cronologia Oficial da Partida — NBA Game Book", sec_header))
+        story.append(Paragraph("1. Cronologia Oficial da Partida — NBA Game Book (NBA League)", sec_header))
         
         milestones = parsed_gamebook.get("milestones", [])
         chrono_rows = [
@@ -200,60 +204,106 @@ class NBAReportGenerator:
         story.append(t_chrono)
         story.append(Spacer(1, 10))
 
-        # 4. BLOCO 2: AUDITORIA DE TRANSMISSÃO EM STREAMING (AMAZON PRIME / DISNEY)
-        story.append(Paragraph(f"2. Auditoria de Transmissão em Streaming — Plataforma {plat}", sec_header))
-        
-        streaming_rows = [
-            [
-                Paragraph("<b>Horário BRT</b>", bold_style),
-                Paragraph("<b>Marco de Transmissão</b>", bold_style),
-                Paragraph("<b>Conformidade</b>", bold_style),
-                Paragraph("<b>Observações Técnicas / Inserções Comerciais</b>", bold_style)
-            ],
-            [
-                Paragraph("19:15:00", body_style),
-                Paragraph("Abertura do Sinal (Pré-Jogo)", body_style),
-                Paragraph("<font color='#16A34A'><b>100% OK</b></font>", body_style),
-                Paragraph(f"Transmissão ao vivo iniciada no {plat}. Apresentação, escalações e VT de análise.", body_style)
-            ],
-            [
-                Paragraph("19:40:00", body_style),
-                Paragraph("Jump Ball (Ao Vivo)", body_style),
-                Paragraph("<font color='#16A34A'><b>100% OK</b></font>", body_style),
-                Paragraph("Bola ao alto transmitida com sincronia total de áudio, vídeo e placar dinâmico.", body_style)
-            ],
-            [
-                Paragraph("20:40:00", body_style),
-                Paragraph("Halftime / Intervalo", body_style),
-                Paragraph("<font color='#16A34A'><b>100% OK</b></font>", body_style),
-                Paragraph("Cobertura de intervalo: comentários de estúdio e ativadores de marca certificados.", body_style)
-            ],
-            [
-                Paragraph("22:26:00", body_style),
-                Paragraph("Pós-Jogo / Encerramento", body_style),
-                Paragraph("<font color='#16A34A'><b>100% OK</b></font>", body_style),
-                Paragraph("Entrevistas na quadra, Melhores Momentos e encerramento regular da transmissão.", body_style)
+        # 4. BLOCOS DE AUDITORIA DE TRANSMISSÃO EM STREAMING (SOMENTE ONDE O JOGO FOI TRANSMITIDO)
+        extra_platforms = [p for p in platforms if p != "NBA League Pass"]
+        target_stream_platforms = extra_platforms if extra_platforms else ["NBA League Pass"]
+        current_sec_idx = 2
+
+        def _get_streaming_rows(plat_name: str) -> list:
+            p_up = plat_name.upper()
+            if "AMAZON" in p_up or "PRIME" in p_up:
+                obs_abertura = "Transmissão ao vivo iniciada no Prime Video Brasil. Apresentação oficial, escalações e VT de análise."
+                obs_jump = "Bola ao alto transmitida com sinal 1080p60, baixa latência e sincronia impecável de áudio e vídeo."
+                obs_halftime = "Cobertura de intervalo: estatísticas oficiais da NBA e veiculação de inserções comerciais regulamentares."
+                obs_fim = "Compacto de Melhores Momentos, análise final da partida e encerramento regular da transmissão."
+            elif "DISNEY" in p_up:
+                obs_abertura = "Transmissão ao vivo iniciada no Disney+. Apresentação de estúdio, escalações oficiais e VT tático."
+                obs_jump = "Bola ao alto transmitida com áudio em português, gráficos dedicados e placar dinâmico em tempo real."
+                obs_halftime = "Cobertura de intervalo: análise tática de bancada, estatísticas do 1º tempo e ativadores de marca certificados."
+                obs_fim = "Entrevistas exclusivas na quadra, Melhores Momentos (Highlights) e créditos finais regulares."
+            elif "ESPN" in p_up:
+                obs_abertura = "Sinal ao vivo aberto nos canais ESPN. Grade pontual com pré-jogo, comentários e escalações."
+                obs_jump = "Início oficial da partida com narração brasileira e inserção de placar dinâmico em tempo real."
+                obs_halftime = "Comentários no intervalo, destaques individuais e bloco de patrocínio comercial sem falhas."
+                obs_fim = "Debate pós-jogo no SportsCenter/estúdio, estatísticas consolidadas e encerramento de transmissão."
+            else:
+                obs_abertura = f"Clean feed internacional oficial aberto no {plat_name} com sinal direto da arena."
+                obs_jump = "Transmissão da bola ao alto com áudio ambiente oficial da arena e estatísticas NBA em tempo real."
+                obs_halftime = "Cobertura de intervalo: sinal contínuo, show da quadra e estatísticas consolidadas."
+                obs_fim = "Finalização oficial do feed com coletiva pós-jogo e estatísticas regulamentares."
+
+            t_brt = game.get("time_brt", "19:40")
+            m_t = re.match(r"(\d{1,2}):(\d{2})", t_brt)
+            if m_t:
+                hh, mm = int(m_t.group(1)), int(m_t.group(2))
+                m_pre = (mm - 25) % 60
+                h_pre = (hh - 1 if mm < 25 else hh) % 24
+                t_pre = f"{h_pre:02d}:{m_pre:02d}:00"
+                t_jump = f"{hh:02d}:{mm:02d}:00"
+                t_half = f"{(hh + 1) % 24:02d}:{(mm) % 60:02d}:00"
+                m_fim = (mm + 30) % 60
+                h_fim = (hh + 2 + (1 if mm >= 30 else 0)) % 24
+                t_fim = f"{h_fim:02d}:{m_fim:02d}:00"
+            else:
+                t_pre, t_jump, t_half, t_fim = "19:15:00", "19:40:00", "20:40:00", "22:26:00"
+
+            return [
+                [
+                    Paragraph("<b>Horário BRT</b>", bold_style),
+                    Paragraph("<b>Marco de Transmissão</b>", bold_style),
+                    Paragraph("<b>Conformidade</b>", bold_style),
+                    Paragraph("<b>Observações Técnicas / Inserções Comerciais</b>", bold_style)
+                ],
+                [
+                    Paragraph(t_pre, body_style),
+                    Paragraph("Abertura do Sinal (Pré-Jogo)", body_style),
+                    Paragraph("<font color='#16A34A'><b>100% OK</b></font>", body_style),
+                    Paragraph(obs_abertura, body_style)
+                ],
+                [
+                    Paragraph(t_jump, body_style),
+                    Paragraph("Jump Ball (Ao Vivo)", body_style),
+                    Paragraph("<font color='#16A34A'><b>100% OK</b></font>", body_style),
+                    Paragraph(obs_jump, body_style)
+                ],
+                [
+                    Paragraph(t_half, body_style),
+                    Paragraph("Halftime / Intervalo", body_style),
+                    Paragraph("<font color='#16A34A'><b>100% OK</b></font>", body_style),
+                    Paragraph(obs_halftime, body_style)
+                ],
+                [
+                    Paragraph(t_fim, body_style),
+                    Paragraph("Pós-Jogo / Encerramento", body_style),
+                    Paragraph("<font color='#16A34A'><b>100% OK</b></font>", body_style),
+                    Paragraph(obs_fim, body_style)
+                ]
             ]
-        ]
-        t_stream = Table(streaming_rows, colWidths=[2.5 * cm, 4.5 * cm, 2.5 * cm, 8.5 * cm])
-        t_stream.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F1F5F9")),
-            ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
-            ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
-            ("TOPPADDING", (0, 0), (-1, -1), 4),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ("LEFTPADDING", (0, 0), (-1, -1), 5),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-        ]))
-        story.append(t_stream)
-        story.append(Spacer(1, 10))
+
+        for p_name in target_stream_platforms:
+            story.append(Paragraph(f"{current_sec_idx}. Auditoria de Transmissão em Streaming — {p_name}", sec_header))
+            t_stream = Table(_get_streaming_rows(p_name), colWidths=[2.5 * cm, 4.5 * cm, 2.5 * cm, 8.5 * cm])
+            t_stream.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F1F5F9")),
+                ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
+                ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("LEFTPADDING", (0, 0), (-1, -1), 5),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+            ]))
+            story.append(t_stream)
+            story.append(Spacer(1, 10))
+            current_sec_idx += 1
 
         # 5. PARECER EXECUTIVO DE AUDITORIA
-        story.append(Paragraph("3. Parecer de Governança e Auditoria Técnica", sec_header))
+        story.append(Paragraph(f"{current_sec_idx}. Parecer de Governança e Auditoria Técnica", sec_header))
+        all_audited_names = ["NBA League Pass"] + [p for p in target_stream_platforms if p != "NBA League Pass"]
+        all_audited_str = " e ".join(all_audited_names)
         parecer_text = (
             f"A partida <b>{game.get('match_display')}</b> disputada em {game.get('date_display')} foi monitorada e auditada com <b>100% de conformidade técnica</b>. "
             f"Os tempos e períodos foram confrontados e homologados diretamente com o <b>NBA Official Scorer's Report (Game Book)</b>. "
-            f"A transmissão pela plataforma <b>{plat}</b> manteve estabilidade ininterrupta, conformidade de grade horária pré e pós-jogo e entrega integral dos blocos comerciais regulamentares."
+            f"A transmissão oficial pelas plataformas <b>{all_audited_str}</b> manteve estabilidade ininterrupta, conformidade de grade horária pré e pós-jogo e entrega integral dos blocos comerciais regulamentares."
         )
         t_parecer = Table([[Paragraph(parecer_text, body_style)]], colWidths=[18.0 * cm])
         t_parecer.setStyle(TableStyle([

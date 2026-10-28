@@ -1,93 +1,40 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_submodules
 
-import os
-import sys
-import glob
-import site
-from PyInstaller.utils.hooks import collect_all
+hiddenimports = ['obsws_python', 'websocket']
+hiddenimports += collect_submodules('obsws_python')
+hiddenimports += collect_submodules('yt_dlp')
+hiddenimports += collect_submodules('reportlab')
+hiddenimports += collect_submodules('google.genai')
+hiddenimports += collect_submodules('paddleocr')
 
-block_cipher = None
-
-# Coleta completa do numpy (datas, binaries e hiddenimports)
-np_datas, np_binaries, np_hidden = collect_all('numpy')
-
-# Localizar e incluir explicitamente as bibliotecas dinâmicas do numpy e openblas
-extra_binaries = list(np_binaries)
-for sp in site.getsitepackages():
-    for lib_dir in ['numpy.libs', 'scipy.libs']:
-        full_dir = os.path.join(sp, lib_dir)
-        if os.path.exists(full_dir):
-            for dll_path in glob.glob(os.path.join(full_dir, '*.dll')):
-                extra_binaries.append((dll_path, lib_dir))
-                extra_binaries.append((dll_path, '.'))
-
-# Playwright (coletor de horários via navegador): inclui driver node e pacotes
-pw_datas, pw_binaries, pw_hidden = collect_all('playwright')
-extra_binaries += list(pw_binaries)
 
 a = Analysis(
-    ['gui/main_gui.py'],
-    pathex=['.'],
-    binaries=extra_binaries,
-    datas=[
-        ('modules', 'modules'),
-        ('config', 'config'),
-        ('data', 'data'),
-        ('version.json', '.'),
-    ] + np_datas + pw_datas,
-    hiddenimports=[
-        'modules',
-        'modules.web_verdict_collector',
-        'modules.perf_logger',
-        'modules.auto_updater',
-        'modules.expert_assistant',
-        'modules.report_generator',
-        'modules.sharepoint_reporter',
-        'modules.audited_games_manager',
-        'modules.autonomous_auditor',
-        'modules.cbf_schedule_fetcher',
-        'customtkinter',
-        'PIL',
-        'cv2',
-        'numpy',
-        'requests',
-        'fitz',
-        'pymupdf',
-    ] + np_hidden + pw_hidden,
+    ['gui\\main_gui.py'],
+    pathex=[],
+    binaries=[],
+    datas=[('C:\\Python312\\Lib\\site-packages\\customtkinter', 'customtkinter/'), ('config', 'config'), ('modules', 'modules'), ('core', 'core'), ('templates', 'templates')],
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[
-        'torch',
-        'torchvision',
-        'scipy',
-        'matplotlib',
-        'botocore',
-        'boto3',
-        'openpyxl',
-        'sklearn',
-        'skimage',
-        'sqlalchemy',
-        'IPython',
-        'notebook',
-    ],
+    excludes=[],
     noarchive=False,
     optimize=0,
 )
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
-    a.zipfiles,
     a.datas,
     [],
     name='Monitor_Esportes',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=False,
+    upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
     console=False,

@@ -234,18 +234,33 @@ class NBAEventsMixin:
             )
             lbl_score.pack(side="left", padx=8)
 
-        # Plataforma
-        plat = game.get("platform") or "Amazon Prime"
-        plat_color = "#1E3A8A" if "AMAZON" in plat.upper() or "PRIME" in plat.upper() else ("#B91C1C" if "DISNEY" in plat.upper() else "#475569")
-        badge_plat = ctk.CTkLabel(
+        # Plataforma Seletor Interativo
+        plat_options = ["Disney", "Amazon Prime", "ESPN", "Disney + ESPN", "NBA League Pass"]
+        current_plat = game.get("platform") or "NBA League Pass"
+        if current_plat not in plat_options:
+            p_chk = current_plat.upper()
+            if "DISNEY" in p_chk: current_plat = "Disney"
+            elif "AMAZON" in p_chk or "PRIME" in p_chk: current_plat = "Amazon Prime"
+            elif "ESPN" in p_chk: current_plat = "ESPN"
+            else: current_plat = "NBA League Pass"
+
+        btn_bg = "#1E3A8A" if "AMAZON" in current_plat.upper() or "PRIME" in current_plat.upper() else ("#B91C1C" if "DISNEY" in current_plat.upper() else ("#C2410C" if "ESPN" in current_plat.upper() else "#334155"))
+        btn_hover = "#1D4ED8" if "AMAZON" in current_plat.upper() or "PRIME" in current_plat.upper() else ("#991B1B" if "DISNEY" in current_plat.upper() else ("#9A3412" if "ESPN" in current_plat.upper() else "#1E293B"))
+
+        opt_plat = ctk.CTkOptionMenu(
             row1,
-            text=f" 📺 {plat} ",
+            values=plat_options,
+            width=135,
+            height=26,
             font=ctk.CTkFont(size=11, weight="bold"),
-            text_color="#FFFFFF",
-            fg_color=plat_color,
-            corner_radius=4
+            fg_color=btn_bg,
+            button_color=btn_hover,
+            button_hover_color=btn_bg,
+            command=lambda val, g=game: self._on_nba_platform_changed(g, val)
         )
-        badge_plat.pack(side="right")
+        opt_plat.set(current_plat)
+        opt_plat.pack(side="right")
+        game["_opt_widget"] = opt_plat
 
         # Linha 2: Detalhes e Botões de Ação
         row2 = ctk.CTkFrame(card, fg_color="transparent")
@@ -310,6 +325,25 @@ class NBAEventsMixin:
         )
         btn_mail.pack(side="left", padx=4)
 
+    def _on_nba_platform_changed(self, game: dict, val: str) -> None:
+        """Manipula a alteração manual da plataforma de transmissão pelo usuário."""
+        self.nba_service.set_game_platform(game, val)
+        # Limpa cache do relatório anterior para forçar regeneração com a nova plataforma
+        self._nba_reports.pop(game.get("id"), None)
+
+        widget = game.get("_opt_widget")
+        if widget:
+            val_up = val.upper()
+            if "AMAZON" in val_up or "PRIME" in val_up:
+                widget.configure(fg_color="#1E3A8A", button_color="#1D4ED8")
+            elif "DISNEY" in val_up:
+                widget.configure(fg_color="#B91C1C", button_color="#991B1B")
+            elif "ESPN" in val_up:
+                widget.configure(fg_color="#C2410C", button_color="#9A3412")
+            else:
+                widget.configure(fg_color="#334155", button_color="#1E293B")
+        self.lbl_nba_status.configure(text=f"Plataforma de {game.get('match_display')} definida como: {val}")
+
     def _on_nba_open_gamebook(self, game: dict) -> None:
         """Baixa e abre o Game Book oficial da NBA no leitor de PDF do sistema."""
         def _worker():
@@ -342,20 +376,18 @@ class NBAEventsMixin:
 
     def _on_nba_sync_sharepoint(self, game: dict) -> None:
         """Sincroniza o relatório do jogo diretamente com o SharePoint."""
-        pdf = self._nba_reports.get(game.get("id"))
-        if not pdf or not os.path.exists(pdf):
-            # Gera antes de sincronizar
+        def _worker():
+            self.lbl_nba_status.configure(text=f"Preparando relatório oficial de {game.get('match_display')}...")
             gb_path = self.nba_service.download_gamebook(game)
             parsed = self.nba_service.parse_gamebook(gb_path) if gb_path else {}
             pdf = self.nba_reporter.generate_report(game, parsed)
             self._nba_reports[game.get("id")] = pdf
 
-        def _worker():
-            self.lbl_nba_status.configure(text=f"Sincronizando {game.get('match_display')} com SharePoint...")
+            self.lbl_nba_status.configure(text=f"Sincronizando {game.get('match_display')} com SharePoint ({game.get('platform')})...")
             ok = SharePointNBAReporter.sync_nba_report(pdf, game)
             if ok:
                 self.lbl_nba_status.configure(text=f"🎉 Sincronizado no SharePoint com sucesso: {game.get('match_display')}")
-                self.after(0, lambda: messagebox.showinfo("SharePoint NBA", f"Relatório de {game.get('match_display')} sincronizado com sucesso!"))
+                self.after(0, lambda: messagebox.showinfo("SharePoint NBA", f"Relatório de {game.get('match_display')} sincronizado com sucesso!\nPlataforma: {game.get('platform')}"))
             else:
                 self.lbl_nba_status.configure(text=f"⚠️ Falha ao sincronizar {game.get('match_display')} no SharePoint.")
         threading.Thread(target=_worker, daemon=True).start()

@@ -114,18 +114,37 @@ class NBAService:
                 except Exception:
                     pass
 
-            # Detectar Emissora
+            # Detectar Emissora e Plataformas de Transmissão Oficiais
             broadcasts = comp.get("broadcasts", [])
-            broadcaster_name = "Outro"
             broadcaster_raw = []
+            raw_broadcast_str = ""
             for b in broadcasts:
                 for b_name in b.get("names", []):
                     broadcaster_raw.append(b_name)
-                    b_upper = b_name.upper()
-                    for k, plat in BROADCASTER_MAPPING.items():
-                        if k in b_upper:
-                            broadcaster_name = plat
-                            break
+                    raw_broadcast_str += " " + b_name.upper()
+
+            # Todo jogo da NBA possui transmissão garantida pelo NBA League Pass
+            detected_platforms = ["NBA League Pass"]
+            broadcaster_name = "NBA League Pass"
+
+            if any(k in raw_broadcast_str for k in ["PRIME", "AMAZON"]):
+                broadcaster_name = "Amazon Prime"
+                if "Amazon Prime" not in detected_platforms:
+                    detected_platforms.append("Amazon Prime")
+            elif any(k in raw_broadcast_str for k in ["DISNEY", "STAR+"]):
+                broadcaster_name = "Disney"
+                if "Disney" not in detected_platforms:
+                    detected_platforms.append("Disney")
+            elif "ESPN" in raw_broadcast_str:
+                broadcaster_name = "Disney"
+                if "Disney" not in detected_platforms:
+                    detected_platforms.append("Disney")
+                if "ESPN" not in detected_platforms:
+                    detected_platforms.append("ESPN")
+            elif "ABC" in raw_broadcast_str:
+                broadcaster_name = "Disney"
+                if "Disney" not in detected_platforms:
+                    detected_platforms.append("Disney")
 
             # URL determinística do Game Book oficial da NBA
             gamebook_filename = f"{date_clean}_{away_tri}{home_tri}_book.pdf"
@@ -150,6 +169,7 @@ class NBAService:
                 "is_finished": status_state == "post" or "FINAL" in status_desc.upper(),
                 "is_live": status_state == "in",
                 "platform": broadcaster_name,
+                "platforms": detected_platforms,
                 "broadcasts_raw": broadcaster_raw,
                 "gamebook_url": gamebook_url,
                 "gamebook_filename": gamebook_filename,
@@ -262,3 +282,30 @@ class NBAService:
             parsed["error"] = f"Falha na extração do Game Book: {e}"
 
         return parsed
+
+    @classmethod
+    def set_game_platform(cls, game: Dict[str, Any], platform_name: str) -> None:
+        """
+        Define as plataformas auditadas do jogo, garantindo que o Game Book (NBA League Pass)
+        seja sempre o marco #1 e a plataforma de streaming selecionada seja o marco secundário.
+        """
+        p_up = platform_name.upper()
+        if "DISNEY + ESPN" in p_up:
+            game["platform"] = "Disney"
+            game["platforms"] = ["NBA League Pass", "Disney", "ESPN"]
+        elif "DISNEY" in p_up:
+            game["platform"] = "Disney"
+            game["platforms"] = ["NBA League Pass", "Disney"]
+        elif "AMAZON" in p_up or "PRIME" in p_up:
+            game["platform"] = "Amazon Prime"
+            game["platforms"] = ["NBA League Pass", "Amazon Prime"]
+        elif "ESPN" in p_up:
+            game["platform"] = "ESPN"
+            game["platforms"] = ["NBA League Pass", "ESPN"]
+        elif "LEAGUE" in p_up or "NBA" in p_up:
+            game["platform"] = "NBA"
+            game["platforms"] = ["NBA League Pass"]
+        else:
+            game["platform"] = platform_name
+            game["platforms"] = ["NBA League Pass", platform_name]
+

@@ -86,14 +86,23 @@ class SharePointNBAReporter:
             if not item_id:
                 return False
 
-            # Normalização de Plataforma
+            # Normalização de Plataforma estritamente alinhada com as Opções da Biblioteca:
+            # ['Amazon Prime', 'Disney', 'Escolha 3', 'ESPN', 'NBA', 'YouTube', 'Caze TV', 'Outro']
             raw_plat = (game.get("platform") or "").upper()
             if "AMAZON" in raw_plat or "PRIME" in raw_plat:
                 plat_norm = "Amazon Prime"
-            elif "DISNEY" in raw_plat or "ESPN" in raw_plat:
+            elif "DISNEY" in raw_plat:
                 plat_norm = "Disney"
+            elif "ESPN" in raw_plat:
+                plat_norm = "ESPN"
+            elif "CAZE" in raw_plat:
+                plat_norm = "Caze TV"
+            elif "YOUTUBE" in raw_plat:
+                plat_norm = "YouTube"
+            elif "LEAGUE" in raw_plat or "NBA" in raw_plat:
+                plat_norm = "NBA"
             else:
-                plat_norm = "Outro"
+                plat_norm = "NBA"
 
             # Data ISO UTC
             iso_utc = game.get("iso_utc") or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
