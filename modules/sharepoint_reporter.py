@@ -145,14 +145,16 @@ class SharePointReporter:
 
     @staticmethod
     def normalizar_plataforma(plat: str) -> str:
-        plat_upper = (plat or "").upper()
+        plat_upper = (plat or "").strip().upper()
         if "AMAZON" in plat_upper or "PRIME" in plat_upper:
             return "Amazon Prime"
         elif "CAZE" in plat_upper or "CAZÉ" in plat_upper:
             return "Caze TV"
         elif "MAX" in plat_upper or "HBO" in plat_upper:
             return "Max"
-        return "Amazon Prime"
+        elif "OUTRO" in plat_upper or "OTHER" in plat_upper:
+            return "Outro"
+        return "Outro"
 
     @classmethod
     def normalizar_confianca(cls, conf: float | str) -> str:

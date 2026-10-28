@@ -224,7 +224,7 @@ class AutonomousAuditor:
                 "item_id": item_id,
                 "partida": partida_field or name,
                 "campeonato": comp_field or "Brasileiro Serie A",
-                "plataforma": plat_field or "Amazon Prime",
+                "plataforma": plat_field or "Outro",
                 "data_hora": data_hora_field,
                 "status_anterior": status_field,
                 "is_conforme": not needs_fix,

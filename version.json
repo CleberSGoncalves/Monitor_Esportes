@@ -1,5 +1,5 @@
 {
-  "version": "2.4.20",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.20/Monitor_Esportes.exe",
-  "changelog": "v2.4.20: Feedback visual em tempo real por etapas no botão de geração e no card (barra de progresso com porcentagem e descrição da etapa ativa 1/4 Transcrição, 2/4 Gemini Lances/Marcas, 3/4 Renderizando PDF, 4/4 Nuvem), desacoplamento assíncrono do SharePoint/E-mail que disponibiliza o PDF instantaneamente em 1 clique e botão de abertura direta '✅ Abrir Relatório PDF (Pronto)'."
+  "version": "2.4.21",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.21/Monitor_Esportes.exe",
+  "changelog": "v2.4.21: Correção estrita de mapeamento de plataforma no SharePoint (canais alternativos/YouTube salvos obrigatoriamente como 'Outro', preservando Amazon Prime e CazéTV exclusivamente para transmissões oficiais CBF), blindagem de fallback contra inconsistências de metadados e envio certificado dos relatórios das Rodadas 31 e 32 do Brasileirão Série A."
 }

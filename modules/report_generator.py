@@ -1611,7 +1611,7 @@ class ReportGenerator:
                 print(f"[SharePoint] Ignorando sincronização: resultado sem partida válida ou com erro.")
             else:
                 comp = str(res0.get("competition") or "Brasileiro Serie A").strip()
-                plat = str(res0.get("platform") or "Amazon Prime").strip()
+                plat = str(res0.get("platform") or "Outro").strip()
                 conf = f"{float(res0.get('confidence_score') or 99.0):.1f}%"
                 event_date = res0.get("date") or res0.get("event_date") or ""
                 event_time = res0.get("time") or res0.get("event_time") or ""
