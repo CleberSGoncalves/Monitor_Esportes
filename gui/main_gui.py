@@ -498,16 +498,13 @@ def _load_cbf_streaming_events() -> list:
         
     # Garantir que os jogos oficiais da escala atual (Copa do Brasil e Brasileirão Série A) estejam sempre presentes
     official_schedule_2026 = [
-        {"comp": "Brasileirão Série A", "partida": "Fluminense x Internacional", "team1": "Fluminense", "team2": "Internacional", "date": "28/10/2026", "time": "18:30", "platform": "CazéTV"},
-        {"comp": "Brasileirão Série A", "partida": "Vasco da Gama x Flamengo", "team1": "Vasco da Gama", "team2": "Flamengo", "date": "29/10/2026", "time": "19:00", "platform": "Amazon Prime"},
-        {"comp": "Brasileirão Série A", "partida": "Flamengo x Corinthians", "team1": "Flamengo", "team2": "Corinthians", "date": "31/10/2026", "time": "18:00", "platform": "CazéTV"},
+        {"comp": "Brasileirão Série A", "partida": "Vasco da Gama x Flamengo", "team1": "Vasco da Gama", "team2": "Flamengo", "date": "29/10/2026", "time": "20:00", "platform": "Amazon Prime"},
         {"comp": "Copa do Brasil", "partida": "Palmeiras x Vasco da Gama", "team1": "Palmeiras", "team2": "Vasco da Gama", "date": "01/11/2026", "time": "15:00", "platform": "Amazon Prime"},
         {"comp": "Copa do Brasil", "partida": "Grêmio x Atlético-MG", "team1": "Grêmio", "team2": "Atlético-MG", "date": "01/11/2026", "time": "17:30", "platform": "Amazon Prime"},
-        {"comp": "Brasileirão Série A", "partida": "Athletico-PR x Vasco da Gama", "team1": "Athletico-PR", "team2": "Vasco da Gama", "date": "04/11/2026", "time": "18:30", "platform": "CazéTV"},
-        {"comp": "Brasileirão Série A", "partida": "São Paulo x Corinthians", "team1": "São Paulo", "team2": "Corinthians", "date": "04/11/2026", "time": "20:30", "platform": "CazéTV"},
-        {"comp": "Brasileirão Série A", "partida": "Cruzeiro x Bahia", "team1": "Cruzeiro", "team2": "Bahia", "date": "05/11/2026", "time": "20:30", "platform": "Amazon Prime"},
+        {"comp": "Brasileirão Série A", "partida": "Athletico-PR x Vasco da Gama", "team1": "Athletico-PR", "team2": "Vasco da Gama", "date": "04/11/2026", "time": "19:30", "platform": "CazéTV"},
+        {"comp": "Brasileirão Série A", "partida": "Cruzeiro x Bahia", "team1": "Cruzeiro", "team2": "Bahia", "date": "05/11/2026", "time": "21:30", "platform": "Amazon Prime"},
         {"comp": "Copa do Brasil", "partida": "Atlético-MG x Grêmio", "team1": "Atlético-MG", "team2": "Grêmio", "date": "07/11/2026", "time": "17:00", "platform": "Amazon Prime"},
-        {"comp": "Copa do Brasil", "partida": "Vasco da Gama x Palmeiras", "team1": "Vasco da Gama", "team2": "Palmeiras", "date": "08/11/2026", "time": "16:00", "platform": "Amazon Prime"},
+        {"comp": "Copa do Brasil", "partida": "Vasco da Gama x Palmeiras", "team1": "Vasco da Gama", "team2": "Palmeiras", "date": "08/11/2026", "time": "16:00", "platform": "Amazon Prime"}
     ]
     existing_keys = {(e.get("date"), e.get("team1", "").lower()[:5]) for e in events}
     for off_ev in official_schedule_2026:
@@ -871,6 +868,14 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
         # Inicia provedor de API para o Frontend React (Porta 5000)
         start_api_thread(self)
         self._on_autostop_change() # Sync inicial
+
+        # Inicia o Auditor Autônomo e Sincronizador de Agenda da NBA
+        try:
+            from modules.nba_autonomous_auditor import NBAAutonomousAuditor
+            nba_auditor = NBAAutonomousAuditor.get_instance(check_interval_sec=180, log_callback=self._log)
+            nba_auditor.start()
+        except Exception as e:
+            self._log(f"⚠️ [NBA] Não foi possível iniciar Auditor Autônomo da NBA: {e}")
 
     def _on_autostop_change(self) -> None:
         try:
@@ -9168,6 +9173,11 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
     # =========================================================
 
     def _on_close(self) -> None:
+        try:
+            from modules.nba_autonomous_auditor import NBAAutonomousAuditor
+            NBAAutonomousAuditor.get_instance().stop()
+        except Exception:
+            pass
         try:
             if hasattr(self, "live_service") and self.live_service:
                 self.live_service.stop()

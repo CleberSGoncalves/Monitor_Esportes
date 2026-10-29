@@ -1,5 +1,5 @@
 {
-  "version": "2.4.25",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.25/Monitor_Esportes.exe",
-  "changelog": "v2.4.25: Adicionado botão direto '🏀 Eventos NBA' na barra superior de Estratégia de Monitoramento e corrigida visibilidade da aba NBA. Atualizada a escala oficial completa de próximos jogos da Copa do Brasil e Brasileirão Série A (preenchendo todos os 5 slots da fila). Adicionada sincronização em lote da agenda da NBA com a biblioteca 'Relatorios_de_Jogos_NBA' no SharePoint."
+  "version": "2.4.26",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.26/Monitor_Esportes.exe",
+  "changelog": "v2.4.26: Auditoria e sincronização 100% autônoma da NBA em background (monitoramento de grade, geração de relatórios, SharePoint e envio de e-mail automático). Modal interativo de seleção de destinatários por e-mail para jogos da NBA. Feedback visual e alertas confirmatórios no botão SharePoint. Purga definitiva de partidas fictícias e alinhamento estrito com a escala oficial CBF 2026 (Amazon Prime e CazéTV)."
 }

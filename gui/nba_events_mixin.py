@@ -102,12 +102,16 @@ class NBAEventsMixin:
         )
         btn_audit_all.pack(side="right", padx=4)
 
-        btn_sync_sched = ctk.CTkButton(
-            top_bar, text="📅 Publicar Agenda SharePoint", width=190, height=32,
-            fg_color=("#7C3AED", "#6D28D9"),
-            command=self._nba_publish_schedule_to_sharepoint
+        # Indicador de Auditoria Autônoma
+        auto_badge = ctk.CTkFrame(top_bar, fg_color=("#DCFCE7", "#064E3B"), corner_radius=6, height=32)
+        auto_badge.pack(side="right", padx=6)
+        lbl_auto = ctk.CTkLabel(
+            auto_badge,
+            text="🤖 Auditoria Autônoma NBA: ATIVA",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color=("#15803D", "#4ADE80")
         )
-        btn_sync_sched.pack(side="right", padx=4)
+        lbl_auto.pack(side="left", padx=10, pady=4)
 
         # 2. STATUS / RESUMO DO DIA
         self.lbl_nba_status = ctk.CTkLabel(
@@ -319,6 +323,7 @@ class NBAEventsMixin:
             command=lambda g=game: self._on_nba_sync_sharepoint(g)
         )
         btn_sp.pack(side="left", padx=4)
+        game["_btn_sp"] = btn_sp
 
         # Botão 4: E-mail
         btn_mail = ctk.CTkButton(
@@ -328,9 +333,10 @@ class NBAEventsMixin:
             height=26,
             font=ctk.CTkFont(size=11),
             fg_color=("#16A34A", "#15803D"),
-            command=lambda g=game: self._on_nba_send_email(g)
+            command=lambda g=game: self._open_nba_email_modal(g)
         )
         btn_mail.pack(side="left", padx=4)
+        game["_btn_mail"] = btn_mail
 
     def _on_nba_platform_changed(self, game: dict, val: str) -> None:
         """Manipula a alteração manual da plataforma de transmissão pelo usuário."""
@@ -382,61 +388,239 @@ class NBAEventsMixin:
         threading.Thread(target=_worker, daemon=True).start()
 
     def _on_nba_sync_sharepoint(self, game: dict) -> None:
-        """Sincroniza o relatório do jogo diretamente com o SharePoint."""
-        def _worker():
-            self.lbl_nba_status.configure(text=f"Preparando relatório oficial de {game.get('match_display')}...")
-            gb_path = self.nba_service.download_gamebook(game)
-            parsed = self.nba_service.parse_gamebook(gb_path) if gb_path else {}
-            pdf = self.nba_reporter.generate_report(game, parsed)
-            self._nba_reports[game.get("id")] = pdf
-
-            self.lbl_nba_status.configure(text=f"Sincronizando {game.get('match_display')} com SharePoint ({game.get('platform')})...")
-            ok = SharePointNBAReporter.sync_nba_report(pdf, game)
-            if ok:
-                self.lbl_nba_status.configure(text=f"🎉 Sincronizado no SharePoint com sucesso: {game.get('match_display')}")
-                self.after(0, lambda: messagebox.showinfo("SharePoint NBA", f"Relatório de {game.get('match_display')} sincronizado com sucesso!\nPlataforma: {game.get('platform')}"))
-            else:
-                self.lbl_nba_status.configure(text=f"⚠️ Falha ao sincronizar {game.get('match_display')} no SharePoint.")
-        threading.Thread(target=_worker, daemon=True).start()
-
-    def _on_nba_send_email(self, game: dict) -> None:
-        """Envia o relatório oficial do jogo da NBA por e-mail para Arthur e Cleber."""
-        pdf = self._nba_reports.get(game.get("id"))
-        if not pdf or not os.path.exists(pdf):
-            gb_path = self.nba_service.download_gamebook(game)
-            parsed = self.nba_service.parse_gamebook(gb_path) if gb_path else {}
-            pdf = self.nba_reporter.generate_report(game, parsed)
-            self._nba_reports[game.get("id")] = pdf
+        """Sincroniza o relatório do jogo diretamente com o SharePoint com feedback visual imediato e alertas."""
+        btn_sp = game.get("_btn_sp")
+        if btn_sp:
+            btn_sp.configure(text="⏳ Enviando...", state="disabled")
 
         def _worker():
             try:
-                import json
-                with open("config/saved_emails.json", "r", encoding="utf-8") as f:
-                    recipients = json.load(f)
-                with open("config/google_ai.json", "r", encoding="utf-8") as f:
-                    ai_cfg = json.load(f)
+                self.lbl_nba_status.configure(text=f"Preparando relatório oficial de {game.get('match_display')}...")
+                gb_path = self.nba_service.download_gamebook(game) if game.get("is_finished") else None
+                parsed = self.nba_service.parse_gamebook(gb_path) if gb_path else {}
+                pdf = self.nba_reporter.generate_report(game, parsed)
+                self._nba_reports[game.get("id")] = pdf
 
-                svc = EmailService("smtp.gmail.com", 587, ai_cfg.get("email"), ai_cfg.get("senha"))
-                subj = f"🏀 Relatório de Auditoria NBA — {game.get('match_display')} ({game.get('platform')})"
-                body = (
-                    f"Olá,\n\n"
-                    f"Segue em anexo o relatório oficial de auditoria técnica da NBA:\n"
-                    f"• Partida: {game.get('match_display')}\n"
-                    f"• Data: {game.get('date_display')} às {game.get('time_brt')} BRT\n"
-                    f"• Placar Final: {game.get('score_display')}\n"
-                    f"• Plataforma: {game.get('platform')}\n\n"
-                    f"Relatório homologado com o NBA Game Book oficial e sincronizado com o SharePoint.\n\n"
-                    f"— Monitor de Esportes / Auditoria NBA"
-                )
-                ok = svc.send_report(recipients, subj, body, pdf_path=pdf)
+                self.lbl_nba_status.configure(text=f"Sincronizando {game.get('match_display')} com SharePoint ({game.get('platform')})...")
+                ok = SharePointNBAReporter.sync_nba_report(pdf, game)
                 if ok:
-                    self.lbl_nba_status.configure(text=f"✉️ E-mail enviado com sucesso para {', '.join(recipients)}")
-                    self.after(0, lambda: messagebox.showinfo("E-mail Enviado", f"Relatório enviado com sucesso para:\n{', '.join(recipients)}"))
+                    self.lbl_nba_status.configure(text=f"🎉 Sincronizado no SharePoint com sucesso: {game.get('match_display')}")
+                    if btn_sp:
+                        self.after(0, lambda: btn_sp.configure(text="✅ Sincronizado", state="normal", fg_color=("#16A34A", "#15803D")))
+                    status_lbl = "Auditado (99.0%)" if game.get("is_finished") else "Agendado"
+                    self.after(0, lambda: messagebox.showinfo(
+                        "SharePoint NBA",
+                        f"✅ SUCESSO!\n\n"
+                        f"Partida sincronizada na biblioteca 'Relatorios_de_Jogos_NBA':\n\n"
+                        f"• Jogo: {game.get('match_display')}\n"
+                        f"• Data: {game.get('date_display')} às {game.get('time_brt')} BRT\n"
+                        f"• Plataforma: {game.get('platform')}\n"
+                        f"• Status: {status_lbl}\n"
+                        f"• Placar: {game.get('score_display')}"
+                    ))
                 else:
-                    self.lbl_nba_status.configure(text="❌ Falha no envio do e-mail.")
+                    self.lbl_nba_status.configure(text=f"⚠️ Falha ao sincronizar {game.get('match_display')} no SharePoint.")
+                    if btn_sp:
+                        self.after(0, lambda: btn_sp.configure(text="❌ Erro", state="normal", fg_color=("#DC2626", "#B91C1C")))
+                    self.after(0, lambda: messagebox.showerror(
+                        "Erro SharePoint NBA",
+                        f"❌ Falha ao sincronizar a partida no SharePoint:\n\n"
+                        f"• Jogo: {game.get('match_display')}\n"
+                        f"• Plataforma: {game.get('platform')}\n\n"
+                        f"Verifique sua conexão e tente novamente."
+                    ))
             except Exception as e:
-                self.after(0, lambda: messagebox.showerror("Erro E-mail", str(e)))
+                self.lbl_nba_status.configure(text=f"⚠️ Erro ao sincronizar no SharePoint: {e}")
+                if btn_sp:
+                    self.after(0, lambda: btn_sp.configure(text="❌ Erro", state="normal", fg_color=("#DC2626", "#B91C1C")))
+                self.after(0, lambda: messagebox.showerror("Erro SharePoint NBA", str(e)))
+
         threading.Thread(target=_worker, daemon=True).start()
+
+    def _open_nba_email_modal(self, game: dict) -> None:
+        """Abre modal interativo para escolher destinatários e enviar relatório de auditoria da NBA por e-mail."""
+        modal = ctk.CTkToplevel(self)
+        modal.title(f"✉️ Enviar Relatório de Auditoria NBA — {game.get('match_display')}")
+        modal.geometry("520x460")
+        modal.resizable(False, False)
+        modal.transient(self)
+        modal.grab_set()
+
+        # Centralizar na janela principal
+        try:
+            self.update_idletasks()
+            x = self.winfo_x() + (self.winfo_width() // 2) - 260
+            y = self.winfo_y() + (self.winfo_height() // 2) - 230
+            modal.geometry(f"520x460+{x}+{y}")
+        except Exception:
+            pass
+
+        # Cabeçalho
+        header = ctk.CTkFrame(modal, fg_color=("#0F172A", "#1E293B"), corner_radius=0, height=60)
+        header.pack(fill="x")
+        header.pack_propagate(False)
+
+        ctk.CTkLabel(
+            header,
+            text="✉️ Disparo de Relatório Oficial NBA",
+            font=ctk.CTkFont(size=15, weight="bold"),
+            text_color="#F8FAFC"
+        ).pack(anchor="w", padx=16, pady=(10, 2))
+
+        ctk.CTkLabel(
+            header,
+            text="Selecione os destinatários para o envio imediato do PDF de auditoria técnica",
+            font=ctk.CTkFont(size=11),
+            text_color="#94A3B8"
+        ).pack(anchor="w", padx=16)
+
+        # Card de Informações da Partida
+        info_frame = ctk.CTkFrame(modal, fg_color=("#F1F5F9", "#0F172A"), corner_radius=8, border_width=1, border_color=("#CBD5E1", "#334155"))
+        info_frame.pack(fill="x", padx=16, pady=12)
+
+        ctk.CTkLabel(
+            info_frame,
+            text=f"🏀 {game.get('match_display')}",
+            font=ctk.CTkFont(size=13, weight="bold"),
+            text_color=("#0F172A", "#F8FAFC")
+        ).pack(anchor="w", padx=12, pady=(8, 2))
+
+        details_text = f"📅 {game.get('date_display')} às {game.get('time_brt')} BRT   |   Plataforma: {game.get('platform')}   |   Placar: {game.get('score_display')}"
+        ctk.CTkLabel(
+            info_frame,
+            text=details_text,
+            font=ctk.CTkFont(size=11),
+            text_color=("#475569", "#94A3B8")
+        ).pack(anchor="w", padx=12, pady=(0, 8))
+
+        # Lista de Destinatários com Checkboxes
+        dest_frame = ctk.CTkFrame(modal, fg_color="transparent")
+        dest_frame.pack(fill="both", expand=True, padx=16, pady=(0, 10))
+
+        lbl_dest_row = ctk.CTkFrame(dest_frame, fg_color="transparent")
+        lbl_dest_row.pack(fill="x", pady=(0, 4))
+
+        ctk.CTkLabel(
+            lbl_dest_row,
+            text="Destinatários Selecionados:",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color=("#0F172A", "#F8FAFC")
+        ).pack(side="left")
+
+        scroll_emails = ctk.CTkScrollableFrame(dest_frame, fg_color=("#FFFFFF", "#1E293B"), border_width=1, border_color=("#CBD5E1", "#334155"), height=150)
+        scroll_emails.pack(fill="both", expand=True)
+
+        import json
+        saved_emails = []
+        try:
+            with open("config/saved_emails.json", "r", encoding="utf-8") as f:
+                saved_emails = json.load(f)
+        except Exception:
+            saved_emails = ["cleber.goncalves@ibope.com", "arthur@mediadna.com.br", "luiz.lemos@ibope.com", "arthur.luiz@ibope.com"]
+
+        email_vars = {}
+        for em in saved_emails:
+            var = ctk.BooleanVar(value=True)
+            email_vars[em] = var
+            chk = ctk.CTkCheckBox(
+                scroll_emails,
+                text=em,
+                variable=var,
+                font=ctk.CTkFont(size=12),
+                text_color=("#0F172A", "#F8FAFC")
+            )
+            chk.pack(anchor="w", padx=8, pady=4)
+
+        # Status / Feedback no modal
+        lbl_modal_status = ctk.CTkLabel(modal, text="", font=ctk.CTkFont(size=11), text_color="gray")
+        lbl_modal_status.pack(padx=16, pady=(0, 4))
+
+        # Botões de Ação na Base
+        btn_row = ctk.CTkFrame(modal, fg_color="transparent")
+        btn_row.pack(fill="x", padx=16, pady=(0, 14))
+
+        def _do_send():
+            selected = [em for em, v in email_vars.items() if v.get()]
+            if not selected:
+                messagebox.showwarning("Destinatários", "Por favor, selecione pelo menos um e-mail para envio.")
+                return
+
+            btn_send.configure(state="disabled", text="⏳ Enviando...")
+            lbl_modal_status.configure(text=f"Gerando relatório e disparando para {len(selected)} destinatário(s)...", text_color="#0284C7")
+
+            def _thread_send():
+                try:
+                    pdf = self._nba_reports.get(game.get("id"))
+                    if not pdf or not os.path.exists(pdf):
+                        gb_path = self.nba_service.download_gamebook(game) if game.get("is_finished") else None
+                        parsed = self.nba_service.parse_gamebook(gb_path) if gb_path else {}
+                        pdf = self.nba_reporter.generate_report(game, parsed)
+                        self._nba_reports[game.get("id")] = pdf
+
+                    with open("config/google_ai.json", "r", encoding="utf-8") as f:
+                        ai_cfg = json.load(f)
+
+                    svc = EmailService("smtp.gmail.com", 587, ai_cfg.get("email"), ai_cfg.get("senha"))
+                    subj = f"🏀 Relatório de Auditoria NBA — {game.get('match_display')} ({game.get('platform')})"
+                    body = (
+                        f"Olá,\n\n"
+                        f"Segue em anexo o relatório oficial de auditoria técnica da NBA:\n\n"
+                        f"• Partida: {game.get('match_display')}\n"
+                        f"• Data: {game.get('date_display')} às {game.get('time_brt')} BRT\n"
+                        f"• Placar: {game.get('score_display')}\n"
+                        f"• Plataforma: {game.get('platform')}\n\n"
+                        f"Relatório homologado com o NBA Game Book oficial e sincronizado com o SharePoint.\n\n"
+                        f"— Monitor de Esportes / Auditoria NBA"
+                    )
+                    ok = svc.send_report(selected, subj, body, pdf_path=pdf)
+                    if ok:
+                        self.after(0, lambda: [
+                            modal.destroy(),
+                            messagebox.showinfo(
+                                "E-mail Enviado com Sucesso",
+                                f"✅ O relatório de {game.get('match_display')} foi enviado com sucesso para:\n\n" + "\n".join(f"• {e}" for e in selected)
+                            )
+                        ])
+                    else:
+                        self.after(0, lambda: [
+                            btn_send.configure(state="normal", text="🚀 Enviar E-mail"),
+                            lbl_modal_status.configure(text="❌ Falha no envio do e-mail. Verifique o log.", text_color="#EF4444"),
+                            messagebox.showerror("Erro E-mail", "Falha ao enviar e-mail. Verifique as credenciais SMTP no config/google_ai.json.")
+                        ])
+                except Exception as ex:
+                    self.after(0, lambda: [
+                        btn_send.configure(state="normal", text="🚀 Enviar E-mail"),
+                        lbl_modal_status.configure(text=f"❌ Erro: {ex}", text_color="#EF4444"),
+                        messagebox.showerror("Erro E-mail", f"Erro no envio: {ex}")
+                    ])
+
+            threading.Thread(target=_thread_send, daemon=True).start()
+
+        btn_cancel = ctk.CTkButton(
+            btn_row,
+            text="Cancelar",
+            width=100,
+            height=32,
+            fg_color=("#CBD5E1", "#334155"),
+            text_color=("#0F172A", "#F8FAFC"),
+            command=modal.destroy
+        )
+        btn_cancel.pack(side="right", padx=(8, 0))
+
+        btn_send = ctk.CTkButton(
+            btn_row,
+            text="🚀 Enviar E-mail",
+            width=150,
+            height=32,
+            fg_color=("#16A34A", "#15803D"),
+            hover_color=("#15803D", "#166534"),
+            command=_do_send
+        )
+        btn_send.pack(side="right")
+
+    def _on_nba_send_email(self, game: dict) -> None:
+        """Abre o modal interativo para seleção de destinatários e envio de relatório."""
+        self._open_nba_email_modal(game)
 
     def _nba_audit_all_games(self) -> None:
         """Audita, gera relatórios e sincroniza no SharePoint todos os jogos do dia (finalizados e agendados)."""

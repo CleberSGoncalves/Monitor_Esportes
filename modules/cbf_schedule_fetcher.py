@@ -286,81 +286,20 @@ def get_recent_finished_matches() -> list:
 
 def get_real_cbf_fixtures() -> list:
     """
-    Retorna estritamente os jogos monitorados futuros que possuem marcação nas colunas:
+    Retorna estritamente os jogos monitorados futuros da CBF de acordo com a tabela oficial (Edição 2026):
     - Brasileirão Série A: Coluna 4 (Amazon Prime) ou Coluna 5 (CazéTV).
-    - Copa do Brasil: Coluna 3 (Amazon Prime).
-    Conforme imagem oficial do PDF da CBF (Tabela Detalhada 2026).
+    - Copa do Brasil: Coluna 3/4 (Amazon Prime).
     """
     fixtures = [
-        # 17/10 (sáb) 18:00 - Brasileirão Série A (Coluna 5 = CazéTV)
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Botafogo",
-            "team2": "Chapecoense",
-            "date": "17/10/2026",
-            "time": "18:00",
-            "platform": "CazéTV",
-            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
-        },
-        # 18/10 (dom) 19:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Athletico-PR",
-            "team2": "Palmeiras",
-            "date": "18/10/2026",
-            "time": "19:30",
-            "platform": "Amazon Prime",
-            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
-        },
-        # 24/10 (sáb) 18:30 - Brasileirão Série A (Coluna 5 = CazéTV)
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Cruzeiro",
-            "team2": "Fortaleza",
-            "date": "24/10/2026",
-            "time": "18:30",
-            "platform": "CazéTV",
-            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
-        },
-        # 25/10 (dom) 19:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Grêmio",
-            "team2": "Internacional",
-            "date": "25/10/2026",
-            "time": "19:30",
-            "platform": "Amazon Prime",
-            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
-        },
-        # 28/10 (qua) 18:30 - Brasileirão Série A (Coluna 5 = CazéTV)
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Fluminense",
-            "team2": "Internacional",
-            "date": "28/10/2026",
-            "time": "18:30",
-            "platform": "CazéTV",
-            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
-        },
-        # 29/10 (qui) 19:00 - Brasileirão Série A (Coluna 4 = Amazon Prime)
+        # 29/10 (qui) 20:00 - Brasileirão Série A (Coluna 4 = Amazon Prime)
         {
             "comp": "Brasileirão Série A",
             "team1": "Vasco da Gama",
             "team2": "Flamengo",
             "date": "29/10/2026",
-            "time": "19:00",
+            "time": "20:00",
             "platform": "Amazon Prime",
             "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
-        },
-        # 31/10 (sáb) 18:00 - Brasileirão Série A (Coluna 5 = CazéTV)
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Flamengo",
-            "team2": "Corinthians",
-            "date": "31/10/2026",
-            "time": "18:00",
-            "platform": "CazéTV",
-            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
         },
         # 01/11 (dom) 15:00 - Copa do Brasil (Amazon Prime)
         {
@@ -382,33 +321,23 @@ def get_real_cbf_fixtures() -> list:
             "platform": "Amazon Prime",
             "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
         },
-        # 04/11 (qua) 18:30 - Brasileirão Série A (CazéTV)
+        # 04/11 (qua) 19:30 - Brasileirão Série A (Coluna 5 = CazéTV)
         {
             "comp": "Brasileirão Série A",
             "team1": "Athletico-PR",
             "team2": "Vasco da Gama",
             "date": "04/11/2026",
-            "time": "18:30",
+            "time": "19:30",
             "platform": "CazéTV",
             "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
         },
-        # 04/11 (qua) 20:30 - Brasileirão Série A (CazéTV)
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "São Paulo",
-            "team2": "Corinthians",
-            "date": "04/11/2026",
-            "time": "20:30",
-            "platform": "CazéTV",
-            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
-        },
-        # 05/11 (qui) 20:30 - Brasileirão Série A (Amazon Prime)
+        # 05/11 (qui) 21:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
         {
             "comp": "Brasileirão Série A",
             "team1": "Cruzeiro",
             "team2": "Bahia",
             "date": "05/11/2026",
-            "time": "20:30",
+            "time": "21:30",
             "platform": "Amazon Prime",
             "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
         },
