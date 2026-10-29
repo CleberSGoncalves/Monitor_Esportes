@@ -79,7 +79,6 @@ class SharePointReporter:
         possible_paths = [
             os.path.join(PROJECT_ROOT, "config", "sp_token_cache.json"),
             os.path.expandvars(r"%APPDATA%\Monitor_Esportes\config\sp_token_cache.json"),
-            r"E:\desenvolvimento\Streaming_Scheduler\sp_token_cache.json"
         ]
         data = {
             "access_token": access_token,
@@ -133,7 +132,6 @@ class SharePointReporter:
         possible_paths = [
             os.path.join(PROJECT_ROOT, "config", "sp_token_cache.json"),
             os.path.expandvars(r"%APPDATA%\Monitor_Esportes\config\sp_token_cache.json"),
-            r"E:\desenvolvimento\Streaming_Scheduler\sp_token_cache.json"
         ]
         
         token_cache_path = possible_paths[0]

@@ -866,15 +866,9 @@ def _save_recent_search(team1: str, team2: str, comp: str, date: str, platform: 
 
 def _load_cbf_streaming_events() -> list:
 
-    """Lê os eventos oficiais de transmissão do projeto Streaming_Scheduler (E:\desenvolvimento\Streaming_Scheduler\data.csv)."""
+    """Lê os eventos oficiais de transmissão configurados no projeto."""
 
-    scheduler_csv = r"E:\desenvolvimento\Streaming_Scheduler\data.csv"
-
-    fallback_csv = os.path.join(PROJECT_ROOT, "config", "streaming_data.csv")
-
-    
-
-    csv_path = scheduler_csv if os.path.exists(scheduler_csv) else fallback_csv
+    csv_path = os.path.join(PROJECT_ROOT, "config", "streaming_data.csv")
 
     events = []
 
@@ -13894,23 +13888,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
             cbf_evts = []
 
-        csv_evts = _load_cbf_streaming_events()
 
-        combined_evts = list(cbf_evts) if cbf_evts else []
-
-        seen_s = {f"{e.get('team1')}_{e.get('team2')}_{e.get('date')}".lower() for e in combined_evts}
-
-        for ce in csv_evts:
-
-            cs = f"{ce.get('team1')}_{ce.get('team2')}_{ce.get('date')}".lower()
-
-            if cs not in seen_s:
-
-                combined_evts.append(ce)
-
-                seen_s.add(cs)
-
-        cbf_evts = combined_evts
 
 
 
@@ -15114,23 +15092,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
                     cbf_events = []
 
-                csv_events = _load_cbf_streaming_events()
 
-                combined_events = list(cbf_events) if cbf_events else []
-
-                seen_sigs = {f"{e.get('team1')}_{e.get('team2')}_{e.get('date')}".lower() for e in combined_events}
-
-                for ce in csv_events:
-
-                    csig = f"{ce.get('team1')}_{ce.get('team2')}_{ce.get('date')}".lower()
-
-                    if csig not in seen_sigs:
-
-                        combined_events.append(ce)
-
-                        seen_sigs.add(csig)
-
-                cbf_events = combined_events
 
                 
 

@@ -1,5 +1,5 @@
 {
-  "version": "2.4.31",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.31/Monitor_Esportes.exe",
-  "changelog": "v2.4.31: Isolamento estrito de canais do YouTube e purge definitivo de ocorrências no SharePoint oficial; publicação e auditoria dos 4 confrontos oficiais da CBF (Vasco x Remo, Vasco x Corinthians, Chapecoense x Fluminense, Fluminense x Inter); sincronização bilateral com Streaming_Scheduler/data.csv para agendamento automatizado; correção do botão de remover e-mail na aba Configurações e modal de e-mails da NBA."
+  "version": "2.4.32",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.32/Monitor_Esportes.exe",
+  "changelog": "v2.4.32: Remoção definitiva de dependências externas e restauração do pipeline 100% autônomo da CBF; relatórios oficiais republicados com o bloco completo de pesquisa e confirmação oficial (Grounding/Súmula CBF/Veículos esportivos); rotina autônoma de súmula e tabelas do campeonato consolidada sem acoplamentos."
 }

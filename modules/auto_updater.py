@@ -25,7 +25,7 @@ def _load_current_version() -> str:
                         return v
             except Exception:
                 pass
-    return "2.4.31"
+    return "2.4.32"
 
 CURRENT_VERSION = _load_current_version()
 
