@@ -1,5 +1,5 @@
 {
-  "version": "2.4.28",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.28/Monitor_Esportes.exe",
-  "changelog": "v2.4.28: Correção definitiva da exclusão de e-mails na aba Configurações (remoção de re-inserção forçada). Novo botão e modal de E-mails Globais da NBA (configuração única refletida em todas as partidas e auditoria autônoma). Auditoria completa de toda a temporada da NBA desde o início (20/10/2026), com botão de sincronização em lote e limpeza preventiva de duplicatas no SharePoint."
+  "version": "2.4.29",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.29/Monitor_Esportes.exe",
+  "changelog": "v2.4.29: Correção do crash de inicialização no update (AttributeError no modal do SharePoint). Integração oficial do Service Principal (SPN) da Azure em modo App-Only direto com a Microsoft Graph API, eliminando bloqueios de acesso condicional (AADSTS53011) e autenticação manual. Auditoria e sincronização 100% autônoma 24/7."
 }

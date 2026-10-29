@@ -4020,6 +4020,14 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
         )
         self.btn_header_sharepoint.pack(side="left", padx=(6, 0))
 
+    def _open_global_sharepoint_auth_modal(self) -> None:
+        """Abre o modal interativo para login Microsoft Device Code no SharePoint."""
+        try:
+            from gui.sharepoint_auth_modal import open_sharepoint_device_auth_modal
+            open_sharepoint_device_auth_modal(self)
+        except Exception as e:
+            logger.error(f"[SharePoint Modal] Erro ao abrir modal: {e}")
+
 
 
         # Disparar checagem automática silenciosa na inicialização
@@ -18696,125 +18704,8 @@ def _ensure_login_bat_exists():
 
 
 
-def main() -> None:
 
-    if "--login-gemini" in sys.argv or "--test-gemini" in sys.argv:
 
-        try:
-
-            import ctypes
-
-            # Anexa ao console do CMD pai que disparou o comando
-
-            if ctypes.windll.kernel32.AttachConsole(-1) != 0:
-
-                sys.stdout = open("CONOUT$", "w", encoding="utf-8", errors="replace")
-
-                sys.stderr = open("CONOUT$", "w", encoding="utf-8", errors="replace")
-
-        except Exception:
-
-            pass
-
-
-
-    if "--login-gemini" in sys.argv:
-
-        try:
-
-            from modules.web_verdict_collector import login_interactive
-
-            login_interactive(wait_s=600)
-
-        except Exception as e_login:
-
-            print(f"[ERRO LOGIN GEMINI] {e_login}", flush=True)
-
-        sys.exit(0)
-
-
-
-    if "--test-gemini" in sys.argv:
-
-        try:
-
-            from modules.web_verdict_collector import get_web_verdict
-
-            print("\n" + "="*60, flush=True)
-
-            print("  TESTANDO CONSULTA NO GEMINI WEB (HEADLESS)", flush=True)
-
-            print("="*60, flush=True)
-
-            print("Enviando pergunta teste sobre Coritiba x Botafogo (12/10/2026)...", flush=True)
-
-            print("Aguardando retorno do navegador em segundo plano...", flush=True)
-
-            res = get_web_verdict("Coritiba", "Botafogo", "12/10/2026", "Brasileirão Série A")
-
-            if res and res.get("verdict_text"):
-
-                t_times = res.get('times', {})
-
-                msg_box = (
-
-                    "✅ Gemini Web conectado com sucesso!\n\n"
-
-                    f"Jogo: Coritiba x Botafogo\n"
-
-                    f"Início identificado: {t_times.get('inicio', 'N/D')}\n"
-
-                    f"Término identificado: {t_times.get('termino', 'N/D')}\n\n"
-
-                    f"Resumo da Transmissão:\n{res['verdict_text'][:250]}..."
-
-                )
-
-                print("\n" + msg_box, flush=True)
-
-                import ctypes
-
-                ctypes.windll.user32.MessageBoxW(0, msg_box, "Monitor de Esportes - Teste Gemini Web", 0x40)
-
-            else:
-
-                msg_box = "⚠️ A sessão do Google não está logada no Gemini Web.\n\nPor favor, execute 'conectar_gemini_web.bat' para fazer o login da sua Conta Google."
-
-                print("\n" + msg_box, flush=True)
-
-                import ctypes
-
-                ctypes.windll.user32.MessageBoxW(0, msg_box, "Monitor de Esportes - Teste Gemini Web", 0x30)
-
-        except Exception as e_test:
-
-            print(f"[ERRO NO TESTE] {e_test}", flush=True)
-
-            import ctypes
-
-            ctypes.windll.user32.MessageBoxW(0, f"Erro no teste: {e_test}", "Monitor de Esportes", 0x10)
-
-        sys.exit(0)
-
-
-
-    _ensure_login_bat_exists()
-
-    app = MonitorApp()
-
-    app.mainloop()
-
-
-
-
-
-if __name__ == "__main__":
-
-    import multiprocessing
-
-    multiprocessing.freeze_support()
-
-    main()
 
 
 
@@ -18986,3 +18877,124 @@ def _open_global_sharepoint_auth_modal(self) -> None:
     open_sharepoint_device_auth_modal(self)
 
 MonitorApp._open_global_sharepoint_auth_modal = _open_global_sharepoint_auth_modal
+
+
+def main() -> None:
+
+    if "--login-gemini" in sys.argv or "--test-gemini" in sys.argv:
+
+        try:
+
+            import ctypes
+
+            # Anexa ao console do CMD pai que disparou o comando
+
+            if ctypes.windll.kernel32.AttachConsole(-1) != 0:
+
+                sys.stdout = open("CONOUT$", "w", encoding="utf-8", errors="replace")
+
+                sys.stderr = open("CONOUT$", "w", encoding="utf-8", errors="replace")
+
+        except Exception:
+
+            pass
+
+
+
+    if "--login-gemini" in sys.argv:
+
+        try:
+
+            from modules.web_verdict_collector import login_interactive
+
+            login_interactive(wait_s=600)
+
+        except Exception as e_login:
+
+            print(f"[ERRO LOGIN GEMINI] {e_login}", flush=True)
+
+        sys.exit(0)
+
+
+
+    if "--test-gemini" in sys.argv:
+
+        try:
+
+            from modules.web_verdict_collector import get_web_verdict
+
+            print("\n" + "="*60, flush=True)
+
+            print("  TESTANDO CONSULTA NO GEMINI WEB (HEADLESS)", flush=True)
+
+            print("="*60, flush=True)
+
+            print("Enviando pergunta teste sobre Coritiba x Botafogo (12/10/2026)...", flush=True)
+
+            print("Aguardando retorno do navegador em segundo plano...", flush=True)
+
+            res = get_web_verdict("Coritiba", "Botafogo", "12/10/2026", "Brasileirão Série A")
+
+            if res and res.get("verdict_text"):
+
+                t_times = res.get('times', {})
+
+                msg_box = (
+
+                    "✅ Gemini Web conectado com sucesso!\n\n"
+
+                    f"Jogo: Coritiba x Botafogo\n"
+
+                    f"Início identificado: {t_times.get('inicio', 'N/D')}\n"
+
+                    f"Término identificado: {t_times.get('termino', 'N/D')}\n\n"
+
+                    f"Resumo da Transmissão:\n{res['verdict_text'][:250]}..."
+
+                )
+
+                print("\n" + msg_box, flush=True)
+
+                import ctypes
+
+                ctypes.windll.user32.MessageBoxW(0, msg_box, "Monitor de Esportes - Teste Gemini Web", 0x40)
+
+            else:
+
+                msg_box = "⚠️ A sessão do Google não está logada no Gemini Web.\n\nPor favor, execute 'conectar_gemini_web.bat' para fazer o login da sua Conta Google."
+
+                print("\n" + msg_box, flush=True)
+
+                import ctypes
+
+                ctypes.windll.user32.MessageBoxW(0, msg_box, "Monitor de Esportes - Teste Gemini Web", 0x30)
+
+        except Exception as e_test:
+
+            print(f"[ERRO NO TESTE] {e_test}", flush=True)
+
+            import ctypes
+
+            ctypes.windll.user32.MessageBoxW(0, f"Erro no teste: {e_test}", "Monitor de Esportes", 0x10)
+
+        sys.exit(0)
+
+
+
+    _ensure_login_bat_exists()
+
+    app = MonitorApp()
+
+    app.mainloop()
+
+
+
+
+
+if __name__ == "__main__":
+
+    import multiprocessing
+
+    multiprocessing.freeze_support()
+
+    main()

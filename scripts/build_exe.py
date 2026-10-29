@@ -76,6 +76,7 @@ def main():
         "--collect-submodules=reportlab",
         "--collect-submodules=google.genai",
         "--collect-submodules=paddleocr",
+        "--collect-all=cryptography",
         entry_point
     ]
 
