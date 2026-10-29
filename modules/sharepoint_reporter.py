@@ -244,10 +244,14 @@ class SharePointReporter:
     @classmethod
     def request_with_retry(cls, method: str, url: str, max_attempts: int = 10, **kwargs) -> requests.Response:
         """
-        Executa requisições HTTP para a Graph API com suporte a retries automáticos
-        e tratamento de rate limiting (HTTP 429 Retry-After).
+        Executa requisições HTTP para a Graph API com suporte a retries automáticos,
+        User-Agent corporativo anti-throttling Microsoft (NONISV) e tratamento de rate limiting.
         """
         import time
+        req_headers = dict(kwargs.get("headers") or {})
+        req_headers.setdefault("User-Agent", "NONISV|ADGBL|MonitorEsportes/2.4.25")
+        kwargs["headers"] = req_headers
+
         for attempt in range(max_attempts):
             try:
                 r = requests.request(method, url, **kwargs)

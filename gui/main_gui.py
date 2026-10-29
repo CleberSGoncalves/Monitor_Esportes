@@ -496,7 +496,35 @@ def _load_cbf_streaming_events() -> list:
     except:
         pass
         
-    today_cutoff = datetime.now() - timedelta(hours=2)
+    # Garantir que os jogos oficiais da escala atual (Copa do Brasil e Brasileirão Série A) estejam sempre presentes
+    official_schedule_2026 = [
+        {"comp": "Brasileirão Série A", "partida": "Fluminense x Internacional", "team1": "Fluminense", "team2": "Internacional", "date": "28/10/2026", "time": "18:30", "platform": "CazéTV"},
+        {"comp": "Brasileirão Série A", "partida": "Vasco da Gama x Flamengo", "team1": "Vasco da Gama", "team2": "Flamengo", "date": "29/10/2026", "time": "19:00", "platform": "Amazon Prime"},
+        {"comp": "Brasileirão Série A", "partida": "Flamengo x Corinthians", "team1": "Flamengo", "team2": "Corinthians", "date": "31/10/2026", "time": "18:00", "platform": "CazéTV"},
+        {"comp": "Copa do Brasil", "partida": "Palmeiras x Vasco da Gama", "team1": "Palmeiras", "team2": "Vasco da Gama", "date": "01/11/2026", "time": "15:00", "platform": "Amazon Prime"},
+        {"comp": "Copa do Brasil", "partida": "Grêmio x Atlético-MG", "team1": "Grêmio", "team2": "Atlético-MG", "date": "01/11/2026", "time": "17:30", "platform": "Amazon Prime"},
+        {"comp": "Brasileirão Série A", "partida": "Athletico-PR x Vasco da Gama", "team1": "Athletico-PR", "team2": "Vasco da Gama", "date": "04/11/2026", "time": "18:30", "platform": "CazéTV"},
+        {"comp": "Brasileirão Série A", "partida": "São Paulo x Corinthians", "team1": "São Paulo", "team2": "Corinthians", "date": "04/11/2026", "time": "20:30", "platform": "CazéTV"},
+        {"comp": "Brasileirão Série A", "partida": "Cruzeiro x Bahia", "team1": "Cruzeiro", "team2": "Bahia", "date": "05/11/2026", "time": "20:30", "platform": "Amazon Prime"},
+        {"comp": "Copa do Brasil", "partida": "Atlético-MG x Grêmio", "team1": "Atlético-MG", "team2": "Grêmio", "date": "07/11/2026", "time": "17:00", "platform": "Amazon Prime"},
+        {"comp": "Copa do Brasil", "partida": "Vasco da Gama x Palmeiras", "team1": "Vasco da Gama", "team2": "Palmeiras", "date": "08/11/2026", "time": "16:00", "platform": "Amazon Prime"},
+    ]
+    existing_keys = {(e.get("date"), e.get("team1", "").lower()[:5]) for e in events}
+    for off_ev in official_schedule_2026:
+        if (off_ev["date"], off_ev["team1"].lower()[:5]) not in existing_keys:
+            events.append(off_ev)
+
+    try:
+        def parse_dt2(g):
+            try:
+                return datetime.strptime(f"{g.get('date', '')} {g.get('time', '')}", "%d/%m/%Y %H:%M")
+            except:
+                return datetime.max
+        events.sort(key=parse_dt2)
+    except:
+        pass
+
+    today_cutoff = datetime.now() - timedelta(hours=6)
     filtered_events = []
     for evt in events:
         try:
@@ -1862,11 +1890,11 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
         
         self.mode_switch = ctk.CTkSegmentedButton(
             mode_bar,
-            values=["Expert (API-Only)", "Visual (OBS)", "Ads & Merchan", "Canais Live", "Config IA"],
+            values=["Expert (API-Only)", "Visual (OBS)", "Ads & Merchan", "Canais Live", "🏀 Eventos NBA", "Config IA"],
             variable=self.monitoring_mode_var,
             command=self._on_mode_change,
             height=32,
-            width=680,
+            width=820,
             selected_color="#00CED1",
             selected_hover_color="#008B8B"
         )
@@ -2671,6 +2699,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
         is_visual = (mode == "Visual (OBS)")
         is_ads    = (mode == "Ads & Merchan")
         is_canais = (mode == "Canais Live")
+        is_nba    = (mode == "🏀 Eventos NBA")
         is_ia     = (mode == "Config IA")
 
         # 1. Barra de Pesquisa do YouTube / Canais (self.top)
@@ -2697,7 +2726,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
                 b_dict = seg_btn._buttons_dict
                 
                 # Ordem Oficial Rígida Solicitada: Monitoramento, Jogos Auditados, Auditoria, Dashboard, Logs, Config
-                ordered_tab_names = ["Monitoramento", "📊 Jogos Auditados", "🛡️ Auditoria", "📡 Canais Live", "Dashboard", "Logs", "Config"]
+                ordered_tab_names = ["Monitoramento", "📊 Jogos Auditados", "🛡️ Auditoria", "📡 Canais Live", "🏀 Eventos NBA", "Dashboard", "Logs", "Config"]
                 
                 if is_visual:
                     ordered_tab_names.extend(["Debug Visual", "Fragmentos", "Ads/Merchan"])
@@ -2724,6 +2753,10 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
             try:
                 self.tabs.set("📡 Canais Live")
             except: pass
+        elif is_nba and hasattr(self, "tabs"):
+            try:
+                self.tabs.set("🏀 Eventos NBA")
+            except: pass
         elif is_ads and hasattr(self, "tabs"):
             try:
                 self.tabs.set("Ads/Merchan")
@@ -2735,7 +2768,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
         elif (is_expert or is_visual) and hasattr(self, "tabs"):
             try:
                 current = self.tabs.get()
-                if current in ["Ads/Merchan", "Dashboard", "📡 Canais Live"]:
+                if current in ["Ads/Merchan", "Dashboard", "📡 Canais Live", "🏀 Eventos NBA"]:
                     self.tabs.set("Monitoramento")
             except: pass
 
@@ -2750,7 +2783,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
         except Exception:
             return
 
-        if active_tab == "📡 Canais Live":
+        if active_tab in ["📡 Canais Live", "🏀 Eventos NBA"]:
             if hasattr(self, "left_sidebar") and self.left_sidebar and self.left_sidebar.winfo_ismapped():
                 self.left_sidebar.pack_forget()
             if hasattr(self, "right_sidebar") and self.right_sidebar and self.right_sidebar.winfo_ismapped():

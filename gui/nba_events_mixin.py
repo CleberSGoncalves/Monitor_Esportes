@@ -96,11 +96,18 @@ class NBAEventsMixin:
         btn_refresh.pack(side="right", padx=10)
 
         btn_audit_all = ctk.CTkButton(
-            top_bar, text="🚀 Auditar & Sincronizar Todos", width=190, height=32,
+            top_bar, text="🚀 Auditar & Sincronizar Dia", width=180, height=32,
             fg_color=("#16A34A", "#15803D"),
             command=self._nba_audit_all_games
         )
         btn_audit_all.pack(side="right", padx=4)
+
+        btn_sync_sched = ctk.CTkButton(
+            top_bar, text="📅 Publicar Agenda SharePoint", width=190, height=32,
+            fg_color=("#7C3AED", "#6D28D9"),
+            command=self._nba_publish_schedule_to_sharepoint
+        )
+        btn_sync_sched.pack(side="right", padx=4)
 
         # 2. STATUS / RESUMO DO DIA
         self.lbl_nba_status = ctk.CTkLabel(
@@ -432,26 +439,58 @@ class NBAEventsMixin:
         threading.Thread(target=_worker, daemon=True).start()
 
     def _nba_audit_all_games(self) -> None:
-        """Audita, gera relatórios e sincroniza no SharePoint todos os jogos finalizados do dia em lote."""
-        finished = [g for g in self.nba_games if g.get("is_finished")]
-        if not finished:
-            messagebox.showinfo("Auditoria NBA", "Nenhum jogo finalizado encontrado para auditar nesta data.")
+        """Audita, gera relatórios e sincroniza no SharePoint todos os jogos do dia (finalizados e agendados)."""
+        target_games = list(self.nba_games)
+        if not target_games:
+            messagebox.showinfo("Auditoria NBA", "Nenhum jogo encontrado nesta data.")
             return
 
         def _worker():
-            total = len(finished)
-            self.lbl_nba_status.configure(text=f"Iniciando auditoria em lote de {total} jogos da NBA...")
+            import time
+            total = len(target_games)
+            self.lbl_nba_status.configure(text=f"Iniciando sincronização em lote de {total} jogos da NBA...")
             success = 0
-            for i, g in enumerate(finished, 1):
-                self.lbl_nba_status.configure(text=f"[{i}/{total}] Auditando {g.get('match_display')}...")
-                gb_path = self.nba_service.download_gamebook(g)
+            for i, g in enumerate(target_games, 1):
+                self.lbl_nba_status.configure(text=f"[{i}/{total}] Processando {g.get('match_display')}...")
+                gb_path = self.nba_service.download_gamebook(g) if g.get("is_finished") else None
                 parsed = self.nba_service.parse_gamebook(gb_path) if gb_path else {}
                 pdf = self.nba_reporter.generate_report(g, parsed)
                 self._nba_reports[g.get("id")] = pdf
                 ok = SharePointNBAReporter.sync_nba_report(pdf, g)
-                if ok: success += 1
+                if ok:
+                    success += 1
+                time.sleep(1.5)
 
-            self.lbl_nba_status.configure(text=f"🎉 Auditoria em lote concluída: {success}/{total} jogos sincronizados no SharePoint!")
-            self.after(0, lambda: messagebox.showinfo("Lote Concluído", f"{success} de {total} jogos foram auditados e sincronizados no SharePoint!"))
+            self.lbl_nba_status.configure(text=f"🎉 Lote concluído: {success}/{total} jogos sincronizados no SharePoint!")
+            self.after(0, lambda: messagebox.showinfo("Lote Concluído", f"{success} de {total} jogos do dia foram sincronizados no SharePoint!"))
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+    def _nba_publish_schedule_to_sharepoint(self) -> None:
+        """Varre a agenda da NBA (ontem, hoje e próximos dias) e publica todos os jogos na lista do SharePoint."""
+        def _worker():
+            import time
+            self.lbl_nba_status.configure(text="Coletando agenda oficial da NBA para publicar no SharePoint...")
+            base_dt = datetime.now()
+            dates_to_sync = [(base_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(-1, 6)]
+            all_games = []
+            for d_str in dates_to_sync:
+                day_games = self.nba_service.fetch_games_for_date(d_str)
+                all_games.extend(day_games)
+
+            total = len(all_games)
+            success = 0
+            for idx, g in enumerate(all_games, 1):
+                self.lbl_nba_status.configure(text=f"[{idx}/{total}] Sincronizando {g.get('match_display')} ({g.get('date_display')})...")
+                gb_path = self.nba_service.download_gamebook(g) if g.get("is_finished") else None
+                parsed = self.nba_service.parse_gamebook(gb_path) if gb_path else {}
+                pdf = self.nba_reporter.generate_report(g, parsed)
+                ok = SharePointNBAReporter.sync_nba_report(pdf, g)
+                if ok:
+                    success += 1
+                time.sleep(1.5)
+
+            self.lbl_nba_status.configure(text=f"✅ Agenda publicada no SharePoint: {success}/{total} jogos sincronizados!")
+            self.after(0, lambda: messagebox.showinfo("Agenda NBA Sincronizada", f"{success} de {total} partidas da agenda da NBA foram publicadas na biblioteca 'Relatorios_de_Jogos_NBA'!"))
 
         threading.Thread(target=_worker, daemon=True).start()

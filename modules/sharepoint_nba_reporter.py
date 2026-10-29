@@ -22,6 +22,16 @@ logger = logging.getLogger(__name__)
 class SharePointNBAReporter:
     _cached_nba_drive_id = "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuBLKjP6Rlw_Q5U94FNKn17N"
     _cached_nba_list_id = "fa332a4b-5c46-433f-953d-e0534a9f5ecd"
+    _cached_existing_cols = {
+        "Title": "Título",
+        "Partida": "Partida",
+        "Campeonato": "Campeonato",
+        "Plataforma": "Plataforma",
+        "Data_Hora": "Data_Hora",
+        "Confianca": "Confianca",
+        "Auditado": "Auditado",
+        "Placar": "Placar"
+    }
 
     @classmethod
     def get_nba_drive_id(cls, token: str, site_id: str) -> Optional[str]:
@@ -52,7 +62,7 @@ class SharePointNBAReporter:
     def sync_nba_report(cls, pdf_path: str, game: Dict[str, Any], confianca: str = "99.0%") -> bool:
         """
         Envia o PDF de relatório da NBA para a biblioteca 'Relatorios_de_Jogos_NBA'
-        do SharePoint e sincroniza os metadados de forma tolerante a falhas.
+        do SharePoint e sincroniza os metadados de forma canônica (1 item único por jogo).
         """
         if not os.path.exists(pdf_path):
             logger.error(f"[SharePoint NBA] PDF não encontrado: {pdf_path}")
@@ -67,7 +77,10 @@ class SharePointNBAReporter:
                 logger.error("[SharePoint NBA] Nenhum drive disponível para sincronização.")
                 return False
 
-            sp_filename = os.path.basename(pdf_path)
+            away_tri = (game.get("away_tri") or "AWAY").upper()
+            home_tri = (game.get("home_tri") or "HOME").upper()
+            date_clean = game.get("date_clean") or datetime.now().strftime("%Y%m%d")
+            sp_filename = f"Relatorio_NBA_{away_tri}_at_{home_tri}_{date_clean}.pdf"
             upload_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root:/{sp_filename}:/content"
             
             headers = {"Authorization": f"Bearer {token}"}
@@ -107,47 +120,30 @@ class SharePointNBAReporter:
             # Data ISO UTC
             iso_utc = game.get("iso_utc") or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-            # Inspecionar colunas existentes na biblioteca para blindagem contra 400
-            existing_cols = {}
-            if cls._cached_nba_list_id:
-                try:
-                    cols_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/lists/{cls._cached_nba_list_id}/columns"
-                    r_cols = SharePointReporter.request_with_retry("GET", cols_url, headers=headers, timeout=10)
-                    if r_cols.status_code == 200:
-                        for c in r_cols.json().get("value", []):
-                            existing_cols[c.get("name")] = c.get("displayName")
-                except Exception as e_cols:
-                    logger.debug(f"[SharePoint NBA] Não foi possível obter schema das colunas: {e_cols}")
+            is_fin = bool(game.get("is_finished"))
+            if is_fin:
+                is_audited = True
+                conf_val = confianca
+                score_val = game.get("score")
+                if not score_val and game.get("away_score") and game.get("home_score"):
+                    score_val = f"{game.get('away_team', '')} {game.get('away_score')} x {game.get('home_score')} {game.get('home_team', '')}".strip()
+                if not score_val:
+                    score_val = game.get("score_display", "Finalizado")
+            else:
+                is_audited = False
+                conf_val = "Agendado"
+                score_val = f"Agendado ({game.get('time_brt', '—')} BRT)"
 
             fields_payload = {
-                "Title": sp_filename
+                "Title": sp_filename,
+                "Partida": game.get("match_display", f"{away_tri} @ {home_tri}"),
+                "Campeonato": "NBA",
+                "Plataforma": plat_norm,
+                "Data_Hora": iso_utc,
+                "Confianca": conf_val,
+                "Auditado": is_audited,
+                "Placar": score_val
             }
-
-            if not existing_cols or "Partida" in existing_cols:
-                fields_payload["Partida"] = game.get("match_display", "Jogo NBA")
-            if not existing_cols or "Campeonato" in existing_cols:
-                fields_payload["Campeonato"] = "NBA"
-            if not existing_cols or "Plataforma" in existing_cols:
-                fields_payload["Plataforma"] = plat_norm
-
-            # Suporte transparente para Data_Partida ou Data_Hora
-            if "Data_Partida" in existing_cols:
-                fields_payload["Data_Partida"] = iso_utc
-            elif "Data_Hora" in existing_cols:
-                fields_payload["Data_Hora"] = iso_utc
-            elif not existing_cols:
-                fields_payload["Data_Partida"] = iso_utc
-
-            if not existing_cols or "Confianca" in existing_cols:
-                fields_payload["Confianca"] = confianca
-            if not existing_cols or "Auditado" in existing_cols:
-                fields_payload["Auditado"] = True
-
-            score_val = game.get("score")
-            if not score_val and game.get("away_score") and game.get("home_score"):
-                score_val = f"{game.get('away_team', '')} {game.get('away_score')} x {game.get('home_score')} {game.get('home_team', '')}".strip()
-            if "Placar" in existing_cols and score_val:
-                fields_payload["Placar"] = score_val
 
             fields_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{item_id}/listItem/fields"
             json_headers = dict(headers)
@@ -160,29 +156,19 @@ class SharePointNBAReporter:
                     logger.info(f"🎉 [SharePoint NBA] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca NBA!")
                     return True
                 
-                # Se falhar por campo não reconhecido ("Field 'XYZ' is not recognized")
                 err_text = r_fields.text
                 m_unrec = re.search(r"Field '([^']+)' is not recognized", err_text)
                 if m_unrec:
                     bad_field = m_unrec.group(1)
-                    logger.warning(f"[SharePoint NBA] Campo '{bad_field}' ainda não criado na biblioteca. Removendo do envio para salvar os demais...")
-                    if bad_field in fields_payload:
-                        del fields_payload[bad_field]
-                        continue
-                
-                # Se for erro com Data_Partida vs Data_Hora
-                if "Data_Partida" in fields_payload and ("Data_Partida" in err_text or "does not exist" in err_text.lower()):
-                    logger.info("[SharePoint NBA] Tentando campo alternativo 'Data_Hora'...")
-                    del fields_payload["Data_Partida"]
-                    fields_payload["Data_Hora"] = iso_utc
+                    logger.warning(f"[SharePoint NBA] Removendo campo não reconhecido '{bad_field}' e tentando novamente...")
+                    fields_payload.pop(bad_field, None)
                     continue
+                else:
+                    logger.warning(f"[SharePoint NBA] Upload concluído, mas falha ao gravar metadados (tentativa {attempt+1}): {r_fields.status_code} - {err_text[:200]}")
+                    break
 
-                logger.error(f"❌ [SharePoint NBA] Erro nos metadados ({r_fields.status_code}): {r_fields.text}")
-                break
-
-            # Se o upload do PDF funcionou, já é um sucesso operacional garantido
             return True
 
         except Exception as e:
-            logger.error(f"❌ [SharePoint NBA] Exceção na sincronização: {e}")
+            logger.error(f"[SharePoint NBA] Exceção ao sincronizar relatório NBA: {e}")
             return False
