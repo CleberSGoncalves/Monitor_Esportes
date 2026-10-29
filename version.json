@@ -1,5 +1,5 @@
 {
-  "version": "2.4.29",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.29/Monitor_Esportes.exe",
-  "changelog": "v2.4.29: Correção do crash de inicialização no update (AttributeError no modal do SharePoint). Integração oficial do Service Principal (SPN) da Azure em modo App-Only direto com a Microsoft Graph API, eliminando bloqueios de acesso condicional (AADSTS53011) e autenticação manual. Auditoria e sincronização 100% autônoma 24/7."
+  "version": "2.4.30",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.30/Monitor_Esportes.exe",
+  "changelog": "v2.4.30: Correção estrutural definitiva do escopo de inicialização do _build_ui (restauração completa da hierarquia de widgets events_box, cbf_ticker_frame e alternância de modos). Integração consolidada da autenticação Enterprise SPN do SharePoint."
 }

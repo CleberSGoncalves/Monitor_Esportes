@@ -4020,71 +4020,33 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
         )
         self.btn_header_sharepoint.pack(side="left", padx=(6, 0))
 
-    def _open_global_sharepoint_auth_modal(self) -> None:
-        """Abre o modal interativo para login Microsoft Device Code no SharePoint."""
-        try:
-            from gui.sharepoint_auth_modal import open_sharepoint_device_auth_modal
-            open_sharepoint_device_auth_modal(self)
-        except Exception as e:
-            logger.error(f"[SharePoint Modal] Erro ao abrir modal: {e}")
+    
 
-
-
-        # Disparar checagem automática silenciosa na inicialização
-
-        self._check_update_silent_startup()
-
-
-
-    def _check_update_silent_startup(self) -> None:
-
-        """Checa silenciosamente se há novas versões ao iniciar e destaca o botão se houver atualização."""
-
-        def run_silent():
-
+        # Disparar checagem automatica silenciosa na inicializacao
+        def _run_silent_update_check():
             try:
-
                 updater = AutoUpdater()
-
                 has_update, remote_ver, download_url, changelog = updater.check_for_update()
-
                 if has_update:
-
                     def highlight_ui():
-
                         if hasattr(self, "btn_header_update") and self.btn_header_update:
-
                             self.btn_header_update.configure(
-
                                 text=f"🚀 NOVA VERSÃO DISPONÍVEL (v{remote_ver})",
-
                                 fg_color="#FF3300",
-
                                 hover_color="#CC0000",
-
                                 text_color="#FFFFFF"
-
                             )
-
                         if hasattr(self, "lbl_header_version") and self.lbl_header_version:
-
                             self.lbl_header_version.configure(
-
                                 text=f"v{updater.current_version} (⚠️ Desatualizado!)",
-
                                 text_color="#FF6666"
-
                             )
-
                         self._log(f"🔔 [AUTO UPDATER] Nova versão v{remote_ver} disponível no GitHub! Clique no botão vermelho no topo para atualizar.")
-
                     self.after(0, highlight_ui)
-
             except Exception:
-
                 pass
 
-        threading.Thread(target=run_silent, daemon=True).start()
+        threading.Thread(target=_run_silent_update_check, daemon=True).start()
 
 
 
@@ -5395,6 +5357,14 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
         self._history_cards = []
 
 
+
+    def _open_global_sharepoint_auth_modal(self) -> None:
+        """Abre o modal interativo para login Microsoft Device Code no SharePoint."""
+        try:
+            from gui.sharepoint_auth_modal import open_sharepoint_device_auth_modal
+            open_sharepoint_device_auth_modal(self)
+        except Exception as e:
+            logger.error(f"[SharePoint Modal] Erro ao abrir modal: {e}")
 
     def _on_mode_change(self, mode: str) -> None:
 
