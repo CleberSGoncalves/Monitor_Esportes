@@ -1,5 +1,5 @@
 {
-  "version": "2.4.32",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.32/Monitor_Esportes.exe",
-  "changelog": "v2.4.32: Remoção definitiva de dependências externas e restauração do pipeline 100% autônomo da CBF; relatórios oficiais republicados com o bloco completo de pesquisa e confirmação oficial (Grounding/Súmula CBF/Veículos esportivos); rotina autônoma de súmula e tabelas do campeonato consolidada sem acoplamentos."
+  "version": "2.4.33",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.33/Monitor_Esportes.exe",
+  "changelog": "v2.4.33: Unificação homogênea e ordenação cronológica estrita da Fila de Agendamentos (Sidebar e Modal de Agendamento sempre consistentes); sincronização imediata dos próximos confrontos oficiais (Vasco da Gama x Flamengo em 29/10/2026 20:00 como Jogo #1); blindagem do fluxo autônomo com fallback temporal para o parecer oficial e súmula CBF."
 }

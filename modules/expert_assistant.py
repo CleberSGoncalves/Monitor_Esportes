@@ -67,13 +67,15 @@ class ExpertAssistant:
         self._init_client()
         return True
 
-    def get_match_chronology(self, team1: str, team2: str, competition: str, platform: str, date: str, start_timestamp: Optional[int] = None, duration: Optional[int] = None, video_url: Optional[str] = None, transcript_text: Optional[str] = None, status_callback: Optional[Callable[[str], None]] = None, sumula_raw_text: Optional[str] = None, live_start_time: Optional[str] = None, live_end_time: Optional[str] = None) -> Dict[str, Any]:
+    def get_match_chronology(self, team1: str, team2: str, competition: str, platform: str, date: str, start_timestamp: Optional[int] = None, duration: Optional[int] = None, video_url: Optional[str] = None, transcript_text: Optional[str] = None, status_callback: Optional[Callable[[str], None]] = None, sumula_raw_text: Optional[str] = None, live_start_time: Optional[str] = None, live_end_time: Optional[str] = None, allow_web_fallback: bool = False) -> Dict[str, Any]:
         """
         Método público principal de auditoria de cronologia. Possui lógica de caching
         e loop auto-corretivo de validação contra a súmula oficial e portais.
         
         sumula_raw_text: Texto completo extraído diretamente do PDF oficial da súmula CBF.
                          Se fornecido, desativa o Google Search e usa o documento como fonte canônica.
+        allow_web_fallback: Se True, permite auditoria autônoma via Web Search Grounding caso
+                            a súmula ainda não tenha sido publicada pela CBF após o tempo de tolerância.
         """
         from datetime import datetime, timedelta, timezone
         import hashlib
@@ -158,22 +160,27 @@ class ExpertAssistant:
             except Exception as e_pdf:
                 print(f"[EXPERT PIPELINE WARN] Falha na rotina de busca de súmula automática: {e_pdf}")
 
-        # TRAVA ESTRITA OBRIGATÓRIA: Relatórios Expert NÃO PODEM sair sem a súmula oficial baixada da CBF!
+        # TRAVA ESTRITA OBRIGATÓRIA: Relatórios Expert aguardam a súmula oficial baixada da CBF (a menos que liberado por tolerância temporal)
         if not sumula_raw_text or not str(sumula_raw_text).strip():
-            msg_err = (
-                f"❌ [AUDITORIA BLOQUEADA] Súmula oficial da CBF não encontrada ou pendente de publicação para {team1} x {team2} ({date}).\n"
-                f"A auditoria no modo Expert exige obrigatoriamente o download da súmula oficial para garantir 100% de conformidade."
-            )
-            print(f"[EXPERT PIPELINE STRICT GUARD] {msg_err}")
-            if status_callback:
-                status_callback("❌ Auditoria cancelada: Súmula CBF pendente de publicação.")
-            return {
-                "error": msg_err,
-                "status": "blocked_missing_sumula",
-                "team1": team1,
-                "team2": team2,
-                "date": date
-            }
+            if not allow_web_fallback:
+                msg_err = (
+                    f"❌ [AUDITORIA BLOQUEADA] Súmula oficial da CBF não encontrada ou pendente de publicação para {team1} x {team2} ({date}).\n"
+                    f"A auditoria no modo Expert aguarda a publicação da súmula oficial da CBF para garantir conformidade."
+                )
+                print(f"[EXPERT PIPELINE STRICT GUARD] {msg_err}")
+                if status_callback:
+                    status_callback("❌ Auditoria aguardando publicação da súmula oficial CBF.")
+                return {
+                    "error": msg_err,
+                    "status": "blocked_missing_sumula",
+                    "team1": team1,
+                    "team2": team2,
+                    "date": date
+                }
+            else:
+                print(f"[EXPERT PIPELINE] Súmula oficial CBF pendente. Ativando auditoria autônoma via Web/Gemini Grounding por tolerância temporal...")
+                if status_callback:
+                    status_callback("Súmula pendente na CBF. Ativando auditoria autônoma via Web Grounding...")
 
         # Loop de Auditoria e Validação com Auto-Correção
         directive_correction = ""

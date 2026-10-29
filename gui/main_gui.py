@@ -656,6 +656,17 @@ def _normalize_scheduled_game_dict(g: dict, idx: int = 1) -> dict:
 
 
 
+def _sort_games_chronologically(games_list: list) -> list:
+    """Ordena estritamente a fila de agendamentos por ordem cronológica (data e hora de início)."""
+    def _parse_key(g):
+        try:
+            d_str = str(g.get("date", "")).strip().replace("-", "/")
+            t_str = str(g.get("time", "")).strip() or "00:00"
+            return datetime.strptime(f"{d_str} {t_str}", "%d/%m/%Y %H:%M")
+        except Exception:
+            return datetime.max
+    return sorted(games_list, key=_parse_key)
+
 def _load_scheduled_games() -> list:
 
     _ensure_broadcaster_rules_synced()
@@ -727,9 +738,8 @@ def _load_scheduled_games() -> list:
                     
 
                     if valid_games:
-
+                        valid_games = _sort_games_chronologically(valid_games)
                         _save_scheduled_games(valid_games)
-
                         return valid_games
 
         except Exception:
@@ -789,8 +799,8 @@ def _load_scheduled_games() -> list:
 
 
 def _save_scheduled_games(games_list: list) -> None:
-
-    _save_config_file("scheduled_games.json", games_list)
+    sorted_list = _sort_games_chronologically(games_list)
+    _save_config_file("scheduled_games.json", sorted_list)
 
 
 
@@ -13640,7 +13650,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
                 from modules.cbf_schedule_fetcher import CBFScheduleFetcher
 
-                cbf_events = CBFScheduleFetcher.get_upcoming_matches()
+                cbf_events = _sort_games_chronologically(CBFScheduleFetcher.get_upcoming_matches())
 
             except:
 
@@ -13876,7 +13886,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
         # Obter jogos: se houver jogos na fila agendada atual, exibe-os; se faltar para 5, completa com os próximos oficiais da CBF
 
-        current_sched = [g for g in getattr(self, "_scheduled_games", []) if g.get("status") in ("pending", "running", "queued", "failed")]
+        current_sched = _sort_games_chronologically([g for g in getattr(self, "_scheduled_games", []) if g.get("status") in ("pending", "running", "queued", "failed")])
 
         try:
 
@@ -13907,6 +13917,8 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                 existing_signatures.add(sig)
 
 
+
+        games_to_show = _sort_games_chronologically(games_to_show)
 
         for idx in range(5):
 
@@ -14022,8 +14034,8 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
 
 
+            new_scheduled_list = _sort_games_chronologically(new_scheduled_list)
             _save_scheduled_games(new_scheduled_list)
-
             self._scheduled_games = new_scheduled_list
 
             modal.destroy()
@@ -14084,7 +14096,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
         # A FILA DE AGENDAMENTOS exibe estritamente os jogos ativos (pending, running, queued, failed) - ocultando concluídos
 
-        games = [g for g in raw_games if g.get("status") in ["pending", "running", "queued", "failed"]]
+        games = _sort_games_chronologically([g for g in raw_games if g.get("status") in ["pending", "running", "queued", "failed"]])
 
         
 
@@ -14504,26 +14516,24 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
                     
 
+                    kickoff_dt = None
+                    try:
+                        kickoff_dt = datetime.strptime(f"{_game.get('date')} {_game.get('time')}", "%d/%m/%Y %H:%M")
+                    except:
+                        pass
+                    passed_tol = bool(kickoff_dt and (datetime.now() - kickoff_dt > timedelta(hours=2, minutes=30)))
+                    allow_fb = bool(_game.get("_sumula_attempts", 0) >= 2 or passed_tol)
                     payload = {
-
                         "team1": _game.get("team1"),
-
                         "team2": _game.get("team2"),
-
                         "competition": _game.get("comp"),
-
                         "platform": _game.get("platform"),
-
                         "date": _game.get("date"),
-
                         "start_timestamp": None,
-
                         "duration": None,
-
                         "video_url": None,
-
-                        "transcript_text": None
-
+                        "transcript_text": None,
+                        "allow_web_fallback": allow_fb
                     }
 
                     
@@ -15147,9 +15157,8 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                 
 
                 if added_count > 0:
-
+                    games = _sort_games_chronologically(games)
                     _save_scheduled_games(games)
-
                     self._scheduled_games = games
 
                     self.after(0, self._update_schedule_panel_ui)
