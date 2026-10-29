@@ -811,14 +811,14 @@ class NBAEventsMixin:
                 def _make_del(del_em=em):
                     def _do_del():
                         try:
-                            with open("config/saved_emails.json", "r", encoding="utf-8") as f_r:
-                                cur = json.load(f_r)
-                            if del_em in cur:
-                                cur.remove(del_em)
-                                with open("config/saved_emails.json", "w", encoding="utf-8") as f_w:
-                                    json.dump(cur, f_w, indent=2)
+                            from gui.main_gui import _remove_saved_email
+                            _remove_saved_email(del_em)
                         except Exception:
-                            pass
+                            try:
+                                from main_gui import _remove_saved_email
+                                _remove_saved_email(del_em)
+                            except Exception:
+                                pass
                         _refresh_list()
                     return _do_del
 
@@ -835,17 +835,12 @@ class NBAEventsMixin:
                 messagebox.showwarning("E-mail Invalido", "Por favor, digite um e-mail valido.")
                 return
             try:
-                import json
-                cur = []
                 try:
-                    with open("config/saved_emails.json", "r", encoding="utf-8") as f_r:
-                        cur = json.load(f_r)
+                    from gui.main_gui import _save_email
+                    _save_email(new_val)
                 except Exception:
-                    cur = []
-                if new_val not in cur:
-                    cur.append(new_val)
-                    with open("config/saved_emails.json", "w", encoding="utf-8") as f_w:
-                        json.dump(cur, f_w, indent=2)
+                    from main_gui import _save_email
+                    _save_email(new_val)
                 entry_new.delete(0, "end")
                 _refresh_list()
             except Exception as ex:

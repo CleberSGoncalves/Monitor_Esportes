@@ -502,13 +502,11 @@ def _remove_saved_email(email_str: str) -> list:
 
     emails = _load_saved_emails()
 
-    email_str = email_str.strip()
+    email_target = email_str.strip().lower()
 
-    if email_str in emails:
+    emails = [e for e in emails if e.strip().lower() != email_target]
 
-        emails.remove(email_str)
-
-        _save_config_file("saved_emails.json", emails)
+    _save_config_file("saved_emails.json", emails)
 
     return emails
 
@@ -13894,7 +13892,25 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
         except:
 
-            cbf_evts = _load_cbf_streaming_events()
+            cbf_evts = []
+
+        csv_evts = _load_cbf_streaming_events()
+
+        combined_evts = list(cbf_evts) if cbf_evts else []
+
+        seen_s = {f"{e.get('team1')}_{e.get('team2')}_{e.get('date')}".lower() for e in combined_evts}
+
+        for ce in csv_evts:
+
+            cs = f"{ce.get('team1')}_{ce.get('team2')}_{ce.get('date')}".lower()
+
+            if cs not in seen_s:
+
+                combined_evts.append(ce)
+
+                seen_s.add(cs)
+
+        cbf_evts = combined_evts
 
 
 
@@ -15094,9 +15110,27 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
                 except Exception as ex_fetch:
 
-                    self._log(f"⏰ [AGENDAMENTO AUTOMÁTICO] Falha ao raspar CBF, usando fallback local: {ex_fetch}")
+                    self._log(f"⏰ [AGENDAMENTO AUTOMÁTICO] Falha ao raspar CBF: {ex_fetch}")
 
-                    cbf_events = _load_cbf_streaming_events()
+                    cbf_events = []
+
+                csv_events = _load_cbf_streaming_events()
+
+                combined_events = list(cbf_events) if cbf_events else []
+
+                seen_sigs = {f"{e.get('team1')}_{e.get('team2')}_{e.get('date')}".lower() for e in combined_events}
+
+                for ce in csv_events:
+
+                    csig = f"{ce.get('team1')}_{ce.get('team2')}_{ce.get('date')}".lower()
+
+                    if csig not in seen_sigs:
+
+                        combined_events.append(ce)
+
+                        seen_sigs.add(csig)
+
+                cbf_events = combined_events
 
                 
 

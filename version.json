@@ -1,5 +1,5 @@
 {
-  "version": "2.4.30",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.30/Monitor_Esportes.exe",
-  "changelog": "v2.4.30: Correção estrutural definitiva do escopo de inicialização do _build_ui (restauração completa da hierarquia de widgets events_box, cbf_ticker_frame e alternância de modos). Integração consolidada da autenticação Enterprise SPN do SharePoint."
+  "version": "2.4.31",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.31/Monitor_Esportes.exe",
+  "changelog": "v2.4.31: Isolamento estrito de canais do YouTube e purge definitivo de ocorrências no SharePoint oficial; publicação e auditoria dos 4 confrontos oficiais da CBF (Vasco x Remo, Vasco x Corinthians, Chapecoense x Fluminense, Fluminense x Inter); sincronização bilateral com Streaming_Scheduler/data.csv para agendamento automatizado; correção do botão de remover e-mail na aba Configurações e modal de e-mails da NBA."
 }
