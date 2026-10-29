@@ -113,6 +113,13 @@ class NBAEventsMixin:
         )
         lbl_auto.pack(side="left", padx=10, pady=4)
 
+        btn_auth_sp = ctk.CTkButton(
+            top_bar, text="🔑 Conectar SharePoint", width=155, height=32,
+            fg_color=("#334155", "#1E293B"), hover_color=("#1E293B", "#0F172A"),
+            command=self._open_sharepoint_auth_modal
+        )
+        btn_auth_sp.pack(side="right", padx=4)
+
         # 2. STATUS / RESUMO DO DIA
         self.lbl_nba_status = ctk.CTkLabel(
             main_frame,
@@ -387,8 +394,26 @@ class NBAEventsMixin:
                 self.after(0, lambda: messagebox.showerror("Erro", "Falha ao gerar o relatório PDF da NBA."))
         threading.Thread(target=_worker, daemon=True).start()
 
+    def _open_sharepoint_auth_modal(self, on_success=None) -> None:
+        """Abre o modal interativo para login corporativo no SharePoint via Device Code."""
+        from gui.sharepoint_auth_modal import open_sharepoint_device_auth_modal
+        open_sharepoint_device_auth_modal(self, on_success=on_success)
+
     def _on_nba_sync_sharepoint(self, game: dict) -> None:
         """Sincroniza o relatório do jogo diretamente com o SharePoint com feedback visual imediato e alertas."""
+        from modules.sharepoint_reporter import SharePointReporter, SharePointAuthRequiredError
+        from gui.sharepoint_auth_modal import open_sharepoint_device_auth_modal
+
+        if not SharePointReporter.is_token_valid():
+            ans = messagebox.askyesno(
+                "Autenticação SharePoint",
+                "A sessão corporativa do SharePoint requer autorização da Microsoft.\n\n"
+                "Deseja autenticar agora via Microsoft Device Code para prosseguir com a sincronização?"
+            )
+            if ans:
+                open_sharepoint_device_auth_modal(self, on_success=lambda: self._on_nba_sync_sharepoint(game))
+            return
+
         btn_sp = game.get("_btn_sp")
         if btn_sp:
             btn_sp.configure(text="⏳ Enviando...", state="disabled")
@@ -427,8 +452,20 @@ class NBAEventsMixin:
                         f"❌ Falha ao sincronizar a partida no SharePoint:\n\n"
                         f"• Jogo: {game.get('match_display')}\n"
                         f"• Plataforma: {game.get('platform')}\n\n"
-                        f"Verifique sua conexão e tente novamente."
+                        f"Verifique sua conexão ou utilize o botão '🔑 Conectar SharePoint'."
                     ))
+            except SharePointAuthRequiredError:
+                self.lbl_nba_status.configure(text="⚠️ Sessão do SharePoint expirou.")
+                if btn_sp:
+                    self.after(0, lambda: btn_sp.configure(text="🔑 Reautenticar", state="normal", fg_color=("#D97706", "#B45309")))
+                self.after(0, lambda: [
+                    messagebox.showwarning(
+                        "Autenticação Expirada",
+                        "A sessão corporativa do SharePoint expirou.\n\n"
+                        "O assistente abrirá o modal para confirmação rápida do código de dispositivo no navegador."
+                    ),
+                    open_sharepoint_device_auth_modal(self, on_success=lambda: self._on_nba_sync_sharepoint(game))
+                ])
             except Exception as e:
                 self.lbl_nba_status.configure(text=f"⚠️ Erro ao sincronizar no SharePoint: {e}")
                 if btn_sp:

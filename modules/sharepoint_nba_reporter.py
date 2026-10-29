@@ -15,7 +15,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from modules.sharepoint_reporter import SharePointReporter, SP_CONFIG
+from modules.sharepoint_reporter import SharePointReporter, SP_CONFIG, SharePointAuthRequiredError
 
 logger = logging.getLogger(__name__)
 
@@ -169,6 +169,8 @@ class SharePointNBAReporter:
 
             return True
 
+        except SharePointAuthRequiredError:
+            raise
         except Exception as e:
             logger.error(f"[SharePoint NBA] Exceção ao sincronizar relatório NBA: {e}")
             return False

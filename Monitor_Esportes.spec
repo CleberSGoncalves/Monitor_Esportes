@@ -4,7 +4,7 @@ from PyInstaller.utils.hooks import collect_all
 
 datas = [('E:\\desenvolvimento\\Monitor_Esportes\\.venv\\Lib\\site-packages\\customtkinter', 'customtkinter/'), ('config', 'config'), ('modules', 'modules'), ('core', 'core'), ('gui', 'gui'), ('templates', 'templates'), ('version.json', '.')]
 binaries = []
-hiddenimports = ['gui', 'gui.canais_live_mixin', 'gui.nba_events_mixin', 'canais_live_mixin', 'nba_events_mixin', 'obsws_python', 'websocket', 'pdfplumber', 'pymupdf', 'fitz', 'modules.nba_autonomous_auditor']
+hiddenimports = ['gui', 'gui.canais_live_mixin', 'gui.nba_events_mixin', 'gui.sharepoint_auth_modal', 'canais_live_mixin', 'nba_events_mixin', 'sharepoint_auth_modal', 'obsws_python', 'websocket', 'pdfplumber', 'pymupdf', 'fitz', 'modules.nba_autonomous_auditor']
 hiddenimports += collect_submodules('obsws_python')
 hiddenimports += collect_submodules('yt_dlp')
 hiddenimports += collect_submodules('reportlab')

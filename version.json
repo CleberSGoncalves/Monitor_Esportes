@@ -1,5 +1,5 @@
 {
-  "version": "2.4.26",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.26/Monitor_Esportes.exe",
-  "changelog": "v2.4.26: Auditoria e sincronização 100% autônoma da NBA em background (monitoramento de grade, geração de relatórios, SharePoint e envio de e-mail automático). Modal interativo de seleção de destinatários por e-mail para jogos da NBA. Feedback visual e alertas confirmatórios no botão SharePoint. Purga definitiva de partidas fictícias e alinhamento estrito com a escala oficial CBF 2026 (Amazon Prime e CazéTV)."
+  "version": "2.4.27",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.27/Monitor_Esportes.exe",
+  "changelog": "v2.4.27: Correção de layout da aba NBA e Canais Live (ocultação total de barras e painéis manuais inferiores para liberar 100% da altura da tabela). Relatórios de canais do YouTube mais limpos e sucintos (filtragem de gols, cartões e faltas, mantendo estritamente marcos regulamentares de transmissão). Desativado envio automático ao SharePoint para canais ao vivo (mantendo geração de relatório local). Nova autenticação interativa corporativa do SharePoint via Microsoft Device Code com 1 clique no topo e na aba NBA."
 }

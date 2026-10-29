@@ -1,0 +1,176 @@
+[
+  {
+    "columnGroup": "Colunas Personalizadas",
+    "description": "",
+    "displayName": "Campeonato",
+    "enforceUniqueValues": false,
+    "hidden": false,
+    "id": "8590c01b-7f30-4b20-9256-1c7d6a1228ea",
+    "indexed": false,
+    "name": "Campeonato",
+    "readOnly": false,
+    "required": true,
+    "choice": {
+      "allowTextEntry": false,
+      "choices": [
+        "Brasileiro Serie A",
+        "Paulista",
+        "Copa do Brasil",
+        "Champions League",
+        "Copa do Mundo",
+        "Sula Americana"
+      ],
+      "displayAs": "dropDownMenu"
+    }
+  },
+  {
+    "columnGroup": "Colunas Personalizadas",
+    "description": "",
+    "displayName": "Data_Hora",
+    "enforceUniqueValues": false,
+    "hidden": false,
+    "id": "be6f8094-20b9-452d-b08c-79e409e90ad2",
+    "indexed": false,
+    "name": "Data_Partida",
+    "readOnly": false,
+    "required": true,
+    "dateTime": {
+      "displayAs": "standard",
+      "format": "dateTime"
+    }
+  },
+  {
+    "columnGroup": "Colunas Personalizadas",
+    "description": "",
+    "displayName": "Plataforma",
+    "enforceUniqueValues": false,
+    "hidden": false,
+    "id": "c86811ff-82cd-49cc-b213-2c3e4a6ffe6d",
+    "indexed": false,
+    "name": "Plataforma",
+    "readOnly": false,
+    "required": true,
+    "choice": {
+      "allowTextEntry": false,
+      "choices": [
+        "Amazon Prime",
+        "Caze TV",
+        "Max",
+        "Outro"
+      ],
+      "displayAs": "dropDownMenu"
+    }
+  },
+  {
+    "columnGroup": "Colunas Personalizadas",
+    "description": "",
+    "displayName": "Partida",
+    "enforceUniqueValues": false,
+    "hidden": false,
+    "id": "3e35db63-be93-4204-8316-153fbe157c37",
+    "indexed": false,
+    "name": "Partida",
+    "readOnly": false,
+    "required": false,
+    "text": {
+      "allowMultipleLines": false,
+      "appendChangesToExistingText": false,
+      "linesForEditing": 0,
+      "maxLength": 255
+    }
+  },
+  {
+    "columnGroup": "Colunas Personalizadas",
+    "description": "",
+    "displayName": "Auditado",
+    "enforceUniqueValues": false,
+    "hidden": false,
+    "id": "69a79013-27ba-4cee-b786-6030178f02a2",
+    "indexed": false,
+    "name": "Auditado",
+    "readOnly": false,
+    "required": true,
+    "boolean": {},
+    "defaultValue": {
+      "value": "0"
+    }
+  },
+  {
+    "columnGroup": "Colunas Personalizadas",
+    "description": "",
+    "displayName": "Confianca",
+    "enforceUniqueValues": false,
+    "hidden": false,
+    "id": "d8366905-70b1-4cb1-bb04-b260ea6076a2",
+    "indexed": false,
+    "name": "Confianca",
+    "readOnly": false,
+    "required": true,
+    "text": {
+      "allowMultipleLines": false,
+      "appendChangesToExistingText": false,
+      "linesForEditing": 0,
+      "maxLength": 255
+    }
+  },
+  {
+    "columnGroup": "Colunas Personalizadas",
+    "description": "",
+    "displayName": "Descrição",
+    "enforceUniqueValues": false,
+    "hidden": false,
+    "id": "cb19284a-cde7-4570-a980-1dab8bd74470",
+    "indexed": false,
+    "name": "_ExtendedDescription",
+    "readOnly": false,
+    "required": false,
+    "text": {
+      "allowMultipleLines": true,
+      "appendChangesToExistingText": false,
+      "linesForEditing": 6,
+      "textType": "richText"
+    }
+  },
+  {
+    "columnGroup": "Colunas Personalizadas",
+    "description": "",
+    "displayName": "Título",
+    "enforceUniqueValues": false,
+    "hidden": false,
+    "id": "fa564e0f-0c70-4ab9-b863-0177e6ddd247",
+    "indexed": false,
+    "name": "Title",
+    "readOnly": false,
+    "required": false,
+    "text": {
+      "allowMultipleLines": false,
+      "appendChangesToExistingText": false,
+      "linesForEditing": 0,
+      "maxLength": 255
+    }
+  },
+  {
+    "columnGroup": "Colunas Personalizadas",
+    "description": "",
+    "displayName": "Nome",
+    "enforceUniqueValues": false,
+    "hidden": false,
+    "id": "8553196d-ec8d-4564-9861-3dbe931050c8",
+    "indexed": false,
+    "name": "FileLeafRef",
+    "readOnly": false,
+    "required": true
+  },
+  {
+    "columnGroup": "_Hidden",
+    "description": "",
+    "displayName": "Tipo de Conteúdo",
+    "enforceUniqueValues": false,
+    "hidden": false,
+    "id": "c042a256-787d-4a6f-8a8a-cf6ab767f12d",
+    "indexed": false,
+    "name": "ContentType",
+    "readOnly": false,
+    "required": false
+  }
+]

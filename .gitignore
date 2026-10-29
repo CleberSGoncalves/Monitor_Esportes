@@ -6,7 +6,13 @@ dist/
 logs/
 *.log
 scratch/
+__pycache__/
+*.pyc
 config/google_ai.json
+config/sp_token_cache.json
+config/nba_cache/
+reports/
+log.txt
 .gemini/
 .idea/
 .vscode/
