@@ -1,5 +1,5 @@
 {
-  "version": "2.4.27",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.27/Monitor_Esportes.exe",
-  "changelog": "v2.4.27: Correção de layout da aba NBA e Canais Live (ocultação total de barras e painéis manuais inferiores para liberar 100% da altura da tabela). Relatórios de canais do YouTube mais limpos e sucintos (filtragem de gols, cartões e faltas, mantendo estritamente marcos regulamentares de transmissão). Desativado envio automático ao SharePoint para canais ao vivo (mantendo geração de relatório local). Nova autenticação interativa corporativa do SharePoint via Microsoft Device Code com 1 clique no topo e na aba NBA."
+  "version": "2.4.28",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.28/Monitor_Esportes.exe",
+  "changelog": "v2.4.28: Correção definitiva da exclusão de e-mails na aba Configurações (remoção de re-inserção forçada). Novo botão e modal de E-mails Globais da NBA (configuração única refletida em todas as partidas e auditoria autônoma). Auditoria completa de toda a temporada da NBA desde o início (20/10/2026), com botão de sincronização em lote e limpeza preventiva de duplicatas no SharePoint."
 }

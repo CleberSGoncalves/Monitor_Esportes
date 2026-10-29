@@ -87,6 +87,23 @@ class SharePointNBAReporter:
             put_headers = dict(headers)
             put_headers["Content-Type"] = "application/pdf"
 
+            # Limpeza preventiva de duplicatas legadas com nomenclaturas antigas
+            try:
+                children_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root/children?$select=id,name"
+                r_children = SharePointReporter.request_with_retry("GET", children_url, headers=headers, timeout=15)
+                if r_children and r_children.status_code == 200:
+                    items = r_children.json().get("value", [])
+                    match_sub = f"{away_tri}_at_{home_tri}_{date_clean}".lower()
+                    for it in items:
+                        it_name = it.get("name", "").lower()
+                        it_id = it.get("id")
+                        if match_sub in it_name and it.get("name") != sp_filename:
+                            logger.info(f"[SharePoint NBA] Removendo arquivo duplicado legado: {it.get('name')}")
+                            del_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{it_id}"
+                            SharePointReporter.request_with_retry("DELETE", del_url, headers=headers, timeout=15)
+            except Exception as e_dup:
+                logger.debug(f"[SharePoint NBA] Checagem de duplicatas: {e_dup}")
+
             with open(pdf_path, "rb") as f:
                 pdf_bytes = f.read()
 

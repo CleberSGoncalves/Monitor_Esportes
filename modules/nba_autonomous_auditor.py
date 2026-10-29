@@ -23,6 +23,7 @@ if PROJECT_ROOT not in sys.path:
 from modules.nba_service import NBAService
 from modules.nba_report_generator import NBAReportGenerator
 from modules.sharepoint_nba_reporter import SharePointNBAReporter
+from modules.sharepoint_reporter import SharePointReporter
 from modules.email_service import EmailService
 
 logger = logging.getLogger("NBAAutonomousAuditor")
@@ -77,22 +78,40 @@ class NBAAutonomousAuditor:
             logger.warning(f"Erro ao salvar cache de jogos auditados da NBA: {e}")
 
     def is_game_audited(self, game_id: str) -> bool:
-        return self._audited_cache.get(str(game_id), {}).get("audited", False)
+        entry = self._audited_cache.get(str(game_id), {})
+        return entry.get("audited", False) and entry.get("sp_synced", False)
 
     def mark_game_audited(self, game: dict, pdf_path: str, email_sent: bool, sp_synced: bool):
         gid = str(game.get("id"))
         self._audited_cache[gid] = {
-            "audited": True,
+            "audited": bool(sp_synced),
             "match": game.get("match_display"),
             "date": game.get("date_display"),
             "score": game.get("score_display"),
             "platform": game.get("platform"),
             "pdf_path": pdf_path,
-            "email_sent": email_sent,
-            "sp_synced": sp_synced,
+            "email_sent": bool(email_sent),
+            "sp_synced": bool(sp_synced),
             "audited_at": datetime.now().isoformat()
         }
         self._save_audited_cache()
+
+    def set_recipients(self, recipients: list):
+        self._recipients = [r.strip() for r in recipients if r and "@" in r]
+        self._log(f"✉️ [Destinatários NBA] Lista atualizada para {len(self._recipients)} e-mails.")
+
+    def get_recipients(self) -> list:
+        if hasattr(self, "_recipients") and self._recipients:
+            return self._recipients
+        emails_path = os.path.join(PROJECT_ROOT, "config", "saved_emails.json")
+        recipients = ["cleber.goncalves@ibope.com", "arthur@mediadna.com.br"]
+        if os.path.exists(emails_path):
+            try:
+                with open(emails_path, "r", encoding="utf-8") as f:
+                    recipients = json.load(f)
+            except Exception:
+                pass
+        return recipients
 
     def start(self):
         if self._running:
@@ -122,8 +141,10 @@ class NBAAutonomousAuditor:
     def run_audit_and_sync_cycle(self):
         """Executa um ciclo completo de checagem da NBA, publicação da agenda e auditoria automática."""
         now_dt = datetime.now()
-        # Monitora ontem, hoje e os próximos 5 dias
-        dates = [(now_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(-1, 6)]
+        season_start = datetime(2026, 10, 20)
+        days_span = max(1, (now_dt - season_start).days + 1)
+        # Varre desde o início oficial da temporada (20/10) até os próximos 5 dias
+        dates = [(season_start + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(days_span + 5)]
         
         all_games = []
         for d_str in dates:
@@ -133,14 +154,11 @@ class NBAAutonomousAuditor:
         self._log(f"🔎 Varredura NBA: {len(all_games)} partidas monitoradas na agenda ({dates[0]} até {dates[-1]}).")
 
         # 1. Carregar destinatários salvos
-        emails_path = os.path.join(PROJECT_ROOT, "config", "saved_emails.json")
-        recipients = ["cleber.goncalves@ibope.com", "arthur@mediadna.com.br"]
-        if os.path.exists(emails_path):
-            try:
-                with open(emails_path, "r", encoding="utf-8") as f:
-                    recipients = json.load(f)
-            except Exception:
-                pass
+        recipients = self.get_recipients()
+
+        sp_token_ok = SharePointReporter.is_token_valid()
+        if not sp_token_ok:
+            self._log("⚠️ [SharePoint NBA] Sessão do SharePoint não autenticada. Clique em '🔑 Conectar SharePoint' na tela para autorizar o envio automático.")
 
         for game in all_games:
             gid = str(game.get("id"))

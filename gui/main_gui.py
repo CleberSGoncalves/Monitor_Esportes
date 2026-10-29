@@ -474,20 +474,6 @@ def _load_saved_emails() -> list:
 
                 emails = default_emails
 
-            changed = False
-
-            for de in default_emails:
-
-                if de not in emails:
-
-                    emails.append(de)
-
-                    changed = True
-
-            if changed:
-
-                _save_config_file("saved_emails.json", emails)
-
             return emails
 
     except Exception:
