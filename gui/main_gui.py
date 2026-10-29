@@ -656,6 +656,38 @@ def _normalize_scheduled_game_dict(g: dict, idx: int = 1) -> dict:
 
 
 
+def _canonical_match_key(team1: str, team2: str, date_str: str) -> str:
+    """Gera uma chave única e normalizada para um confronto em uma data específica, impedindo duplicatas."""
+    import unicodedata, re
+    def _clean(t):
+        if not t:
+            return ""
+        t = unicodedata.normalize('NFKD', str(t)).encode('ASCII', 'ignore').decode('ASCII').lower().strip()
+        t = re.sub(r'\b(futebol|clube|regatas|esporte|ec|fc|cr|saf)\b', '', t).strip()
+        if "vasco" in t: return "vasco"
+        if "flamengo" in t: return "flamengo"
+        if "corinthians" in t: return "corinthians"
+        if "palmeiras" in t: return "palmeiras"
+        if "sao paulo" in t: return "saopaulo"
+        if "santos" in t: return "santos"
+        if "fluminense" in t: return "fluminense"
+        if "botafogo" in t: return "botafogo"
+        if "gremio" in t: return "gremio"
+        if "internacional" in t or "inter" in t: return "internacional"
+        if "atletico" in t and ("mg" in t or "mineiro" in t): return "atleticomg"
+        if "athletico" in t or ("atletico" in t and "pr" in t): return "athleticopr"
+        if "cruzeiro" in t: return "cruzeiro"
+        if "bahia" in t: return "bahia"
+        if "fortaleza" in t: return "fortaleza"
+        if "chapecoense" in t: return "chapecoense"
+        return re.sub(r'[^a-z0-9]', '', t)
+    c1 = _clean(team1)
+    c2 = _clean(team2)
+    teams_part = f"{min(c1, c2)}_x_{max(c1, c2)}"
+    d_clean = str(date_str).strip().replace("-", "/")
+    return f"{teams_part}_{d_clean}"
+
+
 def _sort_games_chronologically(games_list: list) -> list:
     """Ordena estritamente a fila de agendamentos por ordem cronológica (data e hora de início)."""
     def _parse_key(g):
@@ -687,7 +719,7 @@ def _load_scheduled_games() -> list:
 
                 if isinstance(data, list) and len(data) > 0:
 
-                    valid_games = []
+                    valid_games_dict = {}
 
                     for idx, raw_g in enumerate(data, 1):
 
@@ -733,10 +765,18 @@ def _load_scheduled_games() -> list:
 
                                 g["_last_sumula_check_time"] = 0.0
 
-                            valid_games.append(g)
+                            # Deduplicacao estrita por chave canonica
+                            mkey = _canonical_match_key(g.get('team1'), g.get('team2'), g.get('date'))
+                            if mkey not in valid_games_dict:
+                                valid_games_dict[mkey] = g
+                            else:
+                                ex_g = valid_games_dict[mkey]
+                                if g.get('time') == '20:00' or (ex_g.get('time') == '19:00' and g.get('time')):
+                                    valid_games_dict[mkey] = g
 
                     
 
+                    valid_games = list(valid_games_dict.values())
                     if valid_games:
                         valid_games = _sort_games_chronologically(valid_games)
                         _save_scheduled_games(valid_games)
@@ -13904,11 +13944,11 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
         games_to_show = list(current_sched)
 
-        existing_signatures = {f"{g.get('team1')}_{g.get('team2')}".lower() for g in games_to_show}
+        existing_signatures = {_canonical_match_key(g.get('team1'), g.get('team2'), g.get('date')) for g in games_to_show}
 
         for evt in cbf_evts:
 
-            sig = f"{evt.get('team1')}_{evt.get('team2')}".lower()
+            sig = _canonical_match_key(evt.get('team1'), evt.get('team2'), evt.get('date'))
 
             if sig not in existing_signatures:
 
@@ -15114,7 +15154,8 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
                 games = _load_scheduled_games()
 
-                existing_sigs = {f"{g.get('team1')}_{g.get('team2')}_{g.get('date')}_{g.get('time')}".lower() for g in games}
+                existing_by_key = {_canonical_match_key(g.get('team1'), g.get('team2'), g.get('date')): g for g in games}
+                updated_count = 0
 
                 
 
@@ -15122,9 +15163,9 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
                 for idx, evt in enumerate(cbf_events):
 
-                    sig = f"{evt.get('team1')}_{evt.get('team2')}_{evt.get('date')}_{evt.get('time')}".lower()
+                    sig = _canonical_match_key(evt.get('team1'), evt.get('team2'), evt.get('date'))
 
-                    if sig not in existing_sigs:
+                    if sig not in existing_by_key:
 
                         new_id = f"auto_{evt.get('date').replace('/', '')}_{evt.get('time').replace(':', '')}_{idx}"
 
@@ -15152,11 +15193,26 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
                         })
 
+                        existing_by_key[sig] = games[-1]
                         added_count += 1
+                    else:
+                        ex_g = existing_by_key[sig]
+                        changed = False
+                        if evt.get('time') and ex_g.get('time') != evt.get('time'):
+                            ex_g['time'] = evt.get('time')
+                            changed = True
+                        if evt.get('platform') and ex_g.get('platform') != evt.get('platform'):
+                            ex_g['platform'] = evt.get('platform')
+                            changed = True
+                        if evt.get('comp') and ex_g.get('comp') != evt.get('comp'):
+                            ex_g['comp'] = evt.get('comp')
+                            changed = True
+                        if changed:
+                            updated_count += 1
 
                 
 
-                if added_count > 0:
+                if added_count > 0 or updated_count > 0:
                     games = _sort_games_chronologically(games)
                     _save_scheduled_games(games)
                     self._scheduled_games = games
@@ -15316,27 +15372,18 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
         self._run_expert_analysis(data)
 
     def _force_refresh_cbf_mural(self) -> None:
-
-        """Força o download e re-parsing das tabelas oficiais da CBF."""
-
-        try:
-
-            from modules.cbf_schedule_fetcher import CBFScheduleFetcher
-
-            CBFScheduleFetcher.get_upcoming_matches(force_refresh=True)
-
-            self._render_cbf_mural_ui()
-
-            self._log("[CBF MURAL] Tabela atualizada diretamente do portal CBF com sucesso!")
-
-            self._ui_success("Tabela da CBF atualizada live!")
-
-        except Exception as e:
-
-            self._log(f"[CBF MURAL WARN] Erro ao atualizar tabela: {e}")
-
-
-
+        """Força o download e re-parsing das tabelas oficiais da CBF em segundo plano (não trava a interface)."""
+        def do_refresh():
+            try:
+                from modules.cbf_schedule_fetcher import CBFScheduleFetcher
+                CBFScheduleFetcher.get_upcoming_matches(force_refresh=True)
+                self.after(0, self._render_cbf_mural_ui)
+                self.after(0, lambda: self._log('[CBF MURAL] Tabela atualizada diretamente do portal CBF com sucesso!'))
+                self.after(0, lambda: self._ui_success('Tabela da CBF atualizada live!'))
+            except Exception as e:
+                self.after(0, lambda err=e: self._log(f'[CBF MURAL WARN] Erro ao atualizar tabela: {err}'))
+        import threading
+        threading.Thread(target=do_refresh, daemon=True).start()
     def _render_cbf_mural_ui(self) -> None:
 
         """Renderiza o Mural de Próximos Confrontos usando o módulo autônomo CBFScheduleFetcher."""

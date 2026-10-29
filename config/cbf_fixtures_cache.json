@@ -2,64 +2,64 @@
   {
     "comp": "Brasileirão Série A",
     "team1": "Vasco da Gama",
-    "team2": "Cruzeiro",
-    "date": "29/08/2026",
-    "time": "21:20",
-    "platform": "CazéTV",
-    "tag": "📺 Transmissão Exclusiva"
-  },
-  {
-    "comp": "Brasileirão Série A",
-    "team1": "Mirassol",
-    "team2": "Palmeiras",
-    "date": "30/08/2026",
-    "time": "18:30",
+    "team2": "Flamengo",
+    "date": "29/10/2026",
+    "time": "20:00",
     "platform": "Amazon Prime",
-    "tag": "⭐ Alta Prioridade"
+    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
   },
   {
     "comp": "Copa do Brasil",
-    "team1": "Vitória",
+    "team1": "Palmeiras",
     "team2": "Vasco da Gama",
-    "date": "02/09/2026",
-    "time": "21:30",
+    "date": "01/11/2026",
+    "time": "15:00",
     "platform": "Amazon Prime",
-    "tag": "🏆 Decisivo"
-  },
-  {
-    "comp": "Copa do Brasil",
-    "team1": "Santos",
-    "team2": "Palmeiras",
-    "date": "02/09/2026",
-    "time": "21:30",
-    "platform": "Amazon Prime",
-    "tag": "🏆 Decisivo"
+    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
   },
   {
     "comp": "Copa do Brasil",
     "team1": "Grêmio",
-    "team2": "Internacional",
-    "date": "03/09/2026",
-    "time": "20:00",
+    "team2": "Atlético-MG",
+    "date": "01/11/2026",
+    "time": "17:30",
     "platform": "Amazon Prime",
-    "tag": "🏆 Decisivo"
+    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
   },
   {
     "comp": "Brasileirão Série A",
-    "team1": "Botafogo",
-    "team2": "Palmeiras",
-    "date": "06/09/2026",
-    "time": "18:30",
-    "platform": "CazéTV",
-    "tag": "📺 Transmissão Exclusiva"
-  },
-  {
-    "comp": "Brasileirão Série A",
-    "team1": "Corinthians",
-    "team2": "Chapecoense",
-    "date": "06/09/2026",
+    "team1": "Athletico-PR",
+    "team2": "Vasco da Gama",
+    "date": "04/11/2026",
     "time": "19:30",
+    "platform": "CazéTV",
+    "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
+  },
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Cruzeiro",
+    "team2": "Bahia",
+    "date": "05/11/2026",
+    "time": "21:30",
     "platform": "Amazon Prime",
-    "tag": "🔥 Clássico"
+    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
+  },
+  {
+    "comp": "Copa do Brasil",
+    "team1": "Atlético-MG",
+    "team2": "Grêmio",
+    "date": "07/11/2026",
+    "time": "17:00",
+    "platform": "Amazon Prime",
+    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
+  },
+  {
+    "comp": "Copa do Brasil",
+    "team1": "Vasco da Gama",
+    "team2": "Palmeiras",
+    "date": "08/11/2026",
+    "time": "16:00",
+    "platform": "Amazon Prime",
+    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
   }
 ]

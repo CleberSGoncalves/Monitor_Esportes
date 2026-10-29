@@ -18,6 +18,7 @@ import re
 from datetime import datetime, timedelta
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CACHE_PATH = os.path.join(PROJECT_ROOT, "config", "cbf_fixtures_cache.json")
 
 def get_rules_search_paths() -> list:
     paths = []
@@ -485,21 +486,61 @@ def fetch_live_cbf_pdf_fixtures() -> list:
 class CBFScheduleFetcher:
     """Motor de Tabela Oficial da CBF para o Monitor Esportes."""
 
-    @staticmethod
-    def get_upcoming_matches(force_refresh: bool = True) -> list:
+    _memory_upcoming_cache = None
+    _memory_cache_time = 0.0
+
+    @classmethod
+    def get_upcoming_matches(cls, force_refresh: bool = False) -> list:
         """
         Retorna estritamente os próximos jogos oficiais futuros da CBF (data/hora >= agora)
         filtrados unicamente pelas Colunas 4 e 5 (Brasileirão) e Coluna 3 (Copa do Brasil).
-        Mescla dados ao vivo com a tabela oficial garantindo sempre os próximos jogos disponíveis.
+        Utiliza cache em memória e em disco para responder instantaneamente (< 1ms) sem travar a interface gráfica.
         """
+        import time
+        now_ts = time.time()
         today = datetime.now()
-        
-        # 1. Tentar buscar dinamicamente do PDF da CBF
+
+        # 1. Se não for force_refresh, tenta cache em memória (válido por 15 min)
+        if not force_refresh and cls._memory_upcoming_cache and (now_ts - cls._memory_cache_time < 900):
+            valid_mem = []
+            for g in cls._memory_upcoming_cache:
+                try:
+                    g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
+                    if g_dt >= today - timedelta(hours=2):
+                        valid_mem.append(g)
+                except Exception:
+                    valid_mem.append(g)
+            if valid_mem:
+                return valid_mem[:5]
+
+        # 2. Se não for force_refresh, tenta cache em disco (config/cbf_fixtures_cache.json)
+        if not force_refresh and os.path.exists(CACHE_PATH):
+            try:
+                with open(CACHE_PATH, "r", encoding="utf-8") as f:
+                    disk_data = json.load(f)
+                if isinstance(disk_data, list) and disk_data:
+                    valid_disk = []
+                    for g in disk_data:
+                        try:
+                            g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
+                            if g_dt >= today - timedelta(hours=2):
+                                valid_disk.append(g)
+                        except Exception:
+                            valid_disk.append(g)
+                    if valid_disk:
+                        cls._memory_upcoming_cache = valid_disk
+                        cls._memory_cache_time = now_ts
+                        return valid_disk[:5]
+            except Exception:
+                pass
+
+        # 3. Se force_refresh ou sem cache válido, busca dinamicamente do PDF da CBF
         live_fixtures = []
-        try:
-            live_fixtures = fetch_live_cbf_pdf_fixtures()
-        except Exception:
-            pass
+        if force_refresh:
+            try:
+                live_fixtures = fetch_live_cbf_pdf_fixtures()
+            except Exception:
+                pass
 
         # Filtrar jogos futuros do PDF ao vivo
         future_live = []
@@ -508,10 +549,10 @@ class CBFScheduleFetcher:
                 g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
                 if g_dt >= today - timedelta(hours=2):
                     future_live.append(g)
-            except:
+            except Exception:
                 pass
-        
-        # 2. Obter confrontos oficiais de contingência futuros
+
+        # 4. Obter confrontos oficiais de contingência futuros
         real_fixtures = get_real_cbf_fixtures()
         future_real = []
         for g in real_fixtures:
@@ -519,7 +560,7 @@ class CBFScheduleFetcher:
                 g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
                 if g_dt >= today - timedelta(hours=2):
                     future_real.append(g)
-            except:
+            except Exception:
                 future_real.append(g)
 
         # Mesclar mantendo unicidade por (time1, time2, data)
@@ -532,16 +573,16 @@ class CBFScheduleFetcher:
                 combined.append(g)
 
         if not combined:
-            combined = real_fixtures
+            combined = future_real or real_fixtures
 
         # Ordenar por data/hora
         def parse_dt(g):
             try:
                 return datetime.strptime(f"{g.get('date', '')} {g.get('time', '')}", "%d/%m/%Y %H:%M")
-            except:
+            except Exception:
                 return datetime.max
         combined.sort(key=parse_dt)
-        
+
         # Salvar cache limpo
         try:
             os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
@@ -550,6 +591,8 @@ class CBFScheduleFetcher:
         except Exception:
             pass
 
+        cls._memory_upcoming_cache = combined
+        cls._memory_cache_time = now_ts
         return combined[:5]
 
     @staticmethod
