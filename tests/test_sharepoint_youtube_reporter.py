@@ -55,19 +55,16 @@ def test_sharepoint_youtube_reporter_sync_mock(tmp_path):
         assert upload_call[0][0] == "PUT"
         assert SharePointYouTubeReporter._cached_yt_drive_id in upload_call[0][1]
 
-        # Verifica se os metadados foram enviados no PATCH
+        # Verifica se os metadados canônicos foram enviados no PATCH (idêntico a Relatorios_de_Jogos)
         patch_call = mock_req.call_args_list[1]
         assert patch_call[0][0] == "PATCH"
         payload = patch_call[1]["json"]
         assert payload["Partida"] == "Grêmio x Atlético-MG"
-        assert payload["Canal"] == "Rádio Gaúcha"
+        assert payload["Canal"] == "Gaúcha"
         assert payload["Campeonato"] == "Copa do Brasil"
-        assert payload["Inicio_Transmissao"] == "17:00:00"
-        assert payload["Apito_Inicial"] == "17:30:00"
-        assert payload["Apito_Final"] == "19:24:00"
-        assert payload["Fim_Transmissao"] == "19:45:00"
-        assert payload["Duracao_Live"] == "02h 45min 00s"
-        assert payload["Placar"] == "Grêmio 2 x 0 Atlético-MG"
+        assert "Data_Partida" in payload
+        assert payload["Confianca"] == "99.0%"
+        assert payload["Auditado"] is True
 
 
 def test_sharepoint_youtube_reporter_auto_repair(tmp_path):

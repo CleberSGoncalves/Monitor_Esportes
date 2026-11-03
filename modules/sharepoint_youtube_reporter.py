@@ -53,6 +53,26 @@ class SharePointYouTubeReporter:
         return cls._cached_yt_drive_id
 
     @classmethod
+    def normalizar_canal(cls, canal_raw: str) -> str:
+        """Normaliza o nome do canal para as opções padrão cadastradas no SharePoint."""
+        c = (canal_raw or "").strip().lower()
+        if "esporte" in c and "band" in c:
+            return "Esporte Band RS"
+        elif "baldasso" in c:
+            return "Baldasso TV"
+        elif "atlantida" in c or "atlântida" in c:
+            return "Atlantida TV"
+        elif "bage" in c or "bagé" in c:
+            return "Bagé TV"
+        elif "esporte" in c and ("gaucha" in c or "gaúcha" in c):
+            return "Gaucha Esportes"
+        elif "gaucha" in c or "gaúcha" in c:
+            return "Gaúcha"
+        elif "caze" in c or "cazé" in c:
+            return "Caze TV"
+        return canal_raw or "Outro"
+
+    @classmethod
     def sync_youtube_report(
         cls,
         pdf_path: str,
@@ -61,7 +81,14 @@ class SharePointYouTubeReporter:
     ) -> bool:
         """
         Envia o PDF de relatório de canal do YouTube para a biblioteca 'Relatorio Jogos Youtube'
-        do SharePoint e sincroniza os metadados com resiliência total e auto-recuperação.
+        do SharePoint com os 6 metadados estritos idênticos à biblioteca 'Relatorios_de_Jogos':
+        1. Title / Nome (arquivo PDF)
+        2. Partida (Texto)
+        3. Campeonato (Escolha)
+        4. Canal / Plataforma (Escolha)
+        5. Data_Hora / Data_Partida (Data e Hora)
+        6. Confianca (Texto)
+        7. Auditado (Sim/Não)
         """
         if not os.path.exists(pdf_path):
             logger.error(f"[SharePoint YouTube] PDF não encontrado: {pdf_path}")
@@ -77,11 +104,11 @@ class SharePointYouTubeReporter:
                 return False
 
             partida = str(event_info.get("match_display") or event_info.get("partida") or event_info.get("title") or "Partida").strip()
-            canal = str(event_info.get("channel_name") or event_info.get("canal") or event_info.get("channel") or "YouTube").strip()
-            campeonato = str(event_info.get("competition") or event_info.get("campeonato") or "Outro").strip()
-            url_video = str(event_info.get("video_url") or event_info.get("url") or "").strip()
-            duracao_live = str(event_info.get("live_duration") or event_info.get("duration_str") or "").strip()
-            placar = str(event_info.get("score") or event_info.get("placar") or "").strip()
+            raw_canal = str(event_info.get("channel_name") or event_info.get("canal") or event_info.get("channel") or "Gaúcha").strip()
+            canal = cls.normalizar_canal(raw_canal)
+            campeonato = SharePointReporter.normalizar_campeonato(
+                str(event_info.get("competition") or event_info.get("campeonato") or "Copa do Brasil")
+            )
 
             partida_norm = "".join(c for c in partida if c.isalnum() or c in " xX_").strip().replace(" ", "_").lower()
             canal_norm = "".join(c for c in canal if c.isalnum() or c in "_").strip().replace(" ", "_").lower()
@@ -106,35 +133,27 @@ class SharePointYouTubeReporter:
             if not item_id:
                 return False
 
-            # Normalização de data ISO UTC
+            # Normalização de data ISO UTC (idêntica ao Relatorios_de_Jogos)
             raw_date = event_info.get("date") or event_info.get("data_jogo") or datetime.now().strftime("%d/%m/%Y")
             time_start = event_info.get("start_time") or event_info.get("inicio_transmissao") or "17:00"
             iso_utc = SharePointReporter.format_iso_datetime(raw_date, time_start)
 
+            # Estrutura idêntica a Relatorios_de_Jogos
             fields_payload = {
                 "Title": sp_filename,
                 "Partida": partida,
-                "Canal": canal,
                 "Campeonato": campeonato,
-                "Data_Jogo": iso_utc,
-                "Inicio_Transmissao": str(event_info.get("inicio_transmissao") or time_start),
-                "Apito_Inicial": str(event_info.get("apito_inicial") or event_info.get("kickoff") or ""),
-                "Apito_Final": str(event_info.get("apito_final") or event_info.get("end_time") or ""),
-                "Fim_Transmissao": str(event_info.get("fim_transmissao") or event_info.get("close_time") or ""),
-                "Duracao_Live": duracao_live,
-                "URL_Video": url_video,
-                "Confianca": str(confianca),
-                "Auditado": True,
-                "Placar": placar,
-                "Status": "Concluído"
+                "Canal": canal,
+                "Data_Partida": iso_utc,
+                "Confianca": SharePointReporter.normalizar_confianca(confianca),
+                "Auditado": True
             }
 
             fields_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{item_id}/listItem/fields"
             json_headers = dict(headers)
             json_headers["Content-Type"] = "application/json"
 
-            # Auto-recuperação: se algum campo ainda não foi criado na interface do SharePoint,
-            # remove o campo faltante e continua sem quebrar o upload!
+            # Auto-recuperação: suporta variações de nome de coluna (Canal vs Plataforma, Data_Partida vs Data_Hora)
             for attempt in range(5):
                 r_fields = SharePointReporter.request_with_retry(
                     "PATCH", fields_url, headers=json_headers, json=fields_payload, timeout=20
@@ -147,8 +166,16 @@ class SharePointYouTubeReporter:
                 m_unrec = re.search(r"Field '([^']+)' is not recognized", err_text)
                 if m_unrec:
                     bad_field = m_unrec.group(1)
-                    logger.warning(f"[SharePoint YouTube] Removendo campo não reconhecido '{bad_field}' e tentando novamente...")
-                    fields_payload.pop(bad_field, None)
+                    logger.warning(f"[SharePoint YouTube] Campo não reconhecido '{bad_field}'. Adaptando...")
+                    # Fallback de nomes alternativos
+                    if bad_field == "Canal" and "Canal" in fields_payload:
+                        val = fields_payload.pop("Canal")
+                        fields_payload["Plataforma"] = val
+                    elif bad_field == "Data_Partida" and "Data_Partida" in fields_payload:
+                        val = fields_payload.pop("Data_Partida")
+                        fields_payload["Data_Hora"] = val
+                    else:
+                        fields_payload.pop(bad_field, None)
                     continue
                 else:
                     logger.warning(f"[SharePoint YouTube] Metadados parciais (tentativa {attempt+1}): {r_fields.status_code} - {err_text[:200]}")
