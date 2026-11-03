@@ -9,14 +9,20 @@ class ExpertAssistant:
     Assistente Especialista que utiliza Gemini com Search Grounding para extrair
     metadados técnicos e cronologia de eventos esportivos sem necessidade de vídeo.
     """
-    def __init__(self, api_key: str, model_id: str = "gemini-2.5-flash", yt_api_key: Optional[str] = None):
+    def __init__(self, api_key: str, model_id: str = "gemini-3.8-flash", yt_api_key: Optional[str] = None):
         if not api_key:
             raise ValueError("API Key do Gemini é obrigatória para ExpertAssistant.")
         # Aceita lista de chaves separadas por vírgula para rotação/failover
-        self.api_keys = [k.strip() for k in api_key.split(",") if k.strip()]
-        self.exhausted_keys = set() # Chaves que retornaram 429 / spend cap
+        raw_keys = [k.strip() for k in api_key.split(",") if k.strip()]
+        import os
+        for env_var in ["GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "GEMINI_API_KEY_4", "GEMINI_API_KEY_5"]:
+            val = os.getenv(env_var, "").strip()
+            if val and val not in raw_keys:
+                raw_keys.append(val)
+        self.api_keys = raw_keys
+        self.exhausted_keys = set() # Chaves que retornaram 429 / 402 / 503 / spend cap
         self.current_key_idx = 0
-        self.model_id = model_id
+        self.model_id = model_id or os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
         self.yt_api_key = yt_api_key or self.api_keys[0]
         self._init_client()
 
@@ -1042,8 +1048,8 @@ class ExpertAssistant:
                         err_msg = str(e)
                         print(f"[EXPERT WARN] Falha na tentativa {attempt+1} com modelo {current_model}: {err_msg}")
                         
-                        # Se for erro de quota (429) ou spend cap excedido, tenta rotacionar a chave de API e re-executar
-                        if "429" in err_msg or "spend cap" in err_msg.lower() or "limit" in err_msg.lower() or "exhausted" in err_msg.lower():
+                        # Se for erro de quota (429/402/403/503) ou spend cap excedido, tenta rotacionar a chave de API e re-executar
+                        if "429" in err_msg or "402" in err_msg or "403" in err_msg or "503" in err_msg or "spend cap" in err_msg.lower() or "limit" in err_msg.lower() or "exhausted" in err_msg.lower() or "depleted" in err_msg.lower() or "credits" in err_msg.lower() or "unavailable" in err_msg.lower():
                             if self.rotate_key():
                                 print(f"[EXPERT] Rotação de chave ativada devido a limite/quota! Nova chave carregada. Repetindo a tentativa...")
                                 continue

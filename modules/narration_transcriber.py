@@ -58,7 +58,7 @@ def find_ffmpeg() -> Optional[str]:
     return None
 
 
-def make_gemini_client(api_key: str, read_timeout_s: float = 600.0):
+def make_gemini_client(api_key: str, read_timeout_s: float = 45.0):
     """Cliente google-genai com o mesmo perfil de rede do ExpertAssistant, mas com timeout longo (áudio)."""
     import httpx
     from google import genai
@@ -78,16 +78,28 @@ def make_gemini_client(api_key: str, read_timeout_s: float = 600.0):
 
 
 def split_keys(api_key: Any) -> List[str]:
+    keys = []
     if isinstance(api_key, (list, tuple)):
         raw = ",".join(str(k) for k in api_key)
     else:
         raw = str(api_key or "")
-    return [k.strip() for k in raw.split(",") if k.strip()]
+    for k in raw.split(","):
+        k_s = k.strip()
+        if k_s and k_s not in keys:
+            keys.append(k_s)
+
+    # Injetar chaves configuradas em variáveis de ambiente (.env)
+    import os
+    for env_var in ["GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "GEMINI_API_KEY_4", "GEMINI_API_KEY_5"]:
+        val = os.getenv(env_var, "").strip()
+        if val and val not in keys:
+            keys.append(val)
+    return keys
 
 
 def _is_quota_error(ex: Exception) -> bool:
     s = str(ex).lower()
-    return any(k in s for k in ("429", "resource_exhausted", "quota", "rate limit", "spend"))
+    return any(k in s for k in ("429", "402", "403", "503", "resource_exhausted", "quota", "rate limit", "spend", "depleted", "credits", "unavailable"))
 
 
 def gemini_generate_text(api_key: Any, model_id: str, contents: list, *, json_mode: bool = False,
@@ -101,25 +113,36 @@ def gemini_generate_text(api_key: Any, model_id: str, contents: list, *, json_mo
     cfg = types.GenerateContentConfig(temperature=0.1, max_output_tokens=65536,
                                       response_mime_type="application/json" if json_mode else None)
     last_err: Optional[Exception] = None
-    for attempt in range(len(keys) * 2):
-        key = keys[attempt % len(keys)]
-        try:
-            client = (client_factory or make_gemini_client)(key)
-            parts: List[str] = []
-            for chunk in client.models.generate_content_stream(model=model_id, contents=contents, config=cfg):
-                if getattr(chunk, "text", None):
-                    parts.append(chunk.text)
-            txt = "".join(parts).strip()
-            if txt:
-                return txt
-            last_err = RuntimeError("Gemini retornou resposta vazia.")
-        except Exception as ex:  # noqa: BLE001
-            last_err = ex
-            if log:
-                log(f"⚠️ Gemini (chave ...{key[-6:]}): {str(ex)[:160]}")
-            if not _is_quota_error(ex):
-                time.sleep(3)
-    raise RuntimeError(f"Falha no Gemini após rotação de chaves: {last_err}")
+    # Modelos com fallback resiliente
+    candidate_models = [model_id]
+    if "3.8" in model_id and "gemini-2.5-flash" not in candidate_models:
+        candidate_models.append("gemini-2.5-flash")
+    elif "2.5" in model_id and "gemini-3.8-flash" not in candidate_models:
+        candidate_models.append("gemini-3.8-flash")
+
+    for cur_model in candidate_models:
+        for attempt in range(len(keys) * 2):
+            key = keys[attempt % len(keys)]
+            try:
+                client = (client_factory or (lambda k: make_gemini_client(k, read_timeout_s=45.0)))(key)
+                parts: List[str] = []
+                for chunk in client.models.generate_content_stream(model=cur_model, contents=contents, config=cfg):
+                    if getattr(chunk, "text", None):
+                        parts.append(chunk.text)
+                txt = "".join(parts).strip()
+                if txt:
+                    return txt
+                last_err = RuntimeError("Gemini retornou resposta vazia.")
+            except Exception as ex:  # noqa: BLE001
+                last_err = ex
+                if log:
+                    log(f"[AVISO] Gemini (chave ...{key[-6:]} | {cur_model}): {str(ex)[:160]}")
+                if "503" in str(ex) or "unavailable" in str(ex).lower():
+                    # Modelo sobrecarregado nos servidores Google, avança para o fallback imediato
+                    break
+                if not _is_quota_error(ex):
+                    time.sleep(1)
+    raise RuntimeError(f"Falha no Gemini após rotação de chaves e modelos: {last_err}")
 
 
 # ---------------------------------------------------------------------------
@@ -256,7 +279,7 @@ def transcribe_chunk_gemini(api_key: Any, model_id: str, path: str, log: Callabl
             last_err = RuntimeError("Transcrição do bloco veio sem timestamps.")
         except Exception as ex:  # noqa: BLE001
             last_err = ex
-            log(f"⚠️ Bloco {os.path.basename(path)}: {str(ex)[:160]}")
+            log(f"[AVISO] Bloco {os.path.basename(path)}: {str(ex)[:160]}")
         finally:
             try:
                 if uploaded is not None:
@@ -329,7 +352,7 @@ def transcribe_event(event: Dict[str, Any], out_path: str, *, api_key: Any = Non
             source_label = "Legendas do YouTube"
             result["source"] = "youtube_captions"
     except Exception as ex:  # noqa: BLE001
-        log(f"⚠️ Legendas indisponíveis: {str(ex)[:160]}")
+        log(f"[AVISO] Legendas indisponíveis: {str(ex)[:160]}")
 
     if not lines:
         result["captions_missing"] = True

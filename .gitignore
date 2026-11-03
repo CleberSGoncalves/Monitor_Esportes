@@ -16,3 +16,4 @@ log.txt
 .gemini/
 .idea/
 .vscode/
+.env
