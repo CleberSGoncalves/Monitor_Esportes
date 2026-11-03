@@ -1571,7 +1571,7 @@ class CanaisLiveMixin:
         def _do_sp():
             ok = self.live_service.sync_event_to_sharepoint(vid)
             if ok:
-                self.after(0, lambda: messagebox.showinfo("SharePoint Sincronizado", "Relatório publicado com sucesso na biblioteca 'Relatorios_de_Jogos' do SharePoint!"))
+                self.after(0, lambda: messagebox.showinfo("SharePoint Sincronizado", "Relatório publicado com sucesso na biblioteca 'Relatorio Jogos Youtube' do SharePoint!"))
                 self.after(0, self._render_fila_cards)
             else:
                 self.after(0, lambda: messagebox.showwarning("Falha no SharePoint", "Não foi possível sincronizar o relatório no SharePoint. Verifique a conexão com a rede/Graph API."))

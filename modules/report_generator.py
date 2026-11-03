@@ -3251,7 +3251,7 @@ class ReportGenerator:
 
             partida = str(res0.get("match_display") or res0.get("match_id") or "").strip()
 
-            # REGRA FUNDAMENTAL: Proibicao absoluta de envio de testes/canais YouTube para Relatorios_de_Jogos
+            # REGRA FUNDAMENTAL: Proibicao de envio de canais YouTube para Relatorios_de_Jogos (roteado para biblioteca dedicada Relatorio Jogos Youtube)
             p_lower = partida.lower()
             plat_lower = str(res0.get("platform") or "").lower()
             name_pfx = str(name_prefix or "").lower()
@@ -3262,7 +3262,16 @@ class ReportGenerator:
                 or ("jornada" in p_lower and ("digital" in p_lower or "super" in p_lower))
                 or res0.get("report_kind") == "narration" or res0.get("channel_name")
             ):
-                print(f"[SharePoint] Bloqueado upload para Relatorios_de_Jogos: evento de canal YouTube/teste ('{partida}').")
+                print(f"[SharePoint] Roteando evento do YouTube ('{partida}') para biblioteca dedicada 'Relatorio Jogos Youtube'...")
+                try:
+                    from modules.sharepoint_youtube_reporter import SharePointYouTubeReporter
+                    SharePointYouTubeReporter.sync_youtube_report(
+                        pdf_path=pdf_path,
+                        event_info=res0,
+                        confianca=f"{float(res0.get('confidence_score') or 99.0):.1f}%"
+                    )
+                except Exception as ex_yt_sp:
+                    print(f"[SharePoint YouTube] Aviso: Falha na sincronização dedicada do YouTube: {ex_yt_sp}")
                 return pdf_path
 
             if not partida or partida.lower() in ["partida", "none", "n/a", "sem partida"] or res0.get("error"):

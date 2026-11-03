@@ -1847,8 +1847,25 @@ class LiveNarrationService:
 
 
     def sync_event_to_sharepoint(self, vid: str) -> bool:
-        """Sincronizacao de canais do YouTube para Relatorios_de_Jogos desabilitada por regra de negocio."""
-        self.log(f"ℹ️ Canais Live operam em modo isolado: nao enviam relatorios para a lista de futebol do SharePoint.")
+        """Sincroniza relatório do canal do YouTube para a nova biblioteca dedicada 'Relatorio Jogos Youtube'."""
+        try:
+            ev = self.get_event(vid)
+            if not ev:
+                return False
+            pdf_path = ev.get("last_pdf_path") or ev.get("narration_pdf_path")
+            if not pdf_path or not os.path.exists(pdf_path):
+                from pathlib import Path
+                match_id = ev.get("id") or vid
+                candidates = list(Path("reports").glob(f"*{match_id}*.pdf"))
+                if candidates:
+                    pdf_path = str(candidates[0])
+            if pdf_path and os.path.exists(pdf_path):
+                from modules.sharepoint_youtube_reporter import SharePointYouTubeReporter
+                return SharePointYouTubeReporter.sync_youtube_report(pdf_path, ev)
+            else:
+                self.log(f"⚠️ PDF não localizado para sincronização do evento {vid}.")
+        except Exception as e:
+            self.log(f"⚠️ Erro ao sincronizar com SharePoint YouTube: {e}")
         return False
 
     def generate_case_report_for_event(self, vid: str) -> Dict[str, Any]:
