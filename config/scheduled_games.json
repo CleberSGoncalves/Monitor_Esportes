@@ -7,7 +7,7 @@
     "date": "29/10/2026",
     "time": "20:00",
     "platform": "Amazon Prime",
-    "status": "pending",
+    "status": "completed",
     "last_run": null,
     "report_file": null
   },
@@ -17,11 +17,11 @@
     "team2": "Vasco da Gama",
     "comp": "Copa do Brasil",
     "date": "01/11/2026",
-    "time": "15:00",
+    "time": "16:00",
     "platform": "Amazon Prime",
-    "status": "pending",
-    "last_run": null,
-    "report_file": null
+    "status": "completed",
+    "last_run": "03/11/2026 15:56:43",
+    "report_file": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_amazon_prime_copa_do_brasil_palmeiras_x_vasco_da_gama_01112026_20261103_155643.pdf"
   },
   {
     "id": "game_3_01112026_1730",
@@ -31,9 +31,9 @@
     "date": "01/11/2026",
     "time": "17:30",
     "platform": "Amazon Prime",
-    "status": "pending",
-    "last_run": null,
-    "report_file": null
+    "status": "completed",
+    "last_run": "03/11/2026 15:57:30",
+    "report_file": "E:/desenvolvimento/Monitor_Esportes/reports/expert_amazon_prime_copa_do_brasil_grêmio_x_atlético-mg_01112026_20261103_155730.pdf"
   },
   {
     "id": "game_4_04112026_1930",

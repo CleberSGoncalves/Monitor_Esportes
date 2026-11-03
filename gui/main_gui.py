@@ -14498,7 +14498,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
         """Dispara a auditoria de um jogo agendado quando a súmula já está disponível ou por tolerância."""
 
-        if game.get("status") in ["queued", "running", "completed", "failed"]:
+        if game.get("status") in ["queued", "running", "completed"]:
 
             return
 
@@ -14856,7 +14856,9 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
         for g in games:
 
-            if g.get("status", "pending") == "pending":
+            status = g.get("status", "pending")
+
+            if status in ["pending", "failed"]:
 
                 d_str = g.get("date", "")
 
@@ -14868,17 +14870,19 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
                     e_dt = k_dt + timedelta(minutes=110)
 
-                    
+                    # Se falhou e já passaram mais de 48h do início, encerra tentativas
+                    if status == "failed" and (now - k_dt > timedelta(hours=48)):
+                        continue
 
                     if now >= e_dt:
 
-                        # Throttle a verificação da súmula para a cada 15 minutos (900s) se a partida já encerrou (via HTTP scraping direto sem Gemini)
-
+                        # Intervalo de rechecagem: 15 min (900s) para pending, 30 min (1800s) para failed
+                        retry_interval = 1800.0 if status == "failed" else 900.0
                         last_check_t = g.get("_last_sumula_check_time", 0.0)
 
                         import time
 
-                        if time.time() - last_check_t >= 900.0 or last_check_t == 0.0:
+                        if time.time() - last_check_t >= retry_interval or last_check_t == 0.0:
 
                             g["_last_sumula_check_time"] = time.time()
 

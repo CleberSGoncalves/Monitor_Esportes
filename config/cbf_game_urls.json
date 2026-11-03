@@ -1,0 +1,18 @@
+{
+  "gremio-x-atletico-mineiro": {
+    "game_url": "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/gremio-x-atletico-mineiro/835308",
+    "sumula_url": "https://conteudo.cbf.com.br/sumulas/2026/424151se.pdf"
+  },
+  "palmeiras-x-vasco-da-gama": {
+    "game_url": "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/palmeiras-x-vasco-da-gama-saf/835309",
+    "sumula_url": "https://conteudo.cbf.com.br/sumulas/2026/424152se.pdf"
+  },
+  "atletico-mineiro-x-gremio": {
+    "game_url": "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/atletico-mineiro-x-gremio/835310",
+    "sumula_url": ""
+  },
+  "vasco-da-gama-x-palmeiras": {
+    "game_url": "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/vasco-da-gama-saf-x-palmeiras/835311",
+    "sumula_url": ""
+  }
+}

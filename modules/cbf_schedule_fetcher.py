@@ -646,11 +646,40 @@ class CBFScheduleFetcher:
                 "red-bull-bragantino": "red-bull-bragantino",
                 "bahia": "bahia",
                 "remo": "remo",
-                "mirassol": "mirassol"
+                "mirassol": "mirassol",
+                "atletico-mg": "atletico-mineiro",
+                "atletico-mineiro": "atletico-mineiro",
+                "athletico-pr": "athletico-paranaense",
+                "athletico-paranaense": "athletico-paranaense",
+                "athletico": "athletico-paranaense",
+                "atletico-go": "atletico-goianiense",
+                "america-mg": "america-mineiro"
             }
             
             s1 = team_map.get(slug1, slug1)
             s2 = team_map.get(slug2, slug2)
+
+            # 1. Checa cache persistente de URLs oficiais de jogos da CBF
+            try:
+                import json
+                for p_cache in [os.path.join(PROJECT_ROOT, "config", "cbf_game_urls.json"), os.path.join(os.getenv("APPDATA", ""), "Monitor_Esportes", "config", "cbf_game_urls.json")]:
+                    if os.path.exists(p_cache):
+                        with open(p_cache, "r", encoding="utf-8") as f_u:
+                            u_data = json.load(f_u)
+                        k1 = f"{s1}-x-{s2}"
+                        k2 = f"{s2}-x-{s1}"
+                        if k1 in u_data:
+                            val = u_data[k1]
+                            url_res = val.get("game_url") if isinstance(val, dict) else val
+                            print(f"[CBF SEARCH] Link oficial do jogo encontrado no cache: {url_res}")
+                            return url_res
+                        if k2 in u_data:
+                            val = u_data[k2]
+                            url_res = val.get("game_url") if isinstance(val, dict) else val
+                            print(f"[CBF SEARCH] Link oficial do jogo encontrado no cache: {url_res}")
+                            return url_res
+            except Exception:
+                pass
 
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
