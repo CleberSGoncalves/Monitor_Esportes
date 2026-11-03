@@ -3214,13 +3214,13 @@ class ReportGenerator:
 
             
 
-                        # --- Comprovação Técnica Visual (Frame Auditado com Tarja de Horário) ---
+            # --- Comprovação Técnica Visual (Frame Auditado com Tarja de Horário) ---
             proof_imgs = res.get("visual_proof_images") or []
             if not proof_imgs and res.get("visual_proof_image"):
                 proof_imgs = [res.get("visual_proof_image")]
 
             if proof_imgs:
-                if y < 270:
+                if y < 320:
                     c.showPage()
                     y = height - 50
 
@@ -3230,15 +3230,28 @@ class ReportGenerator:
                 y -= 16
                 c.setFillColorRGB(0, 0, 0)
 
-                for img_p in proof_imgs[:2]:
+                for img_idx, img_p in enumerate(proof_imgs[:2], 1):
                     if os.path.exists(img_p):
-                        img_w = 470
-                        img_h = 240
-                        if y - img_h < 40:
+                        img_w = 495
+                        img_h = 278
+                        if y - img_h < 50:
                             c.showPage()
                             y = height - 50
-                        c.drawImage(img_p, 40, y - img_h, width=img_w, height=img_h, preserveAspectRatio=True)
-                        y -= (img_h + 15)
+                        
+                        img_x = (width - img_w) / 2
+                        c.drawImage(img_p, img_x, y - img_h, width=img_w, height=img_h, preserveAspectRatio=True)
+                        
+                        # Borda fina e elegante de acabamento
+                        c.setStrokeColorRGB(0.6, 0.6, 0.6)
+                        c.setLineWidth(0.5)
+                        c.rect(img_x, y - img_h, img_w, img_h, stroke=1, fill=0)
+                        
+                        y -= (img_h + 12)
+                        c.setFont("Helvetica-Oblique", 8.5)
+                        c.setFillColorRGB(0.35, 0.35, 0.35)
+                        c.drawString(img_x, y, f"Registro #{img_idx}: Evidência visual extraída da transmissão ao vivo com carimbo de tempo oficial sincronizado.")
+                        c.setFillColorRGB(0, 0, 0)
+                        y -= 18
 
             y -= 30
 
