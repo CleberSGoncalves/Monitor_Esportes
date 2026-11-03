@@ -60,9 +60,9 @@ AUDIO_FORCE_AFTER_S = 4 * 3600
 
 MAX_AUDIO_ATTEMPTS = 3
 
-TOP_ENTRIES_PER_CHANNEL = 15
+TOP_ENTRIES_PER_CHANNEL = 50
 
-KEEP_ENDED_UNSELECTED_S = 2 * 86400
+KEEP_ENDED_UNSELECTED_S = 3 * 86400
 
 
 
@@ -1024,7 +1024,21 @@ class LiveNarrationService:
 
                         if is_new and st not in ("upcoming", "live"):
 
-                            continue  # só listamos eventos futuros/ao vivo
+                            # Permitir transmissões recentemente encerradas (últimas 72h) com duração ou título de jogo
+
+                            ref_time = info.get("release_timestamp") or info.get("timestamp") or 0
+
+                            dur = int(info.get("duration") or 0)
+
+                            is_recent = (time.time() - ref_time) <= (3 * 86400) if ref_time else True
+
+                            t_low = (info.get("title") or "").lower()
+
+                            has_match = any(k in t_low for k in [" x ", " vs ", " x", "x ", "jornada", "transmissão", "grêmio", "gremio", "inter", "copa", "brasileir"])
+
+                            if not (is_recent and (dur >= 2400 or has_match)):
+
+                                continue  # descarta se for antigo, muito curto ou fora de contexto
 
                         self._upsert_event(vid, info, ch)
 
