@@ -23,11 +23,15 @@ REPORTS_DIR = os.path.join(PROJECT_ROOT, "reports")
 os.makedirs(REPORTS_DIR, exist_ok=True)
 
 class NBAReportGenerator:
+    reports_dir = REPORTS_DIR
+
     def __init__(self, reports_dir: str = REPORTS_DIR):
         self.reports_dir = reports_dir
 
-    def generate_report(self, game: Dict[str, Any], parsed_gamebook: Dict[str, Any],
+    @classmethod
+    def generate_report(cls_or_self, game: Dict[str, Any], parsed_gamebook: Dict[str, Any],
                         streaming_audit: Optional[Dict[str, Any]] = None) -> str:
+        reports_dir = getattr(cls_or_self, 'reports_dir', REPORTS_DIR)
         """
         Gera o PDF oficial do relatório de auditoria do jogo da NBA.
         """
@@ -43,7 +47,7 @@ class NBAReportGenerator:
         partida_slug = f"{game.get('away_tri', 'AWAY')}_at_{game.get('home_tri', 'HOME')}".lower()
         plat_slug = plat.lower().replace(' ', '_')
         pdf_name = f"expert_nba_{plat_slug}_{partida_slug}_{date_clean}.pdf"
-        pdf_path = os.path.join(self.reports_dir, pdf_name)
+        pdf_path = os.path.join(reports_dir, pdf_name)
 
         doc = SimpleDocTemplate(
             pdf_path,
@@ -154,7 +158,7 @@ class NBAReportGenerator:
             [
                 Paragraph("<b>Fase / Período</b>", bold_style),
                 Paragraph("<b>Tipo de Marco</b>", bold_style),
-                Paragraph("<b>Horário Oficial (Local)</b>", bold_style),
+                Paragraph("<b>Horário Oficial (BRT)</b>", bold_style),
                 Paragraph("<b>Descrição Técnica do Evento</b>", bold_style)
             ]
         ]
@@ -166,8 +170,8 @@ class NBAReportGenerator:
                 chrono_rows.append([
                     Paragraph(f"<b>{p_name}</b>", body_style),
                     Paragraph(ev_type, body_style),
-                    Paragraph(f"<b>{m.get('time', '—')}</b>", body_style),
-                    Paragraph(f"Protocolo oficial registrado no Game Book da NBA.", body_style)
+                    Paragraph(f"<b>{m.get('time_brt') or m.get('time', '—')}</b>", body_style),
+                    Paragraph(f"Protocolo oficial registrado no Game Book da NBA ({m.get('time_local_str')})." if m.get('time_local_str') else "Protocolo oficial registrado no Game Book da NBA.", body_style)
                 ])
         else:
             # Fallback estruturado caso o gamebook ainda esteja sendo processado

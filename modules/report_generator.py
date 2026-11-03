@@ -3214,9 +3214,33 @@ class ReportGenerator:
 
             
 
-            y -= 30
+                        # --- Comprovação Técnica Visual (Frame Auditado com Tarja de Horário) ---
+            proof_imgs = res.get("visual_proof_images") or []
+            if not proof_imgs and res.get("visual_proof_image"):
+                proof_imgs = [res.get("visual_proof_image")]
 
-            
+            if proof_imgs:
+                if y < 270:
+                    c.showPage()
+                    y = height - 50
+
+                c.setFont("Helvetica-Bold", 11)
+                c.setFillColorRGB(0.05, 0.2, 0.45) # Azul institucional
+                c.drawString(40, y, "COMPROVAÇÃO TÉCNICA VISUAL (FRAME AUDITADO COM TARJA DE HORÁRIO):")
+                y -= 16
+                c.setFillColorRGB(0, 0, 0)
+
+                for img_p in proof_imgs[:2]:
+                    if os.path.exists(img_p):
+                        img_w = 470
+                        img_h = 240
+                        if y - img_h < 40:
+                            c.showPage()
+                            y = height - 50
+                        c.drawImage(img_p, 40, y - img_h, width=img_w, height=img_h, preserveAspectRatio=True)
+                        y -= (img_h + 15)
+
+            y -= 30
 
         c.save()
 

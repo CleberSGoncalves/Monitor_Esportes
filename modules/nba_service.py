@@ -33,6 +33,30 @@ NBA_CACHE_DIR = os.path.join(PROJECT_ROOT, "config", "nba_cache")
 os.makedirs(NBA_CACHE_DIR, exist_ok=True)
 
 # Mapeamento oficial de Tricodes dos times da NBA
+NBA_TEAM_TIMEZONES = {
+    # Eastern Time (America/New_York)
+    "ATL": "America/New_York", "BOS": "America/New_York", "BKN": "America/New_York",
+    "CHA": "America/New_York", "CLE": "America/New_York", "DET": "America/New_York",
+    "IND": "America/New_York", "MIA": "America/New_York", "NYK": "America/New_York",
+    "ORL": "America/New_York", "PHI": "America/New_York", "TOR": "America/Toronto",
+    "WAS": "America/New_York",
+    
+    # Central Time (America/Chicago)
+    "CHI": "America/Chicago", "DAL": "America/Chicago", "HOU": "America/Chicago",
+    "MEM": "America/Chicago", "MIL": "America/Chicago", "MIN": "America/Chicago",
+    "NOP": "America/Chicago", "OKC": "America/Chicago", "SAS": "America/Chicago",
+    
+    # Mountain Time (America/Denver)
+    "DEN": "America/Denver", "UTA": "America/Denver",
+    
+    # Arizona / Phoenix (America/Phoenix - MST sem DST)
+    "PHX": "America/Phoenix",
+    
+    # Pacific Time (America/Los_Angeles)
+    "GSW": "America/Los_Angeles", "LAC": "America/Los_Angeles", "LAL": "America/Los_Angeles",
+    "POR": "America/Los_Angeles", "SAC": "America/Los_Angeles",
+}
+
 NBA_TEAMS = {
     "Atlanta Hawks": "ATL", "Boston Celtics": "BOS", "Brooklyn Nets": "BKN",
     "Charlotte Hornets": "CHA", "Chicago Bulls": "CHI", "Cleveland Cavaliers": "CLE",
@@ -217,7 +241,7 @@ class NBAService:
             return None
 
     @classmethod
-    def parse_gamebook(cls, pdf_path: str) -> Dict[str, Any]:
+    def parse_gamebook(cls, pdf_path: str, home_tri: str = "", date_clean: str = "") -> Dict[str, Any]:
         """
         Extrai todas as informações de auditoria técnica do PDF oficial do Game Book da NBA:
         - Duração total
@@ -271,7 +295,48 @@ class NBAService:
             if len(lines_p1) > 2:
                 parsed["arena"] = lines_p1[2].strip()
 
-            # 3. Extração dos marcos temporais reais (Start of Period / End of Period)
+            # 3. Identificar Home Team e Data da Partida para conversão precisa de Fuso Horário para BRT (Brasília / UTC-3)
+            home_tri_found = home_tri
+            date_clean_found = date_clean
+
+            # Extração a partir do nome do arquivo (ex: 20261027_BKNBOS_book.pdf)
+            m_fn = re.search(r"(\d{8})_([A-Z]{3})([A-Z]{3})_book\.pdf", os.path.basename(pdf_path))
+            if m_fn:
+                if not date_clean_found: date_clean_found = m_fn.group(1)
+                if not home_tri_found: home_tri_found = m_fn.group(3)
+
+            # Fallback pelo texto do Game Book (HOME: Time)
+            if not home_tri_found:
+                m_home = re.search(r"HOME:\s*([A-Za-z\s]+)", full_text_p1)
+                if m_home:
+                    home_tri_found = cls.get_team_tricode(m_home.group(1).split("(")[0].strip())
+
+            arena_tz_name = NBA_TEAM_TIMEZONES.get(home_tri_found, "America/New_York")
+            try:
+                from zoneinfo import ZoneInfo
+                home_tz = ZoneInfo(arena_tz_name)
+                brt_tz = ZoneInfo("America/Sao_Paulo")
+            except Exception:
+                home_tz = None
+                brt_tz = None
+
+            y_dt, m_dt, d_dt = 2026, 10, 25
+            if date_clean_found and len(date_clean_found) == 8 and date_clean_found.isdigit():
+                y_dt = int(date_clean_found[:4])
+                m_dt = int(date_clean_found[4:6])
+                d_dt = int(date_clean_found[6:8])
+
+            def _convert_local_to_brt(local_time_str: str) -> str:
+                if not (home_tz and brt_tz):
+                    return local_time_str
+                try:
+                    dt_loc = datetime.strptime(f"{y_dt}-{m_dt:02d}-{d_dt:02d} {local_time_str.strip().upper()}", "%Y-%m-%d %I:%M %p")
+                    dt_aware = dt_loc.replace(tzinfo=home_tz)
+                    dt_brt = dt_aware.astimezone(brt_tz)
+                    return dt_brt.strftime("%H:%M:%S")
+                except Exception:
+                    return local_time_str
+
             period_events = []
             for txt in pages_text:
                 for line in txt.split("\n"):
@@ -286,9 +351,27 @@ class NBAService:
                     elif "OVERTIME" in txt or "OT" in txt: period_name = "Prorrogação (OT)"
 
                     if m_start:
-                        period_events.append({"type": "start", "period": period_name, "time": m_start.group(1)})
+                        raw_t = m_start.group(1)
+                        t_brt = _convert_local_to_brt(raw_t)
+                        period_events.append({
+                            "type": "start",
+                            "period": period_name,
+                            "time": t_brt,
+                            "time_brt": t_brt,
+                            "time_local": raw_t,
+                            "time_local_str": f"{raw_t} (Local)"
+                        })
                     if m_end:
-                        period_events.append({"type": "end", "period": period_name, "time": m_end.group(1)})
+                        raw_t = m_end.group(1)
+                        t_brt = _convert_local_to_brt(raw_t)
+                        period_events.append({
+                            "type": "end",
+                            "period": period_name,
+                            "time": t_brt,
+                            "time_brt": t_brt,
+                            "time_local": raw_t,
+                            "time_local_str": f"{raw_t} (Local)"
+                        })
 
                 # Deduplicar e estruturar marcos em ordem cronológica
                 seen = set()

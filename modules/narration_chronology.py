@@ -53,6 +53,8 @@ MAX_NARRATION_CHARS = 600_000
 
 
 NON_MATCH_PATTERNS = [
+    r"\b(sub-?20|sub-?17|sub-?23|aspirantes|copa\s*fgf|ga[uú]cho\s*a2)\b",
+    r"\b(concentra[çc][ãa]o|chegada|aquecimento|viagem|desembarque)\b",
 
     r"\b(debate|elei[çc][õo]es?|lula|bolsonaro|sabatina|governador|prefeito|senado)\b",
 
@@ -78,7 +80,27 @@ NON_MATCH_PATTERNS = [
 
 
 
-def is_likely_match(title: str, duration_s: int = 0) -> bool:
+def is_likely_match(title: str, duration_s: int = 0, event_date_str: Optional[str] = None) -> bool:
+    """Determina se o evento tem alta probabilidade de ser uma transmissão de jogo de futebol real."""
+    if not title:
+        return False
+    is_non, _ = is_definitely_non_match(title)
+    if is_non:
+        return False
+    # Vídeo muito curto (< 40 min) não é transmissão de partida inteira
+    if 0 < duration_s < 2400:
+        return False
+    # 1. Cruzamento direto com a tabela oficial de jogos da CBF
+    try:
+        cbf_res = match_cbf_official_fixture(title, event_date_str)
+        if cbf_res and cbf_res.get("matched"):
+            return True
+    except Exception:
+        pass
+    guessed = guess_match_from_title(title)
+    if not (guessed.get("team1") and guessed.get("team2")):
+        return False
+    return True
 
     """Determina se o evento tem alta probabilidade de ser uma transmissão de jogo de futebol real."""
 
@@ -131,6 +153,125 @@ def is_definitely_non_match(title: str, text: str = "") -> tuple[bool, str]:
 
 
 
+
+CBF_TEAM_KEYWORDS = {
+    "gremio": ["gremio", "grêmio", "tricolor gaucho", "imortal"],
+    "internacional": ["internacional", "inter", "colorado"],
+    "palmeiras": ["palmeiras", "verdao", "verdão", "alviverde"],
+    "vasco da gama": ["vasco", "vascao", "vascão", "cruzmaltino", "gigante da colina"],
+    "flamengo": ["flamengo", "mengo", "mengao", "mengão", "rubro-negro"],
+    "fluminense": ["fluminense", "flu", "tricolor das laranjeiras"],
+    "corinthians": ["corinthians", "timao", "timão", "alvinegro paulista"],
+    "sao paulo": ["sao paulo", "são paulo", "spfc", "tricolor paulista"],
+    "santos": ["santos", "peixe", "alvinegro praiano"],
+    "botafogo": ["botafogo", "fogao", "fogão", "glorioso"],
+    "cruzeiro": ["cruzeiro", "raposa", "cabuloso"],
+    "atletico-mg": ["atletico", "atlético", "galo", "alvinegro mineiro", "atletico-mg"],
+    "athletico-pr": ["athletico", "furacao", "furacão", "rubro-negro paranaense", "athletico-pr"],
+    "bahia": ["bahia", "tricolor de aco", "tricolor de aço", "esquadrao"],
+    "fortaleza": ["fortaleza", "leao do pici", "leão do pici", "tricolor do pici"],
+    "chapecoense": ["chapecoense", "chape", "verdão do oeste"],
+    "vitoria": ["vitoria", "vitória", "leao da barra", "leão da barra"],
+    "coritiba": ["coritiba", "coxa", "alviverde paranaense"],
+    "red bull bragantino": ["bragantino", "red bull", "massa bruta"],
+    "cuiaba": ["cuiaba", "cuiabá", "dourado"],
+    "juventude": ["juventude", "papo", "alviverde de caxias"],
+    "criciuma": ["criciuma", "criciúma", "tigre"],
+    "sport": ["sport", "leao da ilha", "leão da ilha"],
+    "ceara": ["ceara", "ceará", "vozao", "vozão"],
+    "america-mg": ["america-mg", "américa-mg", "coelho"]
+}
+
+def match_cbf_official_fixture(title: str, event_date_str: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    """
+    Cruza o título da transmissão com o calendário oficial de jogos da CBF
+    (Brasileirão Série A e Copa do Brasil).
+    Retorna os dados da partida oficial se houver correspondência exata de ambos os clubes,
+    ou None se o conteúdo não for uma transmissão de partida oficial da CBF.
+    """
+    if not title:
+        return None
+        
+    is_non, _ = is_definitely_non_match(title)
+    if is_non:
+        return None
+
+    import unicodedata
+    def _norm(s):
+        t = unicodedata.normalize('NFD', str(s)).encode('ascii', 'ignore').decode('utf-8').lower()
+        return re.sub(r'[^a-z0-9]', '', t)
+
+    t_clean = _norm(title)
+
+    try:
+        from modules.cbf_schedule_fetcher import get_real_cbf_fixtures, get_recent_finished_matches
+        fixtures = get_real_cbf_fixtures() + get_recent_finished_matches()
+    except Exception:
+        fixtures = []
+
+    def get_keywords(team_name):
+        t_norm = _norm(team_name)
+        for k, v in CBF_TEAM_KEYWORDS.items():
+            if _norm(k) in t_norm or t_norm in _norm(k):
+                return v
+        return [t_norm]
+
+    date_normalized = None
+    if event_date_str:
+        d_raw = str(event_date_str).split("T")[0].split(" ")[0].strip()
+        if "-" in d_raw:
+            parts = d_raw.split("-")
+            if len(parts) == 3:
+                date_normalized = f"{parts[2].zfill(2)}/{parts[1].zfill(2)}/{parts[0]}"
+        elif "/" in d_raw:
+            date_normalized = d_raw
+
+    best_match = None
+    for fix in fixtures:
+        t1_keys = get_keywords(fix.get("team1", ""))
+        t2_keys = get_keywords(fix.get("team2", ""))
+        
+        m1 = any(_norm(k) in t_clean for k in t1_keys)
+        m2 = any(_norm(k) in t_clean for k in t2_keys)
+        
+        if m1 and m2:
+            fix_date = fix.get("date", "")
+            if date_normalized and fix_date:
+                if date_normalized == fix_date:
+                    return {
+                        "matched": True,
+                        "team1": fix["team1"],
+                        "team2": fix["team2"],
+                        "match_display": f"{fix['team1']} x {fix['team2']}",
+                        "competition": fix.get("comp", "Brasileirão Série A"),
+                        "cbf_date": fix["date"],
+                        "cbf_time": fix.get("time", "19:00"),
+                        "cbf_fixture": fix
+                    }
+                else:
+                    best_match = {
+                        "matched": True,
+                        "team1": fix["team1"],
+                        "team2": fix["team2"],
+                        "match_display": f"{fix['team1']} x {fix['team2']}",
+                        "competition": fix.get("comp", "Brasileirão Série A"),
+                        "cbf_date": fix["date"],
+                        "cbf_time": fix.get("time", "19:00"),
+                        "cbf_fixture": fix
+                    }
+            else:
+                return {
+                    "matched": True,
+                    "team1": fix["team1"],
+                    "team2": fix["team2"],
+                    "match_display": f"{fix['team1']} x {fix['team2']}",
+                    "competition": fix.get("comp", "Brasileirão Série A"),
+                    "cbf_date": fix["date"],
+                    "cbf_time": fix.get("time", "19:00"),
+                    "cbf_fixture": fix
+                }
+
+    return best_match
 
 def guess_match_from_title(title: str) -> Dict[str, str]:
     """Extrai 'Time A x Time B', placar e competição de títulos (incluindo scores como 'GRÊMIO 2X0 ATLÉTICO-MG')."""

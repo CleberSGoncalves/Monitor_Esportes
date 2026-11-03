@@ -936,20 +936,32 @@ class LiveNarrationService:
 
                 ev["duration"] = int(info["duration"])
 
-            # Se a chave 🎯 Auto-Detect Jogo estiver ativa, inclui automaticamente na fila (exceto lives 24h ou desmarcadas pelo usuário)
+            from modules.narration_chronology import is_likely_match, is_definitely_non_match, match_cbf_official_fixture
+            ev_title = ev.get("title", "")
+            is_non, _ = is_definitely_non_match(ev_title)
+            cbf_match = match_cbf_official_fixture(ev_title, ev.get("found_at"))
 
+            if is_non:
+                ev["is_match_narration"] = False
+                ev["pipeline"] = "not_match"
+                ev["selected"] = False
+            elif cbf_match and cbf_match.get("matched"):
+                ev["is_match_narration"] = True
+                ev.setdefault("meta", {})
+                if not ev["meta"].get("team1"): ev["meta"]["team1"] = cbf_match.get("team1", "")
+                if not ev["meta"].get("team2"): ev["meta"]["team2"] = cbf_match.get("team2", "")
+                if not ev["meta"].get("competition"): ev["meta"]["competition"] = cbf_match.get("competition", "Brasileirão Série A")
+                if not ev["meta"].get("date") and cbf_match.get("cbf_date"): ev["meta"]["date"] = cbf_match.get("cbf_date")
+
+            # Se a chave 🎯 Auto-Detect Jogo estiver ativa, inclui automaticamente na fila apenas se for partida real da CBF
             if (
-
                 self.get_setting("auto_detect_match", True)
-
                 and not ev.get("selected")
-
                 and not ev.get("user_unselected")
-
+                and not is_non
+                and (bool(cbf_match) or is_likely_match(ev_title, ev.get("duration", 0), ev.get("found_at")))
                 and status in ("upcoming", "live")
-
-                and not _is_24h_or_continuous_stream(ev.get("title", ""), ev)
-
+                and not _is_24h_or_continuous_stream(ev_title, ev)
             ):
 
                 ev["selected"] = True
@@ -1575,30 +1587,27 @@ class LiveNarrationService:
     # ------------------------------------------------------------ cronologia
 
     def default_meta(self, ev: Dict[str, Any]) -> Dict[str, str]:
-
-        from modules.narration_chronology import guess_match_from_title
-
+        from modules.narration_chronology import guess_match_from_title, match_cbf_official_fixture
         meta = dict(ev.get("meta") or {})
-
+        title = ev.get("title", "")
+        # Prioridade maxima: Tabela oficial da CBF
+        try:
+            cbf_res = match_cbf_official_fixture(title, ev.get("found_at") or meta.get("date"))
+            if cbf_res and cbf_res.get("matched"):
+                if not meta.get("team1"): meta["team1"] = cbf_res.get("team1", "")
+                if not meta.get("team2"): meta["team2"] = cbf_res.get("team2", "")
+                if not meta.get("competition"): meta["competition"] = cbf_res.get("competition", "Brasileirão Série A")
+                if not meta.get("date") and cbf_res.get("cbf_date"): meta["date"] = cbf_res.get("cbf_date")
+        except Exception:
+            pass
         analysis = ev.get("transcript_analysis") or {}
-
-        g = guess_match_from_title(ev.get("title", ""))
-
+        g = guess_match_from_title(title)
         for k in ("team1", "team2", "competition"):
-
-            if not meta.get(k):
-
-                meta[k] = analysis.get(k) or g.get(k, "")
-
+            if not meta.get(k): meta[k] = analysis.get(k) or g.get(k, "")
         if not meta.get("date"):
-
             ref = ev.get("actual_start_epoch") or ev.get("scheduled_epoch")
-
             meta["date"] = analysis.get("date") or (datetime.fromtimestamp(ref).strftime("%d/%m/%Y") if ref else "")
-
         return meta
-
-
 
     def run_generation_async(self, vid: str, meta: Optional[Dict[str, str]] = None, auto: bool = False,
 
@@ -1759,6 +1768,34 @@ class LiveNarrationService:
             plog(f"❌ {result['error']}")
 
             return result
+
+                # Gerar comprovação visual estampada com tarja superior oficial
+        try:
+            from modules.visual_proof_service import extract_and_stamp_proof, get_channel_sigla
+            ch_name = ev.get("channel_name") or result.get("platform") or "GAU"
+            ch_code = get_channel_sigla(ch_name)
+            start_epoch = ev.get("actual_start_epoch") or ev.get("scheduled_epoch")
+            start_dt = datetime.fromtimestamp(start_epoch) if start_epoch else datetime.now()
+            
+            sec_target = 1200
+            for m in result.get("milestones", []):
+                if any(k in m.get("label", "").lower() for k in ["apito inicial", "gol", "hino"]):
+                    sec_target = m.get("second_offset") or 1200
+                    break
+
+            v_url = ev.get("url") or f"https://www.youtube.com/watch?v={vid}"
+            proof_file = extract_and_stamp_proof(
+                video_url_or_id=v_url,
+                second_offset=sec_target,
+                stream_start_dt=start_dt,
+                praca="SPO",
+                channel_name=ch_code
+            )
+            if proof_file and os.path.exists(proof_file):
+                result["visual_proof_images"] = [proof_file]
+                plog(f"📸 Frame auditado com tarja anexado ao relatório: {os.path.basename(proof_file)}")
+        except Exception as e:
+            self.log(f"⚠️ Comprovação visual não gerada: {e}")
 
         plog("📄 Renderizando PDF oficial do relatório cronológico...")
 
