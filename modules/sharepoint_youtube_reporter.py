@@ -138,13 +138,14 @@ class SharePointYouTubeReporter:
             time_start = event_info.get("start_time") or event_info.get("inicio_transmissao") or "17:00"
             iso_utc = SharePointReporter.format_iso_datetime(raw_date, time_start)
 
-            # Estrutura idêntica a Relatorios_de_Jogos
+            # Estrutura idêntica à lista Relatorio Jogos Youtube
             fields_payload = {
                 "Title": sp_filename,
                 "Partida": partida,
                 "Campeonato": campeonato,
                 "Canal": canal,
-                "Data_Partida": iso_utc,
+                "Data_Jogo": iso_utc,
+                "Placar": SharePointReporter.normalizar_confianca(confianca),
                 "Confianca": SharePointReporter.normalizar_confianca(confianca),
                 "Auditado": True
             }
@@ -153,24 +154,33 @@ class SharePointYouTubeReporter:
             json_headers = dict(headers)
             json_headers["Content-Type"] = "application/json"
 
-            # Auto-recuperação: suporta variações de nome de coluna (Canal vs Plataforma, Data_Partida vs Data_Hora)
+            # Auto-recuperação: suporta variações de nome de coluna (Canal vs Plataforma, Data_Jogo vs Data_Partida vs Data_Hora)
             for attempt in range(5):
-                r_fields = SharePointReporter.request_with_retry(
-                    "PATCH", fields_url, headers=json_headers, json=fields_payload, timeout=20
-                )
-                if r_fields.status_code in (200, 201):
-                    logger.info(f"🎉 [SharePoint YouTube] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca 'Relatorio Jogos Youtube'!")
-                    return True
+                err_text = ""
+                try:
+                    r_fields = SharePointReporter.request_with_retry(
+                        "PATCH", fields_url, headers=json_headers, json=fields_payload, timeout=20
+                    )
+                    if r_fields and r_fields.status_code in (200, 201):
+                        logger.info(f"🎉 [SharePoint YouTube] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca 'Relatorio Jogos Youtube'!")
+                        return True
+                    err_text = r_fields.text if r_fields else ""
+                except requests.HTTPError as he:
+                    err_text = he.response.text if he.response is not None else str(he)
+                except Exception as ex_gen:
+                    logger.warning(f"[SharePoint YouTube] Erro ao atualizar metadados: {ex_gen}")
+                    break
 
-                err_text = r_fields.text
                 m_unrec = re.search(r"Field '([^']+)' is not recognized", err_text)
                 if m_unrec:
                     bad_field = m_unrec.group(1)
                     logger.warning(f"[SharePoint YouTube] Campo não reconhecido '{bad_field}'. Adaptando...")
-                    # Fallback de nomes alternativos
                     if bad_field == "Canal" and "Canal" in fields_payload:
                         val = fields_payload.pop("Canal")
                         fields_payload["Plataforma"] = val
+                    elif bad_field == "Data_Jogo" and "Data_Jogo" in fields_payload:
+                        val = fields_payload.pop("Data_Jogo")
+                        fields_payload["Data_Partida"] = val
                     elif bad_field == "Data_Partida" and "Data_Partida" in fields_payload:
                         val = fields_payload.pop("Data_Partida")
                         fields_payload["Data_Hora"] = val
@@ -178,7 +188,7 @@ class SharePointYouTubeReporter:
                         fields_payload.pop(bad_field, None)
                     continue
                 else:
-                    logger.warning(f"[SharePoint YouTube] Metadados parciais (tentativa {attempt+1}): {r_fields.status_code} - {err_text[:200]}")
+                    logger.warning(f"[SharePoint YouTube] Metadados parciais (tentativa {attempt+1}): {err_text[:200]}")
                     break
 
             return True

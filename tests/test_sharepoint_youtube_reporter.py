@@ -62,7 +62,7 @@ def test_sharepoint_youtube_reporter_sync_mock(tmp_path):
         assert payload["Partida"] == "Grêmio x Atlético-MG"
         assert payload["Canal"] == "Gaúcha"
         assert payload["Campeonato"] == "Copa do Brasil"
-        assert "Data_Partida" in payload
+        assert "Data_Jogo" in payload
         assert payload["Confianca"] == "99.0%"
         assert payload["Auditado"] is True
 

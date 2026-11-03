@@ -1678,6 +1678,10 @@ class ReportGenerator:
 
             
 
+            match_disp = str(res.get("match_display") or res.get("match_id") or m_display)
+            m_team1 = str(res.get("team1") or "")
+            m_team2 = str(res.get("team2") or "")
+            m_score = str(res.get("resultado") or res.get("score") or "")
             lines.append(f"\nEVENTO: {m_display}")
 
             lines.append(f"Data da Partida: {m_date} | Competição: {m_comp} | Plataforma: {m_platform} | Confiança: {m_conf*100:.1f}%")
@@ -2106,6 +2110,10 @@ class ReportGenerator:
 
             c.setFont("Helvetica-Bold", 14)
 
+            match_disp = str(res.get("match_display") or res.get("match_id") or m_display)
+            m_team1 = str(res.get("team1") or "")
+            m_team2 = str(res.get("team2") or "")
+            m_score = str(res.get("resultado") or res.get("score") or "")
             c.drawString(40, y, f"EVENTO: {m_display}")
 
             y -= 18
