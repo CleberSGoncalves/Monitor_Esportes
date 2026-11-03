@@ -1769,33 +1769,32 @@ class LiveNarrationService:
 
             return result
 
-                # Gerar comprovação visual estampada com tarja superior oficial
+        # Gerar comprovação visual estampada para CADA ETAPA da cronologia
         try:
-            from modules.visual_proof_service import extract_and_stamp_proof, get_channel_sigla
+            from modules.visual_proof_service import generate_chronology_stage_proofs, get_channel_sigla
             ch_name = ev.get("channel_name") or result.get("platform") or "GAU"
             ch_code = get_channel_sigla(ch_name)
             start_epoch = ev.get("actual_start_epoch") or ev.get("scheduled_epoch")
             start_dt = datetime.fromtimestamp(start_epoch) if start_epoch else datetime.now()
-            
-            sec_target = 1200
-            for m in result.get("milestones", []):
-                if any(k in m.get("label", "").lower() for k in ["apito inicial", "gol", "hino"]):
-                    sec_target = m.get("second_offset") or 1200
-                    break
-
             v_url = ev.get("url") or f"https://www.youtube.com/watch?v={vid}"
-            proof_file = extract_and_stamp_proof(
-                video_url_or_id=v_url,
-                second_offset=sec_target,
-                stream_start_dt=start_dt,
-                praca="SPO",
-                channel_name=ch_code
-            )
-            if proof_file and os.path.exists(proof_file):
-                result["visual_proof_images"] = [proof_file]
-                plog(f"📸 Frame auditado com tarja anexado ao relatório: {os.path.basename(proof_file)}")
+            dt_str = result.get("date") or (start_dt.strftime("%d/%m/%Y") if start_dt else "")
+            
+            ms_list = result.get("technical_milestones") or result.get("milestones") or []
+            if ms_list:
+                m_proofs = generate_chronology_stage_proofs(
+                    video_url_or_id=v_url,
+                    milestones=ms_list,
+                    date_str=dt_str,
+                    stream_start_dt=start_dt,
+                    praca="SPO",
+                    channel_name=ch_code
+                )
+                if m_proofs:
+                    result["milestone_proofs"] = m_proofs
+                    result["visual_proof_images"] = [p["image_path"] for p in m_proofs]
+                    plog(f"📸 {len(m_proofs)} frames auditados com tarja gerados para todas as etapas da cronologia.")
         except Exception as e:
-            self.log(f"⚠️ Comprovação visual não gerada: {e}")
+            self.log(f"⚠️ Comprovação visual das etapas não gerada: {e}")
 
         plog("📄 Renderizando PDF oficial do relatório cronológico...")
 

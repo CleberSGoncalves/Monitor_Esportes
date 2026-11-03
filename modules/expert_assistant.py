@@ -1725,15 +1725,26 @@ Retorne TODAS as URLs do site da CBF que você encontrar no resultado da busca.
             response = None
             text_res = ""
             # Até 3 tentativas: exige horário de relógio real na linha de término (sem inventar nada)
-            for _attempt in range(3):
-                response = self.client.models.generate_content(
-                    model=self.model_id,
-                    contents=prompt,
-                    config=config
-                )
-                text_res = (response.text or "").strip()
-                if _end_line_has_clock(text_res):
-                    break
+            max_tries = max(3, len(self.api_keys) * 2)
+            for _attempt in range(max_tries):
+                try:
+                    response = self.client.models.generate_content(
+                        model=self.model_id,
+                        contents=prompt,
+                        config=config
+                    )
+                    text_res = (response.text or "").strip()
+                    if _end_line_has_clock(text_res):
+                        break
+                except Exception as e_att:
+                    err_s = str(e_att)
+                    if any(k in err_s for k in ['429', '402', '403', '503', 'exhausted', 'quota', 'limit', 'depleted', 'credits', 'unavailable']):
+                        if self.rotate_key():
+                            print(f"[EXPERT GROUNDING] Quota atingida. Chave rotacionada para o índice {self.current_key_idx}.")
+                            continue
+                    print(f"[EXPERT GROUNDING WARN] Tentativa {_attempt+1}/{max_tries} falhou: {e_att}")
+                    if _attempt == max_tries - 1:
+                        raise e_att
 
             text_res = _strip_approx(text_res)
             text_res = re.sub(r'\*\*', '', text_res)
