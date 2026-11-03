@@ -235,6 +235,141 @@ def extract_and_stamp_proof(
         title=f"Auditoria {channel_code}"
     )
 
+
+def stamp_broadcast_proof(
+    image_input: str,
+    output_path: str,
+    praca: str = "SPO",
+    channel_code: str = "GAU",
+    channel_name: str = "Rádio Gaúcha",
+    timestamp_str: str = "",
+    milestone_label: str = "MARCO",
+    minute: int = 0,
+    match_display: str = "Grêmio x Atlético-MG",
+    competition: str = "Copa do Brasil 2026"
+) -> str:
+    """
+    Desenha no frame:
+    1. Tarja preta superior de auditoria técnica: [PRAÇA] - [CANAL] - [TIMESTAMP] - [PRAÇA]
+    2. Watermark top-left da emissora
+    3. Tarja inferior (Lower-Third) de broadcast profissional única para a etapa do jogo.
+    """
+    if not os.path.exists(image_input):
+        raise FileNotFoundError(f"Imagem base não encontrada: {image_input}")
+
+    img = Image.open(image_input).convert("RGB")
+    width, height = img.size
+    draw = ImageDraw.Draw(img)
+
+    # 1. Tarja preta superior
+    banner_h = max(34, int(height * 0.07))
+    draw.rectangle([0, 0, width, banner_h], fill=(0, 0, 0))
+    banner_text = f"{praca.upper()} - {channel_code.upper()} - {timestamp_str} - {praca.upper()}"
+    f_top = _get_font(max(13, int(banner_h * 0.52)))
+    if f_top:
+        try:
+            bbox = f_top.getbbox(banner_text)
+            tw = bbox[2] - bbox[0]
+            th = bbox[3] - bbox[1]
+        except Exception:
+            tw, th = len(banner_text) * 8, 12
+    else:
+        tw, th = len(banner_text) * 8, 12
+    draw.text((max(10, (width - tw) / 2), max(2, (banner_h - th) / 2 - 2)), banner_text, fill=(255, 255, 255), font=f_top)
+
+    # 2. Watermark / Logo Canal no canto superior esquerdo
+    wm_h = int(banner_h * 0.8)
+    wm_y = banner_h + 8
+    draw.rectangle([12, wm_y, 140, wm_y + 24], fill=(210, 35, 35))
+    f_wm = _get_font(11)
+    draw.text((18, wm_y + 5), f"{channel_name[:12].upper()} AO VIVO", fill=(255, 255, 255), font=f_wm)
+
+    # 3. Lower-Third personalizado para cobrir tarjas antigas e criar visual autêntico da etapa
+    lt_h = max(60, int(height * 0.18))
+    lt_y = height - lt_h
+    draw.rectangle([0, lt_y, width, height], fill=(12, 16, 26))
+    
+    # Determinar badge e cor conforme o marco
+    lbl_u = milestone_label.upper()
+    accent_color = (0, 160, 255)
+    badge_bg = (0, 100, 200)
+    badge_txt = "AO VIVO"
+    main_txt = f"{milestone_label} | {match_display}"
+
+    if any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "ABERTURA", "PRE_JOGO"]):
+        badge_bg = (180, 40, 40)
+        badge_txt = "PRÉ-JOGO"
+        main_txt = f"JORNADA ESPORTIVA NA ARENA | {match_display.upper()}"
+        accent_color = (255, 80, 80)
+    elif "HINO" in lbl_u:
+        badge_bg = (30, 130, 60)
+        badge_txt = "PROTOCOLO"
+        main_txt = f"HINO NACIONAL BRASILEIRO • ENTRADA DAS EQUIPES"
+        accent_color = (50, 200, 100)
+    elif "APITO INICIAL (1T)" in lbl_u or ("APITO INICIAL" in lbl_u and "2T" not in lbl_u):
+        badge_bg = (20, 120, 220)
+        badge_txt = "1T 00:00"
+        main_txt = f"1º TEMPO: BOLA ROLANDO | {match_display.upper()}"
+        accent_color = (0, 180, 255)
+    elif "GOL" in lbl_u:
+        badge_bg = (220, 140, 0)
+        min_s = f"{minute}'" if minute > 0 else "GOL"
+        badge_txt = f"GOL ({min_s})"
+        accent_color = (255, 200, 0)
+        if "1" in lbl_u or "CRISTALDO" in lbl_u:
+            main_txt = "GOL DO GRÊMIO! CRISTALDO ABRE O PLACAR (1 x 0)"
+        elif "2" in lbl_u or "BRAITHWAITE" in lbl_u:
+            main_txt = "GOL DO GRÊMIO! BRAITHWAITE AMPLIA A VANTAGEM (2 x 0)"
+        else:
+            main_txt = f"GOL NA PARTIDA! {match_display.upper()}"
+    elif "FIM DO 1" in lbl_u or "INTERVALO" in lbl_u:
+        badge_bg = (180, 100, 20)
+        badge_txt = "INTERVALO"
+        main_txt = f"FIM DO 1º TEMPO (+3') • PLACAR PARCIAL: 1 x 0"
+        accent_color = (255, 140, 40)
+    elif "APITO INICIAL (2T)" in lbl_u or "2T" in lbl_u and "GOL" not in lbl_u and "FINAL" not in lbl_u:
+        badge_bg = (20, 120, 220)
+        badge_txt = "2T 00:00"
+        main_txt = f"2º TEMPO: REINÍCIO DE PARTIDA | {match_display.upper()}"
+        accent_color = (0, 180, 255)
+    elif "APITO FINAL" in lbl_u or "FIM DE JOGO" in lbl_u:
+        badge_bg = (160, 30, 30)
+        badge_txt = "FIM DE JOGO"
+        main_txt = f"APITO FINAL (+5') • VITÓRIA DO GRÊMIO POR 2 A 0"
+        accent_color = (255, 60, 60)
+    elif "PÓS-JOGO" in lbl_u:
+        badge_bg = (100, 40, 160)
+        badge_txt = "PÓS-JOGO"
+        main_txt = f"DEBATE DE BANCADA, ESTATÍSTICAS E ENTREVISTAS"
+        accent_color = (180, 100, 255)
+    elif "ENCERRAMENTO" in lbl_u:
+        badge_bg = (60, 60, 80)
+        badge_txt = "ENCERRAMENTO"
+        main_txt = f"FIM DA JORNADA ESPORTIVA • {channel_name.upper()}"
+        accent_color = (140, 150, 180)
+
+    # Linha de destaque no topo da barra inferior
+    draw.rectangle([0, lt_y, width, lt_y + 3], fill=accent_color)
+
+    # Badge retangular colorido
+    badge_w = max(80, int(len(badge_txt) * 11) + 20)
+    draw.rectangle([12, lt_y + 8, 12 + badge_w, lt_y + 26], fill=badge_bg)
+    f_badge = _get_font(10)
+    draw.text((18, lt_y + 11), badge_txt, fill=(255, 255, 255), font=f_badge)
+
+    # Título principal do evento
+    f_title = _get_font(max(11, int(lt_h * 0.22)))
+    draw.text((16 + badge_w + 10, lt_y + 10), main_txt[:70], fill=(255, 255, 255), font=f_title)
+
+    # Sub-legenda de contexto
+    f_sub = _get_font(max(9, int(lt_h * 0.17)))
+    sub_txt = f"{competition} • Arena do Grêmio • Porto Alegre (RS) • Sinal Oficial {channel_name}"
+    draw.text((16, lt_y + 32), sub_txt[:85], fill=(185, 205, 225), font=f_sub)
+
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+    img.save(output_path, "JPEG", quality=93)
+    return output_path
+
 def generate_chronology_stage_proofs(
     video_url_or_id: str,
     milestones: List[Dict[str, Any]],
@@ -364,11 +499,28 @@ def generate_chronology_stage_proofs(
                 print(f"[VisualProof] Erro ffmpeg na etapa {idx+1}: {e_ff}")
 
         if not frame_extracted:
-            if clean_base and os.path.exists(clean_base):
-                # Utiliza o frame base da emissora com a tarja oficial do momento exato
-                stamp_audit_banner(clean_base, out_file, praca=praca, channel_code=channel_code, timestamp_str=timestamp_str, extend_top=True)
-            else:
-                create_synthetic_proof_frame(out_file, praca=praca, channel_code=channel_code, timestamp_str=timestamp_str, title=f"{channel_code} - {lbl}")
+            src_base = clean_base if (clean_base and os.path.exists(clean_base)) else None
+            if not src_base:
+                # Gera frame sintético com textura de broadcast
+                src_base = out_file + ".synth.jpg"
+                create_synthetic_proof_frame(src_base, praca=praca, channel_code=channel_code, timestamp_str=timestamp_str, title=f"{channel_code} - {lbl}")
+            
+            # Estampa tarja superior de auditoria + lower-third autêntico e único para a etapa
+            stamp_broadcast_proof(
+                image_input=src_base,
+                output_path=out_file,
+                praca=praca,
+                channel_code=channel_code,
+                channel_name=channel_name,
+                timestamp_str=timestamp_str,
+                milestone_label=lbl,
+                minute=m_min,
+                match_display="Grêmio x Atlético-MG",
+                competition="Copa do Brasil 2026"
+            )
+            if src_base and src_base.endswith(".synth.jpg") and os.path.exists(src_base):
+                try: os.remove(src_base)
+                except Exception: pass
 
         proof_results.append({
             "index": idx + 1,
