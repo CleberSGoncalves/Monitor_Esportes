@@ -18,14 +18,14 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.40"
-    release_name = "v2.4.40 - Correção Definitiva de Frames de Transmissão por Canal no SharePoint"
+    tag = "v2.4.41"
+    release_name = "v2.4.41 - Correção da Janela de Auditoria NBA e Bloqueio de E-mails Antigos"
     body = (
-        "### Novidades da versão v2.4.40:\n"
-        "- 🛑 **Remoção Absoluta de Fallbacks com Imagens Fictícias**: exclusão de referências de uploads arbitrários no motor de comprovação visual.\n"
-        "- 🎯 **Mapeamento Direto no ReportGenerator**: garantia de que `milestone_proofs` receba diretamente os frames reais extraídos de cada transmissão do YouTube.\n"
-        "- 📑 **Substituição e Homologação dos 4 PDFs no SharePoint**: relatórios de 3 MB com 10 frames de estúdio e transmissão exclusivos para Bagé TV, Esporte Band RS, Gaúcha e Gaúcha Esportes.\n"
-        "- 🧹 **Higienização do SharePoint**: exclusão de itens órfãos/espúrios na biblioteca de documentos."
+        "### Novidades da versão v2.4.41:\n"
+        "- 🛑 **Fim do Spam de E-mails da NBA**: restrição da varredura automática aos jogos de hoje e ontem (em vez de varrer desde 20 de outubro), eliminando o disparo repetitivo de partidas antigas.\n"
+        "- 🏀 **Envio Estritamente em Jogos Finalizados Recentes**: disparo de e-mails condicionado a partidas que terminaram nas últimas 24h e que possuam comprovação visual completa (PDF >= 500 KB).\n"
+        "- 🛡️ **Cache Persistente Bloqueador**: partidas passadas catalogadas permanentemente para impedir reenvios.\n"
+        "- 📑 **Homologação dos Relatórios do YouTube**: 4 PDFs com frames reais de estúdio e transmissão atualizados no SharePoint."
     )
 
     headers = {

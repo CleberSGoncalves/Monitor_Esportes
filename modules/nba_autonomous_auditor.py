@@ -58,7 +58,11 @@ class NBAAutonomousAuditor:
             except Exception:
                 pass
         else:
-            print(f"[NBA AUTO] {msg}", flush=True)
+            try:
+                print(f"[NBA AUTO] {msg}", flush=True)
+            except UnicodeEncodeError:
+                safe_msg = msg.encode("ascii", "replace").decode("ascii")
+                print(f"[NBA AUTO] {safe_msg}", flush=True)
 
     def _load_audited_cache(self) -> dict:
         if os.path.exists(AUDITED_CACHE_PATH):
@@ -141,10 +145,11 @@ class NBAAutonomousAuditor:
     def run_audit_and_sync_cycle(self):
         """Executa um ciclo completo de checagem da NBA, publicação da agenda e auditoria automática."""
         now_dt = datetime.now()
-        season_start = datetime(2026, 10, 20)
-        days_span = max(1, (now_dt - season_start).days + 1)
-        # Varre desde o início oficial da temporada (20/10) até os próximos 5 dias
-        dates = [(season_start + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(days_span + 5)]
+        # Monitora estritamente jogos recentes (ontem e hoje) e próximos 3 dias de agenda
+        yesterday_str = (now_dt - timedelta(days=1)).strftime("%Y-%m-%d")
+        today_str = now_dt.strftime("%Y-%m-%d")
+        future_dates = [(now_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(1, 4)]
+        dates = [yesterday_str, today_str] + future_dates
         
         all_games = []
         for d_str in dates:
@@ -160,12 +165,24 @@ class NBAAutonomousAuditor:
         if not sp_token_ok:
             self._log("⚠️ [SharePoint NBA] Sessão do SharePoint não autenticada. Clique em '🔑 Conectar SharePoint' na tela para autorizar o envio automático.")
 
+        recent_date_cleans = [
+            (now_dt - timedelta(days=1)).strftime("%Y%m%d"),
+            now_dt.strftime("%Y%m%d")
+        ]
+
         for game in all_games:
             gid = str(game.get("id"))
             is_fin = bool(game.get("is_finished"))
             match_disp = game.get("match_display")
+            g_date_clean = game.get("date_clean", "")
 
-            # Caso 1: Jogo FINALIZADO que ainda NÃO foi auditado
+            # Se for jogo antigo (anterior a ontem), cataloga no cache para nunca reprocessar nem disparar e-mails
+            if is_fin and g_date_clean not in recent_date_cleans:
+                if not self.is_game_audited(gid):
+                    self.mark_game_audited(game, "", email_sent=True, sp_synced=True)
+                continue
+
+            # Caso 1: Jogo FINALIZADO recente (hoje ou ontem) que ainda NÃO foi auditado
             if is_fin and not self.is_game_audited(gid):
                 self._log(f"🏁 Partida da NBA FINALIZADA detectada: {match_disp}. Iniciando auditoria autônoma...")
                 
@@ -183,11 +200,11 @@ class NBAAutonomousAuditor:
                 else:
                     self._log(f"⚠️ [SharePoint] Falha temporária ao sincronizar {match_disp} no SharePoint.")
 
-                # d) Disparar E-mail automático com o PDF anexado (EXIGÊNCIA DE COMPROVAÇÃO TÉCNICA VISUAL)
+                # d) Disparar E-mail automático com o PDF anexado (EXIGÊNCIA DE COMPROVAÇÃO TÉCNICA VISUAL >= 500 KB)
                 mail_ok = False
                 pdf_size = os.path.getsize(pdf) if (pdf and os.path.exists(pdf)) else 0
-                if pdf_size < 50_000:
-                    self._log(f"⚠️ [NBA AUTO] PDF gerado ({pdf_size} bytes) sem imagens de comprovação visual. Disparo de e-mail BLOQUEADO por governança MediaDNA.")
+                if pdf_size < 500_000:
+                    self._log(f"⚠️ [NBA AUTO] PDF gerado ({pdf_size} bytes) sem comprovação visual completa (< 500 KB). Disparo de e-mail BLOQUEADO por governança MediaDNA.")
                 else:
                     try:
                         ai_cfg_path = os.path.join(PROJECT_ROOT, "config", "google_ai.json")
