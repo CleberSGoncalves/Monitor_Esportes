@@ -336,7 +336,13 @@ class NBAReportGenerator:
         if proofs:
             story.append(PageBreak())
             story.append(Paragraph("COMPROVAÇÃO TÉCNICA VISUAL DE CADA ETAPA DA CRONOLOGIA — NBA", sec_header))
-            story.append(Paragraph("Evidências visuais com carimbo oficial de auditoria técnica sincronizado no fuso de Brasília (BRT - UTC-3):", subtitle_style))
+            story.append(Paragraph(
+                "Os horários e a tarja (fuso de Brasília, BRT - UTC-3) vêm do Game Book oficial da NBA. "
+                "Cada imagem é um frame real do vídeo oficial de melhores momentos (Full Game Highlights, canal NBA), "
+                "tomado na posição proporcional do período dentro do vídeo; ela ilustra o período, "
+                "não o instante exato do relógio da súmula. Etapas sem vídeo oficial disponível são indicadas como indisponíveis.",
+                subtitle_style
+            ))
             story.append(Spacer(1, 8))
 
             card_title_style = ParagraphStyle(
@@ -377,7 +383,7 @@ class NBAReportGenerator:
                 verif_src = prf.get("verification_source", "Súmula Oficial NBA (Game Book)")
 
                 t_card_header = Table([
-                    [Paragraph(f"<b>ETAPA {idx_p} DE {total_stages} | [{clk} BRT] {stg_title} (Confiança IA: 99%)</b>", card_title_style)]
+                    [Paragraph(f"<b>ETAPA {idx_p} DE {total_stages} | [{clk} BRT] {stg_title}</b>", card_title_style)]
                 ], colWidths=[18.0 * cm])
                 t_card_header.setStyle(TableStyle([
                     ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EFF6FF")),
@@ -395,13 +401,21 @@ class NBAReportGenerator:
                     Spacer(1, 3)
                 ]
 
-                if img_path and os.path.exists(img_path):
+                if img_path and os.path.exists(img_path) and prf.get("frame_available", True):
                     # 16.5cm de largura x 9.28cm de altura (proporção 16:9 exata)
                     card_flowables.append(RLImage(img_path, width=16.5 * cm, height=9.28 * cm))
                     card_flowables.append(Spacer(1, 2))
+                    src_vid = prf.get("source_video_id")
+                    src_txt = f" | Fonte: vídeo oficial NBA (YouTube {src_vid}, {prf.get('source_video_offset_s')}s)" if src_vid else ""
                     card_flowables.append(Paragraph(
-                        f"Evidência Técnica #{idx_p} | Canal: {sigla_ch} | Praça: SPO | Sincronismo BRT: {ts_str} | Verificação: {verif_src}",
+                        f"Evidência Técnica #{idx_p} | Canal: {sigla_ch} | Praça: SPO | Sincronismo BRT: {ts_str} | Verificação: {verif_src}{src_txt}",
                         card_sub_style
+                    ))
+                else:
+                    card_flowables.append(Paragraph(
+                        f"<font color='#B45309'><b>Frame de transmissão indisponível:</b> nenhum vídeo oficial de melhores momentos da NBA foi localizado para esta partida. "
+                        f"Horário registrado no Game Book: {ts_str} BRT.</font>",
+                        card_desc_style
                     ))
 
                 card_flowables.append(Spacer(1, 8))

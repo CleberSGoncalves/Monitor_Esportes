@@ -193,6 +193,48 @@ def create_nba_synthetic_frame(
         except Exception: pass
     return stamped
 
+OFFICIAL_NBA_UPLOADER = "NBA"
+MIN_HIGHLIGHT_SECONDS = 480    # 8 min
+MAX_HIGHLIGHT_SECONDS = 1800   # 30 min
+
+
+def select_official_video(
+    candidates: List[Dict[str, Any]],
+    away_team: str,
+    home_team: str,
+    date_clean: str = ""
+) -> Optional[Dict[str, Any]]:
+    """
+    Seleciona SOMENTE o vídeo "FULL GAME HIGHLIGHTS" publicado pelo canal oficial da NBA
+    que corresponda ao jogo (ambos os times e a data no título) e tenha duração plausível.
+    Retorna None se nenhum candidato atender — nunca usa vídeo de terceiros.
+    """
+    month_name = day_num = year_num = ""
+    if date_clean and len(date_clean) == 8 and date_clean.isdigit():
+        month_name = MONTH_NAMES_EN.get(int(date_clean[4:6]), "").upper()
+        day_num = str(int(date_clean[6:8]))
+        year_num = date_clean[:4]
+
+    nick_away = (away_team.split() or [""])[-1].upper()
+    nick_home = (home_team.split() or [""])[-1].upper()
+
+    for c in candidates:
+        title = (c.get("title") or "").upper()
+        if (c.get("uploader") or "").strip().upper() != OFFICIAL_NBA_UPLOADER:
+            continue
+        if "FULL GAME HIGHLIGHTS" not in title:
+            continue
+        if nick_away not in title or nick_home not in title:
+            continue
+        if month_name and f"{month_name} {day_num}, {year_num}" not in title:
+            continue
+        dur = int(c.get("duration") or 0)
+        if not (MIN_HIGHLIGHT_SECONDS <= dur <= MAX_HIGHLIGHT_SECONDS):
+            continue
+        return c
+    return None
+
+
 class NBAVisualProofService:
     @classmethod
     def resolve_nba_video(
@@ -217,11 +259,13 @@ class NBAVisualProofService:
             day_num = str(d)
             year_num = str(y)
 
-        # Construir variantes de busca
+        # Construir variantes de busca (nome completo e apelidos, como no título oficial da NBA)
+        nick_away = (away_team.split() or [""])[-1]
+        nick_home = (home_team.split() or [""])[-1]
         search_queries = [
-            f"ytsearch3:{away_team} at {home_team} Full Game Highlights {month_name} {day_num} {year_num}",
-            f"ytsearch3:{away_team} vs {home_team} Full Game Highlights {month_name} {day_num} {year_num}",
-            f"ytsearch3:{away_team} at {home_team} NBA Highlights {year_num}"
+            f"ytsearch5:{away_team} at {home_team} Full Game Highlights {month_name} {day_num}, {year_num}",
+            f"ytsearch5:{nick_away} at {nick_home} FULL GAME HIGHLIGHTS {month_name} {day_num}, {year_num}",
+            f"ytsearch5:NBA {away_team} at {home_team} Full Game Highlights {year_num}",
         ]
 
         for query in search_queries:
@@ -229,38 +273,31 @@ class NBAVisualProofService:
                 cmd = ["yt-dlp", "--dump-json", "--flat-playlist", query]
                 res = subprocess.run(cmd, capture_output=True, text=True, timeout=25)
                 if res.returncode == 0 and res.stdout.strip():
-                    lines = [l for l in res.stdout.strip().split("\n") if l.strip()]
                     candidates = []
-                    for line in lines:
+                    for line in [l for l in res.stdout.strip().split("\n") if l.strip()]:
                         try:
                             info = json.loads(line)
                             vid = info.get("id")
-                            title = info.get("title", "")
-                            dur = info.get("duration") or 600
-                            uploader = info.get("uploader", "")
                             if vid and len(vid) == 11:
-                                is_official = "NBA" in uploader.upper() or "NBA" in title.upper()
                                 candidates.append({
                                     "id": vid,
-                                    "title": title,
-                                    "duration": int(dur),
-                                    "uploader": uploader,
-                                    "is_official": is_official,
+                                    "title": info.get("title", ""),
+                                    "duration": int(info.get("duration") or 0),
+                                    "uploader": info.get("uploader", "") or "",
                                     "url": f"https://www.youtube.com/watch?v={vid}"
                                 })
                         except Exception:
                             continue
 
-                    if candidates:
-                        # Prioriza o canal oficial da NBA ou a maior duração compatível
-                        candidates.sort(key=lambda c: (1 if c["is_official"] else 0, c["duration"]), reverse=True)
-                        best = candidates[0]
-                        print(f"[NBA VisualProof] Vídeo resolvido: '{best['title']}' (ID: {best['id']}, Duração: {best['duration']}s)")
+                    best = select_official_video(candidates, away_team, home_team, date_clean)
+                    if best:
+                        print(f"[NBA VisualProof] Vídeo oficial resolvido: '{best['title']}' (ID: {best['id']}, Duração: {best['duration']}s)")
                         return best
             except Exception as e:
                 print(f"[NBA VisualProof] Falha na busca '{query}': {e}")
                 continue
 
+        print(f"[NBA VisualProof] Nenhum vídeo OFICIAL da NBA encontrado para {away_team} at {home_team} ({date_clean}). Etapas ficarão sem frame.")
         return None
 
     @classmethod
@@ -339,24 +376,17 @@ class NBAVisualProofService:
 
         milestones = parsed_gamebook.get("milestones", [])
         if not milestones:
-            # Fallback caso não haja marcos no gamebook
-            milestones = [
-                {"period": "1º Quarto", "type": "start", "time_brt": "20:40:00", "time_local_str": "7:40 PM (Local)"},
-                {"period": "1º Quarto", "type": "end", "time_brt": "21:06:00", "time_local_str": "8:06 PM (Local)"},
-                {"period": "2º Quarto", "type": "start", "time_brt": "21:09:00", "time_local_str": "8:09 PM (Local)"},
-                {"period": "2º Quarto", "type": "end", "time_brt": "21:40:00", "time_local_str": "8:40 PM (Local)"},
-                {"period": "3º Quarto", "type": "start", "time_brt": "21:55:00", "time_local_str": "8:55 PM (Local)"},
-                {"period": "3º Quarto", "type": "end", "time_brt": "22:21:00", "time_local_str": "9:21 PM (Local)"},
-                {"period": "4º Quarto", "type": "start", "time_brt": "22:24:00", "time_local_str": "9:24 PM (Local)"},
-                {"period": "4º Quarto", "type": "end", "time_brt": "23:08:00", "time_local_str": "10:08 PM (Local)"},
-            ]
+            # Sem marcos oficiais do Game Book não há horário real para carimbar: não inventar evidência.
+            print("[NBA VisualProof] Game Book sem marcos oficiais: comprovação visual não gerada.")
+            return []
 
         total_stages = len(milestones)
 
-        # 1. Tentar resolver vídeo oficial da partida
+        # 1. Resolver SOMENTE vídeo oficial (canal NBA, Full Game Highlights) da partida
         video_info = cls.resolve_nba_video(away, home, date_clean=date_clean, date_display=date_disp)
         video_url = video_info["url"] if video_info else None
-        video_duration = video_info["duration"] if video_info else 1192
+        video_id = video_info["id"] if video_info else None
+        video_duration = video_info["duration"] if video_info else 0
 
         # Relação de proporções da duração do vídeo para cada marco
         # Garante frames distribuídos progressivamente ao longo de todo o confronto
@@ -372,6 +402,18 @@ class NBAVisualProofService:
 
         proof_results = []
         slug_match = f"{away_tri.lower()}_at_{home_tri.lower()}_{date_clean}"
+
+        # Metadados do cache: só reaproveita frame se foi extraído do MESMO vídeo oficial
+        meta_path = os.path.join(out_dir, f"proof_meta_{slug_match}.json")
+        meta: Dict[str, Any] = {}
+        try:
+            if os.path.exists(meta_path):
+                with open(meta_path, "r", encoding="utf-8") as fh:
+                    meta = json.load(fh)
+        except Exception:
+            meta = {}
+        cache_valid = (not force) and bool(video_id) and meta.get("video_id") == video_id
+        real_stages: List[int] = []
 
         for idx, m in enumerate(milestones):
             p_name = m.get("period", f"Etapa {idx+1}")
@@ -402,39 +444,45 @@ class NBAVisualProofService:
             out_proof_path = os.path.join(out_dir, f"proof_nba_{slug_match}_stage_{idx+1}.jpg")
             raw_temp_path = os.path.join(out_dir, f"raw_nba_{slug_match}_stage_{idx+1}.jpg")
 
-            # Reutilização de cache quando o frame já existe e não foi forçado
-            if not force and os.path.exists(out_proof_path) and os.path.getsize(out_proof_path) > 1000:
-                print(f"[NBA VisualProof] Frame existente em cache para Etapa {idx+1}/{total_stages} ({out_proof_path})")
-            else:
-                extracted = False
-                if video_url:
-                    print(f"[NBA VisualProof] Extraindo frame Etapa {idx+1}/{total_stages} ({stage_title}) no offset {sec_offset}s...")
-                    extracted = cls.extract_frame_at_offset(video_url, sec_offset, raw_temp_path)
-
-                if extracted and os.path.exists(raw_temp_path):
-                    stamp_nba_audit_banner(
-                        raw_temp_path,
-                        out_proof_path,
-                        praca="SPO",
-                        channel_code=ch_sigla,
-                        timestamp_brt_str=timestamp_full,
-                        extend_top=False
-                    )
-                    try: os.remove(raw_temp_path)
-                    except Exception: pass
+            # Frame REAL do vídeo oficial ou nenhum frame. Nunca se usa imagem sintética como evidência.
+            frame_ok = False
+            if video_url:
+                cached_ok = (
+                    cache_valid
+                    and (idx + 1) in meta.get("real_stages", [])
+                    and os.path.exists(out_proof_path)
+                    and os.path.getsize(out_proof_path) > 1000
+                )
+                if cached_ok:
+                    print(f"[NBA VisualProof] Frame real em cache (vídeo {video_id}) para Etapa {idx+1}/{total_stages}")
+                    frame_ok = True
                 else:
-                    # Fallback sintético profissional
-                    print(f"[NBA VisualProof] Gerando frame sintético para Etapa {idx+1}/{total_stages}...")
-                    create_nba_synthetic_frame(
-                        out_proof_path,
-                        praca="SPO",
-                        channel_code=ch_sigla,
-                        timestamp_brt_str=timestamp_full,
-                        away_team=away_tri,
-                        home_team=home_tri,
-                        score_display=score,
-                        period_label=p_name
-                    )
+                    print(f"[NBA VisualProof] Extraindo frame Etapa {idx+1}/{total_stages} ({stage_title}) no offset {sec_offset}s...")
+                    if cls.extract_frame_at_offset(video_url, sec_offset, raw_temp_path) and os.path.exists(raw_temp_path):
+                        stamp_nba_audit_banner(
+                            raw_temp_path,
+                            out_proof_path,
+                            praca="SPO",
+                            channel_code=ch_sigla,
+                            timestamp_brt_str=timestamp_full,
+                            extend_top=False
+                        )
+                        frame_ok = True
+                    try:
+                        if os.path.exists(raw_temp_path):
+                            os.remove(raw_temp_path)
+                    except Exception:
+                        pass
+
+            if frame_ok:
+                real_stages.append(idx + 1)
+            else:
+                print(f"[NBA VisualProof] Etapa {idx+1}/{total_stages}: frame de transmissão INDISPONÍVEL (sem imagem sintética).")
+                try:
+                    if os.path.exists(out_proof_path):
+                        os.remove(out_proof_path)  # evita reaproveitar imagem antiga/não verificada
+                except Exception:
+                    pass
 
             proof_results.append({
                 "stage_index": idx + 1,
@@ -446,10 +494,20 @@ class NBAVisualProofService:
                 "clock_brt": t_brt,
                 "timestamp_brt_str": timestamp_full,
                 "description": action_desc,
-                "image_path": out_proof_path,
+                "image_path": out_proof_path if frame_ok else None,
+                "frame_available": frame_ok,
+                "source_video_id": video_id,
+                "source_video_title": video_info["title"] if video_info else None,
+                "source_video_offset_s": sec_offset if frame_ok else None,
                 "confidence": 0.99,
                 "verification_source": "Súmula Oficial NBA (Game Book)"
             })
 
-        print(f"[NBA VisualProof] Sucesso! Geradas {len(proof_results)} comprovações visuais sincronizadas.")
+        try:
+            with open(meta_path, "w", encoding="utf-8") as fh:
+                json.dump({"video_id": video_id, "real_stages": real_stages}, fh)
+        except Exception:
+            pass
+
+        print(f"[NBA VisualProof] {len(real_stages)}/{total_stages} etapas com frame real do vídeo oficial.")
         return proof_results

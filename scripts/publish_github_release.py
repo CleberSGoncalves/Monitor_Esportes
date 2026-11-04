@@ -18,15 +18,14 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.36"
-    release_name = "v2.4.36 - Motor de Comprovação Visual NBA (BRT) & Sincronismo Oficial de Canais YouTube"
+    tag = "v2.4.37"
+    release_name = "v2.4.37 - Comprovação Visual NBA: somente vídeo oficial verificado"
     body = (
-        "### Novidades da versão v2.4.36:\n"
-        "- 🏀 **Motor Oficial de Comprovação Visual NBA**: Extração autônoma de frames autênticos do canal oficial da NBA (@nba) para cada quarto e prorrogação.\n"
-        "- ⏱️ **Tarja Superior Broadcast em Fuso BRT**: Carimbo de auditoria técnica no padrão Kantar/IBOPE/MediaDNA sincronizado rigorosamente com o Game Book da NBA no fuso de Brasília (`America/Sao_Paulo` - UTC-3).\n"
-        "- 📑 **Relatórios Periciais Multi-Página NBA**: Relatório executivo de 5 a 7 páginas com cards periciais estruturados para cada etapa da cronologia oficial.\n"
-        "- 📺 **Alinhamento e Segregação de Canais do YouTube**: Distinção estrita entre canais de transmissão de jogo (ex: Gaúcha GZH) e canais de debate/pós-jogo (Gaúcha Esportes).\n"
-        "- 🚀 **Auto-Deploy e Estabilidade**: Atualização nativa compatível com o Auto-Updater da aplicação."
+        "### Novidades da versão v2.4.37:\n"
+        "- 🏀 **Vídeo oficial verificado**: a comprovação visual da NBA só usa o 'Full Game Highlights' do canal NBA, conferindo times, data e duração (corrige casos em que o frame vinha de outro jogo).\n"
+        "- 🚫 **Sem imagem sintética**: etapas sem vídeo oficial aparecem como 'Frame indisponível' no relatório.\n"
+        "- 🔎 **Rastreabilidade**: cada card identifica o vídeo de origem e o ponto extraído; nota metodológica na seção.\n"
+        "- 🧹 **Sem confiança fixa**: removido o percentual de confiança estático dos cards; jogos sem Game Book não geram comprovação."
     )
 
     headers = {
@@ -97,7 +96,7 @@ def publish_release():
         asset_info = upload_resp.json()
         download_url = asset_info.get("browser_download_url")
         print("==================================================")
-        print("  RELEASE v2.3.3 PUBLICADA COM SUCESSO NO GITHUB! ")
+        print(f"  RELEASE {tag} PUBLICADA COM SUCESSO NO GITHUB! ")
         print(f"  URL de Download: {download_url}")
         print("==================================================")
         return True

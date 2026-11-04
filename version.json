@@ -1,5 +1,5 @@
 {
-  "version": "2.4.36",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.36/Monitor_Esportes.exe",
-  "changelog": "v2.4.36: Motor oficial de comprovação visual para NBA com tarja de auditoria técnica broadcast (Kantar/IBOPE/MediaDNA) em fuso de Brasília (BRT); relatórios periciais multi-página com evidências por etapa; checagem e alinhamento das transmissões do YouTube (Gaúcha vs Gaúcha Esportes) e segregação das lives."
+  "version": "2.4.37",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.37/Monitor_Esportes.exe",
+  "changelog": "v2.4.37: Comprovação visual da NBA corrigida: só usa vídeo oficial 'Full Game Highlights' do canal NBA (jogo, data e duração conferidos); etapas sem vídeo oficial aparecem como indisponíveis (sem imagem sintética); cards identificam o vídeo de origem; removido percentual de confiança fixo; jogos sem Game Book não geram comprovação."
 }

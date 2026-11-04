@@ -1,0 +1,169 @@
+{
+  "reprocess": [
+    {
+      "file": "20261020_OKCSAS_book.pdf",
+      "key": "20261020_OKCSAS",
+      "new_video": "PuRFyx_FSbs",
+      "old_video": "rqpPsrbilhk",
+      "reasons": [
+        "video mudou (rqpPsrbilhk -> PuRFyx_FSbs)"
+      ]
+    },
+    {
+      "file": "20261021_DALHOU_book.pdf",
+      "key": "20261021_DALHOU",
+      "new_video": "4hNRkmyNe90",
+      "old_video": "y1pbO1uDxUY",
+      "reasons": [
+        "video mudou (y1pbO1uDxUY -> 4hNRkmyNe90)"
+      ]
+    },
+    {
+      "file": "20261021_GSWLAL_book.pdf",
+      "key": "20261021_GSWLAL",
+      "new_video": "GU4e--bCuwQ",
+      "old_video": "y1pbO1uDxUY",
+      "reasons": [
+        "video mudou (y1pbO1uDxUY -> GU4e--bCuwQ)"
+      ]
+    },
+    {
+      "file": "20261021_UTAMEM_book.pdf",
+      "key": "20261021_UTAMEM",
+      "new_video": "6IVDF14w-Cc",
+      "old_video": "qEepDtX5qLM",
+      "reasons": [
+        "video mudou (qEepDtX5qLM -> 6IVDF14w-Cc)"
+      ]
+    },
+    {
+      "file": "20261023_ATLCHA_book.pdf",
+      "key": "20261023_ATLCHA",
+      "new_video": "w4g6vpvVyos",
+      "old_video": "w4g6vpvVyos",
+      "reasons": [
+        "frame sintetico no lote anterior"
+      ]
+    },
+    {
+      "file": "20261023_HOUSAS_book.pdf",
+      "key": "20261023_HOUSAS",
+      "new_video": "ZUslpiyp7G4",
+      "old_video": "ihLZ3Ti4wqM",
+      "reasons": [
+        "video mudou (ihLZ3Ti4wqM -> ZUslpiyp7G4)"
+      ]
+    },
+    {
+      "file": "20261023_PORSAC_book.pdf",
+      "key": "20261023_PORSAC",
+      "new_video": "P3U_TwDKT-Y",
+      "old_video": "9n0WtH6pzGc",
+      "reasons": [
+        "video mudou (9n0WtH6pzGc -> P3U_TwDKT-Y)"
+      ]
+    },
+    {
+      "file": "20261025_DETPHI_book.pdf",
+      "key": "20261025_DETPHI",
+      "new_video": "GZzCjdjsTAo",
+      "old_video": "Lw6ZDR4KRIY",
+      "reasons": [
+        "video mudou (Lw6ZDR4KRIY -> GZzCjdjsTAo)"
+      ]
+    },
+    {
+      "file": "20261025_ORLNYK_book.pdf",
+      "key": "20261025_ORLNYK",
+      "new_video": "FwN_PBKYgMQ",
+      "old_video": "K7AjpmStxyU",
+      "reasons": [
+        "video mudou (K7AjpmStxyU -> FwN_PBKYgMQ)"
+      ]
+    },
+    {
+      "file": "20261026_CHIBOS_book.pdf",
+      "key": "20261026_CHIBOS",
+      "new_video": "DTNqMLNVBC8",
+      "old_video": "QM_6ANAk3Tc",
+      "reasons": [
+        "video mudou (QM_6ANAk3Tc -> DTNqMLNVBC8)"
+      ]
+    },
+    {
+      "file": "20261026_MINCLE_book.pdf",
+      "key": "20261026_MINCLE",
+      "new_video": "8q9lu3T5twU",
+      "old_video": "C3C6dPCeo9M",
+      "reasons": [
+        "video mudou (C3C6dPCeo9M -> 8q9lu3T5twU)"
+      ]
+    },
+    {
+      "file": "20261026_WASCHA_book.pdf",
+      "key": "20261026_WASCHA",
+      "new_video": "kLAQRSIIDkQ",
+      "old_video": "qFCGAc6Zx5U",
+      "reasons": [
+        "video mudou (qFCGAc6Zx5U -> kLAQRSIIDkQ)"
+      ]
+    },
+    {
+      "file": "20261027_DETNYK_book.pdf",
+      "key": "20261027_DETNYK",
+      "new_video": "CRso2RiQ_-M",
+      "old_video": "qFCGAc6Zx5U",
+      "reasons": [
+        "video mudou (qFCGAc6Zx5U -> CRso2RiQ_-M)",
+        "frame sintetico no lote anterior"
+      ]
+    },
+    {
+      "file": "20261027_SACSAS_book.pdf",
+      "key": "20261027_SACSAS",
+      "new_video": "5-hZ9qdOcYw",
+      "old_video": "X5EXmi9Ihkc",
+      "reasons": [
+        "video mudou (X5EXmi9Ihkc -> 5-hZ9qdOcYw)"
+      ]
+    }
+  ],
+  "ok": [
+    "20261020_BOSDET",
+    "20261020_PHINYK",
+    "20261021_ATLORL",
+    "20261021_CHABKN",
+    "20261021_CHITOR",
+    "20261021_INDNOP",
+    "20261021_MILWAS",
+    "20261021_MINMIA",
+    "20261021_PHXPOR",
+    "20261021_SACLAC",
+    "20261022_CLEPHI",
+    "20261022_DENOKC",
+    "20261023_CHIMIL",
+    "20261023_DALIND",
+    "20261023_DETMIA",
+    "20261023_LACLAL",
+    "20261023_MEMGSW",
+    "20261023_MINORL",
+    "20261023_NOPUTA",
+    "20261023_NYKBOS",
+    "20261023_TORWAS",
+    "20261024_BKNCLE",
+    "20261024_GSWPHX",
+    "20261024_HOUATL",
+    "20261024_MIACHA",
+    "20261024_MILPHI",
+    "20261024_NOPDEN",
+    "20261024_SASDAL",
+    "20261024_WASCHI",
+    "20261025_INDBKN",
+    "20261025_LACOKC",
+    "20261025_LALUTA",
+    "20261025_MEMSAC",
+    "20261025_TORMIN",
+    "20261027_BKNBOS",
+    "20261027_PORLAL"
+  ]
+}
