@@ -18,14 +18,14 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.37"
-    release_name = "v2.4.37 - Comprovação Visual NBA: somente vídeo oficial verificado"
+    tag = "v2.4.38"
+    release_name = "v2.4.38 - Calibração Automática de Marcos via Parecer Oficial e Cronologia Completa"
     body = (
-        "### Novidades da versão v2.4.37:\n"
-        "- 🏀 **Vídeo oficial verificado**: a comprovação visual da NBA só usa o 'Full Game Highlights' do canal NBA, conferindo times, data e duração (corrige casos em que o frame vinha de outro jogo).\n"
-        "- 🚫 **Sem imagem sintética**: etapas sem vídeo oficial aparecem como 'Frame indisponível' no relatório.\n"
-        "- 🔎 **Rastreabilidade**: cada card identifica o vídeo de origem e o ponto extraído; nota metodológica na seção.\n"
-        "- 🧹 **Sem confiança fixa**: removido o percentual de confiança estático dos cards; jogos sem Game Book não geram comprovação."
+        "### Novidades da versão v2.4.38:\n"
+        "- ⏱️ **Calibração Automática de Cronologia**: marcos e horários recalibrados automaticamente pelo horário de início oficial confirmado pela Súmula CBF / Gemini Grounding (elimina defasagem de 1 hora).\n"
+        "- 📑 **Página 1 Completa**: cronologia exibe integralmente todos os marcos da partida (pré-jogo, hino, tempos, gols, acréscimos e encerramento) com 99% de confiança.\n"
+        "- 📺 **Dados de Live Auditados**: preenchimento completo de horários, título e duração no box da transmissão.\n"
+        "- 🧹 **Higienização do SharePoint**: remoção de canais sem transmissão ao vivo e deduplicação de confrontos."
     )
 
     headers = {

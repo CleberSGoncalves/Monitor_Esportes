@@ -1,5 +1,5 @@
 {
-  "version": "2.4.37",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.37/Monitor_Esportes.exe",
-  "changelog": "v2.4.37: Comprovação visual da NBA corrigida: só usa vídeo oficial 'Full Game Highlights' do canal NBA (jogo, data e duração conferidos); etapas sem vídeo oficial aparecem como indisponíveis (sem imagem sintética); cards identificam o vídeo de origem; removido percentual de confiança fixo; jogos sem Game Book não geram comprovação."
+  "version": "2.4.38",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.38/Monitor_Esportes.exe",
+  "changelog": "v2.4.38: Calibração automática de marcos via parecer oficial (Gemini Web/Grounding e Súmula CBF); correção do horário de início para 18h30 com renderização completa de todos os marcos na Página 1; preenchimento de broadcast_info da live; remoção de canais indevidos e deduplicação no SharePoint."
 }
