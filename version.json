@@ -1,5 +1,5 @@
 {
-  "version": "2.4.34",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.34/Monitor_Esportes.exe",
-  "changelog": "v2.4.34: Correção crítica de responsividade da interface (Anti-Freeze): elimina bloqueio de I/O de rede no main thread do Tkinter via cache inteligente em memória e disco no CBFScheduleFetcher (<15ms); deduplicação canônica estrita de confrontos (elimina duplicidade de Vasco x Flamengo ou qualquer jogo na fila); atualização em segundo plano para o mural CBF sem congelamento visual; estabilização da rotina de auditoria resiliente."
+  "version": "2.4.35",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.35/Monitor_Esportes.exe",
+  "changelog": "v2.4.35: Comprovações visuais autênticas extraídas diretamente de cada canal do YouTube (Bagé TV, Esporte Band RS, Gaúcha e Gaúcha Esportes) com frames reais e específicos por emissora; sincronização completa com a lista SharePoint 'Relatorio Jogos Youtube' e preservação estrita da biblioteca CBF oficial; estabilização da esteira de auditoria."
 }

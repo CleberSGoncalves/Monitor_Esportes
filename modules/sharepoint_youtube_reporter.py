@@ -8,6 +8,7 @@ import os
 import sys
 import re
 import logging
+import requests
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 

@@ -18,14 +18,14 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.34"
-    release_name = "v2.4.34 - Anti-Freeze de Interface (I/O Não Bloqueante) & Deduplicação Canônica de Jogos"
+    tag = "v2.4.35"
+    release_name = "v2.4.35 - Comprovações Visuais Autênticas por Canal & Integração SharePoint YouTube"
     body = (
-        "### Novidades da versão v2.4.34:\n"
-        "- ⚡ **Eliminação Definitiva do Congelamento (Anti-Freeze)**: Resolvido o travamento `(Não está respondendo)` do Tkinter. Todas as consultas à CBF agora utilizam cache de 2 níveis (RAM em ~5ms e disco em ~15ms). Acesso à rede para download de PDFs isolado estritamente em segundo plano (`threading.Thread`).\n"
-        "- 🛡️ **Deduplicação Canônica Estrita de Partidas**: Implementado algoritmo bidirecional de chave canônica (`_canonical_match_key`) que elimina duplicatas em qualquer formato (ex: `Vasco x Flamengo 19:00` vs `20:00`), mantendo apenas a partida oficial com horário atualizado in-place.\n"
-        "- 🔄 **Mural CBF e Modal Não-Bloqueantes**: O Mural de Confrontos e o Modal de Agendamentos abrem instantaneamente (<50ms) sem travar a interface gráfica.\n"
-        "- 🧪 **Suíte de Testes Automatizados E2E**: Teste prático comprovado em `scripts/test_anti_freeze_and_dedup.py` com 100% de aprovação (latência de 5.02ms e eliminação real de duplicatas)."
+        "### Novidades da versão v2.4.35:\n"
+        "- 📺 **Comprovações Visuais Autênticas por Canal**: Extração de frames específicos e genuínos diretamente de cada transmissão do YouTube (Bagé TV, Esporte Band RS, Gaúcha e Gaúcha Esportes), eliminando duplicidade de imagens entre canais.\n"
+        "- 📑 **Relatórios Multi-Página de Auditoria Visual**: Cada emissora possui seu dossiê completo de auditoria com tarjas operacionais, sincronismo de horário de Brasília e metadados dedicados.\n"
+        "- ☁️ **Integração SharePoint 'Relatorio Jogos Youtube'**: Armazenamento segregado de lives e canais na lista dedicada com colunas canônicas (`Partida`, `Campeonato`, `Canal`, `Data_Jogo`, `Confianca`/`Placar`, `Auditado`) sem interferir na biblioteca oficial de jogos CBF (`Relatorios_de_Jogos`).\n"
+        "- ⚡ **Otimização de Performance e Estabilidade**: Carregamento instantâneo, auto-deploy e suíte completa de testes automatizados E2E aprovados."
     )
 
     headers = {
