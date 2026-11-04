@@ -409,6 +409,9 @@ class ExpertAssistant:
                                 end_str += ":00"
                             res["match_end"] = end_str
                             print(f"[EXPERT VERDICT] match_end calibrado via parecer oficial: {end_str}")
+                        
+                        if v_times.get("inicio"):
+                            self.calibrate_chronology_milestones(res, res["first_half_start"], res.get("match_end", ""))
                     except Exception as e_calib:
                         print(f"[EXPERT VERDICT WARN] Erro ao calibrar horários do veredito: {e_calib}")
             except Exception as e_v:
@@ -423,6 +426,60 @@ class ExpertAssistant:
                     print(f"[EXPERT CACHE WARN] Falha ao salvar no cache: {e_save}")
         
         return res
+
+    @staticmethod
+    def calibrate_chronology_milestones(res: dict, official_start: str, official_end: str = ""):
+        if not official_start:
+            return
+        try:
+            from datetime import datetime, timedelta
+            parts = official_start.split(":")
+            h, m = int(parts[0]), int(parts[1])
+            s = int(parts[2]) if len(parts) > 2 else 0
+            base_dt = datetime(2026, 1, 1, h, m, s)
+            for key in ["technical_milestones", "milestones", "chronology"]:
+                items = res.get(key) or []
+                for it in items:
+                    lbl = str(it.get("type") or it.get("label") or it.get("desc") or "").upper()
+                    min_val = it.get("minute")
+                    min_int = None
+                    try:
+                        if min_val is not None and str(min_val).isdigit():
+                            min_int = int(min_val)
+                    except Exception:
+                        pass
+                    new_clock = None
+                    if any(k in lbl for k in ["INÍCIO PRÉ-JOGO", "PRE_JOGO", "ABERTURA"]):
+                        new_clock = (base_dt - timedelta(minutes=30)).strftime("%H:%M:%S")
+                    elif "HINO" in lbl or "PROTOCOLO" in lbl:
+                        new_clock = (base_dt - timedelta(minutes=4)).strftime("%H:%M:%S")
+                    elif "APITO INICIAL (1T)" in lbl or ("APITO INICIAL" in lbl and "2T" not in lbl) or (min_int == 0 and "FIM" not in lbl):
+                        new_clock = base_dt.strftime("%H:%M:%S")
+                    elif "FIM DO 1" in lbl or "INTERVALO" in lbl:
+                        new_clock = (base_dt + timedelta(minutes=48)).strftime("%H:%M:%S")
+                    elif "APITO INICIAL (2T)" in lbl or "2T 00:00" in lbl:
+                        new_clock = (base_dt + timedelta(minutes=64)).strftime("%H:%M:%S")
+                    elif any(k in lbl for k in ["APITO FINAL", "FIM DE JOGO", "FIM DO 2"]):
+                        if official_end:
+                            end_p = official_end.split(":")
+                            new_clock = f"{int(end_p[0]):02d}:{int(end_p[1]):02d}:{int(end_p[2]) if len(end_p) > 2 else 0:02d}"
+                        else:
+                            new_clock = (base_dt + timedelta(minutes=114)).strftime("%H:%M:%S")
+                    elif "PÓS-JOGO" in lbl:
+                        new_clock = (base_dt + timedelta(minutes=125)).strftime("%H:%M:%S")
+                    elif "ENCERRAMENTO" in lbl:
+                        new_clock = (base_dt + timedelta(minutes=140)).strftime("%H:%M:%S")
+                    elif min_int is not None:
+                        if min_int <= 45:
+                            new_clock = (base_dt + timedelta(minutes=min_int)).strftime("%H:%M:%S")
+                        else:
+                            new_clock = (base_dt + timedelta(minutes=64 + (min_int - 45))).strftime("%H:%M:%S")
+                    if new_clock:
+                        it["clock"] = new_clock
+                        it["time"] = new_clock
+            print(f"[EXPERT CALIBRATE] Todos os marcos recalibrados estritamente com base em {official_start}!")
+        except Exception as e_calib_detail:
+            print(f"[EXPERT CALIBRATE WARN] Falha na recalibração detalhada: {e_calib_detail}")
 
     def _execute_generation_flow(self, team1: str, team2: str, competition: str, platform: str, date: str, start_timestamp: Optional[int] = None, duration: Optional[int] = None, video_url: Optional[str] = None, transcript_text: Optional[str] = None, directive_correction: str = "", sumula_raw_text: Optional[str] = None) -> Dict[str, Any]:
         """
