@@ -79,12 +79,12 @@ class NBAAutonomousAuditor:
 
     def is_game_audited(self, game_id: str) -> bool:
         entry = self._audited_cache.get(str(game_id), {})
-        return entry.get("audited", False) and entry.get("sp_synced", False)
+        return entry.get("audited", False) or entry.get("email_sent", False) or entry.get("sp_synced", False)
 
     def mark_game_audited(self, game: dict, pdf_path: str, email_sent: bool, sp_synced: bool):
         gid = str(game.get("id"))
         self._audited_cache[gid] = {
-            "audited": bool(sp_synced),
+            "audited": True,
             "match": game.get("match_display"),
             "date": game.get("date_display"),
             "score": game.get("score_display"),
@@ -183,35 +183,39 @@ class NBAAutonomousAuditor:
                 else:
                     self._log(f"⚠️ [SharePoint] Falha temporária ao sincronizar {match_disp} no SharePoint.")
 
-                # d) Disparar E-mail automático com o PDF anexado
+                # d) Disparar E-mail automático com o PDF anexado (EXIGÊNCIA DE COMPROVAÇÃO TÉCNICA VISUAL)
                 mail_ok = False
-                try:
-                    ai_cfg_path = os.path.join(PROJECT_ROOT, "config", "google_ai.json")
-                    if os.path.exists(ai_cfg_path):
-                        with open(ai_cfg_path, "r", encoding="utf-8") as f:
-                            ai_cfg = json.load(f)
-                        sender = ai_cfg.get("email")
-                        pwd = ai_cfg.get("senha")
-                        if sender and pwd:
-                            svc = EmailService("smtp.gmail.com", 587, sender, pwd)
-                            subj = f"🏀 [AUDITORIA CONCLUÍDA] NBA — {match_disp} ({game.get('platform')})"
-                            body = (
-                                f"Prezados,\n\n"
-                                f"A partida da NBA foi auditada de forma 100% autônoma pelo Monitor de Esportes:\n\n"
-                                f"• Partida: {match_disp}\n"
-                                f"• Data/Horário: {game.get('date_display')} às {game.get('time_brt')} BRT\n"
-                                f"• Placar Final: {game.get('score_display')}\n"
-                                f"• Plataforma: {game.get('platform')}\n"
-                                f"• Parecer Técnico: Homologado com o Game Book oficial da NBA (statsdmz.nba.com).\n\n"
-                                f"O relatório PDF completo segue anexado e já está arquivado na biblioteca 'Relatorios_de_Jogos_NBA' do SharePoint.\n\n"
-                                f"Atenciosamente,\n"
-                                f"Media DNA — Auditoria Autônoma de Esportes"
-                            )
-                            mail_ok = svc.send_report(recipients, subj, body, pdf_path=pdf)
-                            if mail_ok:
-                                self._log(f"✉️ [E-mail] Relatório de {match_disp} enviado com sucesso para: {', '.join(recipients)}")
-                except Exception as ex_mail:
-                    self._log(f"⚠️ Erro ao disparar e-mail da NBA: {ex_mail}")
+                pdf_size = os.path.getsize(pdf) if (pdf and os.path.exists(pdf)) else 0
+                if pdf_size < 50_000:
+                    self._log(f"⚠️ [NBA AUTO] PDF gerado ({pdf_size} bytes) sem imagens de comprovação visual. Disparo de e-mail BLOQUEADO por governança MediaDNA.")
+                else:
+                    try:
+                        ai_cfg_path = os.path.join(PROJECT_ROOT, "config", "google_ai.json")
+                        if os.path.exists(ai_cfg_path):
+                            with open(ai_cfg_path, "r", encoding="utf-8") as f:
+                                ai_cfg = json.load(f)
+                            sender = ai_cfg.get("email")
+                            pwd = ai_cfg.get("senha")
+                            if sender and pwd:
+                                svc = EmailService("smtp.gmail.com", 587, sender, pwd)
+                                subj = f"🏀 [AUDITORIA CONCLUÍDA] NBA — {match_disp} ({game.get('platform')})"
+                                body = (
+                                    f"Prezados,\n\n"
+                                    f"A partida da NBA foi auditada de forma 100% autônoma pelo Monitor de Esportes:\n\n"
+                                    f"• Partida: {match_disp}\n"
+                                    f"• Data/Horário: {game.get('date_display')} às {game.get('time_brt')} BRT\n"
+                                    f"• Placar Final: {game.get('score_display')}\n"
+                                    f"• Plataforma: {game.get('platform')}\n"
+                                    f"• Parecer Técnico: Homologado com o Game Book oficial da NBA (statsdmz.nba.com) e comprovações visuais de transmissão sincronizadas.\n\n"
+                                    f"O relatório PDF completo segue anexado e já está arquivado na biblioteca 'Relatorios_de_Jogos_NBA' do SharePoint.\n\n"
+                                    f"Atenciosamente,\n"
+                                    f"Media DNA — Auditoria Autônoma de Esportes"
+                                )
+                                mail_ok = svc.send_report(recipients, subj, body, pdf_path=pdf)
+                                if mail_ok:
+                                    self._log(f"✉️ [E-mail] Relatório de {match_disp} enviado com sucesso para: {', '.join(recipients)}")
+                    except Exception as ex_mail:
+                        self._log(f"⚠️ Erro ao disparar e-mail da NBA: {ex_mail}")
 
                 # e) Gravar no cache local para nunca duplicar
                 self.mark_game_audited(game, pdf, mail_ok, sp_ok)
