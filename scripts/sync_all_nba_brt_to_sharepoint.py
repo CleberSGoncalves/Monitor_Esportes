@@ -8,6 +8,7 @@ import os
 import sys
 import re
 import time
+import json
 from datetime import datetime
 
 sys.stdout.reconfigure(encoding="utf-8")
@@ -30,10 +31,21 @@ def sync_all_cached_gamebooks(limit: int = 0):
     print(f"Atualizando {len(pdf_files)} Game Books da NBA com Comprovação Visual & BRT no SharePoint")
     print(f"==================================================================")
 
+    # Progresso persistido: permite retomar o lote sem reprocessar jogos ja enviados
+    done_path = os.path.join(PROJECT_ROOT, "config", "nba_visual_sync_done.json")
+    try:
+        with open(done_path, "r", encoding="utf-8") as fh:
+            done = set(json.load(fh))
+    except Exception:
+        done = set()
+
     success = 0
     errors = 0
 
     for idx, f in enumerate(pdf_files, 1):
+        if f in done:
+            print(f"[{idx:2d}/{len(pdf_files)}] [SKIP] {f} ja sincronizado com comprovacao visual", flush=True)
+            continue
         pdf_path = os.path.join(cache_dir, f)
         m = re.match(r"(\d{8})_([A-Z]{3})([A-Z]{3})_book\.pdf", f)
         if not m:
@@ -68,6 +80,9 @@ def sync_all_cached_gamebooks(limit: int = 0):
             ok = SharePointNBAReporter.sync_nba_report(out_pdf, game)
             if ok:
                 success += 1
+                done.add(f)
+                with open(done_path, "w", encoding="utf-8") as fh:
+                    json.dump(sorted(done), fh)
                 sz_kb = int(os.path.getsize(out_pdf) / 1024) if os.path.exists(out_pdf) else 0
                 print(f"[{idx:2d}/{len(pdf_files)}] [OK] {away_tri} @ {home_tri} ({d_disp}) -> BRT {time_brt_short} ({sz_kb} KB com Comprovação Visual)")
             else:
