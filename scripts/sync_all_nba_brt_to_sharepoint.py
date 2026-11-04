@@ -1,6 +1,7 @@
 """
-Script para sincronizar todos os 50 relatórios da NBA em cache com o fuso BRT
-diretamente na biblioteca 'Relatorios_de_Jogos_NBA' do SharePoint.
+scripts/sync_all_nba_brt_to_sharepoint.py
+Script para sincronizar todos os relatórios da NBA em cache com o fuso BRT
+e a seção oficial de COMPROVAÇÃO VISUAL diretamente na biblioteca 'Relatorios_de_Jogos_NBA' do SharePoint.
 """
 
 import os
@@ -19,12 +20,14 @@ from modules.sharepoint_nba_reporter import SharePointNBAReporter
 
 TRI_TO_NAME = {v: k for k, v in NBA_TEAMS.items()}
 
-def sync_all_cached_gamebooks():
+def sync_all_cached_gamebooks(limit: int = 0):
     cache_dir = os.path.join(PROJECT_ROOT, "config", "nba_cache")
     pdf_files = sorted([f for f in os.listdir(cache_dir) if f.endswith("_book.pdf")])
+    if limit > 0:
+        pdf_files = pdf_files[:limit]
     
     print(f"==================================================================")
-    print(f"Atualizando {len(pdf_files)} Game Books da NBA com Fuso BRT no SharePoint")
+    print(f"Atualizando {len(pdf_files)} Game Books da NBA com Comprovação Visual & BRT no SharePoint")
     print(f"==================================================================")
 
     success = 0
@@ -60,11 +63,13 @@ def sync_all_cached_gamebooks():
                 "is_finished": True
             }
 
-            out_pdf = NBAReportGenerator.generate_report(game, parsed)
+            # Gera relatório completo com comprovação visual (multi-página)
+            out_pdf = NBAReportGenerator.generate_report(game, parsed, auto_generate_proofs=True)
             ok = SharePointNBAReporter.sync_nba_report(out_pdf, game)
             if ok:
                 success += 1
-                print(f"[{idx:2d}/{len(pdf_files)}] [OK] {away_tri} @ {home_tri} ({d_disp}) -> BRT {time_brt_short}")
+                sz_kb = int(os.path.getsize(out_pdf) / 1024) if os.path.exists(out_pdf) else 0
+                print(f"[{idx:2d}/{len(pdf_files)}] [OK] {away_tri} @ {home_tri} ({d_disp}) -> BRT {time_brt_short} ({sz_kb} KB com Comprovação Visual)")
             else:
                 errors += 1
                 print(f"[{idx:2d}/{len(pdf_files)}] [ERRO] {away_tri} @ {home_tri} ({d_disp}) -> Falha sync")
@@ -73,8 +78,8 @@ def sync_all_cached_gamebooks():
             errors += 1
             print(f"[{idx:2d}/{len(pdf_files)}] [EXCECAO] {away_tri} @ {home_tri}: {e}")
 
-        # Intervalo defensivo para evitar 429 Rate Limit
-        time.sleep(2.0)
+        # Intervalo defensivo para evitar 429 Rate Limit no Graph API
+        time.sleep(3.0)
 
     print(f"\n==================================================================")
     print(f"Concluído: {success} enviados com sucesso, {errors} falhas.")
