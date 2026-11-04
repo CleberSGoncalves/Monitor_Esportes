@@ -18,14 +18,15 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.35"
-    release_name = "v2.4.35 - Comprovações Visuais Autênticas por Canal & Integração SharePoint YouTube"
+    tag = "v2.4.36"
+    release_name = "v2.4.36 - Motor de Comprovação Visual NBA (BRT) & Sincronismo Oficial de Canais YouTube"
     body = (
-        "### Novidades da versão v2.4.35:\n"
-        "- 📺 **Comprovações Visuais Autênticas por Canal**: Extração de frames específicos e genuínos diretamente de cada transmissão do YouTube (Bagé TV, Esporte Band RS, Gaúcha e Gaúcha Esportes), eliminando duplicidade de imagens entre canais.\n"
-        "- 📑 **Relatórios Multi-Página de Auditoria Visual**: Cada emissora possui seu dossiê completo de auditoria com tarjas operacionais, sincronismo de horário de Brasília e metadados dedicados.\n"
-        "- ☁️ **Integração SharePoint 'Relatorio Jogos Youtube'**: Armazenamento segregado de lives e canais na lista dedicada com colunas canônicas (`Partida`, `Campeonato`, `Canal`, `Data_Jogo`, `Confianca`/`Placar`, `Auditado`) sem interferir na biblioteca oficial de jogos CBF (`Relatorios_de_Jogos`).\n"
-        "- ⚡ **Otimização de Performance e Estabilidade**: Carregamento instantâneo, auto-deploy e suíte completa de testes automatizados E2E aprovados."
+        "### Novidades da versão v2.4.36:\n"
+        "- 🏀 **Motor Oficial de Comprovação Visual NBA**: Extração autônoma de frames autênticos do canal oficial da NBA (@nba) para cada quarto e prorrogação.\n"
+        "- ⏱️ **Tarja Superior Broadcast em Fuso BRT**: Carimbo de auditoria técnica no padrão Kantar/IBOPE/MediaDNA sincronizado rigorosamente com o Game Book da NBA no fuso de Brasília (`America/Sao_Paulo` - UTC-3).\n"
+        "- 📑 **Relatórios Periciais Multi-Página NBA**: Relatório executivo de 5 a 7 páginas com cards periciais estruturados para cada etapa da cronologia oficial.\n"
+        "- 📺 **Alinhamento e Segregação de Canais do YouTube**: Distinção estrita entre canais de transmissão de jogo (ex: Gaúcha GZH) e canais de debate/pós-jogo (Gaúcha Esportes).\n"
+        "- 🚀 **Auto-Deploy e Estabilidade**: Atualização nativa compatível com o Auto-Updater da aplicação."
     )
 
     headers = {

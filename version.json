@@ -1,5 +1,5 @@
 {
-  "version": "2.4.35",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.35/Monitor_Esportes.exe",
-  "changelog": "v2.4.35: Comprovações visuais autênticas extraídas diretamente de cada canal do YouTube (Bagé TV, Esporte Band RS, Gaúcha e Gaúcha Esportes) com frames reais e específicos por emissora; sincronização completa com a lista SharePoint 'Relatorio Jogos Youtube' e preservação estrita da biblioteca CBF oficial; estabilização da esteira de auditoria."
+  "version": "2.4.36",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.36/Monitor_Esportes.exe",
+  "changelog": "v2.4.36: Motor oficial de comprovação visual para NBA com tarja de auditoria técnica broadcast (Kantar/IBOPE/MediaDNA) em fuso de Brasília (BRT); relatórios periciais multi-página com evidências por etapa; checagem e alinhamento das transmissões do YouTube (Gaúcha vs Gaúcha Esportes) e segregação das lives."
 }

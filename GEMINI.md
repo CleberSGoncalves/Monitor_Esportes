@@ -37,6 +37,21 @@
 - Nunca executar `taskkill /f /im cloudflared.exe` ou `taskkill /f /im chrome.exe` de forma indiscriminada.
 - Sempre realizar o build do executável (`python scripts/build_exe.py`), publicar a release no GitHub e efetuar o `git push origin main` ao concluir novas versões.
 
+---
+
+## 5. PROTOCOLO OBRIGATÓRIO DE BUILD E PUBLICAÇÃO DE RELEASE (AUTO-UPDATER)
+
+> [!CAUTION]
+> **OBRIGATÓRIO COMPILAR E PUBLICAR RELEASE NO GITHUB A CADA ATUALIZAÇÃO DA APLICAÇÃO**
+> Sempre que finalizar uma rodada de melhorias, implementar novas funcionalidades ou corrigir bugs no código da aplicação, o agente DEVE OBRIGATORIAMENTE executar este fluxo completo:
+> 1. **Incrementar Versão**: Atualizar o arquivo `version.json` com a nova versão semântica e changelog explicativo (ex: `"version": "2.4.36"`).
+> 2. **Compilar Executável**: Executar `python scripts/build_exe.py` para gerar o `dist/Monitor_Esportes.exe` atualizado via PyInstaller.
+> 3. **Publicar Release no GitHub**: Atualizar a tag no script `scripts/publish_github_release.py` e executá-lo para fazer upload do asset `.exe` no GitHub Releases.
+> 4. **Backup e Push**: Executar `git add .`, `git commit -m "..."` e `git push origin main`.
+> 5. **PROIBIDO FINALIZAR SEM PUBLICAR**: O agente NUNCA pode encerrar a resposta sem que a nova versão do executável esteja disponível para download no Auto-Updater da aplicação!
+
+---
+
 ## 🧪 DIRETRIZ OBRIGATÓRIA DE TESTES E VALIDAÇÃO REAL
 
 > [!IMPORTANT]
