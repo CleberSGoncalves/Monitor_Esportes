@@ -409,7 +409,6 @@ def generate_chronology_stage_proofs(
         # Busca frame previamente capturado no diretório scratch ou uploads
         candidates = [
             os.path.abspath("scratch/base_broadcast_frame.jpg"),
-            os.path.abspath(r"C:\Users\Cleber\.gemini\antigravity\brain\4349b494-c0ce-4e02-8f40-71dee7388ad6\.user_uploaded\media_1793733808428_d4ad60b6.png")
         ]
         for c in candidates:
             if os.path.exists(c):

@@ -1,5 +1,5 @@
 {
-  "version": "2.4.39",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.39/Monitor_Esportes.exe",
-  "changelog": "v2.4.39: Extração de frames técnicos 100% autênticos e individualizados para cada canal no YouTube (Bagé TV, Band RS, Gaúcha, Gaúcha Esportes) sem compartilhamento de estúdio; correção do marco de pré-jogo (18:26) com contagem regressiva oficial (sem 1x0); blindagem do auditor autônomo da NBA para bloquear envio de relatórios inferiores a 50KB sem evidências visuais; cache de 107 partidas finalizadas da NBA para prevenir reenvios antigos."
+  "version": "2.4.40",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.40/Monitor_Esportes.exe",
+  "changelog": "v2.4.40: Eliminação definitiva de fallbacks com imagens fictícias/externas em visual_proof_service; mapeamento automático de milestone_proofs no ReportGenerator garantindo que cada canal (Bagé TV, Band RS, Gaúcha, Gaúcha Esportes) exiba estritamente seus próprios frames e estúdios autênticos; substituição integral dos PDFs no SharePoint."
 }

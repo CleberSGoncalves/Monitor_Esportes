@@ -18,14 +18,14 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.39"
-    release_name = "v2.4.39 - Frames Autênticos por Canal do YouTube e Blindagem de Relatórios NBA"
+    tag = "v2.4.40"
+    release_name = "v2.4.40 - Correção Definitiva de Frames de Transmissão por Canal no SharePoint"
     body = (
-        "### Novidades da versão v2.4.39:\n"
-        "- 🎯 **Frames 100% Autênticos por Canal no YouTube**: extração individualizada e independente diretamente do vídeo de cada canal (Bagé TV, Esporte Band RS, Gaúcha e Gaúcha Esportes), com carimbos oficiais respectivos (BGE, BND, GAU, GES).\n"
-        "- ⏱️ **Sincronismo de Pré-Jogo Sem Prematuridade**: correção da Etapa 2 (18h26) na Gaúcha e Band RS exibindo contagem regressiva e escalações oficiais, eliminando o placar de 1x0 anterior ao início da partida.\n"
-        "- 🏀 **Blindagem do Auditor Autônomo da NBA**: bloqueio automático de envio de e-mails para PDFs com tamanho inferior a 50 KB ou sem comprovação visual; auditoria só dispara notificação com o relatório visual completo.\n"
-        "- 🛡️ **Cache Persistente da NBA**: 107 partidas finalizadas catalogadas para prevenir qualquer reenvio retroativo indevido por e-mail."
+        "### Novidades da versão v2.4.40:\n"
+        "- 🛑 **Remoção Absoluta de Fallbacks com Imagens Fictícias**: exclusão de referências de uploads arbitrários no motor de comprovação visual.\n"
+        "- 🎯 **Mapeamento Direto no ReportGenerator**: garantia de que `milestone_proofs` receba diretamente os frames reais extraídos de cada transmissão do YouTube.\n"
+        "- 📑 **Substituição e Homologação dos 4 PDFs no SharePoint**: relatórios de 3 MB com 10 frames de estúdio e transmissão exclusivos para Bagé TV, Esporte Band RS, Gaúcha e Gaúcha Esportes.\n"
+        "- 🧹 **Higienização do SharePoint**: exclusão de itens órfãos/espúrios na biblioteca de documentos."
     )
 
     headers = {
