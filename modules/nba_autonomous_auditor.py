@@ -83,17 +83,27 @@ class NBAAutonomousAuditor:
 
     def is_game_audited(self, game_id: str) -> bool:
         entry = self._audited_cache.get(str(game_id), {})
-        return entry.get("audited", False) or entry.get("email_sent", False) or entry.get("sp_synced", False)
+        if not entry.get("audited", False):
+            return False
+        # Para ser considerado auditado de forma conclusiva, exige PDF com comprovação visual completa (>= 500 KB)
+        pdf = entry.get("pdf_path", "")
+        if not pdf or not os.path.exists(pdf) or os.path.getsize(pdf) < 500_000:
+            return False
+        return True
 
     def mark_game_audited(self, game: dict, pdf_path: str, email_sent: bool, sp_synced: bool):
         gid = str(game.get("id"))
+        pdf_sz = os.path.getsize(pdf_path) if (pdf_path and os.path.exists(pdf_path)) else 0
+        has_proofs = pdf_sz >= 500_000
         self._audited_cache[gid] = {
-            "audited": True,
+            "audited": bool(has_proofs or (email_sent and sp_synced and not pdf_path)),
+            "has_visual_proofs": has_proofs,
             "match": game.get("match_display"),
             "date": game.get("date_display"),
             "score": game.get("score_display"),
             "platform": game.get("platform"),
             "pdf_path": pdf_path,
+            "pdf_size_bytes": pdf_sz,
             "email_sent": bool(email_sent),
             "sp_synced": bool(sp_synced),
             "audited_at": datetime.now().isoformat()
@@ -192,8 +202,15 @@ class NBAAutonomousAuditor:
                 
                 # b) Gerar Relatório Executivo Oficial PDF
                 pdf = self.nba_reporter.generate_report(game, parsed)
-                
-                # c) Publicar no SharePoint na linha da partida
+                pdf_size = os.path.getsize(pdf) if (pdf and os.path.exists(pdf)) else 0
+
+                # EXIGÊNCIA ESTRITA: Relatório NBA só pode ser publicado e concluído com COMPROVAÇÃO VISUAL COMPLETA (>= 500 KB)
+                if pdf_size < 500_000:
+                    self._log(f"⚠️ [NBA AUTO] PDF gerado ({pdf_size} bytes) sem comprovação visual completa (< 500 KB). Vídeo oficial NBA com highlights ainda não disponível no YouTube. Aguardando publicação para homologação definitiva.")
+                    time.sleep(2)
+                    continue
+
+                # c) Publicar no SharePoint na linha da partida (SOMENTE COM COMPROVAÇÃO VISUAL HOMOLOGADA)
                 sp_ok = SharePointNBAReporter.sync_nba_report(pdf, game)
                 if sp_ok:
                     self._log(f"☁️ [SharePoint] Relatório de {match_disp} publicado e homologado no SharePoint!")
@@ -202,37 +219,33 @@ class NBAAutonomousAuditor:
 
                 # d) Disparar E-mail automático com o PDF anexado (EXIGÊNCIA DE COMPROVAÇÃO TÉCNICA VISUAL >= 500 KB)
                 mail_ok = False
-                pdf_size = os.path.getsize(pdf) if (pdf and os.path.exists(pdf)) else 0
-                if pdf_size < 500_000:
-                    self._log(f"⚠️ [NBA AUTO] PDF gerado ({pdf_size} bytes) sem comprovação visual completa (< 500 KB). Disparo de e-mail BLOQUEADO por governança MediaDNA.")
-                else:
-                    try:
-                        ai_cfg_path = os.path.join(PROJECT_ROOT, "config", "google_ai.json")
-                        if os.path.exists(ai_cfg_path):
-                            with open(ai_cfg_path, "r", encoding="utf-8") as f:
-                                ai_cfg = json.load(f)
-                            sender = ai_cfg.get("email")
-                            pwd = ai_cfg.get("senha")
-                            if sender and pwd:
-                                svc = EmailService("smtp.gmail.com", 587, sender, pwd)
-                                subj = f"🏀 [AUDITORIA CONCLUÍDA] NBA — {match_disp} ({game.get('platform')})"
-                                body = (
-                                    f"Prezados,\n\n"
-                                    f"A partida da NBA foi auditada de forma 100% autônoma pelo Monitor de Esportes:\n\n"
-                                    f"• Partida: {match_disp}\n"
-                                    f"• Data/Horário: {game.get('date_display')} às {game.get('time_brt')} BRT\n"
-                                    f"• Placar Final: {game.get('score_display')}\n"
-                                    f"• Plataforma: {game.get('platform')}\n"
-                                    f"• Parecer Técnico: Homologado com o Game Book oficial da NBA (statsdmz.nba.com) e comprovações visuais de transmissão sincronizadas.\n\n"
-                                    f"O relatório PDF completo segue anexado e já está arquivado na biblioteca 'Relatorios_de_Jogos_NBA' do SharePoint.\n\n"
-                                    f"Atenciosamente,\n"
-                                    f"Media DNA — Auditoria Autônoma de Esportes"
-                                )
-                                mail_ok = svc.send_report(recipients, subj, body, pdf_path=pdf)
-                                if mail_ok:
-                                    self._log(f"✉️ [E-mail] Relatório de {match_disp} enviado com sucesso para: {', '.join(recipients)}")
-                    except Exception as ex_mail:
-                        self._log(f"⚠️ Erro ao disparar e-mail da NBA: {ex_mail}")
+                try:
+                    ai_cfg_path = os.path.join(PROJECT_ROOT, "config", "google_ai.json")
+                    if os.path.exists(ai_cfg_path):
+                        with open(ai_cfg_path, "r", encoding="utf-8") as f:
+                            ai_cfg = json.load(f)
+                        sender = ai_cfg.get("email")
+                        pwd = ai_cfg.get("senha")
+                        if sender and pwd:
+                            svc = EmailService("smtp.gmail.com", 587, sender, pwd)
+                            subj = f"🏀 [AUDITORIA CONCLUÍDA] NBA — {match_disp} ({game.get('platform')})"
+                            body = (
+                                f"Prezados,\n\n"
+                                f"A partida da NBA foi auditada de forma 100% autônoma pelo Monitor de Esportes:\n\n"
+                                f"• Partida: {match_disp}\n"
+                                f"• Data/Horário: {game.get('date_display')} às {game.get('time_brt')} BRT\n"
+                                f"• Placar Final: {game.get('score_display')}\n"
+                                f"• Plataforma: {game.get('platform')}\n"
+                                f"• Parecer Técnico: Homologado com o Game Book oficial da NBA (statsdmz.nba.com) e comprovações visuais de transmissão sincronizadas.\n\n"
+                                f"O relatório PDF completo segue anexado e já está arquivado na biblioteca 'Relatorios_de_Jogos_NBA' do SharePoint.\n\n"
+                                f"Atenciosamente,\n"
+                                f"Media DNA — Auditoria Autônoma de Esportes"
+                            )
+                            mail_ok = svc.send_report(recipients, subj, body, pdf_path=pdf)
+                            if mail_ok:
+                                self._log(f"✉️ [E-mail] Relatório de {match_disp} enviado com sucesso para: {', '.join(recipients)}")
+                except Exception as ex_mail:
+                    self._log(f"⚠️ Erro ao disparar e-mail da NBA: {ex_mail}")
 
                 # e) Gravar no cache local para nunca duplicar
                 self.mark_game_audited(game, pdf, mail_ok, sp_ok)

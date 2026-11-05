@@ -18,14 +18,14 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.41"
-    release_name = "v2.4.41 - Correção da Janela de Auditoria NBA e Bloqueio de E-mails Antigos"
+    tag = "v2.4.42"
+    release_name = "v2.4.42 - Homologação de Frames Reais NBA e Blindagem contra Relatórios Incompletos"
     body = (
-        "### Novidades da versão v2.4.41:\n"
-        "- 🛑 **Fim do Spam de E-mails da NBA**: restrição da varredura automática aos jogos de hoje e ontem (em vez de varrer desde 20 de outubro), eliminando o disparo repetitivo de partidas antigas.\n"
-        "- 🏀 **Envio Estritamente em Jogos Finalizados Recentes**: disparo de e-mails condicionado a partidas que terminaram nas últimas 24h e que possuam comprovação visual completa (PDF >= 500 KB).\n"
-        "- 🛡️ **Cache Persistente Bloqueador**: partidas passadas catalogadas permanentemente para impedir reenvios.\n"
-        "- 📑 **Homologação dos Relatórios do YouTube**: 4 PDFs com frames reais de estúdio e transmissão atualizados no SharePoint."
+        "### Novidades da versão v2.4.42:\n"
+        "- 🏀 **Homologação Completa Rodada 04/11**: 100% dos 14 jogos processados com 8/8 frames reais extraídos dos highlights oficiais da NBA no YouTube, com carimbo técnico oficial BRT.\n"
+        "- 🛡️ **Blindagem Anti-Stub (< 500 KB)**: proibição absoluta de upload para o SharePoint e envio de e-mails para relatórios sem comprovação visual; partidas permanecem em fila até que o vídeo oficial esteja disponível.\n"
+        "- 📁 **Deduplicação Determinística no SharePoint**: eliminação de arquivos duplicados através de chave única por partida e data.\n"
+        "- 📅 **Agenda Futura Preparada**: monitoramento contínuo dos próximos jogos de hoje (05/11) e amanhã (06/11 Amazon Prime)."
     )
 
     headers = {
