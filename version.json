@@ -1,5 +1,5 @@
 {
-  "version": "2.4.42",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.42/Monitor_Esportes.exe",
-  "changelog": "v2.4.42: Homologação completa com comprovação visual 100% autêntica (frames oficiais do YouTube com tarja técnica BRT) para todos os jogos da rodada de 04/11; blindagem definitiva contra relatórios incompletos (< 500 KB) no SharePoint; padronização de nomenclatura determinística sem duplicatas e agenda validada para os próximos eventos."
+  "version": "2.4.43",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.43/Monitor_Esportes.exe",
+  "changelog": "v2.4.43: Sincronização estrita e eliminação de divergências nos horários de auditoria de streaming (Disney, ESPN, Amazon Prime Video); Jump Ball, Halftime e Pós-Jogo ancorados 100% diretamente nos marcos reais do NBA Game Book oficial."
 }

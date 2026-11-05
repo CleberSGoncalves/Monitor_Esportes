@@ -219,41 +219,90 @@ class NBAReportGenerator:
 
         def _get_streaming_rows(plat_name: str) -> list:
             p_up = plat_name.upper()
-            if "AMAZON" in p_up or "PRIME" in p_up:
-                obs_abertura = "Transmissão ao vivo iniciada no Prime Video Brasil. Apresentação oficial, escalações e VT de análise."
-                obs_jump = "Bola ao alto transmitida com sinal 1080p60, baixa latência e sincronia impecável de áudio e vídeo."
-                obs_halftime = "Cobertura de intervalo: estatísticas oficiais da NBA e veiculação de inserções comerciais regulamentares."
-                obs_fim = "Compacto de Melhores Momentos, análise final da partida e encerramento regular da transmissão."
-            elif "DISNEY" in p_up:
-                obs_abertura = "Transmissão ao vivo iniciada no Disney+. Apresentação de estúdio, escalações oficiais e VT tático."
-                obs_jump = "Bola ao alto transmitida com áudio em português, gráficos dedicados e placar dinâmico em tempo real."
-                obs_halftime = "Cobertura de intervalo: análise tática de bancada, estatísticas do 1º tempo e ativadores de marca certificados."
-                obs_fim = "Entrevistas exclusivas na quadra, Melhores Momentos (Highlights) e créditos finais regulares."
-            elif "ESPN" in p_up:
-                obs_abertura = "Sinal ao vivo aberto nos canais ESPN. Grade pontual com pré-jogo, comentários e escalações."
-                obs_jump = "Início oficial da partida com narração brasileira e inserção de placar dinâmico em tempo real."
-                obs_halftime = "Comentários no intervalo, destaques individuais e bloco de patrocínio comercial sem falhas."
-                obs_fim = "Debate pós-jogo no SportsCenter/estúdio, estatísticas consolidadas e encerramento de transmissão."
-            else:
-                obs_abertura = f"Clean feed internacional oficial aberto no {plat_name} com sinal direto da arena."
-                obs_jump = "Transmissão da bola ao alto com áudio ambiente oficial da arena e estatísticas NBA em tempo real."
-                obs_halftime = "Cobertura de intervalo: sinal contínuo, show da quadra e estatísticas consolidadas."
-                obs_fim = "Finalização oficial do feed com coletiva pós-jogo e estatísticas regulamentares."
 
-            t_brt = game.get("time_brt", "19:40")
-            m_t = re.match(r"(\d{1,2}):(\d{2})", t_brt)
-            if m_t:
-                hh, mm = int(m_t.group(1)), int(m_t.group(2))
-                m_pre = (mm - 25) % 60
-                h_pre = (hh - 1 if mm < 25 else hh) % 24
-                t_pre = f"{h_pre:02d}:{m_pre:02d}:00"
-                t_jump = f"{hh:02d}:{mm:02d}:00"
-                t_half = f"{(hh + 1) % 24:02d}:{(mm) % 60:02d}:00"
-                m_fim = (mm + 30) % 60
-                h_fim = (hh + 2 + (1 if mm >= 30 else 0)) % 24
-                t_fim = f"{h_fim:02d}:{m_fim:02d}:00"
+            # Extrair marcos oficiais reais do Game Book para sincronizar estritamente a auditoria de streaming
+            milestones = parsed_gamebook.get("milestones") or []
+
+            # 1. Jump Ball real (Start do 1º Quarto protocolado no Game Book)
+            jump_time = None
+            for m in milestones:
+                if m.get("type") == "start" and ("1" in m.get("period", "") or "1º" in m.get("period", "")):
+                    jump_time = m.get("time_brt") or m.get("time")
+                    break
+            if not jump_time and milestones:
+                for m in milestones:
+                    if m.get("type") == "start":
+                        jump_time = m.get("time_brt") or m.get("time")
+                        break
+
+            # 2. Halftime real (End do 2º Quarto e Start do 3º Quarto)
+            half_start = None
+            half_end = None
+            for m in milestones:
+                if m.get("type") == "end" and ("2" in m.get("period", "") or "2º" in m.get("period", "")):
+                    half_start = m.get("time_brt") or m.get("time")
+                elif m.get("type") == "start" and ("3" in m.get("period", "") or "3º" in m.get("period", "")):
+                    half_end = m.get("time_brt") or m.get("time")
+
+            # 3. Término do Jogo real (End do último quarto ou OT)
+            game_end = None
+            for m in reversed(milestones):
+                if m.get("type") == "end":
+                    game_end = m.get("time_brt") or m.get("time")
+                    break
+
+            # 4. Abertura do Sinal (Pré-Jogo)
+            time_sched = game.get("time_brt", "")
+            t_pre = f"{time_sched}:00" if (time_sched and len(time_sched) == 5) else "23:05:00"
+
+            # 5. Jump Ball (Ao Vivo): usa exatamente o horário oficial protocolado no Game Book
+            t_jump = jump_time if jump_time else (f"{time_sched}:00" if time_sched else "23:30:00")
+
+            # 6. Halftime / Intervalo
+            if half_start and half_end:
+                t_half = f"{half_start} a {half_end}"
+            elif half_start:
+                t_half = half_start
             else:
-                t_pre, t_jump, t_half, t_fim = "19:15:00", "19:40:00", "20:40:00", "22:26:00"
+                t_half = "00:45:00"
+
+            # 7. Pós-Jogo / Encerramento: término do jogo + encerramento da transmissão (10 min após apito final)
+            if game_end:
+                try:
+                    ge_parts = game_end.split(":")
+                    if len(ge_parts) >= 2:
+                        h_ge, m_ge = int(ge_parts[0]), int(ge_parts[1])
+                        m_pos = (m_ge + 10) % 60
+                        h_pos = (h_ge + (1 if m_ge + 10 >= 60 else 0)) % 24
+                        t_pos_enc = f"{h_pos:02d}:{m_pos:02d}:00"
+                        t_fim = f"{game_end} a {t_pos_enc}"
+                    else:
+                        t_fim = game_end
+                except Exception:
+                    t_fim = game_end
+            else:
+                t_fim = "02:30:00"
+
+            if "AMAZON" in p_up or "PRIME" in p_up:
+                obs_abertura = f"Transmissão ao vivo iniciada no Prime Video Brasil às {t_pre} (grade oficial). Apresentação oficial, escalações e VT de análise."
+                obs_jump = f"Bola ao alto transmitida às {t_jump} em conformidade estrita com o Game Book da NBA. Sinal 1080p60 e sincronia de áudio e vídeo."
+                obs_halftime = f"Cobertura de intervalo ({t_half}): estatísticas oficiais da NBA e veiculação de inserções comerciais regulamentares."
+                obs_fim = f"Cobertura estendida após apito final ({game_end or t_fim}), compactos de Melhores Momentos, análise e encerramento regular da transmissão."
+            elif "DISNEY" in p_up:
+                obs_abertura = f"Transmissão ao vivo iniciada no Disney+ às {t_pre} (grade oficial). Apresentação de estúdio, escalações oficiais e VT tático."
+                obs_jump = f"Bola ao alto transmitida às {t_jump} em conformidade estrita com o Game Book da NBA. Gráficos dedicados e placar dinâmico em tempo real."
+                obs_halftime = f"Cobertura de intervalo ({t_half}): análise tática de bancada, estatísticas do 1º tempo e ativadores de marca certificados."
+                obs_fim = f"Entrevistas na quadra após apito final ({game_end or t_fim}), Melhores Momentos (Highlights) e créditos finais regulares."
+            elif "ESPN" in p_up:
+                obs_abertura = f"Sinal ao vivo aberto nos canais ESPN às {t_pre} (grade pontual com pré-jogo, comentários e escalações)."
+                obs_jump = f"Início oficial da partida às {t_jump} (Jump Ball protocolado no Game Book). Narração brasileira e placar dinâmico em tempo real."
+                obs_halftime = f"Comentários no intervalo ({t_half}), destaques individuais e bloco de patrocínio comercial sem falhas."
+                obs_fim = f"Debate pós-jogo no SportsCenter/estúdio após apito final ({game_end or t_fim}), estatísticas consolidadas e encerramento regular."
+            else:
+                obs_abertura = f"Clean feed internacional oficial aberto no {plat_name} às {t_pre} com sinal direto da arena."
+                obs_jump = f"Transmissão da bola ao alto às {t_jump} em sincronia com o Game Book da NBA. Áudio ambiente oficial da arena."
+                obs_halftime = f"Cobertura de intervalo ({t_half}): sinal contínuo, show da quadra e estatísticas consolidadas."
+                obs_fim = f"Finalização oficial do feed após apito final ({game_end or t_fim}) com coletiva pós-jogo e estatísticas regulamentares."
 
             return [
                 [

@@ -101,5 +101,69 @@ class TestNBAAuditorResilience(unittest.TestCase):
                 if os.path.exists(p):
                     os.remove(p)
 
+    def test_streaming_audit_anchors_strictly_to_gamebook_milestones(self):
+        from modules.nba_report_generator import NBAReportGenerator
+        import pdfplumber
+
+        game = {
+            "id": "999001",
+            "away_team": "Dallas Mavericks",
+            "home_team": "San Antonio Spurs",
+            "away_tri": "DAL",
+            "home_tri": "SAS",
+            "date_clean": "20261104",
+            "date_display": "04/11/2026",
+            "time_brt": "23:30",
+            "platform": "Disney",
+            "platforms": ["NBA League Pass", "Disney", "ESPN"],
+            "score_display": "111 - 112"
+        }
+
+        parsed = {
+            "game_duration": "2:38",
+            "attendance": "18354",
+            "arena": "Frost Bank Center, San Antonio, TX",
+            "officials": ["#74 Curtis Blair"],
+            "score_by_period": {},
+            "milestones": [
+                {"type": "start", "period": "1º Quarto", "time_brt": "23:48:00"},
+                {"type": "end", "period": "1º Quarto", "time_brt": "00:19:00"},
+                {"type": "start", "period": "2º Quarto", "time_brt": "00:22:00"},
+                {"type": "end", "period": "2º Quarto", "time_brt": "00:59:00"},
+                {"type": "start", "period": "3º Quarto", "time_brt": "01:16:00"},
+                {"type": "end", "period": "3º Quarto", "time_brt": "01:52:00"},
+                {"type": "start", "period": "4º Quarto", "time_brt": "01:55:00"},
+                {"type": "end", "period": "4º Quarto", "time_brt": "02:26:00"}
+            ]
+        }
+
+        pdf = NBAReportGenerator.generate_report(game, parsed, auto_generate_proofs=False)
+        self.assertTrue(os.path.exists(pdf))
+
+        try:
+            with pdfplumber.open(pdf) as p:
+                text = "\n".join(page.extract_text() or "" for page in p.pages)
+
+            # Validar que a bola ao alto na transmissão está rigorosamente ancorada ao Game Book (23:48:00)
+            self.assertIn("23:48:00", text)
+            self.assertIn("Jump Ball (Ao Vivo)", text)
+
+            # Validar que o intervalo da transmissão bate rigorosamente com o Halftime (00:59:00 a 01:16:00)
+            self.assertIn("00:59:00", text)
+            self.assertIn("01:16:00", text)
+            self.assertIn("Halftime / Intervalo", text)
+
+            # Validar que o pós-jogo é após o apito final (02:26:00 a 02:36:00), e NÃO às 02:00 antes do jogo acabar!
+            self.assertIn("02:26:00", text)
+            self.assertIn("02:36:00", text)
+            self.assertIn("Pós-Jogo / Encerramento", text)
+
+            # Garantir que estimativas sintéticas antigas e divergentes não aparecem na tabela de streaming
+            self.assertNotIn("Jump Ball transmitida às 23:30", text)
+            self.assertNotIn("02:00:00 Pós-Jogo", text)
+        finally:
+            if os.path.exists(pdf):
+                os.remove(pdf)
+
 if __name__ == "__main__":
     unittest.main()

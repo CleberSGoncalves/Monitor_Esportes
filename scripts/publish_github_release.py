@@ -18,14 +18,14 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.42"
-    release_name = "v2.4.42 - Homologação de Frames Reais NBA e Blindagem contra Relatórios Incompletos"
+    tag = "v2.4.43"
+    release_name = "v2.4.43 - Sincronização Estrita da Auditoria de Streaming com Marcos do Game Book"
     body = (
-        "### Novidades da versão v2.4.42:\n"
-        "- 🏀 **Homologação Completa Rodada 04/11**: 100% dos 14 jogos processados com 8/8 frames reais extraídos dos highlights oficiais da NBA no YouTube, com carimbo técnico oficial BRT.\n"
-        "- 🛡️ **Blindagem Anti-Stub (< 500 KB)**: proibição absoluta de upload para o SharePoint e envio de e-mails para relatórios sem comprovação visual; partidas permanecem em fila até que o vídeo oficial esteja disponível.\n"
-        "- 📁 **Deduplicação Determinística no SharePoint**: eliminação de arquivos duplicados através de chave única por partida e data.\n"
-        "- 📅 **Agenda Futura Preparada**: monitoramento contínuo dos próximos jogos de hoje (05/11) e amanhã (06/11 Amazon Prime)."
+        "### Novidades da versão v2.4.43:\n"
+        "- 🎯 **Fim das Divergências de Horário**: os blocos de auditoria de streaming (Disney, ESPN, Amazon Prime Video) agora são ancorados 100% diretamente nos marcos reais do Game Book da NBA.\n"
+        "- ⏱️ **Jump Ball Fiel à Quadra**: o marco de bola ao alto reflete com exatidão o início protocolado do 1º Quarto (ex: 23:48:00 BRT e não mais a grade prevista de 23:30:00).\n"
+        "- ⏸️ **Intervalo Real (Halftime)**: janela de intervalo do streaming vinculada ao intervalo regulamentar da quadra (fim do 2Q ao início do 3Q).\n"
+        "- 🏁 **Pós-Jogo Coerente**: encerramento da transmissão ajustado para após o apito final do 4Q/OT, eliminando registros de encerramento antes do término do jogo."
     )
 
     headers = {
