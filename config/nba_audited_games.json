@@ -1000,223 +1000,263 @@
   },
   "401909902": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Oklahoma City Thunder @ Houston Rockets",
     "date": "31/10/2026",
     "score": "98 - 119",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_okc_at_hou_20261031.pdf",
+    "pdf_size_bytes": 2385424,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:21.516870"
+    "audited_at": "2026-11-05T13:33:33.219536"
   },
   "401909903": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Boston Celtics @ Orlando Magic",
     "date": "01/11/2026",
     "score": "108 - 97",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_bos_at_orl_20261101.pdf",
+    "pdf_size_bytes": 2856693,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:21.830294"
+    "audited_at": "2026-11-05T13:39:42.954195"
   },
   "401909904": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Brooklyn Nets @ Indiana Pacers",
     "date": "01/11/2026",
     "score": "98 - 90",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_bkn_at_ind_20261101.pdf",
+    "pdf_size_bytes": 2438888,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:21.830294"
+    "audited_at": "2026-11-05T13:45:51.332391"
   },
   "401909905": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "LA Clippers @ Golden State Warriors",
     "date": "01/11/2026",
     "score": "112 - 124",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_lac_at_gsw_20261101.pdf",
+    "pdf_size_bytes": 2107100,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:21.830294"
+    "audited_at": "2026-11-05T13:51:33.330908"
   },
   "401909906": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Toronto Raptors @ Los Angeles Lakers",
     "date": "01/11/2026",
     "score": "125 - 131",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_tor_at_lal_20261101.pdf",
+    "pdf_size_bytes": 2041323,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:21.830294"
+    "audited_at": "2026-11-05T13:57:35.617209"
   },
   "401909907": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Oklahoma City Thunder @ Cleveland Cavaliers",
     "date": "02/11/2026",
     "score": "117 - 112",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_okc_at_cle_20261102.pdf",
+    "pdf_size_bytes": 2183830,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T14:03:41.203365"
   },
   "401909908": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Detroit Pistons @ Charlotte Hornets",
     "date": "02/11/2026",
     "score": "124 - 91",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_det_at_cha_20261102.pdf",
+    "pdf_size_bytes": 2429045,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T14:09:34.801861"
   },
   "401909909": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Atlanta Hawks @ Indiana Pacers",
     "date": "02/11/2026",
     "score": "108 - 104",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_atl_at_ind_20261102.pdf",
+    "pdf_size_bytes": 1852270,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T14:15:14.170088"
   },
   "401909910": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Brooklyn Nets @ New York Knicks",
     "date": "02/11/2026",
     "score": "90 - 103",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_bkn_at_nyk_20261102.pdf",
+    "pdf_size_bytes": 2092491,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T14:21:26.156764"
   },
   "401909911": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Washington Wizards @ Orlando Magic",
     "date": "02/11/2026",
     "score": "103 - 94",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_was_at_orl_20261102.pdf",
+    "pdf_size_bytes": 2537545,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T14:27:25.038041"
   },
   "401909912": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Chicago Bulls @ Philadelphia 76ers",
     "date": "02/11/2026",
     "score": "107 - 126",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_chi_at_phi_20261102.pdf",
+    "pdf_size_bytes": 1865305,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T14:33:32.042710"
   },
   "401909913": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Sacramento Kings @ Dallas Mavericks",
     "date": "02/11/2026",
     "score": "115 - 100",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_sac_at_dal_20261102.pdf",
+    "pdf_size_bytes": 2628994,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T14:39:28.126954"
   },
   "401909914": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "New Orleans Pelicans @ Memphis Grizzlies",
     "date": "02/11/2026",
     "score": "135 - 134",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_nop_at_mem_20261102.pdf",
+    "pdf_size_bytes": 2758399,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T14:45:45.463910"
   },
   "401909915": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Milwaukee Bucks @ Minnesota Timberwolves",
     "date": "02/11/2026",
     "score": "100 - 112",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_mil_at_min_20261102.pdf",
+    "pdf_size_bytes": 2275908,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T14:51:37.634937"
   },
   "401909916": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Boston Celtics @ Houston Rockets",
     "date": "02/11/2026",
     "score": "93 - 109",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_bos_at_hou_20261102.pdf",
+    "pdf_size_bytes": 1939905,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T14:57:39.480287"
   },
   "401909917": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Utah Jazz @ San Antonio Spurs",
     "date": "02/11/2026",
     "score": "97 - 119",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_uta_at_sas_20261102.pdf",
+    "pdf_size_bytes": 2195725,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T15:03:24.651558"
   },
   "401909918": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Portland Trail Blazers @ Denver Nuggets",
     "date": "02/11/2026",
     "score": "118 - 110",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_por_at_den_20261102.pdf",
+    "pdf_size_bytes": 1890622,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T15:09:24.817787"
   },
   "401909919": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Phoenix Suns @ Golden State Warriors",
     "date": "03/11/2026",
     "score": "113 - 116",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_phx_at_gsw_20261102.pdf",
+    "pdf_size_bytes": 2107857,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T15:15:29.179864"
   },
   "401909920": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Toronto Raptors @ LA Clippers",
     "date": "03/11/2026",
     "score": "125 - 118",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_tor_at_lac_20261102.pdf",
+    "pdf_size_bytes": 2419252,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T15:21:26.355113"
   },
   "401909921": {
     "audited": true,
+    "has_visual_proofs": true,
     "match": "Miami Heat @ Los Angeles Lakers",
     "date": "03/11/2026",
     "score": "117 - 138",
     "platform": "NBA League Pass",
-    "pdf_path": "",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_mia_at_lal_20261102.pdf",
+    "pdf_size_bytes": 2016913,
     "email_sent": true,
     "sp_synced": true,
-    "audited_at": "2026-11-04T14:26:22.118761"
+    "audited_at": "2026-11-05T15:27:39.551979"
   },
   "401909922": {
     "audited": true,
