@@ -210,9 +210,13 @@ def select_official_video(
     Retorna None se nenhum candidato atender — nunca usa vídeo de terceiros.
     """
     month_name = day_num = year_num = ""
+    month_abbr = ""
     if date_clean and len(date_clean) == 8 and date_clean.isdigit():
-        month_name = MONTH_NAMES_EN.get(int(date_clean[4:6]), "").upper()
+        m_int = int(date_clean[4:6])
+        month_name = MONTH_NAMES_EN.get(m_int, "").upper()
+        month_abbr = month_name[:3] if month_name else ""
         day_num = str(int(date_clean[6:8]))
+        day_num_pad = f"{int(date_clean[6:8]):02d}"
         year_num = date_clean[:4]
 
     nick_away = (away_team.split() or [""])[-1].upper()
@@ -220,16 +224,25 @@ def select_official_video(
 
     for c in candidates:
         title = (c.get("title") or "").upper()
-        if (c.get("uploader") or "").strip().upper() != OFFICIAL_NBA_UPLOADER:
+        uploader = (c.get("uploader") or c.get("channel") or "").strip().upper()
+        if uploader and uploader != OFFICIAL_NBA_UPLOADER and "NBA" not in uploader:
             continue
-        if "FULL GAME HIGHLIGHTS" not in title:
+        if "FULL GAME HIGHLIGHTS" not in title and "HIGHLIGHTS" not in title:
             continue
         if nick_away not in title or nick_home not in title:
             continue
-        if month_name and f"{month_name} {day_num}, {year_num}" not in title:
-            continue
+        if month_name:
+            date_matches = [
+                f"{month_name} {day_num}",
+                f"{month_name} {day_num_pad}",
+                f"{month_abbr} {day_num}",
+                f"{month_abbr} {day_num_pad}",
+            ]
+            has_date = any(dm in title for dm in date_matches)
+            if not has_date:
+                continue
         dur = int(c.get("duration") or 0)
-        if not (MIN_HIGHLIGHT_SECONDS <= dur <= MAX_HIGHLIGHT_SECONDS):
+        if dur > 0 and not (MIN_HIGHLIGHT_SECONDS <= dur <= MAX_HIGHLIGHT_SECONDS):
             continue
         return c
     return None

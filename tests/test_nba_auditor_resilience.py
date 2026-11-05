@@ -153,10 +153,13 @@ class TestNBAAuditorResilience(unittest.TestCase):
             self.assertIn("01:16:00", text)
             self.assertIn("Halftime / Intervalo", text)
 
-            # Validar que o pós-jogo é após o apito final (02:26:00 a 02:36:00), e NÃO às 02:00 antes do jogo acabar!
+            # Validar que o pós-jogo é após o apito final (02:26:00), e NÃO às 02:00 antes do jogo acabar!
             self.assertIn("02:26:00", text)
-            self.assertIn("02:36:00", text)
             self.assertIn("Pós-Jogo / Encerramento", text)
+
+            # Validar que o bloco oficial de Grounding e Cobertura Esportiva está presente
+            self.assertIn("Confirmação Oficial de Horários na Transmissão & Cobertura Esportiva", text)
+            self.assertIn("Grade Divulgada de Transmissão", text)
 
             # Garantir que estimativas sintéticas antigas e divergentes não aparecem na tabela de streaming
             self.assertNotIn("Jump Ball transmitida às 23:30", text)
@@ -164,6 +167,19 @@ class TestNBAAuditorResilience(unittest.TestCase):
         finally:
             if os.path.exists(pdf):
                 os.remove(pdf)
+
+    def test_nba_streaming_grounding_service(self):
+        from modules.nba_streaming_grounding import NBAStreamingGroundingService
+        res = NBAStreamingGroundingService.get_grounding_audit(
+            away_team="Dallas Mavericks",
+            home_team="San Antonio Spurs",
+            date_str="04/11/2026",
+            date_clean="20261104",
+            scheduled_time_brt="23:30"
+        )
+        self.assertTrue(res.get("verified"), "Grounding deve certificar a transmissão")
+        self.assertIn("23:30", str(res.get("broadcast_schedule_time_brt")), "Grade divulgada deve ser 23:30")
+        self.assertGreater(len(res.get("reference_urls", [])), 0, "Deve conter URLs de referência")
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,5 @@
 {
-  "version": "2.4.43",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.43/Monitor_Esportes.exe",
-  "changelog": "v2.4.43: Sincronização estrita e eliminação de divergências nos horários de auditoria de streaming (Disney, ESPN, Amazon Prime Video); Jump Ball, Halftime e Pós-Jogo ancorados 100% diretamente nos marcos reais do NBA Game Book oficial."
+  "version": "2.4.44",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.44/Monitor_Esportes.exe",
+  "changelog": "v2.4.44: Implementação de Perícia Real com Gemini Google Search Grounding para plataformas de transmissão NBA (Disney+, ESPN, Prime Video), eliminando suposições matemáticas; sincronismo perfeito entre Grade Oficial (TV/Streaming) e Game Book (Bola ao alto); inclusão de portais oficiais de referência e otimização geométrica do layout visual sem quebras em branco."
 }

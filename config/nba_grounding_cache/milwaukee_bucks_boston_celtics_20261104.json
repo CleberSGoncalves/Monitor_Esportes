@@ -1,0 +1,25 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "21:30:00",
+  "summary": "A partida entre Milwaukee Bucks e Boston Celtics da NBA, realizada em 04/11/2026, teve sua transmissão no Brasil da seguinte forma:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A partida foi transmitida ao vivo no Brasil exclusivamente pelo **NBA League Pass**.\n    ESPN e Disney+ transmitiram outros jogos da rodada em 04/11/2026, mas não o confronto entre Bucks e Celtics. O Prime Video também não listou este jogo em sua programação regular para a data, embora o NBA League Pass possa ser contratado como uma assinatura adicional dentro da plataforma.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão foi às **21h30 (horário de Brasília)**.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   O Tempo - \"NBA hoje (4/11): 14 jogos, horários e onde assistir\"\n    *   JC - \"Onde assistir aos jogos da NBA hoje (04/11): veja transmissões e horários desta quarta-feira\"\n    *   Lakers Brasil - \"Onde assistir NBA hoje: ESPN, Prime Video e League Pass\"\n    *   Hoops Brasil - \"NBA 2026/27: Rodada do dia 4 de novembro\"\n    *   Overdrive - \"Mavericks x Spurs: onde assistir à NBA e horário (04/11)\"\n    *   NBA.com - \"Milwaukee Bucks vs Boston Celtics Nov 4, 2026 Game Details\"\n    *   Prime Video - \"Disfruta de NBA en Prime Video\"\n    *   Prime Video - \"Watch NBA on Prime Video\"",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGvOOEUEh7jcWfddnRRsAOUXbt7f8SG7KSd2jI_YhPD5zyiECvyGFe3AypN96UEOgQGNp9nEABtYW0pKDbyKJvXpKLMyr4YgXSN1c2TIjQ4Uj_0-IZiQRXMbXTK2Ft9d4zS4K28KJxhiJfbIaWG-HvFu7pCsiKgdotd9UpmnHcGwyfCjvk65SzOQtRdSQSjS8MFhsmqv6DV4EJ6ItAcoCbaK5XImLKh7eYGOVki56z0a84FvYQjbcecdSwWzEfX2EfU",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE0YptDShVghSytZiSBJGmC7dpWNto2EhMlpEEf9CN0KUs2zmX-X_HAtLa0TgolmBV_7gkPEtWbkTEVgLRgrLFPnqooJXeRfInSGdD-gE1QFbls8LC8yRDv1Pfi9grF57yyVRYFFA112NVFTJ2zBuEoEn72-_FCqxKtgNndzf4VqTnAkjvT9FKoAhEwYCaNRHPIzaJpY_cdYem50CMIQCWV6EXrZZhck4V8mNl2gVwNado6HozPRjjc_chLGbDUl7xKA1fCNUpCQFMafl5YSt7D_RvfwsH1r0s=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHKrRlGtgLteSEVWgf3iZlIG7bEbjV9QUNfz-2-qzQNHc0Ea91BYlILua2kXQPT_6OFZkvunKEte_du7g4u6ZOKkU8IJvsP6XmLmfC6kQ6Ly4Wn-Kfb3GxzFDOWdnge7AK9A1RO",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFww8M-RiC6ZFQPtAOezBYn2yShXjASSXjp6Wi1ufjM0D8uV8n6uoPy1GYcymkr82lu9D91H_vICx51Ves7q2UTGr8oM60IZfzXLyIjvUWeVTVVX5AMhJA9jL2HlpabC1XHuMG66RXCS4q5aVLq17pcrfDX9nbzx02yjJ9L",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGGDe07Us9qdT4dtsSKhv4sPyxEVH2_q1cJ6oMKRVBVJ0fkmqCazU7__FGd5w058J0pvDZR_msZM8NaxdI-2Hc1TXgKxOrPGA0GAXnGucTG9K-HfgnEPKQ6lWjOSV98fQMScpRgceH7sRmWqpxTS0vV-WLZe56ZF5DPZ-db923P3cgmfXt-Yd_HiXxeXFx_JCV9a1tOhccILD605JnBu0_3nIfqBqhDecZ0m2nnCTTCsRPCk7mem11gGignnOLropQ8Fw==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHgeKpyRzd4ic2wYtQLxd7ikOWCDaMQG1oM6UR2f2C0ReLN0ezhCVB-1sQmPCylDr2EvoQ2MGmNfwgOg2LDXLuq8YpowzQgIo8CnOj22HzArkuruGeQM5JSYPPdtXuY15frR0Zvp4jKF0u79VxFy-0-CldVBOjVGmIT4FtViRn_Dhrde-DlULNPCt6dMcaypXkLi8Wi9mQ=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGzevsca_D-wruzwX9rpF85wA3kaGuIYC1B3-cx3BVtf0d-3FommK4G0BCRPXL5wA9GU_vwQGgGmlN7sU58R_9QG1LXjrH5R_nXpw8PKC9W5pfSBUAAMlmUMU7EEc7EXgiBExM3zPNaghUbHIDLrlfq3dfYJ2CyLoc6-ehZqJtyQg2K9A7degJJvNyQhgrJKVxI",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHyVIZ6zFTzJ8wpMv3GI50XwPg2O8WRTto7twQfQDuf5vXgra5ML5rRnDTMvwchC9IqLPa2CVQYcpA2noM5aD1vED_0y-dnHf_fXJNor2g6em8ONdjiB96SreS58jsqq_ruJN1oBLO2jxpOahtPXtmO3dt9rr2XVK-CIIBLlOUPHaytIF63",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF0IHod5Z-lqJ6Y_vRrYv8KZazj0iLbXvMA6L1fG2c3NgFrNUOLtEUnC5pA8y49ZAd6RdBYWGD_u-9TDKruVpw0KTmQYD3ZJYOsHJbcXVV9igzxTm0wiQAswTLJ3YMjgkXG9Ov9B8E75IOGOc6wDtXZhN92KNDc3oKOOz2VILeMdq_UUCj7AMlDVZo="
+  ],
+  "grounding_date": "05/11/2026 15:54:33"
+}

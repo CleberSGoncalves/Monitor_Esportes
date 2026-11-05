@@ -1,0 +1,24 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "Aqui estão as respostas objetivas sobre a transmissão da partida Atlanta Hawks x Washington Wizards da NBA, realizada em 04/11/2026, no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A partida Atlanta Hawks x Washington Wizards foi transmitida ao vivo no Brasil exclusivamente pelo NBA League Pass. ESPN, Disney+ e Prime Video não transmitiram este jogo específico, embora possuam direitos de transmissão para outros jogos da NBA.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão da partida foi às 21h (horário de Brasília).\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   O Tempo - \"NBA hoje (4/11): 14 jogos, horários e onde assistir\"\n    *   JC - \"Onde assistir aos jogos da NBA hoje (04/11): veja transmissões e horários desta quarta-feira\"\n    *   Portal de Camaquã - \"Hawks x Wizards hoje: Trae Young reencontra ex-time em duelo explosivo da NBA; veja onde assistir ao vivo\"\n    *   Overdrive - \"NBA em novembro de 2026: onde assistir aos jogos e horários\"\n    *   Hoops Brasil - \"NBA 2026/27: Rodada do dia 4 de novembro\"\n    *   Lakers Brasil - \"Onde assistir NBA hoje: ESPN, Prime Video e League Pass\"\n    *   NBA.com - \"Atlanta Hawks vs Washington Wizards Nov 4, 2026 Game Details\"",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGa8-OBgdVMUCUwGN1ORy7I1vVof5q8rG596-168esj5OY0tw0RGT9t0Xaj22yNrYACWEbX4y3iMz_ty9X5wZPYqg3yShetaiB7i50EPZNpMHHhF2VIzZQ7EXXEYxR9KbyLlEv6xe8pr5aVk-dcN1qUGcDIAKcEor6ZYhNFHPsysZvrmlJ__cACSBJVVVrj6m61D08TFUpyAv0q7sFfMpN0EQ8QzBaq-UI8qCclV3bU1VIPKF5dPRjphBWef9gDBLBNRic=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGGi4UDZEfwsxtbjWLmZy29T1J5-dTHkiLPGUc11z1L7XiT_8GGNxuCy4XCp-b694Tm09bbLxciF6X2zZh6BfhC6U0HmB4dug0FvzztFEYhOUwXXXnMXhdRQyzkaDPoTwpqyGmrEA8m6LH6yYXnJ8z2mQQFoukojKYwU_rFBaB4en7jt-t5uCK83IEXCY3qm2xVed0is__Mfo6l-1W4yNVAS05grLC0RC3lsDf7BS88O7lLkr9HffNKQzn4wDtWuAsKrfemt6pAvUumqCWqsDCUPcG9K4npFZXE9Q==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFHHFw39ztW176ZrxW4SKnbBhHOzG8rgXheJv-DQ2nCzaoF4XUPrhFK6zNf06l7O4WfwECQdMnh76iP9f_vaqOAM9R_RZjJLfM4J0KznBGSy9tkxRyDJI4wqpNi7hXNAb1O_RBoCbFqK4D99-lB0eMTy-86Z42uli9YIs0LkIV9BNg-fHArnpZvXU8cABzng2PHuw1aVhBBeY2Lrz8B0aBN_Gz5N924ixNsJB_bWOpa9BJ8KIU5KaatStvCB5-cmKiDIpdiw2KNO2BCqvTM5E530BhKXduvxIt6gkU=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEXnYE-tMtPQxIFbn0Q1W3UNkKRpf_V7VDWcyWd6q0XgnUgls_XbrYWa9Us_TyZ5922o_En9YPLvEZfrdS5ibA8WXSnD6Zlik40YywvYe6GHgluyi_fZC6LsGkI4iln4EtUYFWbQI435Fd9kpMRjCIysbGVAzhsllEFxabmd3sm-is9McIqXrQ=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGqoYRu_Ngwn9ktpBg-T6I1EKs5In3UjF6y1SDOg87zYSC_N9tw_76NyKipiokZ7zxFsKEwjHdZIgF0loqq7Tm3loNgTy55zWm3_r2e5_eN6-24YgPHx67VAe8w0ggNAxelGMsJAJPYWhs7Nc_DxxN57m0IiOKTr8h9nsWLZ_s=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9P2AO0fBWOW63vQW_fxWlFZI-bPI-NL4PN6iwK4Plss7OrVJSe1d9ySDl2x4-m_Ke1YYsW_Z4NpYBtrtz512k8xfnb4GF25_AK-HORkxqCP8tCLv815f1RFxadSwbvXGk3Zeio0A=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFJB2CVRzejI0JJifl2vhqtIJfJ7yo2D1aBTwYGfP0IeMWAOD9w8CmzzDTuyIu-xUxBLDh2rz0HzdqzLNDLz-pI8oOas_dLILGSLQK8px__UchpnNTJ4CoZvcF1sFLFAtFhWrv732s3tijTd1h1b6lbEndZdA-tTNTbsXA3n6vEe2K2sk_I4g==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEeqkY7cNyvfZqI8iTgNMT5sQ1Jh8xYdriCcUXp3QxMJZ5t9n5whwqexOc4QhsKujMWJWkeG214c0gsAhaMo7hHRodwUnK7WRlVqCZ_tc33KKSN9rhfwnxO8mv3zTudr4UNXxgmsG0GupfuCp2g4qXfLBf6yUK1aXjpI_gV4K9q6BG0a_Qyr4Y9qvDC77vl"
+  ],
+  "grounding_date": "05/11/2026 15:54:14"
+}

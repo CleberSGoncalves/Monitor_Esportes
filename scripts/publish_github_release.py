@@ -18,14 +18,15 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.43"
-    release_name = "v2.4.43 - Sincronização Estrita da Auditoria de Streaming com Marcos do Game Book"
+    tag = "v2.4.44"
+    release_name = "v2.4.44 - Perícia Real com Gemini Grounding para Plataformas de Streaming NBA"
     body = (
-        "### Novidades da versão v2.4.43:\n"
-        "- 🎯 **Fim das Divergências de Horário**: os blocos de auditoria de streaming (Disney, ESPN, Amazon Prime Video) agora são ancorados 100% diretamente nos marcos reais do Game Book da NBA.\n"
-        "- ⏱️ **Jump Ball Fiel à Quadra**: o marco de bola ao alto reflete com exatidão o início protocolado do 1º Quarto (ex: 23:48:00 BRT e não mais a grade prevista de 23:30:00).\n"
-        "- ⏸️ **Intervalo Real (Halftime)**: janela de intervalo do streaming vinculada ao intervalo regulamentar da quadra (fim do 2Q ao início do 3Q).\n"
-        "- 🏁 **Pós-Jogo Coerente**: encerramento da transmissão ajustado para após o apito final do 4Q/OT, eliminando registros de encerramento antes do término do jogo."
+        "### Novidades da versão v2.4.44:\n"
+        "- 🔍 **Perícia Real com Gemini Search Grounding**: eliminação total de suposições ou matemática cronológica para plataformas de transmissão (Disney+, ESPN, Prime Video).\n"
+        "- 📡 **Sincronismo de Grade e Quadra**: conformidade absoluta entre grade oficial de abertura do sinal (TV/Streaming) e o Jump Ball oficial registrado no Game Book da NBA.\n"
+        "- 🔗 **Fontes Oficiais Homologadas**: incorporação de links diretos e referências jornalísticas nos relatórios em PDF (ESPN Brasil, Disney+, ge.globo, Lance!).\n"
+        "- 📐 **Otimização Geométrica do Layout**: proporção ajustada das evidências visuais (2 cards por página) eliminando páginas em branco ou quebras indesejadas.\n"
+        "- 🛡️ **Comprovação Visual 100% Homologada**: extração e tarjamento oficial para todos os períodos em todas as partidas."
     )
 
     headers = {

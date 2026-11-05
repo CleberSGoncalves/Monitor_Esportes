@@ -1,0 +1,27 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "23:00:00",
+  "summary": "A partida entre Toronto Raptors e Denver Nuggets da NBA, realizada em 04/11/2026, teve a seguinte cobertura no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A partida Toronto Raptors x Denver Nuggets foi transmitida ao vivo no Brasil exclusivamente pelo **NBA League Pass**. ESPN e Disney+ transmitiram outras partidas da NBA na mesma data, como Philadelphia 76ers x Detroit Pistons e Dallas Mavericks x San Antonio Spurs. O Prime Video não teve a transmissão confirmada para este jogo em sua programação regular, embora o NBA League Pass possa ser contratado como uma assinatura adicional na plataforma.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão da partida Toronto Raptors x Denver Nuggets foi às **23h00 (horário de Brasília)**.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   O Tempo: \"NBA hoje (4/11): 14 jogos, horários e onde assistir\"\n    *   Hoops Brasil: \"NBA 2026/27: Calendário de transmissões da ESPN e Disney+\"\n    *   Hoop78: \"NBA Cup 2026: grupos, datas e onde assistir ao torneio\"\n    *   Fubo News: \"Toronto Raptors at Denver Nuggets - Where to Watch, Stream Info, TV Channel, and Live Updates (November 04, 2026)\"\n    *   Lakers Brasil: \"Onde assistir NBA hoje: ESPN, Prime Video e League Pass\"\n    *   JC: \"Onde assistir aos jogos da NBA hoje (04/11): veja transmissões e horários desta quarta-feira\"\n    *   Hoops Brasil: \"NBA 2026/27: Rodada do dia 4 de novembro\"\n    *   Tudocelular.com: \"Copa do Brasil e NBA: Prime Video divulga programação esportiva de 29 de outubro a 4 de novembro\"\n    *   Overdrive: \"NBA em novembro de 2026: onde assistir aos jogos e horários\"\n    *   Overdrive: \"Mavericks x Spurs: onde assistir à NBA e horário (04/11)\"\n    *   NBA.com (via Google Search): \"NBA 2026/27: onde assistir aos jogos de hoje? Veja horários e programação\"",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF4fvmGqZf9r_sqJjWzTz90t3mbwXwYDepLojLOFiDboFQd8CteIbtQ8HMmM9s2jQ6HgVxF8biaeoykQ2Z-YdVydP4vbN0EztSV7gOINQ3afyIEc3MG4nOCjBsJt1D2uFqjEEn4hB4=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFeYVrs_m3wKPgV1T_aP67Bjr22Ie7b8QsZbx2N-gR12hU68nv0mQA3Vg9C5s4UyB1i6o3-ys499kwuadMDwQOcf8m_CGbRmT9LbDMDVkmlC0OMg55Ziu0F8yqZ7wyFrzxcqFDKbZZXYNwRgB9EDBChClTlJRXS5eIHN2fll30=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH4sooQdKHxI2GhKS37AXjRe_UCZS6h0crakR0NmD3uMmWjUKwfn-AoUQd8ja0DxMSstugun920LkvcMd85VkC48agoRXy4cegYh5LXhGLamYFc1Vxa49-Xjj5vzf3C8I_FNMyCHlP0GLIgvX3ZwXWyRBPwgYASK-HWYYykUFcCDPXFBccdJcg=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEacZ49KpX_3GLyFnZsu6nyh3CU9QVfqd1L5Ype69VuG1G9aDVSaZf4djXimuWeVjfRqfxW-0zhKBqfjwQDzknxmdw6U4_NIjvB4jXCKMP5kxun_qV0NgJ6s-7kcJTu6h1N1xcxCah2NRdYcwzVQzwecfeNijCRVnajozMiUaJHI5WlPx_WtkvsW4M8fAtk1JAqPssSAUbT3XgrRf-CYN3asy8kBpjMMud4uPGQN3tlSXab80Kin5108HUDdekxn4IKG8o=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF9L3u4a6Lvgz7YyivVBwgQww0tI0CbsXv_buj8hak4kLtGd-3BH5k9rF4qUaF2fiZHslSXSxR43ARCqVGwnbdKVGxcyedP0j4ny0uJ4mGO4Lu4aXJHYCalZVRLek20HKPVcCq0kn7pUL08n1TnbA2uXfLmNtpAm9b7i49CzLk29gfEEwCeTtyR8Gy36tlE",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEbWSzjEMttej-WdlPkvHl-tz78E7QX0Wfw9PBQWhAvsxOFK8_5-huu3T2QWvpws696hSvG4rBLNO07igetJLkTMTfmOGzjUQ_CcMRLXWNW57ueEV9Xyz_Wu4qcG8vfsRDJbxQRiHz9h94PYcC4BoQoQ-ly-XvpRCtDbCPOmUI_lBYDM7JYmB6y6v06Xux00utNlJLAa3OcCRxel3aAiLw75r_wFeLVveunRoce96kiQeNl3tmT4vlmHea2wde91K8i1dYjcVZX7T-mhDYydmf0hV6Z2O4rjnZi5w==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEgARr_juRrMAhvaFU-3GQPyim4Ezi4szey8-0GZ3dqhaYoCz2c3dDyVcQEAuHqn3GHsp4zhGi4F4yA9CfrYlm0uE6OWKsKo69mlGmobrQKgLhsPmVdFbQ9mwv71w-QsIYgS9MugJlDdZR8UUm2QXuSyUq5B7He5PcRHeJKnMSHk-lq_9Bfcw==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEB9X_Eae1Qz_rjSBj03wxsUnTqA0G0HLjF1M_qMnDGGrxEOYTd8q1BA5xrCmN3u9tQEzobBWTOsL4sfjiZnDnAn2O1ESnpijCiQqIW0OeP-xFC7lgb7JzUVkELtkGbLWmaKkd8e4RUIbyNVFVpHV00Gb4oPQE3sATetdjvV0N6jWB7SkMd-Ulee5TfnG3U",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFmv8X3bGvjD8wggtlq_YMBfz1Eridi7hvxf0sK--fRJOsrpXtHrrpWvHNhcOd_taJt8o_FnVPieZf7NKCGVluSicZvt9WolAmcpkh-3mUJs1WSRjK8N9QLtXLOxlS7KASl2--EntGYLSqiPFuQu3AToKELuQluq40NHDB_tBQiWfADoCynsUg98HzuH3vUqxO3Fa-slQ860z8dBeMt2sD9YivlL6w=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH02DrcR6meH7B9G4AIgqZw4L0d8fFFIWe_W9aRQMJpafmrLd-EjO0xYeHOz1Iarq0U7a-Ak4Zfv-Noe_zLLH-MiyZX_nnTca8Z6Y-KFjigbp9TBl3tQZcZxTQoLrz8FKCghimLXCoRy5OyKqyD5AzZQ-dKRftxix-kZ9MmmfqVfA7YX5di5SIyxmUmI6IxFM8eaD_al1bRMI3wgwmNdYE8Peh0ABeva5_j30SiDSi4Mqc3bbhWkSyGoJaHa5_0DzG1BBU=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFjZCiEb1Va8CExVomXH-h5DLA418v2l_s99hU_2nyCk8Ahi5f-_2qNJWwfZYuWYsINQvIgHMhSLPMGiluzrEsADCukXu4omKl-ui6Fxe5YPMTWWB4yeD1HYt1l_Fpq4ucngCF4OSDjHPegwmF0_CEXnI2_xVZa_jDkp3b6WP2NDckfAU9ZdXo="
+  ],
+  "grounding_date": "05/11/2026 15:57:07"
+}

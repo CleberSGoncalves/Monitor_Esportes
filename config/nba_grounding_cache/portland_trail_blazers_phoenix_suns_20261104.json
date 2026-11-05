@@ -1,0 +1,23 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "A partida entre Portland Trail Blazers e Phoenix Suns da NBA, realizada em 04/11/2026, teve a seguinte cobertura no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A partida foi transmitida ao vivo no Brasil exclusivamente pelo **NBA League Pass**. ESPN, Disney+ e Prime Video transmitiram outros jogos selecionados da rodada, mas não este confronto específico.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão da partida foi às **23h (vinte e três horas) no horário de Brasília**.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   O Tempo - NBA hoje (4/11): 14 jogos, horários e onde assistir\n    *   JC - Onde assistir aos jogos da NBA hoje (04/11): veja transmissões e horários desta quarta-feira\n    *   Overdrive - NBA em novembro de 2026: onde assistir aos jogos e horários\n    *   Lakers Brasil - Onde assistir NBA hoje: ESPN, Prime Video e League Pass\n    *   Hoops Brasil - NBA 2026/27: Rodada do dia 4 de novembro\n    *   Overdrive - Trail Blazers x Suns: onde assistir à NBA e horário (04/11)",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFD97iznr5m0Gmy3ZAYTekKoefgbDKADmBL7YnL_DC5Mzalcy6vO0_ktOrIIGIIRuTqoRWoAqz2bWL_qNolFdEuhC-4tg0PxoUECMIP-9dykXrtao9sUvEGSAuc7nH-fd3DzW-3DQdoweLabR8pPg7DcqU-Y8lGr31yBJlj1A25i4Whua4LLn0VewhK9O5S5UV0H7cMJwsZRSdQWUGDWaKbed9aPC7X4YK6rFm-EO-_PrfTXRIRXpoTOKQvWRKaeyU8vrskbZjyy3_1TgkhabXnJyLGLprbXPY0yg==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEUzL0_tKUdw4jkGjVYcead4snjirVSf8iwKEEIDGw50YLtP-JrrHrGyx7m5FqK3n8Rwlp_tw-heriRELMbWFjDt9oWifTwLWRlbDwI3Uj42igI0x3A5Uyqaov46NivuI9D8bHPe5s=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH9PJpf64pEUtRIPmw5RIGEYMI9GlkQdnet7k_lY0R6Na5AtooUfQn__CzMjsl1oGhECWEAo59HWvqXBQ_aLNvQ9Or0UvOc_aFSlbZywCytyyhssGKrWy8CMyfgn5_rk0E79Lebkpxh5qLN4neY1NrsUDTIwcb4GtiX356L7aE=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGwHV2DFziFn4jJ5_u4vQ4ArS1axrFOzAKWtWStOADJd_pnmHogzycHxZpZhpSFGI4VH1bV4aDR6fphsR-gkiBtJoFN4PAglXdaxsg734NibxAoeFPRiOAmKwiZpjZ-So9yDFPzmHs_m6bsKGm_83zQkp8Mx-HJBS4fqlduMRRVEsAnfT9GSXHC0PY=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFOZFsyQQ30QveuLKh716BJp9MFh_NkfTJrx7owGh4uY2Y-cDDDhC33h_EYng7LpCxUfFFWAMIJiAxvdIx4VP73zwpu_Gpmc8YaxX-OTyaql-2xQ44CE93IQj2D3cyXKuaThMhqVhDbTyj_Xr4Ujglgfy5ziLkeGoLF7JiixSR3ghZlBXE1MKOmANF6Wg8Q9XoVlSYahjHe4VhefP2zB1Yw5E7SYaStZNjRGeVroqMEHMmvOKlj5FGUNW5diJY-8zqzBvc=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFQZ-vPkGtJXNrTebX35GzTG5CAbmm0oQRtmqVSDqj8_86uF36MKzDePlxz58cCSK7lDjlGCEu1UJwezDFkrul2INlnUc4lCyKAzpMqSBG9aFRd7xMSUf7k9Vzep4FQH4OcXEzMxEKlmAr9AmfXhFWxDKt7AZyDNaSo2udECswv999yXjmi1Hs=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFNK7-ewCvork4DyJqV_Ez4rmmcMkARf3zCqplhuTDA90HjIW0QJDtRbLLK9aJThkBMKwhIl7GfMdwGvAHOwhA4g7ZCwSKYmHI-HZgLdUoT-1oCC_EexqNomSfO-0IEN5vklMAwroOSBwsjyL2JQ6rjNu2roUkD1DR-fzzclyaT6MVMheUG_Q=="
+  ],
+  "grounding_date": "05/11/2026 15:57:22"
+}
