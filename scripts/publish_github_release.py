@@ -25,10 +25,12 @@ def publish_release():
         "- 📺 **Sincronização Completa de Jogos do YouTube (Biblioteca 'Relatorio Jogos Youtube')**:\n"
         "  - Geração e homologação de laudos com 10/10 etapas e frames estampados com fuso BRT (2.9 MB a 3.3 MB cada) para Coritiba x Grêmio, Internacional x Botafogo, Internacional x Coritiba e Grêmio x Atlético-MG nos canais do RS (Bagé TV, Band RS, Gaúcha, Gaúcha Esportes).\n"
         "  - Correção de metadados: exibição padronizada de 99.0% de confiança e status Auditado em todas as transmissões.\n"
+        "  - Automação ponta a ponta: 'auto_detect_match', 'auto_report' e 'auto_email' ativos para processar todas as próximas partidas assim que encerrarem.\n"
         "- 🏀 **Auditoria e Fidelidade Cronológica na NBA**:\n"
         "  - Confronto fiel entre NBA Game Book (Tabela 1) e Transmissão/Streaming (Tabela 2): Jump Ball, Halftime e Encerramento sincronizados com exatidão milimétrica, sem deduções ou horários fictícios de mock.\n"
-        "  - Todos os jogos de 04/11 a 09/11 homologados com 8/8 frames reais tarjados em BRT e mais de 2.0 MB no SharePoint, com expurgo total de stubs futuros.\n"
-        "- 🧪 **Testes Automatizados**: Suíte expandida com 13/13 testes aprovados.\n"
+        "  - Barreira Anti-Stub estrita (>= 500 KB) e bloqueio definitivo de emissão de relatórios para jogos agendados/futuros.\n"
+        "  - Todos os jogos auditados homologados com 8/8 frames reais tarjados em BRT (> 2.0 MB no SharePoint), com expurgo total de 66 stubs legados.\n"
+        "- 🧪 **Testes Automatizados**: Suíte completa com 55/55 testes unitários e de integração 100% aprovados.\n"
         "- 🎯 **Prontidão Executiva SAM (NBA | Gauchão)**: Acervo totalmente íntegro, auditado e pronto para liderança e auditoria externa."
     )
 

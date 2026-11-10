@@ -1543,5 +1543,18 @@
     "email_sent": false,
     "sp_synced": true,
     "audited_at": "2026-11-10T10:40:52.793190"
+  },
+  "test_small_game": {
+    "audited": false,
+    "has_visual_proofs": false,
+    "match": "Test @ Game",
+    "date": null,
+    "score": null,
+    "platform": null,
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\test_dummy_small.pdf",
+    "pdf_size_bytes": 440,
+    "email_sent": false,
+    "sp_synced": false,
+    "audited_at": "2026-11-10T13:44:55.547642"
   }
 }
