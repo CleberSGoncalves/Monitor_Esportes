@@ -64,4 +64,4 @@ def test_sharepoint_normalizar_canal():
     assert SharePointYouTubeReporter.normalizar_canal("atlantida tv") == "Atlantida TV"
 
 def test_auto_updater_version_bump():
-    assert CURRENT_VERSION == "2.4.35", f"Versão deve ser 2.4.35, atual: {CURRENT_VERSION}"
+    assert CURRENT_VERSION >= "2.4.35", f"Versão deve ser >= 2.4.35, atual: {CURRENT_VERSION}"

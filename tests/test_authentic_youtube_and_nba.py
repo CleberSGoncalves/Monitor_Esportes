@@ -20,9 +20,10 @@ def test_nba_auditor_blocks_small_pdf():
     size = os.path.getsize(dummy_pdf)
     assert size < 50_000, "Dummy PDF deve ser menor que 50 KB"
     
-    # O auditor deve rejeitar o envio de e-mail para PDFs < 50 KB
-    # Validamos que is_game_audited respeita o cache
-    assert auditor.is_game_audited("401909842") is True, "Jogo Sacramento @ Clippers deve constar no cache como auditado"
+    # O auditor deve rejeitar o envio de e-mail e homologação para PDFs < 500 KB
+    fake_game = {"id": "test_small_game", "match_display": "Test @ Game"}
+    auditor.mark_game_audited(fake_game, dummy_pdf, email_sent=False, sp_synced=False)
+    assert auditor.is_game_audited("test_small_game") is False, "Jogo com PDF pequeno (< 500 KB) não pode ser considerado auditado!"
     
     if os.path.exists(dummy_pdf):
         os.remove(dummy_pdf)
