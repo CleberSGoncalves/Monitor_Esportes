@@ -1,0 +1,23 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "A partida entre Oklahoma City Thunder e Memphis Grizzlies, realizada em 6 de novembro de 2026, teve sua transmissão no Brasil da seguinte forma:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:** A transmissão ao vivo no Brasil foi exclusiva pelo NBA League Pass. Embora ESPN, Disney+ e Prime Video transmitam jogos da NBA no Brasil durante a temporada 2026/27, este confronto específico não foi listado em suas grades para o dia.\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):** O horário oficial anunciado para o início da transmissão foi às 22h (horário de Brasília).\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Overdrive\n    *   Gazeta do Estado\n    *   JC (Jornal do Commercio)\n    *   Hoop78\n    *   Franca Esportes\n    *   O Tempo\n\nAs informações foram verificadas com base em calendários oficiais da NBA e guias de transmissão.",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEfmidSFq9SwjPaTZF6w-URorkehEtZAZb63dzHFdVkFdHZ03bgBdvyK6XnVPyEg_16QRWRLzib4GKnZ4RW-SW-cyvl-FbdQG8G1FRMKzX_NpstCdTFNB4bQudWA1hingF9sIEWu5okgdim6hwr95beeDbUQAmaJ3kgFQnv7JewS-ltp_NArj8v",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEeaZCBVWEjeiMM_c_HEgAMXpZPQTDsDfPDbcxImmDrNhdCDIHu-3ZD7ALWKmjND9LUo_YcyUXghy0FT8_QUeH3rR0D2KEgFnSUzKs2s0D0OIwDL5GurUv7ydS0uFt4OGgO2_o7Gx6Vmn6_4X1Nw-A1h3QXK6CxeI9tNt7eT_lMOetf5KJIPqSrDy70lnxV0h_llOrJJuZ4jKUzV7cxaLmniPRmqkLCwOs_9YthR-FZ69ttVuWyo4-C",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFP4CQ9odB2xb5Qeb-D-XpDTVS8VngfnkaTTo7BpnFDXa6AS2BQqXt91t5EdiB8aPbC5DgJ4G2DLvZSb8HpJwTajNXKpvhEExRFvNP2AjtT91vXSD6XoZc4WYSmYlyeGM0mopx2LOpSlskHiAxcwwKvU4DFy4qmaF6lYKwQfcEufzv9m2eXlpWSrNkw_hZqKmn7Hw_x7ocus1Hh7syyRg2d_VblhOzBdeALq3jLMQxnf6U4a4YF0OKBcdT287ajQbTQX1VlEV_RG93wiAbQ43qzK3y9VYRUaZQ=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG7fkJBvPpIwa_30JXqPmBETLbtGsM_tQHze-Xv8WXn4ACWXG-xQGffBaQLx6U4CeFPvzag6mYgp92Z--iZkBs9-OANE4ZDh8RfQEUWzy5yXb0VYw5kyeZTLNfy5hcrhp-A-fwu5L7fWkhe0TC_vfEyrE3dCqgIpstDAWGqRTZvNS5KZQ6nBD1Eeg==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEeaGXl1tVePYPhZLq_WxX17C5fSa8BAzthm-c6jvk7l8tXHkbNzLxxScCseqxWxbuL4bZe54zS1C4S3VVnquG2qK5m54edOVcenMlWAz-TKrrtMr4a3u2r6dyuuslpOpx4xHmL6zQIIXnEyFou-D2b_bCU9sw5APdCsakApaeWgdH2dRd627LMqGQ1QCmqgSkAMHcJN_YyxcJfOSz4ICERbRmoBhjRZ5hya_UmNcJ4_3zVxwpUuSg5JweDq9yMtEf1sCC801qaurGS",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFTpT_Mghbpth8lE-90SAw-4vtMTb4C9RG9MA4BpyQZSTFJFW1OUku5GLGaXhM8sDhrpkndhp5bA9609AY_93kknuyfYtRNk3kOddE9EwqgLiPakjr7dUCprM-B9Vw8TwMYmQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGx5DcYlKFKaKG2SSIsUPWuqMaF6QIA-4hQMpUiqDqcn3ldv364klquo8ZK8t7Bu5eJKp-ZO3sqhatBdv8-6EXqpm9SD1nOrhtqMJYGZyo11DyWoOFyXhlCat2H0fXnIvDSAbETomcczCjcwSPBQ0E="
+  ],
+  "grounding_date": "10/11/2026 11:17:37"
+}

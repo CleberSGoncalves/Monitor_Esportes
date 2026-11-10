@@ -1,0 +1,29 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "17:30:00",
+  "summary": "1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A partida entre Philadelphia 76ers e Chicago Bulls, realizada em 08/11/2026, foi transmitida ao vivo no Brasil exclusivamente pelo **NBA League Pass**. Não houve transmissão confirmada para este jogo específico na ESPN, Disney+ ou Prime Video.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão foi às **17h30 (horário de Brasília)**.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Overdrive - \"76ers x Bulls: onde assistir à NBA e horário (08/11)\"\n    *   Hoop78 - \"Bulls x Sixers hoje: horário, onde assistir e escalações\"\n    *   365Scores - \"Chicago Bulls x Philadelphia 76ers: onde assistir ao jogo da NBA hoje (8)\"\n    *   NC News - \"Bulls x Sixers: veja onde assistir ao vivo, horário e escalações pela NBA\"\n    *   O Tempo - \"NBA tem sete jogos no domingo, com Lakers x Pistons e Celtics x Bucks\"\n    *   Flashscore - \"Chicago Bulls v Philadelphia 76ers Basketball (08/11/2026)\"\n    *   Antenados na TV e Streaming - \"Agenda esportiva de domingo (08/11): jogos e onde assistir\"\n    *   Lakers Brasil - \"Onde assistir NBA hoje: ESPN, Prime Video e League Pass\"\n    *   TyC Sports - \"Ver EN VIVO Bulls vs. 76ers: dónde ver por TV y ONLINE\"",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHo4VXR8LNR2A8HkuyD8tDGNpZS7YeQY1NNonQ0w-ubg1hrBWS30PoX4n3tB8Dz99k_lbWzdT_hR0bTtB9m5H0KmhVpE9PkG4d_42RjRqVyx-Xa616VgiSl_SlRZBYyIMoFXBZfFABE8HkLZlP2kZkPden8nu6D8OUi_fPJZBCPxfjYAA==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGI1RmvuSMSyGJvPnPqpfz5OugSphiCiktxUwJ73C9OMSCIcuEhy-S-pd7_4NAQOHb45IJnA_XXnara8FS-8YMAd8bWWoSGYS1h2FNRVmpD9M7jS02QRXRB6jJcu7J-dH-YExhPrCkmYIQgadu48iMgvRgJD1AYPPFuablY1P-VPKl7Bvp5OL4ggx6pKw2DiEE=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFMxFBMcpse7o4UIgUT6ednb4g5FmndfqwRXZb6UdfaQvuLoU5EAuP3FzA29_JXgtEtbwH4T02GdWzs131FdvBObpjv8OnCG2T-B3tIej6liuM6v_PE91J65JfQazcmjB6m_zfnaTka8ooWDEQQSo-7PKI6xULmtoZshFLGBeEbTETcc82Tvy3lWXZjJ4ne",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGL9oCigrhXEC6KyHi-BygXIMzKsC34EJy1Ht1LdJRiUFikuAqVeKU6jVE4qJfO_f9w7EDXcH6XfE03bu6FVDC6Hdaxr837-h7dEgrOSgzK868eE6SEvq_iae71mFjZcQGdJv8_bVBCdTg98f59fXsDkU8oiAgmgZje8vK3dY_T2M1Y",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEJLblnUSq4WbR_E_9GmoD5kv3IylVCrEtxssHslS5MGPsbgjs5KhmoPBLfuEI7BFgUBhqA40uK4e-7rmdNm4tTm0IXCDwofGJCqCXLyQExR9Kb-iv2LhakY-iyK1mCg5Y4_A_yBcp8xwH8FdcMOIOyYCjo3XQfU-17ddy5VuY54jm_3dZomrv_N-LTag7OlllwD7lUR9zF2E0qL4kjRvRCRBxB-xNE1rOELYBd4S9l7IPxlekPnvQ=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEyN9F0rF4U7l09IfhNFM2biA3hPBy9xLcrTVRiopo041iRjufi-poO9RcXk0sQQ1U-twRDUqITz8GqSjXIOowQEjveyhE3_TSt77Pi-aFAX1ZJ6aSorcW7d0n7H1mV5jIhd9PXjm-DbO-4M39KJVFwp3YrD_dRQjaNXt9wOHKSPeMThQ2uCbKNXE0LkdaSjNTXul0SCJ_dUS94",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHj3s5qzF9p9fnYSCGdZJB9-rGTkDbPVnTEhHO_HW1ECls_O30MecYkVF1-2-WQF2pRZDFp2XwU6LOXkfbi41vOSRTqzvzG03a5qbVtlBhVIEhzN-TbJ806dAGMVguHkYQJXM1ZIWGmOuGhlADygesi4mwPNX3Reea9U9A2y0Hx8CuhmeUKhhkAsl2BIdVpYuzvxG4oy7spGFdbyCS2PV-8qTK3iqqFlPwzu1OxFA==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH3jjUpOCgpNCXvwsr0gzKIkdagnFfE_zn5BbFdF-AIhzPg-yTnnQ67A8fiIRBcp2YjJZvQxbUBs1yGBQ7kOkbaS4QPXlmHRMEHz9tiBZwTd2uN6z3qoTt0Fm6Ad0uSbJEwOu-b5ZA_P4PSMarx91XE705MD_Rp2hv8h7-JF3zrz57Kky8mfwlAKLbg5vHen5B9wu__YVnSKbe-KQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHdJlthgzIxSagR_6uLYZ4YY4wKqF6OURmsprjEhhJT0Wrx0lNMuN5bZQLUiQqDdjWFSUwMNKZw3xtgW5rLQGRO1gaYt25whHqi2XIe9o3bVZsAESH6qhCJxxHVZZo5Pmcn_Qg_3xfqCn4EfYflnHs4dHf_Q6XNHK7UZXZ16SrkDAxn9Jx6AFtb7d8T-9uUFrID9aPeK2Jlu5loAV5JKnM=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGD4ky0kDlIlsQ53jhAtWyhgzBOWcdBVgjyQbPX3MVPzZL3DAA1vcuGeKdped2VUfpC0MIUk2b3oqRiUwopm3B3CVdrcrWPUruo1Oo90cFM6R46byIE_dOjSuXtzinF6TqnvMi6vkIQnDcTf1YLCn5or9h9pP5q-SxdNtHTzUrfN8G_Wsc4TyVvRyd8PZNeGEgZuVcjYP7FGSZRQjP_q1CQllTEb0crRKe8VAUXIYenhHrWx-uR3eJWThx5JLQDqkaaxui4SA==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFUU3S1jI2v6np4HQ4uL7NdIJSN8R-XA7hmnYzMOq_80K3rO19bbupxat3WdmS80-5NOTqe88XJnvK9p8M5bzy6FIaUH0En_uhS545nhELXYJMS17iCe7Q8TLW-UNNEfLHzt_mO6WpRIbLYa3HlEuWpJI67bumj8vqehmRzLVfL3JmpIbXTe-5xYbbuozQhMdh_2FG02zorZQt7XJ74YnaEpWs5pepbkA==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFEGZUl3E37dK6SaXYDuxrfVMM-6FLwTEACs4qC4HECZdQ8XABSALqnqg9QaENOH9Btu2AaYj-nPHFR1poSEmqrXercKUGpTouai5mdN6PnaejoTJPLiY7Tgkv1NYhaXZuXAr5Wtc8=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG5dPKUQH7NDFyd22zlaJK5vOuEm-S_RwyNSm-Kgje13LmnGgPJaPYzOIc8-22DF4D90Go7gNj2uvIX6wrqKrMR-Wr9Lrh2Yboogdf0t32puljTCl6UUVxuQ1fElyqBmRsqzHH4bYjohIb-EpyQdu-U83nZwu9YrtEcj412aFBPMQ3MI_x9xt5ldS8GF-xn_4zqFXGp8uSAqYajNh5qk_mU28iQEgirgUhUqw=="
+  ],
+  "grounding_date": "10/11/2026 11:36:07"
+}

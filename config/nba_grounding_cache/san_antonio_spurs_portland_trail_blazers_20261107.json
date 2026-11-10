@@ -1,0 +1,25 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "A partida entre San Antonio Spurs e Portland Trail Blazers, realizada em 8 de novembro de 2026, teve transmissão ao vivo no Brasil pelos seguintes canais e plataformas:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    *   NBA League Pass\n    *   ESPN 2\n    *   Disney+ Premium (inclui a programação esportiva completa da ESPN)\n    *   O Prime Video transmitiu jogos selecionados da NBA, mas não havia partidas da rodada de 8 de novembro de 2026 confirmadas em sua grade própria.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    *   A transmissão da partida estava programada para iniciar às 00h (meia-noite) no horário de Brasília.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Overdrive (overdrive.com.br)\n    *   O Tempo (otempo.com.br)\n    *   Lakers Brasil (lakersbrasil.com)\n    *   365Scores (365scores.com)\n    *   Antenados na TV e Streaming (antenadosnatv.com.br)",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG-OCFdnpEV8Df61fGKuM-10TkXjsSiGKRYg5RmdXjf0fqIm67P5IvTsdUe6muvIyhYIH_7ADvC75sRddqC-R6lfPuoqFw4pdkePTipG5Zy3--0bKKYgMdPyJZkvs9Q7pp9Dj4DjAsC7ARSrsC1cuSgS5PLb93s7feqjd2cID6PaRdeitStguXeAbk=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFbqP7kjjLKSNBLw2J4dEGhJyAX97fRms-DbGklSn9mREtUd_MSTZV-To3pnK_zHqb2tWkNLMRUyfXXzZPTv02EKT_6EfI-35owf7KzZ4UAx9fmZfEf9IvXHNo_oSe8WiYza4o99-UFzBfjMS7KkwEtULR7n09s-2P7ts8FBQPdefyU_1G8NUO5Lc_0TntEEPGW1-x7WAg_wY6r2zlg7KEjGOSj-hmvDRNj4zt0ldJnnvhI3l_5xw==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFJ4c9KP0aPcjkRdnmd1NRHgX3_WvokFTXZyD1lTLbT3-rJ45Bpn2M6OrFfDfS2l9cs8MctkSa813HFHIoi4624H-J1f4d1OOnnaR-jkToDD4G4J1jbIzHkBTgtofc-pstpSOonsY7Qh-Xhx2Jsjpz1jrTuNZ0abO0UVY9cQ25iPT77XRzs",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG2dXwA0m_qa8YVvEpv5qceCX1RIdGT60disgQMF7aAIkWAswBL1BvEeTz-Yds32lSZ594jzPZ4Qh9vLlxDi1jB_rc2SfR6hiYiodZSt-kGdwJ6hBUTu4cNtA6nbzscOugLs9swhNDKRJWoze11A4ZjUFAJKqCqYZB8-3MIEu1KRLiFHmZGSqyUly5mjYsJuw==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFwuwjhPXGv1Nywi-jL-HV2WtFMzzSJouw3Fas1lqT1-D2OSg0jzNcCRPZVROfiaf9bRw7HNpSWLQUuljZOJZHAo2MJIfHcbvuUX6YhiBd-juMZbOm1Nyc2-DVdUw32pK5mE5A4HaDdD1jMMOxM8D-MunzX3jUWAb_f0OtH1vePGPKH_sDjoDgzblHlzG-ZL-8=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH0wNAnlhlVNWpwupRiZtD7UN7Li0LS5yu2jtEqZNRtxmqsJxbYM-XA9IifF2J8xUmWkAH1XLoWlrGkwUGqc55ZdtX1YQRB-GSY9MuK16rE5RzZoKKawoYcxtm6paJJgpyPkjeQK9ft4rNxVROJ0XqLn9NeuKSPeKaUbSKoRi5dMnBsADEXdg==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEgTvDCsCfaok_U_kRN3TZF338Qr0ibmj4_wAXawd0xw-ahQrz19Qz0DZH8EaPjH95J653eRAqAa_GkUihsmT3sb2kyLSp1rJzrnR-eyHJDX28bPxhZagI6IAeScrlFtJOCy36EZQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGBYWchlJ2RITl-0fxcvYpki0zIvEwHmp2S5mEiyYkdVX_1_CSFY0haGDe2yQM3Zp0sXh_fhqXswvCd-8pWCs6iBWyjQq5PJNyzJjiziXHuaxUTOsAkk-CVvHgvMKORv_xX5RD9TyPm0HCP0sYBz0gnacO59MnmpoMIkHefXI_3WfX-PTC5DEugypiNzPNLgHNWa6T_WsOtYA_b3RodMot-xZW3ZKiT",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGSJs0WkwnzcZT2nKl5aNmjCLOrqjC8lUIByQunZcimjn6gqu32pJIURTMN66le0-eHWL72StY4QlE1j9i9xGs42HGH3Z-qr--D_QLOdKGfCO5nDV5Rg_0NNqyqqa9JaqzGdL8RHwA4AeQhj1kXhvMRjkkgM5zRxmbI5d6SX2TCAhfVwo96ieHKygo5d3IanTCt4PgYUuOI_uFkdN-Gm9fF33yMNw=="
+  ],
+  "grounding_date": "10/11/2026 11:34:45"
+}

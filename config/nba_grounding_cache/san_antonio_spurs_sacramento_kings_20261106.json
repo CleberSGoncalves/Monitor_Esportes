@@ -1,0 +1,24 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "A partida entre San Antonio Spurs e Sacramento Kings da NBA, realizada em 07/11/2026, teve a seguinte cobertura no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A partida foi transmitida ao vivo no Brasil exclusivamente pelo NBA League Pass.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão foi 00h (meia-noite) no horário de Brasília.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Overdrive\n    *   Hoop78\n    *   Flashscore\n    *   Onde Está Passando\n    *   Le Parisien\n    *   TNT Sports\n    *   Franca Esportes",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFxQgOUtNF5s3wxYEscH1EQMfdEGSy8LflRZXYNszaxsfbpBTBB8o4rpHimKAff2hGAINgujYU-m5BOtQOE0GoQv1Qy5IKaeuBiObYaTJW1nDPFjcANcbVc80d6JnRkbZCZq4V7T5ryehyWfUpsVl_xykQh7YmHHJ1_uHGf7-XElhsLPA==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGGClc9c81LiVA_W7JmjD1GU-98YhGIkhhpFn9HKNCznI_LnKA6GiCFGTyWs5vkzGizFJtFr0aRIWa4RyadnUcMJ0nnKELpob_DhY-g6B4HhWjxR0M2jqUB8S5PUwx7uJs_9bBhKLSXdr_qHpUFVlHbZzqhJkCzEGNMpu3edAmih4ig7IDO1_7_VjyQdrTbWw==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHQB8o7sTSoCvhT2Hr6EiaSjw_E6lK-7uZ9feYSesDNnf-gAbX7WQ_ijCCOk-P4yYYmBFwjKUvQvIkgAZUx2YUgbCEuyIJFmUPMBO7YGwmPk03_X27cFLVCVRpgh2yH2-NCsdwFleTABBgUs-WwPGwBdTRTf7BIy-tAAaGo3WgNlpnOj0yF2-baZGRIhxiCxH6lszvU1S0SBW5vmQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGiEg7iwVgTqgvTF8WtjD1XqwqSdik7iYSPw6dtR_Ns6D6wjYTfljcOHPb8qswaSgXRrfvikXJw2pqgb4UJ_g_aPEyDL91d8_9sNE6c7IRjxR2SYl28Cmj9Y0BbVjS4Lat68-Rl-h9DYDKvJgsRclNXkiiFyNTnL4q7aRluuwXq3StkUE_gJbMUETdDxWd_SnqARe_dazwOO9F2-Cwf",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFdjgXB8Z9wlne7bS-w2h77nOg0u9C6ng2VRNa31HWZNxRYU3ugBVVLFDnBgj69fHYY7wjoUXhoOvu5jutFCTKBZe7th3RzQHLDZWsY91bWXiaF5dldTy4Nj4Z-_fOyxOHD77xBRIfga6lBIWrvx_wiO-t671NUi57Tz_WEMTyU4sN5sqv_ndGovsN_w2N-60ozEBwgHw6cqLFNH-E=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEbrJH9I1yCshzpZ__vL5k9V240Vopdujm09aWShJ6tIiW-LALv0VONNcXjYGHOLL2fhRRX9TXqFSwOvrJmYqxOlsD4BaGkiAEQx4cOmCpbnujnQXzhtLyJKE8K7Gnf8ZL9YP7JXHprxSjiO-2eYVJbyhj7GL6fPWL_fXcWFUFLta3v91y6jh1Crpx8UuP82Zmn1QQ9HQ3nJWdO82ZVk_RLvmukEFaX9wuZQ70_QuLrek0=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFowi3BjbJCRz7l0t8NOaxk6XtgDcDrJPt4QGpSSy2Khvg8rCbYb0Bt9qPu2wfuJaadKcrQmFyqduUTcmxAiV290HCd5AhpjMEFURD-oO4ztuOGsQbsnLEft_2IXFpTms4uUtOxC5m94uCDWFeidWqQYNt4XyYlksOLMz6dFVRtlyYbef5enYE2b3dr_JCL41j8HMar_uGJOdhc9F8gsg==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE3sYki3Uu0hN8KW7tXaOMdfELTenKDiVMj1y_Dcu57esoMO4DcFbOOh8SMKpQiqvnRwzDTuxMxjN3TDp2QArmemtI7ehRe1VNpwqIlVPnC7_AwDdThkccNnFJsPNbb2Albc19h7kygsdvzdMNm6eOtFsboCyHKQ2x1Hkec2MF-YKqoIAxghwSWrqHLwVxy3Oj3ImlBKP_KqY8ehQwCAU6EP6Jd5A2NgQsS1TzgOj65cbjhpZ0u4VasGmWBS8kFdgR1dMTXSeuXNt5OWQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEoVmT0QcaQxOeVtB7wFLMw3qV-4LfejSws9H7JSRhUPzFwbY2KIcOUNVPhAErhDIr00fYBGyITcUntSSNxhkAP-kPRR5kOKQGnmciB1NLAQZc6l8fGMN_CJmy-k8L-fhK0k06gC8ZZihhYRVugrHzCfw3RrY417ngPbLl7zhTpjMAixZkATC8ozZ3qNRhROF8iPz3cva3Ke7ecd2-1lw3aasJz8uEbQ3osuH19gkaB4tfE-XJgR8ODpfWOTZtQZnMAfw2I8SDbUCzp-Y2-xsF234RPYyN8qNPwL36sWxXz8tXrFXrMiZmdSdkwbaIPiH7Df3NhiXp76pYGvwpH2fVMOAn2",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHrNeosguLKCj9deXZOrY4CxgxcAaX_z_UZmxryO2nzsRS53SETktrJYdvhpyoqKmz_O-Wh23lkElyFudO1sqwkEe_yvkUcakuXKQOkfU0binsMasnwxUwd_drUNFcsaFX_yRNlhBspV9GnaTmVeJtfRWDGdsfVZcFPZZCQ6dnWw09Arp9hgxSo0H4FvmKdfzt0NoumNRXGeQOMbwJ99SblvHWCmrINp3CF",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEv5bBsVuwFEMAv0nokd7a5ErBetxyVSlzROCtNIBkCgN8Bp_TsqU_HUa6IODxL14GJu8AgTw-2Oh_ZFnYbBxCz_SpqyoKxUwWgkb0yVGAihjc0IPtKllw4CxVaFJYP0hiuy7oY4kIxM-hQIrEL37Go"
+  ],
+  "grounding_date": "10/11/2026 11:23:27"
+}

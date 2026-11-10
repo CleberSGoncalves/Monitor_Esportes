@@ -1,0 +1,21 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "A partida entre Miami Heat e Golden State Warriors da NBA, realizada em 06/11/2026, teve a seguinte cobertura no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    *   NBA League Pass\n    *   Prime Video\n    *   ESPN 2\n    *   Disney+ Premium\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    *   A transmissão teve início às 00h (meia-noite) no horário de Brasília.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Overdrive - \"NBA em novembro de 2026: onde assistir aos jogos e horários\": (URL: `https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE5LmVqnJKDn5jRVMa-e9aqcKCDUzRu3xlLef1WD9tLxS1JKfw8JWlPH8h5IOPbzgOMZdfbiMLHPH9cW-T4-mShJ_n-RbbbWdJoG7GNF3Bb2ZTpfSS9ij0tr0vqlPzh8owqyVZgdHE5sAAXyM3lFBwweZ1NX9Yyd66i14S4Dp0hYiieHo-y11Y=`)\n    *   Overdrive - \"Heat x Warriors: onde assistir à NBA e horário (06/11)\": (URL: `https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEcTTI3oJtNKi9hmdoiPmBfdF2WKc1tfzScylAhw4t6rblcTGiSHCANltMz5n277QxPD2lZVRs3r83BBpZgCP02DxV__SlL3xdD86tVqrHoRC7IxGLPF2rDKq_eBgwIuA5Py-USoNe-kjNuvFuqpu9vyMstg9sqfxfh--Tx9xCXY7ghk5E7`)\n    *   O Universo da TV - \"Prime Video reúne Brasileirão, Copa do Brasil e NBA entre os destaques esportivos da semana\": (URL: `https://vertexaisearch.cloud.google.google.com/grounding-api-redirect/AUZIYQGVf9fNL28LocDJ6nNvZnEqM41grsHHXYjKf4VlV6gfqpiIxm_Aa0nhdDPP1YGbnC-LQcgRwm0sNzZJBm_umdocqQJ1GL4S61youhyoRZ24O9S8inPX9uJqD0I0488SAD45xUMc7Xbo0lZsfBUDDBY1LvPZ9ux8VzPVUxBJlRg4fOre2ZGYBXMyjqFM`)\n    *   TyC Sports - \"Ver EN VIVO Warriors vs. Heat: dónde seguirlo por TV y ONLINE\": (URL: `https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE_0wx-aAKZ_JClVpuPtO6sOeHS9hc3wcUQONHTa4t7Xm4XYsGlSUDHap0EllJebtmz6jmkRtv4jZD_kgV2Caj2WIyhMkOTwnF9FpY4XDSSj_r6ecJvT9cgB1jAaCOAje1j4QdKasELu-eloYJXnFuRlHzLZ8g6CQRL3GbxxqpdpvTLoN1YiYpbiu1U7FIRva1lQnZjVoxDjUW_ObG_INOkKCmOyKRvvbk=`)\n    *   365Scores - \"Golden State Warriors x Orlando Magic: onde assistir ao jogo da NBA hoje (7)\": (URL: `https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGa9kO_AszfKdlb9V5YF5baHgvkn9JLmS1RRFwl-uy4FqIE3cFi9trQlASA2i673pCtbX73DZpeIaStB7oZ_8v-Wjf5v5GnEbd60ZGPN_2Lq6dTwnEbMD-Iwerfc6ZafuaLqezdd4EW6O8QozeJHWWGDrWX6OXqfUbYMTxmu1q8XtbI_z0AsHaDjmc0J-Z05U5G`)",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE5LmVqnJKDn5jRVMa-e9aqcKCDUzRu3xlLef1WD9tLxS1JKfw8JWlPH8h5IOPbzgOMZdfbiMLHPH9cW-T4-mShJ_n-RbbbWdJoG7GNF3Bb2ZTpfSS9ij0tr0vqlPzh8owqyVZgdHE5sAAXyM3lFBwweZ1NX9Yyd66i14S4Dp0hYiieHo-y11Y=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEcTTI3oJtNKi9hmdoiPmBfdF2WKc1tfzScylAhw4t6rblcTGiSHCANltMz5n277QxPD2lZVRs3r83BBpZgCP02DxV__SlL3xdD86tVqrHoRC7IxGLPF2rDKq_eBgwIuA5Py-USoNe-kjNuvFuqpu9vyMstg9sqfxfh--Tx9xCXY7ghk5E7",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGa9kO_AszfKdlb9V5YF5baHgvkn9JLmS1RRFwl-uy4FqIE3cFi9trQlASA2i673pCtbX73DZpeIaStB7oZ_8v-Wjf5v5GnEbd60ZGPN_2Lq6dTwnEbMD-Iwerfc6ZafuaLqezdd4EW6O8QozeJHWWGDrWX6OXqfUbYMTxmu1q8XtbI_z0AsHaDjmc0J-Z05U5G",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGVf9fNL28LocDJ6nNvZnEqM41grsHHXYjKf4VlV6gfqpiIxm_Aa0nhdDPP1YGbnC-LQcgRwm0sNzZJBm_umdocqQJ1GL4S61youhyoRZ24O9S8inPX9uJqD0I0488SAD45xUMc7Xbo0lZsfBUUDBY1LvPZ9ux8VzPVUxBJlRg4fOre2ZGYBXMyjqFM",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE_0wx-aAKZ_JClVpuPtO6sOeHS9hc3wcUQONHTa4t7Xm4XYsGlSUDHap0EllJebtmz6jmkRtv4jZD_kgV2Caj2WIyhMkOTwnF9FpY4XDSSj_r6ecJvT9cgB1jAaCOAje1j4QdKasELu-eloYJXnFuRlHzLZ8g6CQRL3GbxxqpdpvTLoN1YiYpbiu1U7FIRva1lQnZjVoxDjUW_ObG_INOkKCmOyKRvvbk="
+  ],
+  "grounding_date": "10/11/2026 11:10:16"
+}

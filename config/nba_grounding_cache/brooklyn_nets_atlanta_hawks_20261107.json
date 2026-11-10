@@ -1,0 +1,35 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "21:30:00",
+  "summary": "A partida entre Brooklyn Nets e Atlanta Hawks, realizada em 7 de novembro de 2026, teve sua transmissão ao vivo no Brasil através de múltiplos canais e plataformas de streaming.\n\n1.  **Canais de TV e Plataformas de Streaming:**\n    *   ESPN 2.\n    *   Disney+ (plano Premium).\n    *   NBA League Pass.\n    O Prime Video transmitiu outros jogos da NBA na temporada, mas não há confirmação de que tenha transmitido especificamente esta partida.\n\n2.  **Horário Oficial Anunciado:**\n    O horário oficial anunciado para o início da transmissão foi às 21h30 (horário de Brasília).\n\n3.  **Portais e Links/Fontes Oficiais Consultados:**\n    *   O Tempo.\n    *   Overdrive.\n    *   Hoop78.\n    *   Hoops Brasil.\n    *   GazetaWeb.\n    *   Disney+ (página do evento).\n    *   Flashscore.\n    *   Sports Illustrated.\n    *   RealGM NBA Box Score.\n    *   TrashTalk.\n    *   Basketball-Reference.com.",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH0yxMjxjqRki-4u_LFC0WUkS5HHQ9VDHpr130XVBtTM6BW9XiBv_pIP6OgOTB_Qq0ewT6se97LEzMOU0I0UycsdXF0BovvU2xuW9s5sNXXept_L1eDDXOX7cmq-EauysccA0JPP3BA130mn8l_Gq2GSp8gVh-5vs4Z_ujVUMff1bgcz7fk00ycZsvzRMubywPr7OL3blBvaXbK3Y66xAFWVpiKNQL1wlfQD8Zs8mkAUfo20tHX2nnPvLd5XVljumK6erYl",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF1Xt7iKL1RnLUFMTvCF-I_mk4ZyUD6cF7_jzMrI-AffcqfN0LzhG1QGC1AWOwAv4gONaHrx8jFM4wcedECnrX6HfXVmJKSkiUP3uzXS_mY_qEQpy_jnQ5IPDgzKafN0VYizTei2m85157Ix0ALTjzyswEYFZP7IcM7e0epZVJxDI2H",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFGtSWYaJo84CNPWcWXbcPhynaEFWPgsDQ31yduidCa7SMco3A--MitSAHmaGl1lujuLOr1deuPDuumgUOEzbdXzW9vn8KUh_nOcV6XcXRIikwbT545XlH8AHBV7wiOv70dTUwVIH_qNsoMb25FtGXrRPa4mVrOPY5w-pSZEnWU9LLJM3ksNqj6xoY2be9K",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHrroZ2WThGp5q5VCfH8H1U2PMhQqFc1S66tiL5jGT2aGgWZ9yzAphwIx4YBpqi738bEvyxIukVON5YDGZ6NYx4v2p2g-HMw15uBYqiyUmtJ9TAaaPVsTwJfKHkj8NIMGhJrZALy0Z6f4erbBCU2_ZkZx8J9Uw1RFh_43SQRFaGnqbnNtP7HhE4NSWQD7c8sN7MTlXRgrCtCLeiK2zDH_9TahcuhAA1cWJHbKPD4T4RsF73X2DarY4C8KAoBUcDbV-f5GVKcQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFODTcKNZxOCAucL59v5SuUseVm6AhYhvgk4tVW43yEHJ1gaSp_54Q2-Km5uzIZa724TKPMlwP5aZqt-p2QIvqBmvsfulBey9h_4aR2by7IYLCw8rWq9EB69WjUCZkCa1tcEG_r2Q6ONDUE2d6eqsG6QH_RqhoRYnFLwOQtsb3u-udcGJxl4P2_rwDGGG68",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEXLvy6oaKqdLNhbOqYCnmVncghMNES3RZqORHA1PgD94-PNaJQ3GyxRhHP7vwZyTNrSnPEGgOBzGBq-1Leomc4KalytxqY2HkaIOyX2cebiqYBINHKvD5KrMvk6XgbXQCfjY5nDHZms9Fv--wevXlRnQ_FdDePdMIfG7Ov0NxtcJrLxNwUlMG7QVlJ0JmY",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG54K1AMn6a5qGj456aZqC8QGYhzu4JDekGuwQeUqxB2MuTIP0IaQjpuMD3UK1F4jaKJMtTvjgxTfAYxT3vU9hpsqDqia5OFUZvr5Kj7FwFIxjOvShS4PsMoXXi0al2L5kDOlmem_YmMAYZ-eYU9dBQHc9x7YY3aN5pZka_Se845JFScGqaIPMTiUC-zaqsJEuGcz-bYIiUxkjZckpdifcKLB815tlLu8bA9pz6W5-BcTCzFvXsfUn_VCpZ3kT9fHNP0bia23Yl5SXL",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEjJn0N3I5upBIZJyr-KVIgh90BdbiGQeJ-aMyVqcQegewx2jsVU79qOsk2LQlOFZkH1wvO3cjqwqSL0gFB64051lVKt3mZZdadfS1-QYGR_nMNRpSC4wlRQdXpoCH_UTRF2yEFgGAzPg_6IgoUVFYC4Yiwnoh80D7ogBlk8SKqerhc3bI2GfE=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG3Gjp5um_cb1x7e6PxY9kvuRTjZo3OA5ixzfWdZFs7Qg1KWZ6Hg5IJrTWWeig12j1mH61vE8Q0ssW8f-jZak10EmlJAZtBtAxm-dyruQFhovUCeFWEEFQhjOjf1MyCWvI7uXuV8hUbZQdqLplFmbqzMccUwMdApWlYCKajZFpbRJSBrM9jbg==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG9olREViMLy0JgeJOUMk8dexYjMrj9dlWN0f8c9uq5KvhFEKFNaqx_rCubOL6PQ9ghcJ1_uqPIw-rhGOZ_HlKfO33Z_t1cKppcGj_cFYH-J1F6ch-phmAzyR5MkMAIAqHexkx84b9gsr5FxqB_U2F421BRucjMKtGpyn6R-Lu_JEgGHfbNVg==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGYNAJnRWrWffWKrhl_V_lQF8Fr8xhZkUaF_dFplIrzA2Bcc5brsMBHCIDWiodvFBQxkhAaCwcuCnCoZcDMbIyVUY_L6oFCc3xClJzpNPQbT-BU-jp3oKvULndFsDRKiQnmxlaP1z_e5bbyeVGm_9WtXwmIar72uYc69qbC6th7PETHxG_JJFN5GnrXbNJoKwvr",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGTUspwFQ58Fj46wPZDtoPQgOP9hhPrkT6k_arKI6RZAmLIiBY5pF3acueS0p1oBjfcmcRf0LXj1o84wLQSEoFzz8qGYd1pGwayEJld4YrYtByne3DUWQzq-7PYi3Bs_oKBkZGonlp9Yo9wUXXQveSSwbcCCNyPjcEcY-5rfYGNy2UYlyjwnDW1iR4oGpqElSONgvOAMcYO",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHKgJ6oodwmShuk-YS3emxCYL7LZg20yKrWutoNmyam08aPDCq0qv3D6BKALWk5xUGtRr5Fo1din4gFHfUXkXiEjRf6iTNTFn5PVIamkF8EuoN_UUvyLIV_mUR2BswRYmv4BygPSzLoElF0Io61aluim9BvEOgax10qe_c5JGensnREpn5XmBI0eTLXvSM6sGU=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFo3JsPrIO6p_xtUO6-4MOleTD4G4L4zim1kQAMMiC4X5wM5Aa53ibhs3xItX3RZALHk0ekAQfUCd6waybVJmVS4khe3J7hFlt4mnX1SL6h7VRFAPgzHrss9D1Odvl96T0Iq-muduu_ymMkNRu1bDyTfBdyUHdV19lj6Q9OmUOqdm3nY0ZnM1xvsN6pmb9-zmg5bx50Hw==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFyWt0WjnaXhfimpV9CY4oal9iCO2iftRKRn9EvuDeQcmdrOE9bLZzFdBjQFu1CUTpDGJuC6T8cHXmVt-7aiU04e3Ga-Ol27WfrGrrewwd1T6LTL3I7stl9zuSdNrVaJcbNnHDwR4gqEC5zPivyrMemlC_E2S0_ye8m1d9xF9a7NHOFojSUA-sYgpYqWDwWUIcjnlxR1zo=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGozGN0im6J7UQh-efVInynrU4UpykUYPKH_4OQCEdwwpuCipTpttx_jg2hpB2zevvuNhjflQa-Quho82BBckdEDmgOtXKOI-t-nS-gfVwe_wvVYb4hXY20frUNKoQlWeGz187o2RYEvXpweoD6gY5rSYMiLlW25vgH",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGJq6UiDn8xAY515IArrBQ0Pf34bsHLbEabRKzTbzZQ_fP6AwQS_ytmWypn365iZv6Z2Ih9aPpbi_wBhXCVD0gQaeeciKoN3birsLw0BRMP6UT0eLMjDrDV_XgrwX-KJX33XyvNkRozkAwbiwVuzlZhMxHfse-qG3KT8GUGcNdqOrO205JJUQLrxIao",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEuOA7-C1I0-ev6Qxp67UFUpnq-RgvVK9D5vuXBkcDlBDljV5zBhcb_16k9nSRzQfURMHcVN0mLZJ_8cNVEUvjVgdWE2zhhJD-kTmDzLSLMFsUrKyn2vaOVk8XaI0-mSRBz-WCsut2Rrvxwd5DU_ELT",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHeCGWH3Dzp8dPXyNr3kBG_ZjhxC9E1zkwmeBB0vo5y4-D9hVtRS3eQhlVjMsTmslZhjp5iR458LotCzkTLJzUpYHIa78-vVsNIOefqRZy777kxEJaUhAjGUxZOXnexdI1GhoKeWjAB4sXa6a6wJJqJQlnkagcn3AP28xk="
+  ],
+  "grounding_date": "10/11/2026 11:26:46"
+}

@@ -1,0 +1,21 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "Aqui estão as informações sobre a transmissão da partida Toronto Raptors x Milwaukee Bucks da NBA, realizada em 06/11/2026, no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A partida Toronto Raptors x Milwaukee Bucks foi transmitida ao vivo no Brasil pelo **NBA League Pass**. Embora ESPN, Disney+ e Prime Video também transmitam jogos da NBA no Brasil, a cobertura específica para este jogo em 06/11/2026 foi confirmada para o NBA League Pass.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão da partida foi às **22h (horário de Brasília)**.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Overdrive - \"Raptors x Bucks: onde assistir à NBA e horário (06/11)\"\n    *   Overdrive - \"NBA em novembro de 2026: onde assistir aos jogos e horários\"\n    *   O Tempo - \"NBA Cup tem nove jogos nesta sexta, com 76ers x Cavaliers e Lakers x Blazers em destaque\"\n    *   Lance do Jogo - \"Onde assistir Bucks x Raptors: Palpite NBA em 06/11/2026\"\n    *   [Nome do Portal não especificado no snippet] - \"Onde assistir aos jogos da NBA hoje (06/11): veja horários e transmissões desta sexta-feira\"",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEWs5pLhAjwscWK-n-_kOnXgHwzt7xKdSXfos_ME9x9YctoJgFiip43hjgbhmPD5wx88qOsW_mT1RNymZxP5fC1Vf_83yAbar4nVyFTYZQZhVl4SeZyPkMXQEBfDkUxAczJlGADyItsqCiUoK1dKRVOkHfKFK9DsLPQ7B30MQRFDm3iyxM=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG8vQc1J2n_yFBGaH5LJ--aev-07M5tRfW8xe7Kt_PNaTcSktW3HCClRj3G62-TPv4nohEDDO6UQ34fjJSBKcodlvf4xM_9BDOjU5vvGglb8DlouQAAl6HuwGKjj6Zkyd3Id98aSINzOsZ8u7kqEpdj_fMpN2bMs42OqZDyHZUs_FMabpeRx-AWCbfSH2EEuozMAkUXVGBHTHrReR6Am6hOg-4QASF_PFHS0AbdeB4SGBQyAJerYKUI9kemnWjsO8qhQJyKZYd1hacRJ5WJrW-wnEuJCOP5fF4=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEw_NV_aAsgEFcjCEYfY9WpBXGYFAwGk-JJLegSlTW_GvLXG93Fx13j2yGDr9TBUp5VK0LodFAMINGP-6IPTzwUriGdvlUCvMi4iRtmUIro055kIEDvzRiJK5GyAmV14in4E-CZJLS8cEZmXGTXcU7tr7YXEr1jSlYw8MdJSS8Qad48mHVMwpfjC1-ZLde3B4q5mktBTEiW_Z9RVeN4J5mmhjOwPXWaqzqKK2yr7c_MjzBtBXjOm1z7tpPOQ0keeRT-SIMjbfwi4Mcv",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH7XnErLxkSH-Czy6kDODf08iZmsu5JeDSSDCQNP0gP4tE_z_63IgLVk767ZxhfFw0wVV4FLYqiCU5kYmKw9M-er1jtS_QnwTKYiajYEkavuIc9Mbq-cByuYRo1LU3FQyEVwiwJVfTLJb_rBARqSMm3yWAeze8oxwNJ7vGPvOgiQzVDnWW6iQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFN8dFLhm7Pg9IZa0A08dQuDWMT3v_5zu1zE5bClmKIyH8kAf6MS8p3ZPkRe49xcQxETxwE3zJrQq-btj7aNjPsSBuPRHaOx44rDOv2PMDN_WlldU1F4r-NcpFGg5jTolBPI5cTAAv5dKJnuDKjcdH0uTjZJuPiYltQNWSRzDsXNr9KYalw7TF6p058k6Q="
+  ],
+  "grounding_date": "10/11/2026 11:19:01"
+}

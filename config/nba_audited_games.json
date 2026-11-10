@@ -1491,5 +1491,57 @@
     "email_sent": false,
     "sp_synced": true,
     "audited_at": "2026-11-10T10:29:27.614840"
+  },
+  "401909956": {
+    "audited": true,
+    "has_visual_proofs": true,
+    "match": "Indiana Pacers @ Dallas Mavericks",
+    "date": "09/11/2026",
+    "score": "122 - 125",
+    "platform": "NBA League Pass",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_ind_at_dal_20261109.pdf",
+    "pdf_size_bytes": 2451685,
+    "email_sent": false,
+    "sp_synced": true,
+    "audited_at": "2026-11-10T10:35:23.143278"
+  },
+  "401909957": {
+    "audited": true,
+    "has_visual_proofs": true,
+    "match": "Denver Nuggets @ Houston Rockets",
+    "date": "09/11/2026",
+    "score": "100 - 110",
+    "platform": "NBA League Pass",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_den_at_hou_20261109.pdf",
+    "pdf_size_bytes": 2386904,
+    "email_sent": false,
+    "sp_synced": true,
+    "audited_at": "2026-11-10T10:35:38.898899"
+  },
+  "401909958": {
+    "audited": true,
+    "has_visual_proofs": true,
+    "match": "San Antonio Spurs @ Phoenix Suns",
+    "date": "09/11/2026",
+    "score": "122 - 96",
+    "platform": "NBA League Pass",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_sas_at_phx_20261109.pdf",
+    "pdf_size_bytes": 2254819,
+    "email_sent": false,
+    "sp_synced": true,
+    "audited_at": "2026-11-10T10:35:53.895680"
+  },
+  "401909959": {
+    "audited": true,
+    "has_visual_proofs": true,
+    "match": "New Orleans Pelicans @ Golden State Warriors",
+    "date": "10/11/2026",
+    "score": "87 - 138",
+    "platform": "NBA League Pass",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_nop_at_gsw_20261109.pdf",
+    "pdf_size_bytes": 1986747,
+    "email_sent": false,
+    "sp_synced": true,
+    "audited_at": "2026-11-10T10:40:52.793190"
   }
 }

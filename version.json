@@ -1,5 +1,5 @@
 {
-  "version": "2.4.45",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.45/Monitor_Esportes.exe",
-  "changelog": "v2.4.45: Blindagem contra relatórios fictícios e discrepâncias cronológicas na NBA: eliminação total de stubs agendados e fallbacks estáticos; sincronismo canônico entre Game Book oficial, plataformas de streaming e Gemini Search Grounding; comprovação técnica visual completa com 8/8 frames tarjados em BRT; sincronização automática de relatórios de lives do YouTube na biblioteca dedicada 'Relatorio Jogos Youtube'."
+  "version": "2.4.47",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.47/Monitor_Esportes.exe",
+  "changelog": "v2.4.47: Sincronização e geração completa dos relatórios de YouTube na biblioteca dedicada 'Relatorio Jogos Youtube' (Coritiba x Grêmio, Inter x Botafogo, Inter x Coritiba e Grêmio x Galo) com 10/10 marcos e frames carimbados em BRT; auditoria e sincronização temporal estrita da NBA (confronto fiel de Jump Ball/Halftime/Encerramento entre Game Book e Streaming); testes automatizados (13/13 aprovados) e total prontidão para a reunião executiva SAM (NBA | Gauchão)."
 }

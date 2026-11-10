@@ -1,0 +1,22 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "22:30:00",
+  "summary": "A partida entre Orlando Magic e Golden State Warriors, realizada em 07/11/2026, teve sua transmissão no Brasil da seguinte forma:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A transmissão ao vivo no Brasil foi confirmada pelo **NBA League Pass**. Embora ESPN 2 e Disney+ tenham transmitido outras partidas da NBA na mesma data, não foram listados como canais para o jogo Orlando Magic x Golden State Warriors. O Prime Video, que geralmente transmite jogos da NBA, mostrou um replay da partida \"Magic vs. Warriors Sat, Nov 7\", indicando que pode ter havido transmissão ao vivo, mas o NBA League Pass é a plataforma consistentemente citada para a transmissão ao vivo deste jogo específico no Brasil.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão foi às **22h30 (horário de Brasília)**.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Overdrive - \"Magic x Warriors: onde assistir à NBA e horário (07/11)\"\n    *   O Tempo - \"NBA tem sete jogos no sábado, com Nuggets x Pacers no México e Warriors em quadra\"\n    *   365Scores - \"Golden State Warriors x Orlando Magic: onde assistir ao jogo da NBA hoje (7)\"\n    *   Jornal DCI - \"Onde assistir o jogo do Warriors x Magic na NBA neste sábado\"\n    *   Hoop78 - \"Warriors x Magic hoje: horário, onde assistir e escalações\"\n    *   Prime Video - \"Watch Orlando Magic on Prime Video\"",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHqU-bCV6UM5EzIcJTSc93EE5pfl9667F2m0oEB3w-wwzac8q-FA8g2ZL5_LzADokPpf6K5XjojkMR3PZn1RIBGdTE2tGig_hY3yekG5jKZGrlyRQxkSU_DKy3UexSWDII9ZvQR4Q9kQOPkQolvY-8EgCrxY7oUlZNyVXy1vXNxAH61Wv0ymg==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG-aByjp_KqAUK_tggkGLoCKO5D1HHrQYUzG0L-SMjqc1xN5bomyKKa4nhoGeeCOgt6_k_W5OjaypJwX-rFMmf1y_5Y5NWAcdJeHCRsqQseSn3ieGPplCaGQp9791th-UKjDXOf-aA58t-C-FtuPK6UvWD783vBuwxu7vxBygMMq_rT5Lk4yKx0A-FlonEBZSMXP319QbRaV8Dt-u0_gJbUEupsBlWizTGVOCtHA9p22u6TdeNC9zxnprgLn4_vfkP5Aptc",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFKgm4PsfqA1VZNk3nb9WCntVwFoGcSmfChVNL2mJQY-vSOMTU1DGUeYMBXE-fnQrSr2JSGAKcgYIt7pFweRBcwXvDU6j7pz5dUgj2MJyN88uzC1MFEwNCk6aB6CrwPOWPbSpmPus-GEGZBpM5CNoux-XQ_DS3lqnA-tKxPoFY1yj2mHXgAzhD2piHsATx_R76q",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG-whjXPYPrq5JKp-a83NBxg14KVFlMfNR1XpMlXjr3Ec10smkRXb1j7DEoCJnZ-oeDUpq6Uj5B_SPXSHQyt7pwJxgntJFrd2eHxQQnh5rjj-Lha_8IP7GKFaVqVJ40oNb4yEqDx7lZms0riUxYyQs72f3CYfKZzhnuCmxaeWv69kjEsJBQ8HYCWOC9P7YRaui-ANpSki3jDe6hgrFPZWA8",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHM1TSiACLzw72CtDhR7mqr0fMBoCG4MMkZLfG-KAHYQDqzOcPm8gY4jNxShHQTfL2asJhSs5qhiyBG3tHc3werOY1-wZK8B-aHSOkCuveFdsU1aZ6ecKsoLdMxYm-12PyQp-e17GbQ8-2Fg_wYP7gAeaRTF6sgnu_X6vQdrr8D3hyEwYIeT6jpKfmlIvrD32tz_g==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHSUaizFwoS_mIROy2DGImhSFfwscr37in7xOI070-u2vx8PEjo6ptmWjdOem4-Vy7yy374VHjYfzifZPW3iKiRQO1qv1WXVz9efzfn6pogx0Y_FMvgZngdru8NlW_dcZmKoLslASja8pNIJwTgOF-89AvqDXcPwpSjaLM0PtG3_i0mJjTUVGvmZrj19Q9dFKQ6lPo="
+  ],
+  "grounding_date": "10/11/2026 11:31:50"
+}

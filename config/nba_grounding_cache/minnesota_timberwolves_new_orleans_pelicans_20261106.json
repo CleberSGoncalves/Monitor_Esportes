@@ -1,0 +1,23 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "Aqui estão as informações sobre a transmissão da partida Minnesota Timberwolves x New Orleans Pelicans da NBA, realizada em 06/11/2026, no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A partida foi transmitida ao vivo no Brasil pelo **NBA League Pass**.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão foi às **22h (horário de Brasília)**.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Overdrive (overdrive.com.br)\n    *   O Tempo (otempo.com.br)\n    *   JC (jornalcorreio.com.br)\n    *   Lakers Brasil (lakersbrasil.com)\n    *   Hoop78 (hoop78.com.br)\n    *   Hoops Brasil (hoopsbrasil.com.br)",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGIunC53z6PKWPMYQcRAcy68iepqEQGLf6RQEm7jtgSuR2xqmHKNTsFhhz2R0nPMYfTI-1VrX6Xs8Bd4tp0EFCxIFF0NW6hR-lUJ8SWvMyEvquvZHzeoApJmfJ46gP4qZBiCMqlJVH6Gz1upd1dwHPp1Bvrf2sLewOBy29Tm7iBcSf67wqNzN20j2Uo8Q==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLYGpnHTecEO9IDJokIo0uqeDi1B6MNBRJzl-BTk00GyyQeBUGMW1w-lWWYOsm8EZos0iwdv3Fw5zHwdNbkJ6Er5394rL3E8SzalBTO7xBns_wIKN6EqebMbzIXcl7-oDYFQog03fFxUcq42zyoMfG7x7LaFSCJeOCJRwnjDXLsgkAyY6-ztugHmI2I09uipPITVyW-KtBwTCAFxlKoAQLMM6Gq9lYyhzMk1AYGzUdn8KKpf9_2JCNEv2xq4ocLAt-okOlpaR47k_o4lLjsXA9-BvIWOMkaZk=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGDL98kDYHNBUri0-CFyAW9wrL20okGhlh1PR-NwvJr9SLKvXiNo8J6KqcWYnx0An_Yf1TBenRig9tSZMlA_ACMCri-ttkxrkf_7vYQvIHPn0KBk__WdXDBN4mAh6VCoHXRzjsJ6LRA8z33fUTA5xX2rXlGMIt4ugqIWtZPXiT41mrxWQg=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG8RWnoo8MdFP9QRCvWTPrkcmfpsgzC2E1OH-42Tm7ZvqCnu-u19mDDLQE6bGyGhAUak7qrSosJhAqdj0eTHnMq9yMlKQS5qYbpPNR10XQj7OwxuVVnIMZAO503k5pOLz1TfMLItRP6gLcmomaV8uBKrSWit6NIJwKNrfHa1wlTgY2Iu2E=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFZF5Vm9HV6wd0okfX3P74UWVYam1MZYez15kzgtwvAtT3U4RRoxYeQa0SEc9O6C1oRtNFdr_YO8N6vjfmUpPDI-yr3Bi5IYqyTnlzuAEx_nHxQNyRxHqJ4VgMMMr2Yc8ERBYEwaaHbwFJQjCIc1nRrqNGg5qudIHnQiusu8yv_dvxqF17rxw==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGvAayMVu6GLHSAkAknCBLVnW9iTb5QEX_qX0vGzrdELNToCoNUcXOJ_oBLmclAM5gy0CN5AYQIQxxH3n-jX1kfZv6KkHkoLrgoT6QvZGscdeOn8SOgJ7F6RUuPj78BX9GghjP0YKyZm6RKjRQwjdZACCig7bQxg7e0yQ2WX7nnsD6iTngy7A==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFVU09ZVrd9s_dsCOla5NjQS94Ez065bm8HGC7BLYGlNiZAJsLeXBiFa3M3oMGyugszzbDozREROnwS4SIENsAlynRPcLecqYuZMOSy56ur_Y3U20RgBYOBqLCx7xIRqz-P3SszeyadU695Rk5iKJiwwoukyNDqD9jQ94vyc2V7HdywygXsCt5HYbyQ59ZNn21SNtlCNE8e0FeXLKFb1VceGD3vOM3FRol_sstnkOakscXf31YYjb8ABw7y5LJk0h8lLKAHMvk_syZS",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEU89P7uWaNxM5_QDWxKjOLDTwtpEbuc0UQf7WpHBH3CaPauzxkFeXHsX8WjqY5SqPghg39BM1Z5BZBFVz82miQvW6Eg495uKj8vFbsQ7DbgFxh9-F3mpSixwQM2I0LQnAENQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEj7gR6QUu70Xs0unQ87JnAWPOnSQ9p8BZd6LhMEJQWmlKIxwDs2c3BiiGCLmIYxMcavAzWh59uf3R1MVUJR8DYxanAgiiQ8QNQlyGfyFL8Mgh_IlEFC_BrXhxpK21NFh3jLurwbNtHhc6PtaKZcAH6mRz153BOMTwDFd8Bju-ToMo3CR8Ncdgcz1g4",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHnMF3Jgpq7vcfDc9zm2NNmFaOtEDBOcUEb-Pnz1l7_y0hQFlyLdMjYeTqIMp5d9yxwZavylFXsF6ugjhaaZrDd9RPhWirV1_UHpikEzeqUT9pq8VX6BppoNtz2NA986Y3B_k6q6b7X7wep-1UoEtPIdAkkmW9MwrcJcPhv-DMXr7Tdb22YSyaj1t6zuHI="
+  ],
+  "grounding_date": "10/11/2026 11:20:32"
+}

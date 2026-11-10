@@ -1,0 +1,12 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "Não é possível consultar guias de programação esportiva, matérias ou cobertura em tempo real para a partida Miami Heat x Sacramento Kings da NBA que será realizada em 08/11/2026, pois a data do evento ainda não ocorreu.\n\nAs informações sobre a transmissão (canais de TV, plataformas de streaming, horário oficial de início da transmissão) e os links/fontes oficiais só estarão disponíveis mais próximo da data do jogo, quando as grades de programação forem divulgadas pelas emissoras e plataformas.",
+  "reference_urls": [],
+  "grounding_date": "10/11/2026 11:44:59"
+}

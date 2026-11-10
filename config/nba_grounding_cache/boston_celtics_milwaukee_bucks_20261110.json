@@ -1,0 +1,26 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "A partida entre Boston Celtics e Milwaukee Bucks da NBA, realizada em 8 de novembro de 2026, teve a seguinte cobertura de transmissão no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:** A partida foi transmitida ao vivo no Brasil exclusivamente pelo NBA League Pass. Não houve transmissão confirmada para ESPN, Disney+ ou Prime Video para este jogo específico.\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):** O horário oficial anunciado para o início da transmissão foi às 22h (horário de Brasília).\n3.  **Portais e links/fontes oficiais consultados:**\n    *   O Tempo - \"NBA tem sete jogos no domingo, com Lakers x Pistons e Celtics x Bucks\"\n    *   Overdrive - \"Celtics x Bucks: onde assistir à NBA e horário (08/11)\"\n    *   Hoop78 - \"Bucks x Celtics hoje: horário, onde assistir e escalações\"\n    *   365Scores - \"Milwaukee Bucks x Boston Celtics: onde assistir ao jogo da NBA hoje (8)\"\n    *   Overdrive - \"NBA em novembro de 2026: onde assistir aos jogos e horários\"\n    *   Antenados na TV e Streaming - \"Agenda esportiva de domingo (08/11): jogos e onde assistir\"",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEavDWESJMq1TEPDeLSdlLsvQvKJHuGx31gaU4AT9mOZII5DaxjHMh_VE0T8qDbDRiqzPKQGKsICOoLvxSN48J_aIS1oylb-jfgGfG3aK_hPPInTBgLuPxApvPBv08Eosgfg2EGrxzxJWYeQk4hAqLYv3dKZdAAKImyitoUmcVcHjRGefVKe8GLcmSpFfwyo0ZWhOrzxivIeXOzveoL97jtFY2FSaKZwbRiUxNBOk2OUFpF-tbfPHQ=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHabjCP5P0F-FFdCn6x9xeuK3Ckx0upBp3nylo3pk2O1dwhz4A4hNxjoA9jkIwL1FoMDv_aD71Yp6mUYpmwHOtOwptSWfNK8J3JvVmQlesUXKSIW7ODfIaQ-7HmTMV8AqnHip8QUQNZKydtHrU0xyt3d9HNcFe4qbmfBZZQN4ud4DLpGwXx",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGpVhAbdkDwuePECjHQ-lkEiYGeM3HCbX6ytpIXX4Yp78FoFbrSv-NF1rOFkcPmyY4FU7f0PEdX99fHjgJOOUqRPz1Ff_DM47srd5-gEGnx5nDcboLlFKFAJYjpXv3GQasRjlJpvKMYJDoqDOAI4PI27kUI9jvyh6WZl3Bg0eBcMAaUjw==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEFHyH-6V6ogYgZt8DpjYCjsfQvBnLS0gJx-AqrtJK3xD8Ngcg-9tz5RBhKe-i09SwxdMhnRnU8HMhA-48Rg4TkSSyt81Dd5FcQxNf7wiKWOVvKDnM9McTGI1uX8VXMRBJdLH47kbfvPwqPi-rAZKdWZYLOjy0BJI7Lh4XoCLSdVx_AFe17jtdptg3Vr-fPIxem",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFrDDZxd3Uw5S3243Sb191CwIiEyyNST2MUfKAbstm_TQ1S16MpsBCdw5fcfwAH87FRWEv4y_brRwYs7BflPgBEiJ512BlfJgsDbQLpqtJ_3AT1R6SMZW0k6c_Ib_uBJBwYanDvedjo4Ty6n5anQLvnvy8WwGHNXqOfTUHn-Rk_D7kF33T8aRAt3sKCOqYt-9E=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFPfyLGsR9qmrLTY_ep8Ax3TwSTOzL5ATZooSrRDpmYsBinhOLyLjfLK2N7z78h-agUxCryBpm_Qs3Rumeow00HQOkWqjK9Fu9Qv1MrsHJTi2EauXD1ot0WmiKE-VjviBKVlgjJEx61vubWyCkNKlsmocdbDrvcxQeLZ_uXY2hoDtIdqHwk7Q==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGKAvNGfzgPwZP-jEmZLtZovfdkOBHfqoJBBXLcbtJqXtrg3O83NCSSPhrjHOdnuH_3N85jzEWEgEsUL3BPkfwKH2SkAS3_49tB8gyrKSBM511ATyytZZGXSZjTAfeoBc_R5Y9QLsl1QfsZ-HNIuwp9_SK51hoxXoCF3Vn7Ps6mA2wZX8xmoQcixA==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHn4jenEy37Ck7XCa1xywY7DSecVWXImGnrKvpSdgAVgcidCy4pY42-uDLJo4Lm_uL8J6Un8t9WwTGU0rn74C6rjb-C_-cfWHSjdOR00SbbeXpQLWOMicT9LYf9EDMpdLSwkt6SGIh7bvK3byzmdxNGs56COZADn8TW4Et-2oCXe0nu3gtqq9VJ9H2ygD0GZ2eV",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFgvmrHfM3J9gfQgzqmVEw34rY_Q7db7WP7ENSfCBt54O0ICCOYKUp2agOD4BBVUNMTOVjYc2iMu_Q6bMn9GHgnJ9ri6VGNk-vvo9IRpJ7c0x0gBK27D09Eyn4-Nz7vKckaoEWoUVkCEidE29boPtOXJcbTDHEXK6isGDUXrwknLGFliGUnuEThpf-VhnXTezzpPl1WJ8OCFU7Dc5ClMNQTkrA1UBRMVQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFIfEFKeHB_p3XaeMVIhzvdpB5XnEKNvakfCG5Lz22TRVDdM5N_VSVwac2xjVebVFS83SrGwPMbNsPck98v3DfWkcL1FRmcYv9pnroVS54EK9X_xY2QW_D29piGgX36D3W6FWfzFNhRgfEuMDK4XHbdaPSEVjTKRxbLVZmqwPijbqrPGqA8Q_4="
+  ],
+  "grounding_date": "10/11/2026 12:26:25"
+}
