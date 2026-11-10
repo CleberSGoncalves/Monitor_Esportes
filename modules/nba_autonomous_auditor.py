@@ -252,25 +252,8 @@ class NBAAutonomousAuditor:
                 self._log(f"✅ [NBA AUTO] Partida {match_disp} auditada, arquivada e notificada com sucesso!")
                 time.sleep(2)
 
-            # Caso 2: Jogo AGENDADO (futuro) — assegura que a linha de agendamento exista e esteja atualizada no SharePoint
+            # Caso 2: Jogo AGENDADO (futuro) — aguarda a realização da partida.
+            # Relatórios oficiais de auditoria são estritamente gerados após o encerramento do confronto,
+            # com Game Book oficial e comprovação técnica visual completa.
             elif not is_fin:
-                sched_key = f"sched_{gid}"
-                cur_sig = f"{game.get('date_display')}_{game.get('time_brt')}_{game.get('platform')}"
-                cached = self._audited_cache.get(sched_key)
-                if not cached or cached.get("sig") != cur_sig:
-                    self._log(f"📅 Registrando/Atualizando jogo agendado no SharePoint: {match_disp} ({game.get('date_display')} {game.get('time_brt')} BRT, {game.get('platform')})...")
-                    gb_path = None
-                    parsed = {}
-                    pdf = self.nba_reporter.generate_report(game, parsed)
-                    ok = SharePointNBAReporter.sync_nba_report(pdf, game)
-                    if ok:
-                        self._audited_cache[sched_key] = {
-                            "match": match_disp,
-                            "time": game.get("time_brt"),
-                            "date": game.get("date_display"),
-                            "platform": game.get("platform"),
-                            "sig": cur_sig,
-                            "synced_at": datetime.now().isoformat()
-                        }
-                        self._save_audited_cache()
-                    time.sleep(2)
+                pass

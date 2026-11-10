@@ -1,0 +1,25 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "23:00:00",
+  "summary": "A partida entre San Antonio Spurs e Phoenix Suns da NBA, realizada em 09/11/2026, teve a seguinte cobertura no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A transmissão ao vivo no Brasil foi realizada exclusivamente pelo **NBA League Pass**.\n    Embora ESPN e Disney+ transmitam jogos da temporada regular da NBA 2026/27 e tenham exibido outras partidas em 09/11/2026 (como Washington Wizards x Detroit Pistons), o confronto entre Spurs e Suns não estava em suas grades de programação para essa data. O Prime Video também transmite jogos selecionados da NBA, mas não listou esta partida em sua programação para 09/11/2026.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão da partida foi às **23h (23:00) no horário de Brasília**.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Hoop78 - \"Suns x Spurs hoje: horário, onde assistir e escalações\" (09/11/2026)\n    *   O Tempo - \"NBA tem oito jogos nesta segunda, com Lakers x Hawks e Nuggets x Rockets como destaques\" (09/11/2026)\n    *   Lakers Brasil - \"Onde assistir NBA hoje: ESPN, Prime Video e League Pass\" (09/11/2026)\n    *   Hoops Brasil - \"NBA 2026/27: Rodada do dia 9 de novembro\" (09/11/2026)\n    *   Hoops Brasil - \"Onde assistir aos jogos da NBA hoje? Programação TV/Streaming completa\" (09/11/2026)\n    *   Onde Está Passando - \"Phoenix Suns x San Antonio Spurs (09/11 às 23:00): onde assistir - NBA\"\n    *   Overdrive - \"NBA em novembro de 2026: onde assistir aos jogos e horários\" (06/11/2026)",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF1WjlHVdk-1uohVebjTN-mEr3uf4_o_biD5E7CsABFJSS1anyew6RO6vjQJWxWq5AOpRpyzIM-C5qZTq8brv7ZEJrCR9ou3OvDSHVr89mlyiW1x5c4sY244hdD6w5vWa4fTJDjwGVfE_tXcUXO2NfriFMWM8ZycuyTm8urrk4A0bl9Kz47AM7UVC-T8_sX",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH8M5Rxm5n0TcXgB9pbG8_tzTYuSzzq4calc9Z_xEmvBmM3EHK_2Bn6BeVQmZZiIFl_rojFeDPPEmGpuqPchy6rzA6dRYEh3CFb20cuVD7X8ay4lU2wUEv7SSmQ-W0LL480xNmqlTfqDT1IfKCslYT77moLzAbAtZ8p7r3_3ODXmLmOFioApQZv156sCO3kJC00XTVTUKYGSN53aq0OHUBReki6aOXKZ0KOTk8D5sIQYKpj_YK5rlq9MNYMgCzw_sw10KSsbFoVfAJN",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFU5HN12CReIOaMi4AMtIJoB0HHN2C6iyV-Ff3MjsclM-7lRDsDQn3fOu-1rm78lFcMMJNWQcBsJ-H0ewuXgLTRbOLt8lDDWtqVMwspYM8DWGET7zDW63LwGTXEEuD0tKXJ8w3O4d4=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHym-0GhtcLvuBTviRR_ccyRYzOBAckuYz1FKWSv0hirLAqPSon_zUaNDoGZba5-niH1NhufBknfDushTfnTfMu4wIJOnlQIhAktkegGUthtgd0eynhMa-dkI7sJ_faDja2ITQz-atIDBa4kK8Jl-A5Q-X5UKxixahRI4EO-KM=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGDuRNbmF_pAkJnE726mU39HiPv_vgyi6gtVJ2Zz-Lk7D19Zc4ZlyN2ybYsDfEyOdeHJq4PHYwIE8CpomouHOpPtohQkKsD8GYQ63hWybzJkJ-4kExBY3IFQrgFeZLaUDG8frRpmd2EnyTctamMSWgWAQuUmGfoVoZYBcIcFlFieu38o00l5Z0=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGn6YduCXzisllpTKrSRU9TrMGtYnPwoARJ03zIvfxVXPeRZ5M8joaPv_GdT8cAd3WGFoTkVqHWtSWCr5YavppFJLIFEq31mXYFbAbp2jHv-dEd1x5Smo0P068DI4CSoXRHucAMkQ8eiIiKnD2ctaJaOQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGRSFyD3uB7t2daddD_GoZTEkVFwwxRZ_Ziwbi6Ym2g5KJ1PvsRbM0mtTjZCMINsaYRNe50210hiEkDTzRAyUcOea0S72fN1GveG1Gv73nbfaD5EIp7gN-S5YEKRB88PFraBO-xigc-5arldhechOx7qfA-onfpKxOIPW6bRMhCcoEtRZcR5w==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGEsEfYA3qVvbhL8j97JT7c_WC9dsFTbpbk-_ZEgDXpbHriWWMTQAKspcAJRRxsajE7e0hGTCDTtaZSjye9k9foBH9fxuXJCiUeY5j89VxiTEt8rCt8aQjSKXGhzMnRbpHTHuD0B7Jt9Epfofmxa8wiZXPZCrOQmMQllXVcrGTGCfMO5HkPeOBl2JfnkFJa",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF0_20reAuGyvgdXCUpfk08Irzmo6L918OYhWnyDue4WIr0tFreHFR8l_Jaiouc-z-v8VS7CDe187YVYDni-GVbKeWgs8y8MD_0b8AcxKPNVpKJ9MuDnHdYJvynhTQoXElfpUZoAwdRRsl3W-3Pu_s-8zhtjGdxK1ugdHy4xnqWr2sWMBG3Sb1iHOwIuIGlqnpId2zBiK5RrX1A_LHgT7ISixC1S9d2KsBNJuOOSj46brGF6CxP2yI2yVG8Zn2tKPKsGlK0Jo-3"
+  ],
+  "grounding_date": "10/11/2026 10:25:30"
+}

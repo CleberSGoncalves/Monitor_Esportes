@@ -18,15 +18,15 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.44"
-    release_name = "v2.4.44 - Perícia Real com Gemini Grounding para Plataformas de Streaming NBA"
+    tag = "v2.4.45"
+    release_name = "v2.4.45 - Blindagem Total contra Stubs, Perícia Real NBA e Sincronização YouTube"
     body = (
-        "### Novidades da versão v2.4.44:\n"
-        "- 🔍 **Perícia Real com Gemini Search Grounding**: eliminação total de suposições ou matemática cronológica para plataformas de transmissão (Disney+, ESPN, Prime Video).\n"
-        "- 📡 **Sincronismo de Grade e Quadra**: conformidade absoluta entre grade oficial de abertura do sinal (TV/Streaming) e o Jump Ball oficial registrado no Game Book da NBA.\n"
-        "- 🔗 **Fontes Oficiais Homologadas**: incorporação de links diretos e referências jornalísticas nos relatórios em PDF (ESPN Brasil, Disney+, ge.globo, Lance!).\n"
-        "- 📐 **Otimização Geométrica do Layout**: proporção ajustada das evidências visuais (2 cards por página) eliminando páginas em branco ou quebras indesejadas.\n"
-        "- 🛡️ **Comprovação Visual 100% Homologada**: extração e tarjamento oficial para todos os períodos em todas as partidas."
+        "### Novidades da versão v2.4.45:\n"
+        "- 🛡️ **Eliminação Total de Relatórios Stubs / Agendados**: proibição absoluta de gerar relatórios preliminares fictícios (19:40 / 0-0). Relatórios oficiais só são emitidos após conclusão real com Game Book e evidências visuais.\n"
+        "- ⏱️ **Sincronismo Cronológico Canônico**: conformidade rigorosa e harmônica entre a grade de abertura do sinal (Gemini Grounding), Jump Ball real do Game Book e transmissões em streaming.\n"
+        "- 📸 **Comprovação Visual Oficial (8/8 Frames)**: extração garantida de frames reais dos vídeos oficiais de Highlights com tarja regulamentar de auditoria em fuso de Brasília (BRT).\n"
+        "- 📺 **Sincronização Automática do YouTube**: integração nativa e automática de relatórios de lives com a biblioteca dedicada 'Relatorio Jogos Youtube' do SharePoint.\n"
+        "- 🏀 **Homologação Completa da Rodada**: auditoria e publicação definitiva de todas as 8 partidas de 09/11/2026 no SharePoint."
     )
 
     headers = {

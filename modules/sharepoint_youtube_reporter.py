@@ -147,7 +147,6 @@ class SharePointYouTubeReporter:
                 "Canal": canal,
                 "Data_Jogo": iso_utc,
                 "Placar": SharePointReporter.normalizar_confianca(confianca),
-                "Confianca": SharePointReporter.normalizar_confianca(confianca),
                 "Auditado": True
             }
 

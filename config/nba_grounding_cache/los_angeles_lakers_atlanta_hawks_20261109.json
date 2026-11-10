@@ -1,0 +1,23 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "A partida entre Los Angeles Lakers e Atlanta Hawks, realizada em 9 de novembro de 2026, teve a seguinte transmissão no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A transmissão ao vivo no Brasil foi realizada exclusivamente pelo NBA League Pass.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão foi às 21h (horário de Brasília).\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Lakers Brasil (via Vertex AI Search)\n    *   Hoop78 (via Vertex AI Search)\n    *   O Tempo (via Vertex AI Search)\n    *   CNN Brasil (via Vertex AI Search)\n    *   365Scores (via Vertex AI Search)\n    *   Hoops Brasil (via Vertex AI Search)\n    *   SpaceMoney (via Vertex AI Search)\n    *   Prime Video (como plataforma de replay)",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGKycsQCmabYGI5XyGuhaSi1i_tzwKGfQGlBFlPcZYObA1q8_L3Vhg015ZqT0QeMG1afFqETW2K9aGk_xMz7ZJYwzrpbn7SZgx5DjxU2PAgLmoLyO9LWkyJ7NMvOnGadi9-s311cXtoJWrO-lYJsM6thRCST3ngJkdJubUNpQOBOcmLSF8gNDbCsUlrppyR",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGqY_Im3CiP6cR5tS-IOSpR20D7MY7p7fi9kXTv3W--IIpqYY77sckLSzO7FQJfPF_hiPLDm-DgQEFALUfSIxXUwcA8BL-oD0hblMBihPYLAcRUqv2ydpnY5KFvH9dUDoj5g0qin1eTNAB8WwvfV24D65ncJKge-mDhsz7UIjiyV3Bs3h7P0i4uCB6Fibkyslc=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQESUeTOCEC8fNNq2e2eL5omTssDOzLbINQ7gAQOP_VvDLy9N_TS8qEnjbQlw0L9zSV4wmSo4Fw2QP7wFWYusyjxswb57wld1MGGqsoP01Zi2a_xU2_Dfrg-hRH6Rn3I-BkCpiAIo0Z7PvqXAXaWr9DQRqQDO8h8ekA6YAUEYvJtjKIYXjMcENnI8VCbs3Q_k0oIiim7KDwbCWsXpEwm5y0qnbNu79Kce2_HV05ZKwu8liQMZCpqJPT9vZi9Ep1SJ5BVKtAgwLEMg7YH",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFXfsv8KSRfaMuORuWGA2wnHaruUk2tFJFIPepZP-4th7bgM4xgBIcCxvXrOknxsTJgVnf9M1tLbOelx1R6B07mmpWTd1-ErF58Sqt0VTCbzywngrJuHYs91JF0yGGwvpMKFUkt_s9SG3HtPhZT2tVCfstPNossCTuw4PRNRNfyamIhuht-OY-34LIsSdguu_yQ_akksinuDKmtJlgQlbJBToYH9JIMl5fKXm3Mj4k5atYkkks=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE6tkaEGSbSQlGxXDmKB_fm2QfsTPsa6lkOZoNHBvzYncPpss_764CmQDD8I52_g7LbH6enXyujaGzND0Uvj6pXgrIdT0DkKo40J2NzGdRWY-Hxs3k4zIx0tXwY17nFv1ICa7g_HKVq0LqrnoNenkmor3YCnlC0So2h3gksyilA5d5ER6OBaHrNdcZdyEXylVMn",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEbNhTlJ7hin2lJwoQzj7MM4XmFbIYv5Is-W1g_Ul_VMig30CeiPzCSVTP8MudhT9PsFnc7gYc03HRypbrvtdpKQzSK-hYoAH8qySN-0xuUVe6Z3XTwkjo3tAKJfWC1mCR0pFWOujMQkc3SJqhjC328Tw==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG_60obuezx9TdWyynR3MCq6i2oB8c11axPnTSZZbgonqTJERx3TWme1zN5LybMQGGOc2cq3qQRFMN1QIxDKuG-WdOB0uTF4eESYv7gDiQhQK4twb5Z2LxrCDK8Vw93l_6zVNyBUC4EcHIxccVMkOzAiGQ7ZYXeQmQXQ8UxqxyaeLTJug==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEXEiQ42IgwDP1V-lRW9OCoFrtCYS_y3LIJi0tv9kV9cHcvVSKNIebgIF-VODlYX7QCIr_-vrxoSP00zu45XvVHxvwDXzfG6sbrkSgMfbjEamaDl1n4tQMhjfTy-zGBFQ-x7hwBjPS0tm3ue0kBiPiQPVm5uxXkDeZdSv2Nn9IybhWBbzU=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHVbS29_59aXA4TGx3DwWB7ax7rLNSnLEY4ietC-_jLsRx8aRq-DHdYdtP56PqQcL2TNql_wdgxou6vWZrO-GPETcHPku-GE8VdUk00SGQ9yONFDWuEPUSdkBzWBc97Yh_aQI3uwOZOE9yxjQhSrS-jCOCyl_SCCUucofZjGYaF5cHJUolqAvZqlp5wV7LfGj8XbCA="
+  ],
+  "grounding_date": "10/11/2026 10:08:43"
+}

@@ -1,0 +1,26 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "21:30:00",
+  "summary": "A partida entre Memphis Grizzlies e Toronto Raptors da NBA, realizada em 09/11/2026, teve a seguinte cobertura de transmissão no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A transmissão ao vivo da partida Memphis Grizzlies x Toronto Raptors no Brasil foi realizada exclusivamente pelo **NBA League Pass**.\n    ESPN e Disney+ transmitiram outro jogo da NBA no mesmo dia (Washington Wizards x Detroit Pistons), mas não a partida entre Grizzlies e Raptors. O Prime Video, embora tenha um pacote de jogos da NBA, não listou esta partida em sua programação para 09/11/2026.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão da partida Memphis Grizzlies x Toronto Raptors foi às **21h30 (horário de Brasília)**.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Overdrive - \"Grizzlies x Raptors: onde assistir à NBA e horário (09/11)\"\n    *   O Tempo - \"NBA tem oito jogos nesta segunda, com Lakers x Hawks e Nuggets x Rockets como destaques\"\n    *   Hoops Brasil - \"NBA 2026/27: Calendário de transmissões da ESPN e Disney+\"\n    *   Franca Esportes - \"Toronto Raptors x Memphis Grizzlies\"\n    *   Lakers Brasil - \"Onde assistir NBA hoje: ESPN, Prime Video e League Pass\"\n    *   Hoops Brasil - \"NBA 2026/27: Rodada do dia 9 de novembro\"\n    *   Hoops Brasil - \"Onde assistir aos jogos da NBA hoje? Programação TV/Streaming completa\"\n    *   Overdrive - \"NBA em novembro de 2026: onde assistir aos jogos e horários\"",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLbilUiffDGVmeTuS8dhjM9Ar7V3Jbjq_U5Ru63tUW72Iq0TQPYGNcL1C7ZQj0UEAyiRfCthJsMw55UG7VUmyktL6X3Jr_TsMENth1Szk3LDR8vOpNkoB8I4dXS04NDw7OaqObXYqw1sUxYZLTavWRkfsWKhORA3n9hJ8KZs_pSvurCy_rjC3YWQ==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHOZNdqkCDETpOKb0V4OZWJpy3cgjoPn4DqxNfJmnlR9tMWdmqaYP8cxpcNrbOj5fHhqOr-Dm0QEUgsnwKBuqHdYgpF8xqlndFEAbWL6ytZ6osm91uzqjrLXLdOrmJY2J7bXbV9R9vU0kv-Je9cdASK1zp7DK6BYNLtqHl5kpPx3nONk1AoaqIES8tbbmsyDRUW2JXcFTyU6hS-J9tbEZij91xOtqO9FzOFIjGw21ORxTpK7vXL9nIbqn67RPNAGuMbYsUmrx3W_5CB",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGsIaelOZzvXbSkq7TmQ2Wy-fKfha9ELhRncSMgI2LgqKefD_nCsPpOD5CNouUaWgMNMqVYYOnd072MHMQxKALitzMQZ9GvVrXC0GjqQqNHzAxWRNhNV0bukN4PnOEQdiiy6BRf5Xg=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQECCDLgSIw7Ap6PIq0IBHmNn8c_AFWzS-V0hUsBWv8Pb7fCSarQe5efFYJ1fynlEqBCOCySxr2wBY29V7XPn5wVynzxVKLEGlW0rZBE4S-lFHJkVnHmEdxdFgRBwJw8i10J2qISJbHGHqRx0euYz8oPoED5kKTGUt9z08dHxTM=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHKIZ-29YCnRqdiXKRO-6Xb2ZEuOoPZHGvsWqQLKNVpONB-A48baWYCGhmNgkw9OOUUwPUnqOtIf5_TBZFxoJjgFtCRQIp5kuCGALE0zXsu9gjqEybDcD9WG8ptijLoqeUb5aouevKGTqZms9kc0Lr0Yg==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGGzg9sai84I7ZotD35MIdQGrDWVpBAv-Lwz5ECcvKaas-4nxfSAQ2MXJKCOamvQTnnqvTn-9RTk8aGu-gdTLWvUufyBxS1BQO6wjZE3to9YWQhdpQRQ_x5pRbsxJcf4cXu_nAxYaIzB-0AMMdgRC-TrdFIUnDRI51ODRTFhl25jYySIONCha4=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE-HsFXGBWbyp0I2lPXu71vhumx0qSnthFbEwI-ZAN_W51V7hzy28Er1woLcaLnM-EZIqlJarS7vRqG1YlfnC3XQBvHfXfSfAH28ko3XOG8KzWkA3-eQUYFN-_tOvZt9fG_y7XWrdE4SK_qj7xFD9rFS3mHhgYDvXdaormy8lu4BxzXyKndEA==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFfK8ZjPg4qx3_LsWskceQIPThilM8yC5moXQGjYYPq1mkh54qg0eLsfnNkXTqAl5sFu9WPpLXv6r4C0wptLJj96_f9dCEIDGMck22LEPGL9ztDorKLghazZH-jaeSHS5-_8hu2KVKtJmZTDmLqa9UdNAxRckNQp3V133uVM34PehNT19a8Bs8wwVXtGEt_",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFnUOSXajChvxIZvwWRuJgenKpz6mXxyqhm-9rGtiZITWJ4uuU4A0VWCPIOBiA4YdHtkNavL1vJNokTgNfXMsPi0WeSUFpdG4VauJ3uPk8iQThNQu4rraoxHELiwAfaYY5zIRNh0KfNrtL4sLD_TQDLePF9JQ82YuyONt6smE6YaLGMDg_E9p0WNuKKY5NaLCiD",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE3Z96qPZPRzMyOIOsk92nHs7pVWd9-FRg_U8Jr9cHKydhXo2aU5ZJfTtG6ofCdWxQSKeTay4lP-D46LSC1eNgpiU-3PFt5elKKmnvkaMzNRErr97wTk_IH7vUqkg_Cex09h8lPX-DndJUzVfW9soZI"
+  ],
+  "grounding_date": "10/11/2026 10:22:52"
+}

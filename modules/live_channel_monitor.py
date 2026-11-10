@@ -1818,50 +1818,50 @@ class LiveNarrationService:
 
 
 
-        # Disparo desacoplado em segundo plano (SharePoint NÃO é automático para Canais Live, conforme solicitado)
-
+        # Disparo desacoplado em segundo plano: Sincronização automática com SharePoint e Envio por E-mail
         def _bg_sync():
-
-            # Nota: Sincronização com SharePoint em Canais Live é estritamente sob demanda via botão na interface
-
-
+            try:
+                plog("☁️ Sincronizando relatório automaticamente na biblioteca 'Relatorio Jogos Youtube' do SharePoint...")
+                self.sync_event_to_sharepoint(vid)
+            except Exception as ex_sp:
+                self.log(f"⚠️ Aviso SharePoint: {ex_sp}")
 
             if auto or self.get_setting("auto_report", True) or self.get_setting("auto_email", True):
-
                 try:
-
                     plog("✉️ Enviando relatório por e-mail...")
-
                     self.send_email(vid)
-
                 except Exception as ex_em:
-
                     self.log(f"⚠️ Aviso E-mail: {ex_em}")
 
-
-
         threading.Thread(target=_bg_sync, daemon=True).start()
-
         return {"ok": True, "pdf_path": pdf}
 
 
 
     def sync_event_to_sharepoint(self, vid: str) -> bool:
-        """Sincroniza relatório do canal do YouTube para a nova biblioteca dedicada 'Relatorio Jogos Youtube'."""
+        """Sincroniza relatório do canal do YouTube para a biblioteca dedicada 'Relatorio Jogos Youtube'."""
         try:
             ev = self.get_event(vid)
             if not ev:
                 return False
-            pdf_path = ev.get("last_pdf_path") or ev.get("narration_pdf_path")
+            pdf_path = ev.get("pdf_path") or ev.get("last_pdf_path") or ev.get("narration_pdf_path")
             if not pdf_path or not os.path.exists(pdf_path):
                 from pathlib import Path
                 match_id = ev.get("id") or vid
                 candidates = list(Path("reports").glob(f"*{match_id}*.pdf"))
+                if not candidates:
+                    p_clean = _safe(ev.get("match_display") or ev.get("title") or "")
+                    if p_clean:
+                        candidates = list(Path("reports").glob(f"*{p_clean}*.pdf"))
                 if candidates:
                     pdf_path = str(candidates[0])
             if pdf_path and os.path.exists(pdf_path):
                 from modules.sharepoint_youtube_reporter import SharePointYouTubeReporter
-                return SharePointYouTubeReporter.sync_youtube_report(pdf_path, ev)
+                ok = SharePointYouTubeReporter.sync_youtube_report(pdf_path, ev)
+                if ok:
+                    self.update_event(vid, sharepoint_synced=True, sharepoint_synced_at=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+                    self.log(f"☁️ [SharePoint YouTube] Relatório de '{ev.get('match_display') or ev.get('title')}' sincronizado com sucesso!")
+                return ok
             else:
                 self.log(f"⚠️ PDF não localizado para sincronização do evento {vid}.")
         except Exception as e:
@@ -2014,11 +2014,12 @@ class LiveNarrationService:
 
         pdf = self.reporter.write_expert_report([res_payload], prefs={"show_chrono": True, "show_milestones": True, "show_secondary": True, "show_sources": True}, sync_sharepoint=False, name_prefix="caso_ocorrencia")
 
+        from modules.sharepoint_youtube_reporter import SharePointYouTubeReporter
+        sp_ok = SharePointYouTubeReporter.sync_youtube_report(pdf, res_payload)
+
         self.update_event(vid, pdf_path=pdf, error="", progress=f"Relatório de ocorrência gerado ({os.path.basename(pdf)})",
-
                           generated_at=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-
-                          sharepoint_synced=True, sharepoint_synced_at=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+                          sharepoint_synced=sp_ok, sharepoint_synced_at=datetime.now().strftime("%d/%m/%Y %H:%M:%S") if sp_ok else None)
 
         self.log(f"📄 Relatório de ocorrência gerado e publicado no SharePoint: {os.path.basename(pdf)}")
 

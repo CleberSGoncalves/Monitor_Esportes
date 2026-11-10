@@ -1439,5 +1439,57 @@
     "email_sent": true,
     "sp_synced": true,
     "audited_at": "2026-11-05T11:06:55.976132"
+  },
+  "401909952": {
+    "audited": true,
+    "has_visual_proofs": true,
+    "match": "Los Angeles Lakers @ Atlanta Hawks",
+    "date": "09/11/2026",
+    "score": "124 - 114",
+    "platform": "NBA League Pass",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_lal_at_atl_20261109.pdf",
+    "pdf_size_bytes": 2122879,
+    "email_sent": false,
+    "sp_synced": true,
+    "audited_at": "2026-11-10T10:28:41.775294"
+  },
+  "401909953": {
+    "audited": true,
+    "has_visual_proofs": true,
+    "match": "Cleveland Cavaliers @ Charlotte Hornets",
+    "date": "09/11/2026",
+    "score": "112 - 124",
+    "platform": "NBA League Pass",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_cle_at_cha_20261109.pdf",
+    "pdf_size_bytes": 2292330,
+    "email_sent": false,
+    "sp_synced": true,
+    "audited_at": "2026-11-10T10:28:57.042958"
+  },
+  "401909954": {
+    "audited": true,
+    "has_visual_proofs": true,
+    "match": "Washington Wizards @ Detroit Pistons",
+    "date": "09/11/2026",
+    "score": "111 - 122",
+    "platform": "NBA League Pass",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_was_at_det_20261109.pdf",
+    "pdf_size_bytes": 2094110,
+    "email_sent": false,
+    "sp_synced": true,
+    "audited_at": "2026-11-10T10:29:11.925480"
+  },
+  "401909955": {
+    "audited": true,
+    "has_visual_proofs": true,
+    "match": "Memphis Grizzlies @ Toronto Raptors",
+    "date": "09/11/2026",
+    "score": "118 - 102",
+    "platform": "NBA League Pass",
+    "pdf_path": "E:\\desenvolvimento\\Monitor_Esportes\\reports\\expert_nba_nba_league_pass_mem_at_tor_20261109.pdf",
+    "pdf_size_bytes": 2445386,
+    "email_sent": false,
+    "sp_synced": true,
+    "audited_at": "2026-11-10T10:29:27.614840"
   }
 }

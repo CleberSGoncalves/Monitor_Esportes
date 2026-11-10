@@ -168,36 +168,18 @@ class NBAReportGenerator:
             ]
         ]
 
-        if milestones:
-            for m in milestones:
-                p_name = m.get("period", "Período")
-                ev_type = "Início de Período" if m.get("type") == "start" else "Término de Período"
-                chrono_rows.append([
-                    Paragraph(f"<b>{p_name}</b>", body_style),
-                    Paragraph(ev_type, body_style),
-                    Paragraph(f"<b>{m.get('time_brt') or m.get('time', '—')}</b>", body_style),
-                    Paragraph(f"Protocolo oficial registrado no Game Book da NBA ({m.get('time_local_str')})." if m.get('time_local_str') else "Protocolo oficial registrado no Game Book da NBA.", body_style)
-                ])
-        else:
-            default_events = [
-                ("1º Quarto", "Início", "19:40:00", "Bola ao alto (Jump Ball) e início oficial do 1Q."),
-                ("1º Quarto", "Fim", "20:06:00", "Encerramento do 1º Quarto."),
-                ("2º Quarto", "Início", "20:09:00", "Início do 2º Quarto."),
-                ("2º Quarto", "Fim", "20:40:00", "Fim da primeira etapa (Halftime)."),
-                ("Intervalo (Halftime)", "Intervalo", "20:40 a 20:55", "Intervalo principal regulamentar de 15 minutos."),
-                ("3º Quarto", "Início", "20:55:00", "Início do 3º Quarto."),
-                ("3º Quarto", "Fim", "21:21:00", "Encerramento do 3º Quarto."),
-                ("4º Quarto", "Início", "21:24:00", "Início do último quarto regulamentar."),
-                ("4º Quarto", "Fim", "22:08:00", "Fim do tempo normal de jogo."),
-                ("Fim da Partida", "Encerramento", "22:26:00", f"Apito final e encerramento. Placar: {score}")
-            ]
-            for p_name, ev_t, t_str, desc in default_events:
-                chrono_rows.append([
-                    Paragraph(f"<b>{p_name}</b>", body_style),
-                    Paragraph(ev_t, body_style),
-                    Paragraph(f"<b>{t_str}</b>", body_style),
-                    Paragraph(desc, body_style)
-                ])
+        if not milestones:
+            raise ValueError(f"Não é permitido gerar relatório da NBA sem marcos oficiais do Game Book ({game.get('match_display')}). Auditoria técnica interrompida para evitar dados fictícios.")
+
+        for m in milestones:
+            p_name = m.get("period", "Período")
+            ev_type = "Início de Período" if m.get("type") == "start" else "Término de Período"
+            chrono_rows.append([
+                Paragraph(f"<b>{p_name}</b>", body_style),
+                Paragraph(ev_type, body_style),
+                Paragraph(f"<b>{m.get('time_brt') or m.get('time', '—')}</b>", body_style),
+                Paragraph(f"Protocolo oficial registrado no Game Book da NBA ({m.get('time_local_str')})." if m.get('time_local_str') else "Protocolo oficial registrado no Game Book da NBA.", body_style)
+            ])
 
         t_chrono = Table(chrono_rows, colWidths=[3.8 * cm, 3.2 * cm, 3.5 * cm, 7.5 * cm])
         t_chrono.setStyle(TableStyle([
@@ -268,10 +250,10 @@ class NBAReportGenerator:
             # 4. Abertura do Sinal (Pré-Jogo): obtido via Grounding oficial de grade
             time_sched = game.get("time_brt", "")
             grade_sched = grounding_data.get("broadcast_schedule_time_brt")
-            t_pre = grade_sched if (grade_sched and len(grade_sched) >= 5) else (f"{time_sched}:00" if (time_sched and len(time_sched) == 5) else "23:30:00")
+            t_pre = grade_sched if (grade_sched and len(grade_sched) >= 5) else (f"{time_sched}:00" if (time_sched and len(time_sched) == 5) else (time_sched if time_sched else "Grade Oficial"))
 
             # 5. Jump Ball (Ao Vivo): usa exatamente o horário oficial protocolado no Game Book
-            t_jump = jump_time if jump_time else (f"{time_sched}:00" if time_sched else "23:48:00")
+            t_jump = jump_time if jump_time else (f"{time_sched}:00" if (time_sched and len(time_sched) == 5) else (time_sched if time_sched else "Início"))
 
             # 6. Halftime / Intervalo
             if half_start and half_end:
@@ -279,7 +261,7 @@ class NBAReportGenerator:
             elif half_start:
                 t_half = half_start
             else:
-                t_half = "00:59:00 a 01:16:00"
+                t_half = "Intervalo regulamentar"
 
             # 7. Pós-Jogo / Encerramento: término do jogo + encerramento da transmissão após apito final
             if game_end:
@@ -296,7 +278,7 @@ class NBAReportGenerator:
                 except Exception:
                     t_fim = game_end
             else:
-                t_fim = "02:26:00 a 02:40:00"
+                t_fim = "Encerramento após apito final"
 
             if "AMAZON" in p_up or "PRIME" in p_up:
                 obs_abertura = f"Transmissão ao vivo iniciada no Prime Video Brasil às {t_pre} (grade oficial homologada via Gemini Grounding). Apresentação oficial, escalações e VT de análise."
@@ -378,14 +360,16 @@ class NBAReportGenerator:
 
         time_sched_def = game.get("time_brt", "")
         grade_sched_def = grounding_data.get("broadcast_schedule_time_brt")
-        t_pre_def = grade_sched_def if (grade_sched_def and len(grade_sched_def) >= 5) else (f"{time_sched_def}:00" if time_sched_def else "23:30:00")
+        t_pre_def = grade_sched_def if (grade_sched_def and len(grade_sched_def) >= 5) else (f"{time_sched_def}:00" if (time_sched_def and len(time_sched_def) == 5) else (time_sched_def if time_sched_def else "Grade Oficial"))
         
         milestones = parsed_gamebook.get("milestones") or []
-        jump_time_def = "23:48:00"
+        jump_time_def = None
         for m in milestones:
             if m.get("type") == "start":
-                jump_time_def = m.get("time_brt") or m.get("time") or jump_time_def
+                jump_time_def = m.get("time_brt") or m.get("time")
                 break
+        if not jump_time_def:
+            jump_time_def = t_pre_def
 
         grounding_lines = [
             f"<b>Metodologia de Auditoria:</b> Pesquisa ativa em tempo real via {grounding_src} e confronto canônico com o NBA Official Game Book.",

@@ -1,0 +1,27 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "22:00:00",
+  "summary": "A partida entre Indiana Pacers e Dallas Mavericks da NBA, realizada em 09/11/2026, teve a seguinte cobertura no Brasil:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A transmissão ao vivo no Brasil da partida Indiana Pacers x Dallas Mavericks foi realizada exclusivamente pelo NBA League Pass.\n    ESPN e Disney+ transmitiram outros jogos da rodada de 09/11/2026, como Washington Wizards x Detroit Pistons, mas não a partida entre Pacers e Mavericks. O Prime Video também não listou este jogo em sua programação para a data.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão da partida foi às 22h (horário de Brasília).\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   Overdrive - \"Pacers x Mavericks: onde assistir à NBA e horário (09/11)\"\n    *   O Tempo - \"NBA tem oito jogos nesta segunda, com Lakers x Hawks e Nuggets x Rockets como destaques\"\n    *   Lakers Brasil - \"Onde assistir NBA hoje: ESPN, Prime Video e League Pass\"\n    *   Hoops Brasil - \"NBA 2026/27: Rodada do dia 9 de novembro\"\n    *   Overdrive - \"NBA em novembro de 2026: onde assistir aos jogos e horários\"\n    *   Hoops Brasil - \"Onde assistir aos jogos da NBA hoje? Programação TV/Streaming completa\"\n    *   Lance do Jogo - \"Onde assistir Dallas Mavericks x Indiana Pacers: Palpite 09/11/2026\"\n    *   Onde Está Passando - \"Dallas Mavericks x Indiana Pacers (09/11 às 22:00): onde assistir\"\n    *   CNN Brasil - \"NBA 2026/27: onde assistir aos jogos de hoje? Veja horários e programação\"",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHljNM5EOfDppdaLy5Rvylji4LIjM2uoHF8fZJCA3uBRcTx2-EvsTIdoMowjW_gmesNgbw6yHbpPD-X07-4FDAeMKcT1aoZqRFCkQKUuO3TItmQv0T18WVlSnZlIzi3nDWT2WbbpHt5UYx0F5rjCxS9avZPvtlKctzuKFDgcyP0xsNjnKy5Qgg=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHKbPGETHH66LKIGpdpV8NtNd778pw1_h7iNUBa5FkcTLaNo2VAEiX020bS6W7iybP0cZjdAYOnkkKMuzQjKXyRs94phsw7gd5L0xjRgywfgziqhxCJxZy1elZ2SPi8mr1iLTSaBhnxxZpwUAdNmzEMPeBBtNhCLBj8qniX7FX3e-Dvinr2re3-v1ArJNLwPQoZBsz6E2sjjHds4NbhtgxnsZoLO3Jr1XZPPnD1KJKiWPE5wRx43x4dXLgZ7Z8Hcb8UQoh3LT-dXEQ=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHVhEpK0GkwGEtAI0jbzpybs_Ywq2BTJb967Hf9cw60WSlF42IegY82QXM_Qh2UAwGou5dFAdVp_49zH1YPcqPYvMjxBrsynbMVJD-QRJdxFOEYftB6rvs5eQ3W6WfY4mgMpddQhA==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGpTj9zyE0Hq86OK4uJKr6pvj7T35B3keRibTzW4PuxRx1AuVVuVNyGYjH0Pp36KQ9IvH3Dxe1rt2SHuFY9OcM4ILgUiwgBe1f-5yLICJqcJ7tGQEx8wRXroUqvPsO0svi6N2St3huWpxvOH9aJ-JER-aQUkhrCRfO3GWlhXw==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFj8YLdWmpfiMuniNI9xSE0leVAz5xFLDs_lQ1dxsv28qBvp2somSRxPgf2ESJBzStrnvawcqqmmHvlTZqMf8IwT06EFrx6wsquqZYchiAwfh1-26p5eveuIJg8PUBAUQGkWrll9bfizudFuXlpp5XwoWa6Kz35cm7LrxvlfCAmL_0v-Eiedg==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGbEQABfabqh7FjLt76KFN2A3qGA5cJ9gByzLB6Es9OmJ7MSxQiJAbraqHp2_CdAk_-5XBwDzb6kgl6fQkmx-mZJ1DwrYpcg73_Wgq0Xgem2GCiZnZifzbQoMY-HqClkfdVMLYuD9x9R2aCmr1yg8xO",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG8dnWRdNcXpM7obssk9vpO0O7PRxGt9AcfeiMdQVAMdSpUgBE73RSmQw5O5QDrmUv8t9G_fGOXmyxSxGKcp8gTd-5GPwYPzOoNx2mBLSENLiZSrz5IcPRF4Z28aac1E0osBD_isfw_ESeGTCp15fAhsx9PCSCnua1YJY0mLWPiQR2GbZcu",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQESP_9LVHs94w5BxUln9X-QuueFRpRHgUC8Pvzmcj7hd-5OkUzT40-DM_1FhZ9B1V2V9dmrXPXujXxercrn0GAd3GR-qOaUTgdMY8hKZoRDnHwb1cAOU7zv3tV97u8iGTJf5yWrYF43_13l451dcPQcUmfPc_vMXLz2B_FOJbGCzlXnjfohq57NRx7c5a0=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG5WGiWZnASq0ifTVIjoCATVr98ZBsEy4lAbDSszljlTpvZMl1gwe-OJBV2K2EftTHPofdR5OEiMbBfnSJTI10iiVd-NuUU8bfaMeUX3ostgWAqC4648yI5QI47rBMvu25RqU331rimKecj9X4yQgn492CXGJ4GoEeSE8PHomT2-gLPtUgB4_PNfdKEiLX8TxI=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF7X44NOAXti3DbmRH6sT4BANGRyc8VJ8vYSD57PIs_J-bUfLGCghWBs1QKf2SthRyKAUxQaVW5YGOPxOmMEeN7WjKso-TQbwJrSkPn2xZSWafMXXUWRmQUR73wNzUlreJTXx_d5541TVL-pfF-ifIknnV2bs6uXy64DT5tCLLgAPta5MzflZi8_wjrUp55pys_l43VU5aCew==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHqxk4tmjxiYOjGiTi8hikMg2vonk5XIMTbSJKle-lwgc1WsOEBrANadIeElLDwRchUvAY8ZaNpLAdP1ewf7h5l6Lcz_NVh-ROaWf5OGLkfu8VUbmesRkKEF4APrGbE-uZg-Wp-9PH8sHHAH1QAK5WjBa_iG1w1obvJKnmnPfDpFo2w5IDW60VjH5q9dlD9sdeBd8OOJcHl12yNiw3iD8zpzHy7cwa7L3F4xzayBoGVkLLiaNzCOsuLpJ0Uf728BXbyl9Q6Dc_W"
+  ],
+  "grounding_date": "10/11/2026 10:24:09"
+}

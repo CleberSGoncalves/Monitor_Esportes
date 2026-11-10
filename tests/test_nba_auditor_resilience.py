@@ -168,6 +168,14 @@ class TestNBAAuditorResilience(unittest.TestCase):
             if os.path.exists(pdf):
                 os.remove(pdf)
 
+    def test_nba_report_generator_rejects_empty_milestones(self):
+        """Garante que a geração de PDF é rejeitada se o Game Book não tiver marcos oficiais (sem default_events fictícios)."""
+        from modules.nba_report_generator import NBAReportGenerator
+        gen = NBAReportGenerator()
+        game = {"match_display": "Denver Nuggets @ Houston Rockets", "time_brt": "22:30", "platform": "NBA League Pass"}
+        with self.assertRaises(ValueError):
+            gen.generate_report(game, {})
+
     def test_nba_streaming_grounding_service(self):
         from modules.nba_streaming_grounding import NBAStreamingGroundingService
         res = NBAStreamingGroundingService.get_grounding_audit(
