@@ -1,5 +1,5 @@
 {
-  "version": "2.4.49",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.49/Monitor_Esportes.exe",
-  "changelog": "v2.4.49: Correção crítica na comprovação visual de transmissões de Cobertura & Debate e Partidas: eliminação de reaproveitamento de frames estáticos de fallback; extração autêntica multiformato via yt-dlp DASH (bestvideo+bestaudio); frames sintéticos com layouts e paletas temáticas exclusivas por etapa; remoção definitiva de textos hardcoded nas tarjas inferiores (lower-third 100% dinâmico com Nome do Programa e Pauta); 62 testes automatizados 100% aprovados."
+  "version": "2.4.50",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.50/Monitor_Esportes.exe",
+  "changelog": "v2.4.50: Roteamento autônomo de Cobertura/Debate vs. Narração de Partida: pipeline 'ready_coverage' integrado para disparo automático de laudos temáticos sem eliminação da fila; suporte a geração em lote e botões dedicados na interface; 62 testes 100% aprovados."
 }

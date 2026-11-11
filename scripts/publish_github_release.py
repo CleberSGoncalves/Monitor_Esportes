@@ -18,18 +18,16 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.49"
-    release_name = "v2.4.49 - Comprovação Visual Autêntica de Debate e Dinamismo de Lower-Third"
+    tag = "v2.4.50"
+    release_name = "v2.4.50 - Roteamento Autônomo de Cobertura/Debate vs. Narração de Jogo"
     body = (
-        "### Novidades da versão v2.4.49:\n"
-        "- 📸 **Comprovação Visual 100% Autêntica e Dinâmica**:\n"
-        "  - Eliminação de qualquer repetição de frames estáticos de fallback.\n"
-        "  - Extração de múltiplos formatos DASH do YouTube via yt-dlp (bestvideo+bestaudio) garantindo extração direta de frames reais da transmissão.\n"
-        "  - Tarja inferior (Lower-Third) 100% dinâmica: exibe o Nome do Programa e a pauta em debate para transmissões de cobertura, eliminando completamente textos fixos de outras partidas.\n"
-        "  - Gerador sintético enriquecido com temas e layouts distintos por etapa quando a transmissão estiver indisponível.\n"
-        "- 🎙️ **Laudos de Cobertura & Debate Esportivo**:\n"
-        "  - Suporte completo a programas de estúdio (Central do Torcedor, Vamo Colorado, Baldasso Night Show, etc.).\n"
-        "  - Divisão temática por blocos de pauta e marcas auditadas.\n"
+        "### Novidades da versão v2.4.50:\n"
+        "- 🎙️ **Roteamento Automático de Cobertura & Debate vs. Partida Narrada**:\n"
+        "  - O pipeline de canais ao vivo agora bifurca autonomamente entre **Partida Narrada** (`ready_match`) e **Cobertura/Debate Esportivo** (`ready_coverage`).\n"
+        "  - Quando um canal entra ao vivo com programa de debate ou mesa-redonda em vez de narração lance a lance, o evento é mantido na fila e gera automaticamente o laudo temático com Nome do Programa, blocos de pauta e marcas auditadas.\n"
+        "  - Interface gráfica atualizada com botão e badge roxo `🎙️ Gerar Relatório (Debate)`.\n"
+        "- 📸 **Comprovação Visual 100% Autêntica**:\n"
+        "  - Extração multiformato DASH no YouTube e eliminação de overlays estáticos.\n"
         "- 🧪 **Testes Automatizados**: 62/62 testes 100% aprovados."
     )
 

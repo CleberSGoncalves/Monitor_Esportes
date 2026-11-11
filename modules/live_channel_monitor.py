@@ -1235,7 +1235,7 @@ class LiveNarrationService:
 
                 self.run_analysis_async(vid)
 
-            elif pipe == "ready_match" and self.get_setting("auto_report", True) and not ev.get("auto_generated") and vid not in self._busy:
+            elif pipe in ("ready_match", "ready_coverage") and self.get_setting("auto_report", True) and not ev.get("auto_generated") and vid not in self._busy:
 
                 self.update_event(vid, auto_generated=True)
 
@@ -1393,51 +1393,59 @@ class LiveNarrationService:
 
                 self._generate_locked(vid, meta=meta, auto=True, progress_cb=None)
 
-        else:
-
-            cat = analysis.get("event_category") or "Programa / Debate"
-
-            prog_msg = f"ℹ️ {cat}: {summary_txt}" if summary_txt else f"ℹ️ {cat} (Não houve narração de partida em tempo real)."
-
+        elif ev.get("is_coverage_debate") or is_cov:
+            prog_label = prog_name or ev.get("program_name") or extract_program_name(ev.get("title", "")) or "Programa Esportivo"
+            prog_msg = f"🎙️ Cobertura/Debate: {prog_label}"
             if brand_mentions:
-
                 prog_msg += f" • 📢 {len(brand_mentions)} marcas citadas"
 
             self.update_event(
-
                 vid,
-
-                pipeline="not_match",
-
+                pipeline="ready_coverage",
                 is_match_narration=False,
-
+                is_coverage_debate=True,
+                program_name=prog_label,
+                coverage_theme=ev.get("title", ""),
                 transcript_analysis=analysis,
-
                 meta=meta,
-
                 brand_mentions=brand_mentions,
-
                 brands_summary=brands_summary,
-
                 progress=prog_msg,
-
                 error="",
-
-                selected=False,
-
-                user_unselected=True
-
+                selected=True,
+                user_unselected=False
             )
+            self.log(f"🎙️ [{ev.get('title', vid)[:45]}] Classificado como COBERTURA & DEBATE: {prog_label}")
 
+            # Se a chave Auto-Relatório estiver ativa, gera o relatório de debate automaticamente!
+            if self.get_setting("auto_report", True) and not ev.get("auto_generated"):
+                self.update_event(vid, auto_generated=True)
+                self._generate_locked(vid, meta=meta, auto=True, progress_cb=None)
+
+        else:
+            cat = analysis.get("event_category") or "Conteúdo Geral"
+            prog_msg = f"ℹ️ {cat}: {summary_txt}" if summary_txt else f"ℹ️ {cat} (Não houve narração de partida ou cobertura esportiva)."
+            if brand_mentions:
+                prog_msg += f" • 📢 {len(brand_mentions)} marcas citadas"
+
+            self.update_event(
+                vid,
+                pipeline="not_match",
+                is_match_narration=False,
+                transcript_analysis=analysis,
+                meta=meta,
+                brand_mentions=brand_mentions,
+                brands_summary=brands_summary,
+                progress=prog_msg,
+                error="",
+                selected=False,
+                user_unselected=True
+            )
             try:
-
                 self.remove_from_queue(vid)
-
             except Exception as ex_rm:
-
                 self.log(f"⚠️ Aviso ao remover da fila: {ex_rm}")
-
-            self.log(f"🗑️ [Auto-Eliminação] '{ev.get('title', vid)[:45]}' não é jogo e foi removido da fila.")
+            self.log(f"🗑️ [Auto-Eliminação] '{ev.get('title', vid)[:45]}' não é esportivo e foi removido da fila.")
 
 
 

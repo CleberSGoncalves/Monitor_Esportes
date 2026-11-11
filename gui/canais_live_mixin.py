@@ -676,7 +676,7 @@ class CanaisLiveMixin:
         if mode == "active":
             filtered = [e for e in selected_events if e.get("pipeline") in ("live", "transcribing", "analyzing", "generating", "waiting") or e.get("status") in ("live", "upcoming")]
         elif mode == "done":
-            filtered = [e for e in selected_events if e.get("pdf_path") or e.get("pipeline") in ("done", "ready_match", "not_match")]
+            filtered = [e for e in selected_events if e.get("pdf_path") or e.get("pipeline") in ("done", "ready_match", "ready_coverage", "not_match")]
         else:
             filtered = selected_events
 
@@ -697,7 +697,7 @@ class CanaisLiveMixin:
                 return 0
             if p in ("generating", "analyzing", "transcribing"):
                 return 1
-            if p == "ready_match":
+            if p in ("ready_match", "ready_coverage"):
                 return 2
             if e.get("pdf_path"):
                 return 3
@@ -965,7 +965,8 @@ class CanaisLiveMixin:
         btn_row.pack(fill="x", padx=10, pady=(4, 10))
 
         # 1. BOTÃO DE RELATÓRIO DINÂMICO COM FEEDBACK VISUAL POR ETAPA
-        if is_match is True:
+        is_cov_or_ready = ev.get("is_coverage_debate") or pipe == "ready_coverage"
+        if is_match is True or is_cov_or_ready:
             def make_open_live_pdf(v_id=vid):
                 return lambda: self._open_live_pdf(v_id)
 
@@ -981,7 +982,6 @@ class CanaisLiveMixin:
                 btn_state = "normal"
                 btn_width = 175
             elif pipe == "generating":
-                # ETAPA ATIVA: Mostra exatamente o que a IA está fazendo em laranja pulsante
                 chrono_text = stage_title
                 btn_color = "#e65100"
                 btn_hover = "#ef6c00"
@@ -1002,6 +1002,13 @@ class CanaisLiveMixin:
                 btn_cmd = lambda: None
                 btn_state = "disabled"
                 btn_width = 130
+            elif is_cov_or_ready:
+                chrono_text = "🎙️ Gerar Relatório (Debate)"
+                btn_color = "#6a1b9a"
+                btn_hover = "#8e24aa"
+                btn_cmd = make_chrono()
+                btn_state = "normal" if has_narr else "disabled"
+                btn_width = 175
             else:
                 chrono_text = "📊 Gerar Relatório"
                 btn_color = "#008080"
@@ -1176,7 +1183,7 @@ class CanaisLiveMixin:
         if val:
             # Se houver partidas narradas prontas na fila ainda sem PDF, dispara automaticamente
             for ev in self.live_service.list_events():
-                if ev.get("selected") and ev.get("pipeline") == "ready_match" and not ev.get("pdf_path"):
+                if ev.get("selected") and ev.get("pipeline") in ("ready_match", "ready_coverage") and not ev.get("pdf_path"):
                     self.live_service.run_generation_async(ev["video_id"], meta=None, auto=True)
 
     def _on_auto_email_toggle(self) -> None:
