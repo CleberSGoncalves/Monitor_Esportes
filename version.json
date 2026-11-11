@@ -1,5 +1,5 @@
 {
-  "version": "2.4.50",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.50/Monitor_Esportes.exe",
-  "changelog": "v2.4.50: Roteamento autônomo de Cobertura/Debate vs. Narração de Partida: pipeline 'ready_coverage' integrado para disparo automático de laudos temáticos sem eliminação da fila; suporte a geração em lote e botões dedicados na interface; 62 testes 100% aprovados."
+  "version": "2.4.51",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.51/Monitor_Esportes.exe",
+  "changelog": "v2.4.51: Atualização da grade oficial da CBF para Novembro de 2026 (a partir de 14/11: Mirassol x Galo, Coritiba x Santos, Flamengo x Athletico, Palmeiras x Flamengo); proteção estrita contra auto-auditoria de jogos antigos (> 8h do kickoff arquivados como expirados); eliminação de fallback para datas passadas no autopreenchimento; 62 testes 100% aprovados."
 }

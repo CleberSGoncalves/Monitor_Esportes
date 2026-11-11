@@ -1,65 +1,101 @@
 [
   {
     "comp": "Brasileirão Série A",
-    "team1": "Vasco da Gama",
-    "team2": "Flamengo",
-    "date": "29/10/2026",
-    "time": "20:00",
-    "platform": "Amazon Prime",
-    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
-  },
-  {
-    "comp": "Copa do Brasil",
-    "team1": "Palmeiras",
-    "team2": "Vasco da Gama",
-    "date": "01/11/2026",
-    "time": "15:00",
-    "platform": "Amazon Prime",
-    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
-  },
-  {
-    "comp": "Copa do Brasil",
-    "team1": "Grêmio",
+    "team1": "Mirassol",
     "team2": "Atlético-MG",
-    "date": "01/11/2026",
+    "date": "14/11/2026",
     "time": "18:30",
-    "platform": "Amazon Prime",
-    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
+    "platform": "CazéTV",
+    "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
   },
   {
     "comp": "Brasileirão Série A",
-    "team1": "Athletico-PR",
-    "team2": "Vasco da Gama",
-    "date": "04/11/2026",
+    "team1": "Coritiba",
+    "team2": "Santos",
+    "date": "18/11/2026",
     "time": "19:30",
     "platform": "CazéTV",
-    "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
+    "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
+  },
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Remo",
+    "team2": "Chapecoense",
+    "date": "18/11/2026",
+    "time": "20:00",
+    "platform": "CazéTV",
+    "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
+  },
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Flamengo",
+    "team2": "Athletico-PR",
+    "date": "18/11/2026",
+    "time": "20:30",
+    "platform": "Amazon Prime",
+    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
   },
   {
     "comp": "Brasileirão Série A",
     "team1": "Cruzeiro",
-    "team2": "Bahia",
-    "date": "05/11/2026",
-    "time": "21:30",
+    "team2": "Palmeiras",
+    "date": "18/11/2026",
+    "time": "20:30",
     "platform": "Amazon Prime",
     "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
   },
   {
-    "comp": "Copa do Brasil",
-    "team1": "Atlético-MG",
-    "team2": "Grêmio",
-    "date": "07/11/2026",
-    "time": "17:00",
-    "platform": "Amazon Prime",
-    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
+    "comp": "Brasileirão Série A",
+    "team1": "Corinthians",
+    "team2": "Botafogo",
+    "date": "18/11/2026",
+    "time": "21:30",
+    "platform": "CazéTV",
+    "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
   },
   {
-    "comp": "Copa do Brasil",
-    "team1": "Vasco da Gama",
-    "team2": "Palmeiras",
-    "date": "08/11/2026",
-    "time": "16:00",
+    "comp": "Brasileirão Série A",
+    "team1": "Palmeiras",
+    "team2": "Flamengo",
+    "date": "21/11/2026",
+    "time": "16:30",
     "platform": "Amazon Prime",
-    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
+    "tag": "🔥 Confronto Direto pelo Título (Amazon Prime - Coluna 4)"
+  },
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Bahia",
+    "team2": "Coritiba",
+    "date": "21/11/2026",
+    "time": "17:30",
+    "platform": "CazéTV",
+    "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
+  },
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Athletico-PR",
+    "team2": "Remo",
+    "date": "22/11/2026",
+    "time": "16:00",
+    "platform": "CazéTV",
+    "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
+  },
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Chapecoense",
+    "team2": "Palmeiras",
+    "date": "24/11/2026",
+    "time": "18:00",
+    "platform": "Amazon Prime",
+    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
+  },
+  {
+    "comp": "Brasileirão Série A",
+    "team1": "Atlético-MG",
+    "team2": "Corinthians",
+    "date": "25/11/2026",
+    "time": "19:30",
+    "platform": "Amazon Prime",
+    "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
   }
 ]

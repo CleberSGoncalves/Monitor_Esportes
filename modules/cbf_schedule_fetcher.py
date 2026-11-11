@@ -288,6 +288,83 @@ def get_recent_finished_matches() -> list:
             "time": "18:30",
             "platform": "CazéTV",
             "tag": "⚡ Auditoria Concluída"
+        },
+        # 29/10/2026 - Brasileirão Série A
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Vasco da Gama",
+            "team2": "Flamengo",
+            "score": "2 x 3",
+            "date": "29/10/2026",
+            "time": "20:00",
+            "platform": "Amazon Prime",
+            "tag": "⚡ Auditoria Concluída"
+        },
+        # 01/11/2026 - Copa do Brasil
+        {
+            "comp": "Copa do Brasil",
+            "team1": "Palmeiras",
+            "team2": "Vasco da Gama",
+            "score": "3 x 0",
+            "date": "01/11/2026",
+            "time": "15:00",
+            "platform": "Amazon Prime",
+            "tag": "⚡ Auditoria Concluída"
+        },
+        # 01/11/2026 - Copa do Brasil
+        {
+            "comp": "Copa do Brasil",
+            "team1": "Grêmio",
+            "team2": "Atlético-MG",
+            "score": "2 x 0",
+            "date": "01/11/2026",
+            "time": "17:30",
+            "platform": "Amazon Prime",
+            "tag": "⚡ Auditoria Concluída"
+        },
+        # 04/11/2026 - Brasileirão Série A
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Athletico-PR",
+            "team2": "Vasco da Gama",
+            "score": "1 x 0",
+            "date": "04/11/2026",
+            "time": "19:30",
+            "platform": "CazéTV",
+            "tag": "⚡ Auditoria Concluída"
+        },
+        # 05/11/2026 - Brasileirão Série A
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Cruzeiro",
+            "team2": "Bahia",
+            "score": "1 x 1",
+            "date": "05/11/2026",
+            "time": "21:30",
+            "platform": "Amazon Prime",
+            "tag": "⚡ Auditoria Concluída"
+        },
+        # 07/11/2026 - Copa do Brasil
+        {
+            "comp": "Copa do Brasil",
+            "team1": "Atlético-MG",
+            "team2": "Grêmio",
+            "score": "1 x 1",
+            "date": "07/11/2026",
+            "time": "17:00",
+            "platform": "Amazon Prime",
+            "tag": "⚡ Auditoria Concluída"
+        },
+        # 08/11/2026 - Copa do Brasil
+        {
+            "comp": "Copa do Brasil",
+            "team1": "Vasco da Gama",
+            "team2": "Palmeiras",
+            "score": "0 x 2",
+            "date": "08/11/2026",
+            "time": "16:00",
+            "platform": "Amazon Prime",
+            "tag": "⚡ Auditoria Concluída"
         }
     ]
 
@@ -322,77 +399,118 @@ def get_real_cbf_fixtures() -> list:
     Retorna estritamente os jogos monitorados futuros da CBF de acordo com a tabela oficial (Edição 2026):
     - Brasileirão Série A: Coluna 4 (Amazon Prime) ou Coluna 5 (CazéTV).
     - Copa do Brasil: Coluna 3/4 (Amazon Prime).
+    Atualizado para a reta decisiva de Novembro de 2026.
     """
     fixtures = [
-        # 29/10 (qui) 20:00 - Brasileirão Série A (Coluna 4 = Amazon Prime)
+        # 14/11 (sáb) 18:30 - Brasileirão Série A (Coluna 5 = CazéTV)
         {
             "comp": "Brasileirão Série A",
-            "team1": "Vasco da Gama",
-            "team2": "Flamengo",
-            "date": "29/10/2026",
+            "team1": "Mirassol",
+            "team2": "Atlético-MG",
+            "date": "14/11/2026",
+            "time": "18:30",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
+        },
+        # 18/11 (qua) 19:30 - Brasileirão Série A (Coluna 5 = CazéTV)
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Coritiba",
+            "team2": "Santos",
+            "date": "18/11/2026",
+            "time": "19:30",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
+        },
+        # 18/11 (qua) 20:00 - Brasileirão Série A (Coluna 5 = CazéTV)
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Remo",
+            "team2": "Chapecoense",
+            "date": "18/11/2026",
             "time": "20:00",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
+        },
+        # 18/11 (qua) 20:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Flamengo",
+            "team2": "Athletico-PR",
+            "date": "18/11/2026",
+            "time": "20:30",
             "platform": "Amazon Prime",
             "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
         },
-        # 01/11 (dom) 15:00 - Copa do Brasil (Amazon Prime)
-        {
-            "comp": "Copa do Brasil",
-            "team1": "Palmeiras",
-            "team2": "Vasco da Gama",
-            "date": "01/11/2026",
-            "time": "15:00",
-            "platform": "Amazon Prime",
-            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
-        },
-        # 01/11 (dom) 17:30 - Copa do Brasil (Amazon Prime)
-        {
-            "comp": "Copa do Brasil",
-            "team1": "Grêmio",
-            "team2": "Atlético-MG",
-            "date": "01/11/2026",
-            "time": "17:30",
-            "platform": "Amazon Prime",
-            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
-        },
-        # 04/11 (qua) 19:30 - Brasileirão Série A (Coluna 5 = CazéTV)
-        {
-            "comp": "Brasileirão Série A",
-            "team1": "Athletico-PR",
-            "team2": "Vasco da Gama",
-            "date": "04/11/2026",
-            "time": "19:30",
-            "platform": "CazéTV",
-            "tag": "📺 Transmissão Exclusiva (CazéTV - Coluna 5)"
-        },
-        # 05/11 (qui) 21:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
+        # 18/11 (qua) 20:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
         {
             "comp": "Brasileirão Série A",
             "team1": "Cruzeiro",
-            "team2": "Bahia",
-            "date": "05/11/2026",
-            "time": "21:30",
+            "team2": "Palmeiras",
+            "date": "18/11/2026",
+            "time": "20:30",
             "platform": "Amazon Prime",
             "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
         },
-        # 07/11 (sáb) 17:00 - Copa do Brasil (Amazon Prime)
+        # 18/11 (qua) 21:30 - Brasileirão Série A (Coluna 5 = CazéTV)
         {
-            "comp": "Copa do Brasil",
-            "team1": "Atlético-MG",
-            "team2": "Grêmio",
-            "date": "07/11/2026",
-            "time": "17:00",
-            "platform": "Amazon Prime",
-            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
+            "comp": "Brasileirão Série A",
+            "team1": "Corinthians",
+            "team2": "Botafogo",
+            "date": "18/11/2026",
+            "time": "21:30",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
         },
-        # 08/11 (dom) 16:00 - Copa do Brasil (Amazon Prime)
+        # 21/11 (sáb) 16:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
         {
-            "comp": "Copa do Brasil",
-            "team1": "Vasco da Gama",
-            "team2": "Palmeiras",
-            "date": "08/11/2026",
-            "time": "16:00",
+            "comp": "Brasileirão Série A",
+            "team1": "Palmeiras",
+            "team2": "Flamengo",
+            "date": "21/11/2026",
+            "time": "16:30",
             "platform": "Amazon Prime",
-            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Copa do Brasil)"
+            "tag": "🔥 Confronto Direto pelo Título (Amazon Prime - Coluna 4)"
+        },
+        # 21/11 (sáb) 17:30 - Brasileirão Série A (Coluna 5 = CazéTV)
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Bahia",
+            "team2": "Coritiba",
+            "date": "21/11/2026",
+            "time": "17:30",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
+        },
+        # 22/11 (dom) 16:00 - Brasileirão Série A (Coluna 5 = CazéTV)
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Athletico-PR",
+            "team2": "Remo",
+            "date": "22/11/2026",
+            "time": "16:00",
+            "platform": "CazéTV",
+            "tag": "📺 Transmissão Oficial (CazéTV - Coluna 5)"
+        },
+        # 24/11 (ter) 18:00 - Brasileirão Série A (Coluna 4 = Amazon Prime)
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Chapecoense",
+            "team2": "Palmeiras",
+            "date": "24/11/2026",
+            "time": "18:00",
+            "platform": "Amazon Prime",
+            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
+        },
+        # 25/11 (qua) 19:30 - Brasileirão Série A (Coluna 4 = Amazon Prime)
+        {
+            "comp": "Brasileirão Série A",
+            "team1": "Atlético-MG",
+            "team2": "Corinthians",
+            "date": "25/11/2026",
+            "time": "19:30",
+            "platform": "Amazon Prime",
+            "tag": "🔥 Transmissão Exclusiva (Amazon Prime - Coluna 4)"
         }
     ]
 
@@ -572,8 +690,27 @@ class CBFScheduleFetcher:
                 seen.add(key)
                 combined.append(g)
 
+        # Filtro estrito: NUNCA permitir jogos do passado em get_upcoming_matches!
+        strict_future = []
+        for g in combined:
+            try:
+                g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
+                if g_dt >= today - timedelta(hours=2):
+                    strict_future.append(g)
+            except Exception:
+                pass
+        combined = strict_future
+
         if not combined:
-            combined = future_real or real_fixtures
+            strict_real = []
+            for g in real_fixtures:
+                try:
+                    g_dt = datetime.strptime(f"{g.get('date')} {g.get('time')}", "%d/%m/%Y %H:%M")
+                    if g_dt >= today - timedelta(hours=2):
+                        strict_real.append(g)
+                except Exception:
+                    pass
+            combined = strict_real
 
         # Ordenar por data/hora
         def parse_dt(g):

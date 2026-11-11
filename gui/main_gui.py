@@ -755,9 +755,13 @@ def _load_scheduled_games() -> list:
 
                             
 
-                        # Mantém se for futuro OU se for recente oficial pendente
+                        # Se o jogo já ocorreu há mais de 8 horas, finaliza status pendente/running
+                        if not is_future and g_dt and (datetime.now() - g_dt > timedelta(hours=8)):
+                            if g.get("status") in ("pending", "running", "queued"):
+                                g["status"] = "completed" if g.get("report_file") else "expired"
 
-                        if is_future or g.get("status") in ("pending", "running"):
+                        # Mantém se for futuro OU se for recente oficial com menos de 8 horas
+                        if is_future or (is_recent and g.get("status") in ("pending", "running")) or g.get("status") == "completed":
 
                             if g.get("status") == "failed" and is_future:
 
@@ -13690,7 +13694,7 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
 
                 from modules.cbf_schedule_fetcher import CBFScheduleFetcher
 
-                cbf_events = _sort_games_chronologically(CBFScheduleFetcher.get_upcoming_matches())
+                cbf_events = _sort_games_chronologically(CBFScheduleFetcher.get_upcoming_matches(force_refresh=True))
 
             except:
 
@@ -14941,8 +14945,17 @@ MINUTAGEM DOS GOLS, CARTÕES E SUBSTITUIÇÕES."""
                                     else:
 
                                         kickoff_dt = datetime.strptime(f"{_game.get('date')} {_game.get('time')}", "%d/%m/%Y %H:%M")
+                                        diff_kickoff = datetime.now() - kickoff_dt
 
-                                        passed_tolerance = (datetime.now() - kickoff_dt > timedelta(hours=2, minutes=30))
+                                        # Se o jogo ocorreu há mais de 8 horas, arquiva e não dispara auditoria automática
+                                        if diff_kickoff > timedelta(hours=8):
+                                            _game["status"] = "completed" if _game.get("report_file") else "expired"
+                                            self._log(f"⏰ [AGENDAMENTO] Jogo {_game.get('team1')} x {_game.get('team2')} ({_game.get('date')}) já foi realizado há mais de 8h. Agendamento arquivado.")
+                                            _save_scheduled_games(getattr(self, "_scheduled_games", []))
+                                            self.after(0, self._update_schedule_panel_ui)
+                                            return
+
+                                        passed_tolerance = (diff_kickoff > timedelta(hours=2, minutes=30))
 
                                         attempts = _game.get("_sumula_attempts", 0)
 

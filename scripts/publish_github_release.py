@@ -18,16 +18,15 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.50"
-    release_name = "v2.4.50 - Roteamento Autônomo de Cobertura/Debate vs. Narração de Jogo"
+    tag = "v2.4.51"
+    release_name = "v2.4.51 - Calendário Oficial CBF Novembro 2026 & Proteção Anti-Loop de Jogos Antigos"
     body = (
-        "### Novidades da versão v2.4.50:\n"
-        "- 🎙️ **Roteamento Automático de Cobertura & Debate vs. Partida Narrada**:\n"
-        "  - O pipeline de canais ao vivo agora bifurca autonomamente entre **Partida Narrada** (`ready_match`) e **Cobertura/Debate Esportivo** (`ready_coverage`).\n"
-        "  - Quando um canal entra ao vivo com programa de debate ou mesa-redonda em vez de narração lance a lance, o evento é mantido na fila e gera automaticamente o laudo temático com Nome do Programa, blocos de pauta e marcas auditadas.\n"
-        "  - Interface gráfica atualizada com botão e badge roxo `🎙️ Gerar Relatório (Debate)`.\n"
-        "- 📸 **Comprovação Visual 100% Autêntica**:\n"
-        "  - Extração multiformato DASH no YouTube e eliminação de overlays estáticos.\n"
+        "### Novidades da versão v2.4.51:\n"
+        "- 🗓️ **Grade Oficial da CBF Atualizada (Novembro 2026)**:\n"
+        "  - Confrontos futuros oficiais cadastrados a partir de **14/11/2026** (Mirassol x Atlético-MG, Coritiba x Santos, Remo x Chapecoense, Flamengo x Athletico-PR, Cruzeiro x Palmeiras, Corinthians x Botafogo, Palmeiras x Flamengo, etc.).\n"
+        "  - O botão **Preencher com Próximos Eventos** agora preenche exclusivamente confrontos futuros válidos a partir do dia 14/11.\n"
+        "- 🛡️ **Proteção Anti-Loop de Jogos Passados**:\n"
+        "  - O agendador automático em background agora arquiva imediatamente qualquer partida com mais de 8 horas de realização como `expirada`, impedindo que jogos passados fiquem em loop de 'Processando I.A...'.\n"
         "- 🧪 **Testes Automatizados**: 62/62 testes 100% aprovados."
     )
 
