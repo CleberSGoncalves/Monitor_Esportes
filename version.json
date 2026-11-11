@@ -1,5 +1,5 @@
 {
-  "version": "2.4.51",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.51/Monitor_Esportes.exe",
-  "changelog": "v2.4.51: Atualização da grade oficial da CBF para Novembro de 2026 (a partir de 14/11: Mirassol x Galo, Coritiba x Santos, Flamengo x Athletico, Palmeiras x Flamengo); proteção estrita contra auto-auditoria de jogos antigos (> 8h do kickoff arquivados como expirados); eliminação de fallback para datas passadas no autopreenchimento; 62 testes 100% aprovados."
+  "version": "2.5.0",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.0/Monitor_Esportes.exe",
+  "changelog": "v2.5.0: Migração e integração completa do projeto Streaming_Scheduler para dentro do Monitor_Esportes na nova aba superior '📅 Reporte de Eventos'. Inclui todas as 6 sub-abas nativas (Streaming, Logs, Acessos, Campeonatos, Canais YouTube, FAQ), grade interativa de 8 colunas com popups para edição de data, horário e canais, extração CBF PDF (-1h), Copa do Mundo Excel (-2h), varredura de canais YouTube com validação CBF, sincronização SharePoint Graph API (com fallback Power Automate) e disparo SMTP com trava noturna e idempotência diária. Suíte de testes 100% aprovada."
 }

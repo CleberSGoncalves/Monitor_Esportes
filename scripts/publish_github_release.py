@@ -18,16 +18,26 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.51"
-    release_name = "v2.4.51 - Calendário Oficial CBF Novembro 2026 & Proteção Anti-Loop de Jogos Antigos"
+    tag = "v2.5.0"
+    release_name = "v2.5.0 - Migração Completa do Streaming_Scheduler ('Reporte de Eventos') Unificado"
     body = (
-        "### Novidades da versão v2.4.51:\n"
-        "- 🗓️ **Grade Oficial da CBF Atualizada (Novembro 2026)**:\n"
-        "  - Confrontos futuros oficiais cadastrados a partir de **14/11/2026** (Mirassol x Atlético-MG, Coritiba x Santos, Remo x Chapecoense, Flamengo x Athletico-PR, Cruzeiro x Palmeiras, Corinthians x Botafogo, Palmeiras x Flamengo, etc.).\n"
-        "  - O botão **Preencher com Próximos Eventos** agora preenche exclusivamente confrontos futuros válidos a partir do dia 14/11.\n"
-        "- 🛡️ **Proteção Anti-Loop de Jogos Passados**:\n"
-        "  - O agendador automático em background agora arquiva imediatamente qualquer partida com mais de 8 horas de realização como `expirada`, impedindo que jogos passados fiquem em loop de 'Processando I.A...'.\n"
-        "- 🧪 **Testes Automatizados**: 62/62 testes 100% aprovados."
+        "### Novidades da versão v2.5.0:\n"
+        "- 📅 **Nova Aba Superior Geral: 'Reporte de Eventos'**:\n"
+        "  - Migração 100% integral e nativa do projeto `Streaming_Scheduler` para dentro do `Monitor_Esportes`.\n"
+        "  - **6 Sub-Abas Preservadas Exatamente Iguais**:\n"
+        "    1. **Streaming**: Grade de eventos de 8 colunas com ordenação, filtros múltiplos de plataformas e campeonatos, e popups interativos no clique duplo (calendário DateEntry, sliders de hora/minuto TimePopup, opções de navegador, minutos de ação e canais).\n"
+        "    2. **Logs**: Central de auditoria com filtro por tipo (ERROR, WARNING, INFO), intervalo de datas, exportação CSV e limpeza.\n"
+        "    3. **Acessos**: Gestão de credenciais criptografadas via Fernet/AES para Prime, Disney, DAZN, Paramount, Max e Gmail SMTP.\n"
+        "    4. **⚽ Campeonatos**: Gestão dinâmica de torneios adicionais (Adicionar, Editar, Remover, Ativar/Pausar) persistidos localmente.\n"
+        "    5. **📺 Canais YouTube**: Cadastro e monitoramento de lives validadas pela CBF, com busca manual e publicação imediata no SharePoint.\n"
+        "    6. **FAQ**: Manual completo do usuário e documentação de proteções de runtime.\n"
+        "- ⚙️ **Motores de Extração e Negócio Nativos**:\n"
+        "  - **Regra CBF PDF (-1h)**: Ajuste obrigatório de -1 hora e recálculo de data para jogos de tabelas detalhadas oficiais da CBF.\n"
+        "  - **Regra Copa do Mundo (-2h)**: Ajuste de -2 horas em confrontos da planilha oficial de grupos.\n"
+        "  - **SharePoint Graph API**: Normalização profunda de nomes, regra estrita de 1 linha por canal de transmissão e fallback inteligente para Power Automate Flow.\n"
+        "  - **Disparo de E-mails**: Layout corporativo em HTML com bloqueio de segurança noturno (22h-07h) e garantia de idempotência diária por hash.\n"
+        "  - **Segurança de Processos**: Gerenciamento seguro de Chrome DevTools (portas 9222 e 9224) sem encerramento indiscriminado de outros processos.\n"
+        "- 🧪 **Testes Automatizados**: Suíte de testes unitários e de integração E2E 100% aprovada."
     )
 
     headers = {
@@ -98,8 +108,9 @@ def publish_release():
         asset_info = upload_resp.json()
         download_url = asset_info.get("browser_download_url")
         print("==================================================")
-        print(f"  RELEASE {tag} PUBLICADA COM SUCESSO NO GITHUB! ")
-        print(f"  URL de Download: {download_url}")
+        print("RELEASE PUBLICADA COM SUCESSO!")
+        print(f"Versão: {tag}")
+        print(f"Download URL: {download_url}")
         print("==================================================")
         return True
     else:
@@ -107,4 +118,5 @@ def publish_release():
         return False
 
 if __name__ == "__main__":
-    publish_release()
+    success = publish_release()
+    sys.exit(0 if success else 1)

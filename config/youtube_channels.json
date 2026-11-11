@@ -1,0 +1,32 @@
+[
+  {
+    "nome": "Gaúcha",
+    "url": "https://www.youtube.com/@gaucha",
+    "ativo": true
+  },
+  {
+    "nome": "Gaúcha Esportes",
+    "url": "https://www.youtube.com/@gauchaesportes",
+    "ativo": true
+  },
+  {
+    "nome": "Atlântida TV",
+    "url": "https://www.youtube.com/@atlantida_tv",
+    "ativo": true
+  },
+  {
+    "nome": "Baldasso TV",
+    "url": "https://www.youtube.com/@BaldassoTV",
+    "ativo": true
+  },
+  {
+    "nome": "Bagé TV",
+    "url": "https://www.youtube.com/@Bag%C3%A9TvOficial",
+    "ativo": true
+  },
+  {
+    "nome": "Esporte Band RS",
+    "url": "https://www.youtube.com/@EsporteBandRS",
+    "ativo": true
+  }
+]

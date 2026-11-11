@@ -1,0 +1,214 @@
+{
+  "updated_at": "2026-11-06T11:54:07.084997",
+  "total": 16,
+  "events": [
+    {
+      "id": "known_1",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Fluminense x Mirassol",
+        "Data": "2026-11-22T12:00:00Z",
+        "Hor_x00e1_rio": "18:30",
+        "Transmiss_x00e3_o": [
+          "Cazé TV"
+        ],
+        "ChaveEvento": "brasileiraoseriea_fluminensexmirassol_20261122_1830"
+      }
+    },
+    {
+      "id": "known_2",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Coritiba x Santos",
+        "Data": "2026-11-18T12:00:00Z",
+        "Hor_x00e1_rio": "18:30",
+        "Transmiss_x00e3_o": [
+          "Cazé TV"
+        ],
+        "ChaveEvento": "brasileiraoseriea_coritibaxsantos_20261118_1830"
+      }
+    },
+    {
+      "id": "known_3",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Mirassol x Atlético-MG",
+        "Data": "2026-11-14T12:00:00Z",
+        "Hor_x00e1_rio": "17:30",
+        "Transmiss_x00e3_o": [
+          "Amazon Prime"
+        ],
+        "ChaveEvento": "brasileiraoseriea_atleticomgxmirassol_20261114_1730"
+      }
+    },
+    {
+      "id": "known_4",
+      "fields": {
+        "Title": "CBF - Copa do Brasil",
+        "Partida": "Vasco da Gama x Palmeiras",
+        "Data": "2026-11-08T12:00:00Z",
+        "Hor_x00e1_rio": "16:00",
+        "Transmiss_x00e3_o": [
+          "Amazon Prime"
+        ],
+        "ChaveEvento": "copadobrasil_palmeirasxvasco_20261108_1600"
+      }
+    },
+    {
+      "id": "known_5",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Santos x Corinthians",
+        "Data": "2026-11-08T12:00:00Z",
+        "Hor_x00e1_rio": "10:30",
+        "Transmiss_x00e3_o": [
+          "Amazon Prime"
+        ],
+        "ChaveEvento": "brasileiraoseriea_corinthiansxsantos_20261108_1030"
+      }
+    },
+    {
+      "id": "known_6",
+      "fields": {
+        "Title": "CBF - Copa do Brasil",
+        "Partida": "Atlético-MG x Grêmio",
+        "Data": "2026-11-07T12:00:00Z",
+        "Hor_x00e1_rio": "17:00",
+        "Transmiss_x00e3_o": [
+          "Amazon Prime"
+        ],
+        "ChaveEvento": "copadobrasil_atleticomgxgremio_20261107_1700"
+      }
+    },
+    {
+      "id": "known_7",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Cruzeiro x Bahia",
+        "Data": "2026-11-05T12:00:00Z",
+        "Hor_x00e1_rio": "20:30",
+        "Transmiss_x00e3_o": [
+          "Amazon Prime"
+        ],
+        "ChaveEvento": "brasileiraoseriea_bahiaxcruzeiro_20261105_2030"
+      }
+    },
+    {
+      "id": "known_8",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Athletico-PR x Vasco da Gama",
+        "Data": "2026-11-04T12:00:00Z",
+        "Hor_x00e1_rio": "18:30",
+        "Transmiss_x00e3_o": [
+          "Cazé TV"
+        ],
+        "ChaveEvento": "brasileiraoseriea_athleticoprxvasco_20261104_1830"
+      }
+    },
+    {
+      "id": "known_9",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Flamengo x Grêmio",
+        "Data": "2026-11-04T12:00:00Z",
+        "Hor_x00e1_rio": "19:00",
+        "Transmiss_x00e3_o": [
+          "Gaúcha"
+        ],
+        "ChaveEvento": "brasileiraoseriea_flamengoxgremio_20261104_1900_gaucha"
+      }
+    },
+    {
+      "id": "known_10",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Flamengo x Grêmio",
+        "Data": "2026-11-04T12:00:00Z",
+        "Hor_x00e1_rio": "19:00",
+        "Transmiss_x00e3_o": [
+          "Gaúcha Esportes"
+        ],
+        "ChaveEvento": "brasileiraoseriea_flamengoxgremio_20261104_1900_gauchaesportes"
+      }
+    },
+    {
+      "id": "known_11",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Flamengo x Grêmio",
+        "Data": "2026-11-04T12:00:00Z",
+        "Hor_x00e1_rio": "19:00",
+        "Transmiss_x00e3_o": [
+          "Baldasso TV"
+        ],
+        "ChaveEvento": "brasileiraoseriea_flamengoxgremio_20261104_1900_baldassotv"
+      }
+    },
+    {
+      "id": "known_12",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Flamengo x Grêmio",
+        "Data": "2026-11-04T12:00:00Z",
+        "Hor_x00e1_rio": "19:00",
+        "Transmiss_x00e3_o": [
+          "Bagé TV"
+        ],
+        "ChaveEvento": "brasileiraoseriea_flamengoxgremio_20261104_1900_bagetv"
+      }
+    },
+    {
+      "id": "known_13",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Internacional x Coritiba",
+        "Data": "2026-11-03T12:00:00Z",
+        "Hor_x00e1_rio": "19:00",
+        "Transmiss_x00e3_o": [
+          "Gaúcha"
+        ],
+        "ChaveEvento": "brasileiraoseriea_coritibaxinternacional_20261103_1900_gaucha"
+      }
+    },
+    {
+      "id": "known_14",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Internacional x Coritiba",
+        "Data": "2026-11-03T12:00:00Z",
+        "Hor_x00e1_rio": "19:00",
+        "Transmiss_x00e3_o": [
+          "Baldasso TV"
+        ],
+        "ChaveEvento": "brasileiraoseriea_coritibaxinternacional_20261103_1900_baldassotv"
+      }
+    },
+    {
+      "id": "known_15",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Internacional x Coritiba",
+        "Data": "2026-11-03T12:00:00Z",
+        "Hor_x00e1_rio": "19:00",
+        "Transmiss_x00e3_o": [
+          "Gaúcha Esportes"
+        ],
+        "ChaveEvento": "brasileiraoseriea_coritibaxinternacional_20261103_1900_gauchaesportes"
+      }
+    },
+    {
+      "id": "known_16",
+      "fields": {
+        "Title": "CBF - Brasileirão Série A",
+        "Partida": "Botafogo x São Paulo",
+        "Data": "2026-11-23T12:00:00Z",
+        "Hor_x00e1_rio": "19:00",
+        "Transmiss_x00e3_o": [
+          "Amazon Prime"
+        ],
+        "ChaveEvento": "brasileiraoseriea_botafogoxsaopaulo_20261123_1900"
+      }
+    }
+  ]
+}

@@ -306,6 +306,14 @@ except (ImportError, ModuleNotFoundError):
 
     from nba_events_mixin import NBAEventsMixin
 
+try:
+
+    from gui.reporte_eventos_mixin import ReporteEventosMixin
+
+except (ImportError, ModuleNotFoundError):
+
+    from reporte_eventos_mixin import ReporteEventosMixin
+
 from modules.auto_updater import AutoUpdater
 
 from modules.autonomous_auditor import AutonomousAuditor
@@ -1102,7 +1110,7 @@ def _load_cbf_streaming_events() -> list:
 
 
 
-class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
+class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ReporteEventosMixin, ctk.CTk):
 
     def _load_ui_scale_preference(self) -> float:
 
@@ -1367,6 +1375,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
         self.reporter = ReportGenerator(reports_dir=_reports_dir)
 
         self._init_canais_live()
+        self._init_reporte_eventos()
 
 
 
@@ -3824,7 +3833,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
 
             mode_bar,
 
-            values=["Expert (API-Only)", "Visual (OBS)", "Ads & Merchan", "Canais Live", "🏀 Eventos NBA", "Config IA"],
+            values=["Expert (API-Only)", "Visual (OBS)", "Ads & Merchan", "Canais Live", "🏀 Eventos NBA", "📅 Reporte de Eventos", "Config IA"],
 
             variable=self.monitoring_mode_var,
 
@@ -3832,7 +3841,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
 
             height=32,
 
-            width=820,
+            width=980,
 
             selected_color="#00CED1",
 
@@ -5148,6 +5157,8 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
 
         self.tab_nba = self.tabs.add("🏀 Eventos NBA")
 
+        self.tab_reporte = self.tabs.add("📅 Reporte de Eventos")
+
         self.tab_dash = self.tabs.add("Dashboard")
 
         self.tab_logs = self.tabs.add("Logs")
@@ -5199,6 +5210,8 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
         self._build_tab_canais_live()
 
         self._build_tab_nba()
+
+        self._build_tab_reporte_eventos()
 
 
 
@@ -5434,6 +5447,8 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
 
         is_nba    = (mode == "🏀 Eventos NBA")
 
+        is_reporte = (mode == "📅 Reporte de Eventos" or mode == "Reporte de Eventos")
+
         is_ia     = (mode == "Config IA")
 
 
@@ -5444,7 +5459,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
 
             self.top.pack_forget()
 
-            if not (is_canais or is_nba or is_ia or is_ads):
+            if not (is_canais or is_nba or is_ia or is_ads or is_reporte):
 
                 self.top.pack(side="bottom", fill="x", padx=12, pady=(4, 4))
 
@@ -5490,7 +5505,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
 
                 # Ordem Oficial Rígida Solicitada: Monitoramento, Jogos Auditados, Auditoria, Dashboard, Logs, Config
 
-                ordered_tab_names = ["Monitoramento", "📊 Jogos Auditados", "🛡️ Auditoria", "📡 Canais Live", "🏀 Eventos NBA", "Dashboard", "Logs", "Config"]
+                ordered_tab_names = ["Monitoramento", "📊 Jogos Auditados", "🛡️ Auditoria", "📡 Canais Live", "🏀 Eventos NBA", "📅 Reporte de Eventos", "Dashboard", "Logs", "Config"]
 
                 
 
@@ -5552,6 +5567,14 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
 
             except: pass
 
+        elif is_reporte and hasattr(self, "tabs"):
+
+            try:
+
+                self.tabs.set("📅 Reporte de Eventos")
+
+            except: pass
+
         elif is_ads and hasattr(self, "tabs"):
 
             try:
@@ -5604,7 +5627,7 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ctk.CTk):
 
 
 
-        is_fullscreen_tab = any(k in active_tab for k in ["Canais Live", "Eventos NBA", "NBA", "Dashboard", "Logs", "Config", "Ads/Merchan"])
+        is_fullscreen_tab = any(k in active_tab for k in ["Reporte de Eventos", "Canais Live", "Eventos NBA", "NBA", "Dashboard", "Logs", "Config", "Ads/Merchan"])
 
 
 
