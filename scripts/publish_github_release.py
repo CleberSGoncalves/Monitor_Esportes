@@ -18,20 +18,19 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.48"
-    release_name = "v2.4.48 - Modalidade Cobertura & Debate ao Vivo (Nome do Programa & Timeline Temática)"
+    tag = "v2.4.49"
+    release_name = "v2.4.49 - Comprovação Visual Autêntica de Debate e Dinamismo de Lower-Third"
     body = (
-        "### Novidades da versão v2.4.48:\n"
-        "- 🎙️ **Novo Modo 'Cobertura & Debate Esportivo ao Vivo' (YouTube)**:\n"
-        "  - Suporte completo para transmissões ao vivo sem narração de bola rolando lance a lance (Central do Torcedor, Vamo Colorado, Baldasso Night Show, É o Grêmio, Os Donos da Bola, Bate-Bola, Resenha Fora da Sala, etc.).\n"
-        "  - **Nome do Programa**: Reconhecimento automático e exibição proeminente no cabeçalho do laudo, na caixa de metadados, na interface gráfica e no SharePoint.\n"
-        "  - **Timeline Temática por Blocos**: Divisão cronológica da live em capítulos temáticos com síntese das opiniões e análises da bancada, em vez de marcos fictícios de apito.\n"
-        "  - **Auditoria de Marcas & Patrocinadores**: Mapeamento de todas as marcas, anúncios e merchandisings falados no estúdio.\n"
-        "  - **Comprovação Visual Contínua**: Frames da transmissão ao vivo com tarja oficial de auditoria técnica no fuso de Brasília (BRT).\n"
-        "- ⚽ **Modos Tradicionais 100% Preservados**:\n"
-        "  - Brasileirão, Copa do Brasil (CBF / Streaming) e Jornadas com Narração Lance a Lance operando com 10/10 marcos intactos.\n"
-        "- 🏀 **NBA Autônoma**: Sincronismo do Game Book, barreira anti-stub e canal oficial mantidos.\n"
-        "- 🧪 **Testes Automatizados**: Suíte expandida com 61/61 testes 100% aprovados."
+        "### Novidades da versão v2.4.49:\n"
+        "- 📸 **Comprovação Visual 100% Autêntica e Dinâmica**:\n"
+        "  - Eliminação de qualquer repetição de frames estáticos de fallback.\n"
+        "  - Extração de múltiplos formatos DASH do YouTube via yt-dlp (bestvideo+bestaudio) garantindo extração direta de frames reais da transmissão.\n"
+        "  - Tarja inferior (Lower-Third) 100% dinâmica: exibe o Nome do Programa e a pauta em debate para transmissões de cobertura, eliminando completamente textos fixos de outras partidas.\n"
+        "  - Gerador sintético enriquecido com temas e layouts distintos por etapa quando a transmissão estiver indisponível.\n"
+        "- 🎙️ **Laudos de Cobertura & Debate Esportivo**:\n"
+        "  - Suporte completo a programas de estúdio (Central do Torcedor, Vamo Colorado, Baldasso Night Show, etc.).\n"
+        "  - Divisão temática por blocos de pauta e marcas auditadas.\n"
+        "- 🧪 **Testes Automatizados**: 62/62 testes 100% aprovados."
     )
 
     headers = {

@@ -1798,7 +1798,11 @@ class LiveNarrationService:
                     date_str=dt_str,
                     stream_start_dt=start_dt,
                     praca="SPO",
-                    channel_name=ch_code
+                    channel_name=ch_code,
+                    match_display=result.get("match_title") or result.get("program_name") or ev.get("title") or "Transmissão Ao Vivo",
+                    competition=result.get("championship") or ("Debate & Cobertura Esportiva" if result.get("is_coverage_debate") else "Transmissão Oficial de Futebol"),
+                    program_name=result.get("program_name") or ev.get("program_name") or "",
+                    is_coverage_debate=result.get("is_coverage_debate", False)
                 )
                 if m_proofs:
                     result["milestone_proofs"] = m_proofs

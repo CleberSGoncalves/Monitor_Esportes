@@ -86,3 +86,41 @@ def test_sharepoint_filename_and_title_for_coverage():
     }
     # Verifica normalização de canal
     assert SharePointYouTubeReporter.normalizar_canal("Gaúcha") == "Gaúcha"
+
+def test_visual_proof_distinct_frames_and_no_wrong_overlay(tmp_path):
+    from modules.visual_proof_service import generate_chronology_stage_proofs
+    import hashlib
+
+    milestones = [
+        {"clock": "18:00:00", "min": 0, "lbl": "ABERTURA", "txt": "Início da transmissão e pauta do dia."},
+        {"clock": "18:30:00", "min": 30, "lbl": "ANÁLISE", "txt": "Debate tático da rodada."},
+        {"clock": "19:00:00", "min": 60, "lbl": "INTERVALO", "txt": "Pausa e interação com torcedores."},
+        {"clock": "19:30:00", "min": 90, "lbl": "DEBATE", "txt": "Repercussão dos lances polêmicos."},
+        {"clock": "19:54:00", "min": 114, "lbl": "ENCERRAMENTO", "txt": "Notas finais e despedida dos comentaristas."}
+    ]
+
+    proofs = generate_chronology_stage_proofs(
+        video_url_or_id="dummy_video_for_unit_test",
+        milestones=milestones,
+        date_str="24/10/2026",
+        praca="SPO",
+        channel_name="GAU",
+        output_dir=str(tmp_path),
+        match_display="Inter x Botafogo",
+        competition="Debate & Cobertura Esportiva",
+        program_name="Central do Torcedor",
+        is_coverage_debate=True
+    )
+
+    assert len(proofs) == 5
+    hashes = set()
+    for p in proofs:
+        img_p = p["image_path"]
+        assert os.path.exists(img_p)
+        with open(img_p, "rb") as f:
+            h = hashlib.md5(f.read()).hexdigest()
+        assert h not in hashes, f"Frame duplicado detectado: {img_p}"
+        hashes.add(h)
+
+    # Verifica que todos os 5 frames têm hashes únicos
+    assert len(hashes) == 5

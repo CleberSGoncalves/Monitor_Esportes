@@ -324,33 +324,32 @@ class ReportGenerator:
 
     def _get_rich_milestone_description(self, lbl: str, m_min: int = 0, match_disp: str = "", t1: str = "", t2: str = "", score: str = "") -> str:
         lbl_u = str(lbl or "").upper()
-        t1_s = t1 or "Grêmio"
-        t2_s = t2 or "Atlético-MG"
+        t1_s = t1 or "Mandante"
+        t2_s = t2 or "Visitante"
+        m_display = match_disp or (f"{t1_s} x {t2_s}" if t1 and t2 else "partida")
         
         if any(k in lbl_u for k in ["INÍCIO TRANSMISSÃO", "INÍCIO PRÉ-JOGO", "ABERTURA", "PRE_JOGO"]):
-            return "Abertura oficial do sinal de transmissão e início da jornada esportiva direto do estúdio."
+            return f"Abertura oficial do sinal de transmissão e início da jornada esportiva para {m_display}."
         if "HINO" in lbl_u:
             return "Execução oficial do Hino Nacional Brasileiro e protocolo de alinhamento das equipes no gramado."
         if "APITO INICIAL (1T)" in lbl_u or ("APITO INICIAL" in lbl_u and "2T" not in lbl_u):
-            return f"Autorização da arbitragem e saída de bola oficial para o 1º tempo na Arena do Grêmio."
+            return f"Autorização da arbitragem e saída de bola oficial para o 1º tempo de {m_display}."
         if "GOL" in lbl_u:
-            if "1" in lbl_u or "CRISTALDO" in lbl_u or m_min <= 45:
-                return f"Gol do {t1_s}! Cristaldo abre o placar em finalização precisa após jogada pelo flanco direito."
-            elif "2" in lbl_u or "BRAITHWAITE" in lbl_u or m_min > 45:
-                return f"Gol do {t1_s}! Braithwaite amplia a vantagem após jogada na pequena área."
-            return f"Gol confirmado na partida! Movimentação no placar de {match_disp}."
+            return f"Gol confirmado na partida! Movimentação no placar de {m_display}."
         if "FIM DO 1" in lbl_u or "FIM 1T" in lbl_u or "INTERVALO" in lbl_u:
-            return f"Encerramento da primeira etapa após acréscimos regulamentares (+3') com vantagem do {t1_s}."
+            return f"Encerramento da primeira etapa após acréscimos regulamentares da arbitragem."
         if "APITO INICIAL (2T)" in lbl_u or ("2T" in lbl_u and "GOL" not in lbl_u and "FINAL" not in lbl_u):
-            return f"Início da etapa complementar com saída de bola e reinício de disputa na Arena."
+            return f"Início da etapa complementar com saída de bola e reinício de disputa."
         if "APITO FINAL" in lbl_u or "FIM DE JOGO" in lbl_u:
-            return f"Término regulamentar da partida após 5 minutos de acréscimo. Vitória do {t1_s} por 2 a 0."
+            if score and score != "N/A":
+                return f"Término regulamentar da partida após acréscimos. Placar final: {score}."
+            return f"Término regulamentar da partida após acréscimos oficiais da arbitragem."
         if "PÓS-JOGO" in lbl_u:
-            return "Análise técnica de bancada, estatísticas completas e entrevistas coletivas dos treinadores."
+            return "Análise técnica de bancada, estatísticas completas e entrevistas coletivas pós-jogo."
         if "ENCERRAMENTO" in lbl_u:
             return "Encerramento oficial da transmissão ao vivo e conclusão da cobertura da jornada esportiva."
         
-        return f"Registro técnico oficial de {lbl} validado na cronologia da partida."
+        return f"Registro técnico oficial de {lbl} validado na cronologia de {m_display}."
 
     def __init__(self, reports_dir: str) -> None:
 
@@ -3025,7 +3024,11 @@ class ReportGenerator:
                             date_str=dt_str,
                             praca="SPO",
                             channel_name=ch_name,
-                            base_frame_path=base_frame
+                            base_frame_path=base_frame,
+                            match_display=res.get("match_title") or res.get("program_name") or "Transmissão Ao Vivo",
+                            competition=res.get("championship") or ("Debate & Cobertura Esportiva" if res.get("is_coverage_debate") else "Transmissão Oficial de Futebol"),
+                            program_name=res.get("program_name") or "",
+                            is_coverage_debate=res.get("is_coverage_debate", False)
                         )
                         res["milestone_proofs"] = m_proofs
                         res["visual_proof_images"] = [p["image_path"] for p in m_proofs]

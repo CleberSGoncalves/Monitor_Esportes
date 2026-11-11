@@ -105,7 +105,11 @@ def test_coverage_pipeline():
         date_str="24/10/2026",
         stream_start_dt=datetime(2026, 10, 24, 18, 0, 0),
         praca="SPO",
-        channel_name="GAU"
+        channel_name="GAU",
+        match_display="Inter x Botafogo / Grêmio Mobilização",
+        competition="Debate & Cobertura Esportiva",
+        program_name="Central do Torcedor",
+        is_coverage_debate=True
     )
     assert len(m_proofs) >= 5, f"Esperado >= 5 frames, obtido {len(m_proofs)}"
     result["milestone_proofs"] = m_proofs
