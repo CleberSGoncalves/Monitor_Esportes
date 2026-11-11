@@ -81,6 +81,7 @@ PIPELINE_LABELS = {
     "transcribed": ("🔍 Transcrição pronta (em análise)", "#00CED1"),
 
     "ready_match": ("✅ Partida Narrada — Pronta p/ Relatório", "#00FF7F"),
+    "ready_coverage": ("🎙️ Cobertura/Debate — Pronto p/ Relatório", "#BA55D3"),
 
     "not_match": ("ℹ️ Programa/Debate (Não é jogo narrado)", "#90A4AE"),
 
@@ -936,13 +937,24 @@ class LiveNarrationService:
 
                 ev["duration"] = int(info["duration"])
 
-            from modules.narration_chronology import is_likely_match, is_definitely_non_match, match_cbf_official_fixture
+            from modules.narration_chronology import is_likely_match, is_definitely_non_match, match_cbf_official_fixture, is_sports_debate_or_coverage, extract_program_name
             ev_title = ev.get("title", "")
             is_non, _ = is_definitely_non_match(ev_title)
+            is_cov, prog_name = is_sports_debate_or_coverage(ev_title)
             cbf_match = match_cbf_official_fixture(ev_title, ev.get("found_at"))
 
-            if is_non:
+            if is_cov:
                 ev["is_match_narration"] = False
+                ev["is_coverage_debate"] = True
+                ev["event_type"] = "live_coverage_debate"
+                ev["program_name"] = prog_name
+                ev.setdefault("meta", {})
+                ev["meta"]["program_name"] = prog_name
+                ev["meta"]["event_type"] = "live_coverage_debate"
+                ev["meta"]["theme"] = ev_title
+            elif is_non:
+                ev["is_match_narration"] = False
+                ev["is_coverage_debate"] = False
                 ev["pipeline"] = "not_match"
                 ev["selected"] = False
             elif cbf_match and cbf_match.get("matched"):
@@ -958,9 +970,8 @@ class LiveNarrationService:
                 self.get_setting("auto_detect_match", True)
                 and not ev.get("selected")
                 and not ev.get("user_unselected")
-                and not is_non
-                and (bool(cbf_match) or is_likely_match(ev_title, ev.get("duration", 0), ev.get("found_at")))
-                and status in ("upcoming", "live")
+                and (is_cov or (not is_non and (bool(cbf_match) or is_likely_match(ev_title, ev.get("duration", 0), ev.get("found_at")))))
+                and status in ("upcoming", "live", "ended")
                 and not _is_24h_or_continuous_stream(ev_title, ev)
             ):
 

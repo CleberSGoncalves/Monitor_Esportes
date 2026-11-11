@@ -1,5 +1,5 @@
 {
-  "version": "2.4.47",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.47/Monitor_Esportes.exe",
-  "changelog": "v2.4.47: Sincronização e geração completa dos relatórios de YouTube na biblioteca dedicada 'Relatorio Jogos Youtube' (Coritiba x Grêmio, Inter x Botafogo, Inter x Coritiba e Grêmio x Galo) com 10/10 marcos e frames carimbados em BRT; auditoria e sincronização temporal estrita da NBA (confronto fiel de Jump Ball/Halftime/Encerramento entre Game Book e Streaming); testes automatizados (13/13 aprovados) e total prontidão para a reunião executiva SAM (NBA | Gauchão)."
+  "version": "2.4.48",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.4.48/Monitor_Esportes.exe",
+  "changelog": "v2.4.48: Implementação da modalidade de laudo 'Cobertura & Debate Esportivo ao Vivo' para lives sem narração lance a lance (Central do Torcedor, Vamo Colorado, Baldasso Night Show, É o Grêmio, etc.); extração e exibição do Nome do Programa no cabeçalho e metadados; timeline temática por blocos e comprovação visual com frames em fuso BRT; 61 testes automatizados 100% aprovados."
 }

@@ -201,7 +201,7 @@ class NBAService:
                 "home_score": home_score,
                 "score_display": f"{away_score} - {home_score}" if (away_score is not None and home_score is not None) else "—",
                 "status": status_desc,
-                "is_finished": status_state == "post" or "FINAL" in status_desc.upper(),
+                "is_finished": (status_state == "post" or "FINAL" in status_desc.upper()) and (away_score is not None and home_score is not None) and not (away_score == 0 and home_score == 0) and not any(k in status_desc.upper() for k in ["POSTP", "CANCEL", "SUSP"]),
                 "is_live": status_state == "in",
                 "platform": broadcaster_name,
                 "platforms": detected_platforms,

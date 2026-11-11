@@ -224,8 +224,8 @@ def select_official_video(
 
     for c in candidates:
         title = (c.get("title") or "").upper()
-        uploader = (c.get("uploader") or c.get("channel") or "").strip().upper()
-        if uploader and uploader != OFFICIAL_NBA_UPLOADER:
+        uploader = (c.get("uploader") or c.get("channel") or "").strip().upper().lstrip("@")
+        if uploader != OFFICIAL_NBA_UPLOADER:
             continue
         if "FULL GAME HIGHLIGHTS" not in title and "HIGHLIGHTS" not in title:
             continue

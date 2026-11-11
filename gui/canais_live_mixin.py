@@ -822,6 +822,19 @@ class CanaisLiveMixin:
                 justify="left",
                 wraplength=560
             ).pack(fill="x", padx=10, pady=(0, 2))
+        elif ev.get("is_coverage_debate") or meta.get("program_name") or ev.get("program_name"):
+            prog = ev.get("program_name") or meta.get("program_name") or "Programa Esportivo"
+            theme = ev.get("coverage_theme") or meta.get("theme") or ""
+            theme_disp = f" • Pauta: {theme[:50]}" if theme else ""
+            ctk.CTkLabel(
+                card,
+                text=f"🎙️ Programa/Debate: {prog}{theme_disp}",
+                font=ctk.CTkFont(size=11, weight="bold"),
+                text_color="#BA55D3",
+                anchor="w",
+                justify="left",
+                wraplength=560
+            ).pack(fill="x", padx=10, pady=(0, 2))
         elif is_match is False:
             cat_txt = t_analysis.get("event_category") or "Programa / Debate"
             reason_txt = t_analysis.get("classification_summary") or "Não foi identificada narração de partida em tempo real."

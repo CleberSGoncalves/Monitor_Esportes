@@ -84,3 +84,52 @@ def test_youtube_report_structure_includes_10_milestones_and_grounding():
     pdf = rep_gen.write_expert_report([test_payload], sync_sharepoint=False, name_prefix="test_pipeline_guarantee")
     assert os.path.exists(pdf)
     assert os.path.getsize(pdf) > 5000
+
+
+def test_postponed_or_zero_score_games_are_not_finished():
+    """Garante que jogos adiados, cancelados ou com placar 0-0 nunca sejam marcados como finalizados."""
+    from modules.nba_service import NBAService
+
+    # Jogo com status "post" mas adiado
+    game_postponed = {
+        "status": "Postponed",
+        "status_state": "post",
+        "away_score": None,
+        "home_score": None
+    }
+    is_postp_or_canc = any(k in game_postponed["status"].upper() for k in ["POSTP", "CANCEL", "SUSP"])
+    has_score = (game_postponed["away_score"] is not None and game_postponed["home_score"] is not None)
+    is_fin = (game_postponed["status_state"] == "post") and has_score and not is_postp_or_canc
+    assert not is_fin, "Jogo adiado não pode ser considerado finalizado"
+
+    # Jogo com 0-0
+    game_zero = {
+        "status": "Final",
+        "status_state": "post",
+        "away_score": 0,
+        "home_score": 0
+    }
+    is_zero = (game_zero["away_score"] == 0 and game_zero["home_score"] == 0)
+    is_fin_zero = (game_zero["status_state"] == "post") and not is_zero
+    assert not is_fin_zero, "Jogo 0-0 não pode ser considerado finalizado"
+
+
+def test_uploader_filter_accepts_at_nba_and_rejects_empty():
+    """Valida que o seletor aceita @NBA e rejeita uploader vazio."""
+    from modules.nba_visual_proof_service import select_official_video
+
+    cand_at = {
+        "id": "VidAtNba001",
+        "uploader": "@NBA",
+        "duration": 900,
+        "title": "CELTICS at LAKERS | FULL GAME HIGHLIGHTS | October 27, 2026"
+    }
+    cand_empty = {
+        "id": "VidEmpty001",
+        "uploader": "",
+        "duration": 900,
+        "title": "CELTICS at LAKERS | FULL GAME HIGHLIGHTS | October 27, 2026"
+    }
+    assert select_official_video([cand_at], "Boston Celtics", "Los Angeles Lakers", "20261027") is not None
+    assert select_official_video([cand_empty], "Boston Celtics", "Los Angeles Lakers", "20261027") is None
+

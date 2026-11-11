@@ -192,6 +192,11 @@ class NBAAutonomousAuditor:
                     self.mark_game_audited(game, "", email_sent=True, sp_synced=True)
                 continue
 
+            # Trava absoluta contra jogos agendados, não iniciados ou com placar 0-0
+            is_zero_zero = (game.get("away_score") == 0 and game.get("home_score") == 0) or str(game.get("score_display", "")).strip() in ("0 - 0", "—", "-", "")
+            if not is_fin or is_zero_zero:
+                continue
+
             # Caso 1: Jogo FINALIZADO recente (hoje ou ontem) que ainda NÃO foi auditado
             if is_fin and not self.is_game_audited(gid):
                 self._log(f"🏁 Partida da NBA FINALIZADA detectada: {match_disp}. Iniciando auditoria autônoma...")
@@ -199,6 +204,9 @@ class NBAAutonomousAuditor:
                 # a) Baixar Game Book oficial
                 gb_path = self.nba_service.download_gamebook(game)
                 parsed = self.nba_service.parse_gamebook(gb_path) if gb_path else {}
+                if not gb_path or not parsed.get("milestones"):
+                    self._log(f"⏳ [NBA AUTO] Game Book oficial da NBA ainda não disponível para {match_disp}. Aguardando publicação oficial no statsdmz...")
+                    continue
                 
                 # b) Gerar Relatório Executivo Oficial PDF
                 pdf = self.nba_reporter.generate_report(game, parsed)

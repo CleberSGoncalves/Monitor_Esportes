@@ -104,18 +104,30 @@ class SharePointYouTubeReporter:
                 logger.error("[SharePoint YouTube] Nenhum drive disponível para sincronização.")
                 return False
 
-            partida = str(event_info.get("match_display") or event_info.get("partida") or event_info.get("title") or "Partida").strip()
+            prog_name = event_info.get("program_name") or (event_info.get("meta") or {}).get("program_name") or ""
+            theme = event_info.get("coverage_theme") or (event_info.get("meta") or {}).get("theme") or ""
+            is_cov = bool(event_info.get("is_coverage_debate") or event_info.get("event_type") == "live_coverage_debate" or (prog_name and not event_info.get("is_match_narration")))
+
+            if is_cov and prog_name:
+                partida = f"[{prog_name}] {theme or event_info.get('title') or 'Debate'}"[:100].strip()
+            else:
+                partida = str(event_info.get("match_display") or event_info.get("partida") or event_info.get("title") or "Partida").strip()
+
             raw_canal = str(event_info.get("channel_name") or event_info.get("canal") or event_info.get("channel") or "Gaúcha").strip()
             canal = cls.normalizar_canal(raw_canal)
-            campeonato = SharePointReporter.normalizar_campeonato(
-                str(event_info.get("competition") or event_info.get("campeonato") or "Copa do Brasil")
-            )
+            raw_comp = str(event_info.get("competition") or event_info.get("campeonato") or ("Debate Esportivo" if is_cov else "Copa do Brasil"))
+            campeonato = SharePointReporter.normalizar_campeonato(raw_comp) if not is_cov else "Copa do Brasil"
 
             partida_norm = "".join(c for c in partida if c.isalnum() or c in " xX_").strip().replace(" ", "_").lower()
+            if is_cov and len(partida_norm) > 40:
+                partida_norm = partida_norm[:40]
             canal_norm = "".join(c for c in canal if c.isalnum() or c in "_").strip().replace(" ", "_").lower()
             date_clean = event_info.get("date_clean") or datetime.now().strftime("%Y%m%d")
 
-            sp_filename = f"Relatorio_Youtube_{canal_norm}_{partida_norm}_{date_clean}.pdf"
+            if is_cov:
+                sp_filename = f"Relatorio_Youtube_debate_{canal_norm}_{partida_norm}_{date_clean}.pdf"
+            else:
+                sp_filename = f"Relatorio_Youtube_{canal_norm}_{partida_norm}_{date_clean}.pdf"
             upload_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root:/{sp_filename}:/content"
 
             headers = {"Authorization": f"Bearer {token}"}

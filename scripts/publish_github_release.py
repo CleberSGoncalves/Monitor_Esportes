@@ -18,20 +18,20 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.4.47"
-    release_name = "v2.4.47 - Sincronização Total YouTube (Gauchão/RS) e Conformidade Fiel NBA"
+    tag = "v2.4.48"
+    release_name = "v2.4.48 - Modalidade Cobertura & Debate ao Vivo (Nome do Programa & Timeline Temática)"
     body = (
-        "### Novidades da versão v2.4.47:\n"
-        "- 📺 **Sincronização Completa de Jogos do YouTube (Biblioteca 'Relatorio Jogos Youtube')**:\n"
-        "  - Geração e homologação de laudos com 10/10 etapas e frames estampados com fuso BRT (2.9 MB a 3.3 MB cada) para Coritiba x Grêmio, Internacional x Botafogo, Internacional x Coritiba e Grêmio x Atlético-MG nos canais do RS (Bagé TV, Band RS, Gaúcha, Gaúcha Esportes).\n"
-        "  - Correção de metadados: exibição padronizada de 99.0% de confiança e status Auditado em todas as transmissões.\n"
-        "  - Automação ponta a ponta: 'auto_detect_match', 'auto_report' e 'auto_email' ativos para processar todas as próximas partidas assim que encerrarem.\n"
-        "- 🏀 **Auditoria e Fidelidade Cronológica na NBA**:\n"
-        "  - Confronto fiel entre NBA Game Book (Tabela 1) e Transmissão/Streaming (Tabela 2): Jump Ball, Halftime e Encerramento sincronizados com exatidão milimétrica, sem deduções ou horários fictícios de mock.\n"
-        "  - Barreira Anti-Stub estrita (>= 500 KB) e bloqueio definitivo de emissão de relatórios para jogos agendados/futuros.\n"
-        "  - Todos os jogos auditados homologados com 8/8 frames reais tarjados em BRT (> 2.0 MB no SharePoint), com expurgo total de 66 stubs legados.\n"
-        "- 🧪 **Testes Automatizados**: Suíte completa com 55/55 testes unitários e de integração 100% aprovados.\n"
-        "- 🎯 **Prontidão Executiva SAM (NBA | Gauchão)**: Acervo totalmente íntegro, auditado e pronto para liderança e auditoria externa."
+        "### Novidades da versão v2.4.48:\n"
+        "- 🎙️ **Novo Modo 'Cobertura & Debate Esportivo ao Vivo' (YouTube)**:\n"
+        "  - Suporte completo para transmissões ao vivo sem narração de bola rolando lance a lance (Central do Torcedor, Vamo Colorado, Baldasso Night Show, É o Grêmio, Os Donos da Bola, Bate-Bola, Resenha Fora da Sala, etc.).\n"
+        "  - **Nome do Programa**: Reconhecimento automático e exibição proeminente no cabeçalho do laudo, na caixa de metadados, na interface gráfica e no SharePoint.\n"
+        "  - **Timeline Temática por Blocos**: Divisão cronológica da live em capítulos temáticos com síntese das opiniões e análises da bancada, em vez de marcos fictícios de apito.\n"
+        "  - **Auditoria de Marcas & Patrocinadores**: Mapeamento de todas as marcas, anúncios e merchandisings falados no estúdio.\n"
+        "  - **Comprovação Visual Contínua**: Frames da transmissão ao vivo com tarja oficial de auditoria técnica no fuso de Brasília (BRT).\n"
+        "- ⚽ **Modos Tradicionais 100% Preservados**:\n"
+        "  - Brasileirão, Copa do Brasil (CBF / Streaming) e Jornadas com Narração Lance a Lance operando com 10/10 marcos intactos.\n"
+        "- 🏀 **NBA Autônoma**: Sincronismo do Game Book, barreira anti-stub e canal oficial mantidos.\n"
+        "- 🧪 **Testes Automatizados**: Suíte expandida com 61/61 testes 100% aprovados."
     )
 
     headers = {

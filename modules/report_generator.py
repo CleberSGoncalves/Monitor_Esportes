@@ -2549,49 +2549,41 @@ class ReportGenerator:
 
 
 
+            is_coverage = bool(res.get("report_kind") == "live_coverage" or res.get("is_coverage_debate"))
+            prog_name_disp = res.get("program_name") or (res.get("broadcast_info") or {}).get("program_name") or "Programa Esportivo"
             b_info = res.get("broadcast_info")
 
             if b_info:
-
                 c.setFont("Helvetica-Bold", 11)
-
-                c.drawString(40, y, "EVENTO & CANAL DE TRANSMISSAO (NARRACAO AO VIVO):")
-
+                if is_coverage:
+                    c.drawString(40, y, "EVENTO & CANAL DE TRANSMISSÃO (COBERTURA & DEBATE AO VIVO):")
+                else:
+                    c.drawString(40, y, "EVENTO & CANAL DE TRANSMISSAO (NARRACAO AO VIVO):")
                 y -= 14
-
                 
-
                 c.setStrokeColorRGB(0.0, 0.7, 0.7)
-
                 c.setFillColorRGB(0.96, 0.98, 1.0)
-
                 box_h = 58
-
                 c.roundRect(40, y - box_h, width - 80, box_h + 4, 4, fill=1, stroke=1)
-
                 c.setFillColorRGB(0, 0, 0)
-
                 
-
                 c.setFont("Helvetica-Bold", 9)
-
                 c.drawString(50, y - 13, f"• Canal: {b_info.get('channel_name') or plat_display}")
-
-                c.drawString(290, y - 13, f"• Duracao da Live: {b_info.get('duration') or dur_str}")
-
+                if is_coverage:
+                    c.drawString(290, y - 13, f"• Programa: {prog_name_disp[:32]}")
+                else:
+                    c.drawString(290, y - 13, f"• Duracao da Live: {b_info.get('duration') or dur_str}")
                 
-
                 c.setFont("Helvetica", 8.5)
-
                 v_title = str(b_info.get('video_title') or '')[:75]
-
                 c.drawString(50, y - 27, f"• Live: {v_title}")
-
                 c.drawString(50, y - 41, f"• Inicio: {b_info.get('live_start') or inicio_live or '--:--'}  |  Fim: {b_info.get('live_end') or fim_live or '--:--'}")
-
-                c.drawString(290, y - 41, f"• Transcricao: {b_info.get('transcript_source') or 'YouTube'}")
-
-                c.drawString(50, y - 53, f"• Arquivo: {b_info.get('narration_file') or 'narracao.txt'}")
+                if is_coverage:
+                    c.drawString(290, y - 41, f"• Duração: {b_info.get('duration') or dur_str}")
+                    c.drawString(50, y - 53, f"• Formato: Cobertura / Debate Esportivo em Estúdio")
+                else:
+                    c.drawString(290, y - 41, f"• Transcricao: {b_info.get('transcript_source') or 'YouTube'}")
+                    c.drawString(50, y - 53, f"• Arquivo: {b_info.get('narration_file') or 'narracao.txt'}")
 
                 y -= (box_h + 16)
 
@@ -2665,7 +2657,7 @@ class ReportGenerator:
 
             c.setFont("Helvetica-Bold", 11)
 
-            c.drawString(40, y, "CRONOLOGIA COMPLETA E AUDITADA:")
+            c.drawString(40, y, "TIMELINE TEMÁTICA DA TRANSMISSÃO & BLOCOS DE DEBATE:" if (res.get("report_kind") == "live_coverage" or res.get("is_coverage_debate")) else "CRONOLOGIA COMPLETA E AUDITADA:")
 
             y -= 20
 
@@ -3061,7 +3053,7 @@ class ReportGenerator:
 
                 c.setFont("Helvetica-Bold", 12)
                 c.setFillColorRGB(0.05, 0.2, 0.45) # Azul institucional
-                c.drawString(40, y, "COMPROVAÇÃO TÉCNICA VISUAL DE CADA ETAPA DA CRONOLOGIA:")
+                c.drawString(40, y, "COMPROVAÇÃO TÉCNICA VISUAL DE CADA BLOCO DA TRANSMISSÃO:" if (res.get("report_kind") == "live_coverage" or res.get("is_coverage_debate")) else "COMPROVAÇÃO TÉCNICA VISUAL DE CADA ETAPA DA CRONOLOGIA:")
                 y -= 14
                 c.setFont("Helvetica", 8.5)
                 c.setFillColorRGB(0.3, 0.3, 0.3)
