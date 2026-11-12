@@ -18,20 +18,24 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.7"
-    release_name = "v2.5.7 - Fidelidade 100% ao Streaming Scheduler e Correção de Fusos e Grade CBF"
+    tag = "v2.5.8"
+    release_name = "v2.5.8 - Refinamento Visual NBA, Calibração de Frames e Agenda SharePoint"
     body = (
-        "### Novidades da versão v2.5.7:\n"
-        "- 🎯 **Fidelidade 100% ao Streaming Scheduler**:\n"
-        "  - Correção do fuso CBF (-1h oficial sem dupla subtração de 2h).\n"
-        "  - Preservação inteligente das rodadas oficiais vigentes na CDN da CBF (PDFs Brasileirão Série A e Copa do Brasil) e Copa do Mundo 2026.\n"
-        "  - Resolução definitiva de varredura descartando confrontos quando a data corrente da máquina for posterior aos jogos tabelados.\n"
-        "- 📁 **Resiliência e Carregamento de Grade CSV e Planilha Copa do Mundo**:\n"
-        "  - Carregamento inicial automático e sanitizado de streaming_data.csv / data.csv na inicialização da aba.\n"
-        "  - Empacotamento de `data.csv` e `Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx` diretamente no executável compilado via PyInstaller.\n"
-        "- 🛡️ **Ativação Completa das 6 Plataformas por Padrão**:\n"
-        "  - Todas as 6 plataformas (Prime, DAZN, Max, Disney, Cazé TV, CBF) ativas por padrão, idêntico ao Streaming Scheduler.\n"
-        "- 🧪 **113 Testes Automatizados E2E e Integração Aprovados (100% de sucesso)**."
+        "### Novidades da versão v2.5.8:\n"
+        "- 🏀 **Tarja Técnica Visual Refinada (Sem Horário de Relógio)**:\n"
+        "  - Remoção dos horários das tarjas dos frames para eliminar defasagem em relação ao cronômetro de jogo nos highlights.\n"
+        "  - Identificação clara como 'HIGHLIGHT OFICIAL DE COMPROVAÇÃO' com data oficial no formato canônico.\n"
+        "  - Revisão completa e atualização de 1.118 frames de evidências fotográficas em cache.\n"
+        "- ⏱️ **Calibração de Offsets da NBA (Etapa 7 no 4º Quarto)**:\n"
+        "  - Ajuste da proporção da Etapa 7 (Início do 4º Quarto) para 88% da duração do vídeo, prevenindo rigorosamente a captura de frames do final do 3º quarto.\n"
+        "- 📅 **Sincronização de Jogos Futuros no SharePoint**:\n"
+        "  - Pré-preenchimento automático da biblioteca 'Relatorios_de_Jogos_NBA' com fichas técnicas oficiais em PDF e status 'Agendado'.\n"
+        "  - Conforme os confrontos são realizados, o sistema atualiza o registro automaticamente com o relatório pericial final e 99.0% de confiança.\n"
+        "- 🌍 **Tolerância de Fuso Horário nos Vídeos Oficiais (+/- 1 dia)**:\n"
+        "  - Resolução automática das partidas finalizadas desde 10/11 (Spurs @ Bulls, Lakers @ Bucks, Wizards @ Pacers, Cavaliers @ Knicks, etc.).\n"
+        "- 🎙️ **Correção em Canais Live**:\n"
+        "  - Resolução do NameError 'is_cov' no fluxo de transcrição de debates esportivos.\n"
+        "- 🧪 **116 Testes Automatizados Aprovados (100% de sucesso)**."
     )
 
     headers = {

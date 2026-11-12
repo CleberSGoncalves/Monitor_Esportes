@@ -1322,7 +1322,8 @@ class LiveNarrationService:
         )
 
         is_match = bool(analysis.get("is_match_narration"))
-
+        is_cov = bool(analysis.get("is_coverage_debate"))
+        prog_name = analysis.get("program_name") or ""
         meta = dict(ev.get("meta") or {})
 
         if analysis.get("team1"):

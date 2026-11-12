@@ -216,6 +216,63 @@ class NBAService:
         return games
 
     @classmethod
+    def fetch_season_schedule(cls, force_refresh: bool = False, max_future_days: Optional[int] = None) -> List[Dict[str, Any]]:
+        """
+        Coleta toda a agenda da temporada da NBA (passados, presentes e futuros).
+        Utiliza cache em 'config/nba_season_schedule.json' para máxima velocidade.
+        """
+        from concurrent.futures import ThreadPoolExecutor
+
+        cache_file = os.path.join(PROJECT_ROOT, "config", "nba_season_schedule.json")
+        now_ts = time.time()
+        if not force_refresh and os.path.exists(cache_file):
+            try:
+                # Cache válido por 12 horas
+                if (now_ts - os.path.getmtime(cache_file)) < 43200:
+                    with open(cache_file, "r", encoding="utf-8") as f:
+                        cached_data = json.load(f)
+                    if cached_data and isinstance(cached_data, list):
+                        return cached_data
+            except Exception:
+                pass
+
+        # Coletar calendário completo de datas
+        try:
+            url_cal = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard"
+            req = urllib.request.Request(url_cal, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            cal = data.get("leagues", [{}])[0].get("calendar", [])
+            dates = [c[:10].replace("-", "") for c in cal if isinstance(c, str)]
+        except Exception as e:
+            print(f"[NBA] Falha ao coletar calendário: {e}")
+            dates = []
+
+        if not dates:
+            base = datetime.now()
+            dates = [(base + timedelta(days=i)).strftime("%Y%m%d") for i in range(-5, 30)]
+
+        if max_future_days is not None:
+            today_clean = datetime.now().strftime("%Y%m%d")
+            limit_clean = (datetime.now() + timedelta(days=max_future_days)).strftime("%Y%m%d")
+            dates = [d for d in dates if d <= limit_clean]
+
+        all_games = []
+        with ThreadPoolExecutor(max_workers=8) as ex:
+            results = ex.map(cls.fetch_games_for_date, dates)
+            for game_list in results:
+                all_games.extend(game_list)
+
+        try:
+            os.makedirs(os.path.dirname(cache_file), exist_ok=True)
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(all_games, f, indent=2, ensure_ascii=False)
+        except Exception:
+            pass
+
+        return all_games
+
+    @classmethod
     def download_gamebook(cls, game: Dict[str, Any], force: bool = False) -> Optional[str]:
         """Baixa o PDF oficial do Game Book da NBA de forma determinística."""
         local_path = game.get("local_gamebook_path")

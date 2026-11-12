@@ -88,8 +88,9 @@ def stamp_nba_audit_banner(
 ) -> str:
     """
     Desenha a tarja oficial de auditoria técnica no topo do frame:
-    [PRAÇA] - [CANAL] - [DD/MM/YYYY HH:MM:SS] - [PRAÇA]
-    Garante sincronismo 100% no fuso de Brasília (BRT).
+    [PRAÇA] - [CANAL] - [DD/MM/YYYY] - HIGHLIGHT OFICIAL DE COMPROVAÇÃO - [PRAÇA]
+    Remove rigorosamente o horário (HH:MM:SS) da tarja para eliminar qualquer
+    confusão com o relógio interno do jogo nos frames de highlights.
     """
     if not os.path.exists(image_input):
         raise FileNotFoundError(f"Frame base não encontrado: {image_input}")
@@ -109,7 +110,10 @@ def stamp_nba_audit_banner(
         draw = ImageDraw.Draw(img)
         draw.rectangle([0, 0, width, banner_h], fill=(0, 0, 0))
 
-    banner_text = f"{praca.upper()} - {channel_code.upper()} - {timestamp_brt_str} - {praca.upper()}"
+    # Extrai estritamente a data (DD/MM/YYYY) e remove horários para clareza técnica total
+    date_match = re.search(r'\b\d{2}/\d{2}/\d{4}\b', timestamp_brt_str)
+    date_part = f" - {date_match.group(0)}" if date_match else ""
+    banner_text = f"{praca.upper()} - {channel_code.upper()}{date_part} - HIGHLIGHT OFICIAL DE COMPROVAÇÃO - {praca.upper()}"
     
     font_size = max(14, int(banner_h * 0.52))
     font = _get_font(font_size, bold=True)
@@ -205,7 +209,7 @@ def select_official_video(
     date_clean: str = ""
 ) -> Optional[Dict[str, Any]]:
     """
-    Seleciona SOMENTE o vídeo "FULL GAME HIGHLIGHTS" publicado pelo canal oficial da NBA
+    Seleciona SOMENTE o vídeo 'FULL GAME HIGHLIGHTS' publicado pelo canal oficial da NBA
     que corresponda ao jogo (ambos os times e a data no título) e tenha duração plausível.
     Retorna None se nenhum candidato atender — nunca usa vídeo de terceiros.
     """
@@ -306,6 +310,16 @@ class NBAVisualProofService:
                     if best:
                         print(f"[NBA VisualProof] Vídeo oficial resolvido: '{best['title']}' (ID: {best['id']}, Duração: {best['duration']}s)")
                         return best
+
+                    # Tolerância de fuso horário americano vs Brasília (+/- 1 dia)
+                    if date_clean and len(date_clean) == 8 and date_clean.isdigit():
+                        base_dt = datetime(int(date_clean[:4]), int(date_clean[4:6]), int(date_clean[6:8]))
+                        for delta in (1, -1):
+                            alt_d = (base_dt + timedelta(days=delta)).strftime("%Y%m%d")
+                            best_alt = select_official_video(candidates, away_team, home_team, alt_d)
+                            if best_alt:
+                                print(f"[NBA VisualProof] Vídeo oficial resolvido (tolerância fuso {alt_d}): '{best_alt['title']}' (ID: {best_alt['id']}, Duração: {best_alt['duration']}s)")
+                                return best_alt
             except Exception as e:
                 print(f"[NBA VisualProof] Falha na busca '{query}': {e}")
                 continue
@@ -406,7 +420,12 @@ class NBAVisualProofService:
         has_ot = any("OT" in m.get("period", "").upper() or "PRORROG" in m.get("period", "").upper() for m in milestones)
 
         if has_ot and total_stages >= 10:
-            stage_ratios = [0.06, 0.18, 0.26, 0.42, 0.50, 0.64, 0.72, 0.86, 0.91, 0.97]
+            stage_ratios = [0.06, 0.18, 0.26, 0.38, 0.46, 0.58, 0.68, 0.80, 0.89, 0.98]
+        elif total_stages == 8:
+            # Calibração estrita para 8 etapas (4 quartos):
+            # Q1: 0.08, 0.22 | Q2: 0.32, 0.46 | Q3: 0.54, 0.68 | Q4: 0.88, 0.98
+            # Garante que a etapa 7 (Início do 4º Quarto) caia a 88%, evitando frames do final do 3º quarto
+            stage_ratios = [0.08, 0.22, 0.32, 0.46, 0.54, 0.68, 0.88, 0.98]
         else:
             stage_ratios = [
                 0.08 + (0.88 * i / max(1, total_stages - 1))

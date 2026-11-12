@@ -443,10 +443,10 @@ class NBAReportGenerator:
             story.append(PageBreak())
             story.append(Paragraph("COMPROVAÇÃO TÉCNICA VISUAL DE CADA ETAPA DA CRONOLOGIA — NBA", sec_header))
             story.append(Paragraph(
-                "Os horários e a tarja (fuso de Brasília, BRT - UTC-3) vêm do Game Book oficial da NBA. "
-                "Cada imagem é um frame real do vídeo oficial de melhores momentos (Full Game Highlights, canal NBA), "
-                "tomado na posição proporcional do período dentro do vídeo; ela ilustra o período, "
-                "não o instante exato do relógio da súmula. Etapas sem vídeo oficial disponível são indicadas como indisponíveis.",
+                "Os horários oficiais de início e término são registrados na Súmula Oficial da NBA (Game Book) no fuso de Brasília (BRT). "
+                "Cada imagem é um frame da transmissão oficial de highlights da partida (Full Game Highlights, canal NBA), "
+                "tomado na posição proporcional do período dentro do vídeo para comprovação visual das etapas da partida, com tarja técnica "
+                "'HIGHLIGHT OFICIAL DE COMPROVAÇÃO'. O cronômetro exibido no placar da transmissão reflete o tempo de bola em jogo.",
                 subtitle_style
             ))
             story.append(Spacer(1, 6))
@@ -489,7 +489,7 @@ class NBAReportGenerator:
                 verif_src = prf.get("verification_source", "Súmula Oficial NBA (Game Book)")
 
                 t_card_header = Table([
-                    [Paragraph(f"<b>ETAPA {idx_p} DE {total_stages} | [{clk} BRT] {stg_title}</b>", card_title_style)]
+                    [Paragraph(f"<b>ETAPA {idx_p} DE {total_stages} | [Horário Oficial: {clk} BRT] {stg_title}</b>", card_title_style)]
                 ], colWidths=[18.0 * cm])
                 t_card_header.setStyle(TableStyle([
                     ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EFF6FF")),
@@ -514,7 +514,7 @@ class NBAReportGenerator:
                     src_vid = prf.get("source_video_id")
                     src_txt = f" | Fonte: vídeo oficial NBA (YouTube {src_vid}, {prf.get('source_video_offset_s')}s)" if src_vid else ""
                     card_flowables.append(Paragraph(
-                        f"Evidência Técnica #{idx_p} | Canal: {sigla_ch} | Praça: SPO | Sincronismo BRT: {ts_str} | Verificação: {verif_src}{src_txt}",
+                        f"Evidência Técnica #{idx_p} (Highlight Oficial de Comprovação) | Canal: {sigla_ch} | Praça: SPO | Súmula Oficial: {ts_str} BRT | Verificação: {verif_src}{src_txt}",
                         card_sub_style
                     ))
                 else:
@@ -533,4 +533,134 @@ class NBAReportGenerator:
 
         doc.build(story)
         print(f"[NBA Reporter] Relatório PDF gerado com sucesso: {pdf_path}")
+        return pdf_path
+
+    @classmethod
+    def generate_schedule_sheet(cls_or_self, game: Dict[str, Any]) -> str:
+        """
+        Gera uma ficha técnica oficial em PDF (1 página) para partida agendada da NBA.
+        Utilizado para preenchimento antecipado do SharePoint antes da realização do confronto.
+        """
+        reports_dir = getattr(cls_or_self, 'reports_dir', REPORTS_DIR)
+        os.makedirs(reports_dir, exist_ok=True)
+        away = game.get("away_team", "Visitante")
+        home = game.get("home_team", "Mandante")
+        away_tri = (game.get("away_tri") or away[:3]).upper()
+        home_tri = (game.get("home_tri") or home[:3]).upper()
+        date_clean = game.get("date_clean", datetime.now().strftime("%Y%m%d"))
+        date_disp = game.get("date_display", datetime.now().strftime("%d/%m/%Y"))
+        time_brt = game.get("time_brt", "Horário a confirmar")
+        plat = game.get("platform") or "NBA League Pass"
+        platforms = game.get("platforms") or [plat]
+        plat_display = " / ".join(platforms)
+
+        pdf_filename = f"Relatorio_NBA_{away_tri}_at_{home_tri}_{date_clean}.pdf"
+        pdf_path = os.path.join(reports_dir, pdf_filename)
+
+        doc = SimpleDocTemplate(
+            pdf_path,
+            pagesize=A4,
+            leftMargin=1.5 * cm,
+            rightMargin=1.5 * cm,
+            topMargin=1.5 * cm,
+            bottomMargin=1.5 * cm
+        )
+
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            "SchedTitle",
+            parent=styles["Heading1"],
+            fontSize=15,
+            leading=19,
+            textColor=colors.HexColor("#0F172A"),
+            fontName="Helvetica-Bold",
+            alignment=1
+        )
+        sub_style = ParagraphStyle(
+            "SchedSub",
+            parent=styles["Normal"],
+            fontSize=9.5,
+            leading=13,
+            textColor=colors.HexColor("#475569"),
+            alignment=1
+        )
+        label_style = ParagraphStyle(
+            "SchedLabel",
+            parent=styles["Normal"],
+            fontSize=9.5,
+            leading=13,
+            textColor=colors.HexColor("#334155"),
+            fontName="Helvetica-Bold"
+        )
+        val_style = ParagraphStyle(
+            "SchedVal",
+            parent=styles["Normal"],
+            fontSize=9.5,
+            leading=13,
+            textColor=colors.HexColor("#0F172A"),
+            fontName="Helvetica"
+        )
+        box_style = ParagraphStyle(
+            "SchedBox",
+            parent=styles["Normal"],
+            fontSize=8.5,
+            leading=12,
+            textColor=colors.HexColor("#1E3A8A"),
+            fontName="Helvetica-Oblique",
+            alignment=1
+        )
+
+        story = [
+            Paragraph("<b>MONITORAMENTO ESTRATÉGICO DE TRANSMISSÕES ESPORTIVAS — NBA</b>", sub_style),
+            Spacer(1, 4),
+            Paragraph(f"<b>FICHA TÉCNICA DE AGENDAMENTO: {away_tri} @ {home_tri}</b>", title_style),
+            Spacer(1, 6),
+            Paragraph(f"Partida Oficial da Temporada Regular da NBA • Data Prevista: {date_disp} às {time_brt} BRT", sub_style),
+            Spacer(1, 14),
+            HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#1D4ED8"), spaceAfter=14),
+        ]
+
+        info_data = [
+            [Paragraph("Confronto:", label_style), Paragraph(f"<b>{away} @ {home}</b>", val_style)],
+            [Paragraph("Campeonato:", label_style), Paragraph("National Basketball Association (NBA)", val_style)],
+            [Paragraph("Data Prevista:", label_style), Paragraph(f"{date_disp}", val_style)],
+            [Paragraph("Horário Previsto:", label_style), Paragraph(f"{time_brt} BRT (Fuso de Brasília)", val_style)],
+            [Paragraph("Plataformas / Canais:", label_style), Paragraph(f"{plat_display}", val_style)],
+            [Paragraph("Status de Monitoramento:", label_style), Paragraph("<font color='#0284C7'><b>AGENDADO — Aguardando Início e Conclusão</b></font>", val_style)],
+            [Paragraph("Praça de Auditoria:", label_style), Paragraph("São Paulo (SPO) / Rede Nacional", val_style)],
+            [Paragraph("Protocolo Técnico:", label_style), Paragraph("MediaDNA Autonomous Auditor v2.5", val_style)]
+        ]
+
+        t_info = Table(info_data, colWidths=[5.5 * cm, 12.5 * cm])
+        t_info.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F8FAFC")),
+            ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#CBD5E1")),
+            ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ("LEFTPADDING", (0, 0), (-1, -1), 10),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ]))
+        story.append(t_info)
+        story.append(Spacer(1, 18))
+
+        box_text = (
+            "<b>NOTA DE HOMOLOGAÇÃO DE AGENDAMENTO:</b><br/>"
+            "Este confronto está formalmente cadastrado e homologado no pipeline de monitoramento autônomo da NBA. "
+            "Assim que o jogo for finalizado pelas autoridades esportivas, o sistema coletará automaticamente a Súmula Oficial (Game Book), "
+            "extrairá os marcos cronológicos dos 4 quartos (comprovação visual com frames e destaques oficiais), "
+            "calculará as métricas periciais de exibição de patrocinadores e atualizará este registro no SharePoint com o Relatório Executivo Completo."
+        )
+        t_box = Table([[Paragraph(box_text, box_style)]], colWidths=[18.0 * cm])
+        t_box.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EFF6FF")),
+            ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#3B82F6")),
+            ("TOPPADDING", (0, 0), (-1, -1), 10),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+            ("LEFTPADDING", (0, 0), (-1, -1), 12),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 12),
+        ]))
+        story.append(t_box)
+
+        doc.build(story)
         return pdf_path

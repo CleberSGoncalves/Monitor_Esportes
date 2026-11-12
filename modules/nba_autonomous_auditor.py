@@ -174,6 +174,19 @@ class NBAAutonomousAuditor:
         sp_token_ok = SharePointReporter.is_token_valid()
         if not sp_token_ok:
             self._log("⚠️ [SharePoint NBA] Sessão do SharePoint não autenticada. Clique em '🔑 Conectar SharePoint' na tela para autorizar o envio automático.")
+        else:
+            # Sincronização antecipada de jogos futuros agendados no SharePoint (1 vez a cada 12h)
+            last_sync = getattr(self, "_last_schedule_sync", 0)
+            if (time.time() - last_sync) > 43200:
+                try:
+                    self._log("📅 [SharePoint NBA] Sincronizando agenda de jogos futuros no SharePoint...")
+                    season_games = self.nba_service.fetch_season_schedule(max_future_days=30)
+                    num_sched = SharePointNBAReporter.sync_all_scheduled_games(season_games, max_future_games=30)
+                    self._last_schedule_sync = time.time()
+                    if num_sched > 0:
+                        self._log(f"✅ [SharePoint NBA] {num_sched} jogo(s) futuro(s) agendado(s) catalogado(s) no SharePoint.")
+                except Exception as e_sched:
+                    self._log(f"⚠️ [SharePoint NBA] Aviso na sincronização da agenda: {e_sched}")
 
         recent_date_cleans = [
             (now_dt - timedelta(days=1)).strftime("%Y%m%d"),
@@ -212,20 +225,27 @@ class NBAAutonomousAuditor:
                 pdf = self.nba_reporter.generate_report(game, parsed)
                 pdf_size = os.path.getsize(pdf) if (pdf and os.path.exists(pdf)) else 0
 
-                # EXIGÊNCIA ESTRITA: Relatório NBA só pode ser publicado e concluído com COMPROVAÇÃO VISUAL COMPLETA (>= 500 KB)
-                if pdf_size < 500_000:
-                    self._log(f"⚠️ [NBA AUTO] PDF gerado ({pdf_size} bytes) sem comprovação visual completa (< 500 KB). Vídeo oficial NBA com highlights ainda não disponível no YouTube. Aguardando publicação para homologação definitiva.")
-                    time.sleep(2)
-                    continue
+                has_full_proofs = pdf_size >= 500_000
+                confianca_report = "99.0%" if has_full_proofs else "Game Book Homologado"
 
-                # c) Publicar no SharePoint na linha da partida (SOMENTE COM COMPROVAÇÃO VISUAL HOMOLOGADA)
-                sp_ok = SharePointNBAReporter.sync_nba_report(pdf, game)
+                if not has_full_proofs:
+                    self._log(f"⏳ [NBA AUTO] Relatório preliminar ({pdf_size} bytes) baseado no Game Book oficial. Aguardando disponibilização de highlights para comprovação visual completa.")
+
+                # c) Publicar no SharePoint na linha da partida
+                sp_ok = SharePointNBAReporter.sync_nba_report(pdf, game, confianca=confianca_report)
                 if sp_ok:
-                    self._log(f"☁️ [SharePoint] Relatório de {match_disp} publicado e homologado no SharePoint!")
+                    self._log(f"☁️ [SharePoint] Relatório de {match_disp} publicado no SharePoint ({confianca_report})!")
                 else:
                     self._log(f"⚠️ [SharePoint] Falha temporária ao sincronizar {match_disp} no SharePoint.")
 
-                # d) Disparar E-mail automático com o PDF anexado (EXIGÊNCIA DE COMPROVAÇÃO TÉCNICA VISUAL >= 500 KB)
+                # Se ainda não tiver comprovação visual completa (< 500 KB), não finaliza no cache
+                # para permitir que no próximo ciclo, assim que o vídeo estiver disponível,
+                # o relatório seja re-gerado e promovido para 99.0% com os frames reais.
+                if not has_full_proofs:
+                    time.sleep(2)
+                    continue
+
+                # d) Disparar E-mail automático com o PDF anexado (SOMENTE COM COMPROVAÇÃO VISUAL COMPLETA >= 500 KB)
                 mail_ok = False
                 try:
                     ai_cfg_path = os.path.join(PROJECT_ROOT, "config", "google_ai.json")

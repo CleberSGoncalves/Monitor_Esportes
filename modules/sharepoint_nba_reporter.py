@@ -9,7 +9,7 @@ import sys
 import re
 import logging
 from datetime import datetime, timezone
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
@@ -191,3 +191,29 @@ class SharePointNBAReporter:
         except Exception as e:
             logger.error(f"[SharePoint NBA] Exceção ao sincronizar relatório NBA: {e}")
             return False
+
+    @classmethod
+    def sync_all_scheduled_games(cls, games: List[Dict[str, Any]], max_future_games: int = 60) -> int:
+        """
+        Sincroniza antecipadamente os jogos agendados da NBA no SharePoint.
+        Gera uma ficha técnica oficial em PDF de agendamento e preenche as colunas
+        da biblioteca 'Relatorios_de_Jogos_NBA' com 'Agendado'.
+        Conforme as partidas acontecem, o relatório final substitui o registro automaticamente.
+        """
+        from modules.nba_report_generator import NBAReportGenerator
+        synced_count = 0
+        scheduled_games = [g for g in games if not g.get("is_finished")]
+
+        for g in scheduled_games[:max_future_games]:
+            try:
+                sheet_pdf = NBAReportGenerator.generate_schedule_sheet(g)
+                if sheet_pdf and os.path.exists(sheet_pdf):
+                    ok = cls.sync_nba_report(sheet_pdf, g, confianca="Agendado")
+                    if ok:
+                        synced_count += 1
+                        logger.info(f"[SharePoint NBA] Jogo agendado sincronizado: {g.get('match_display')} ({g.get('date_display')})")
+            except Exception as e_s:
+                logger.warning(f"[SharePoint NBA] Falha ao sincronizar agenda de {g.get('match_display')}: {e_s}")
+                continue
+
+        return synced_count
