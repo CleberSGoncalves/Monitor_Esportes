@@ -721,7 +721,11 @@ def logindisney(url: str, us: str, passw: str, driver, tempo: int, evento: str) 
 
 # ── SCRAPERS COMPLETOS DAS PLATAFORMAS (STREAMING_SCHEDULER ORIGINAL) ────────
 
-def run_eventos_prime(url_camp: str, expected_camp: str = "Brasileirão serie A") -> List[Tuple[Any, ...]]:
+def run_eventos_prime(
+    url_camp: str,
+    expected_camp: str = "Brasileirão serie A",
+    data_inicio_obj: Optional[datetime] = None
+) -> List[Tuple[Any, ...]]:
     """
     Extrai eventos esportivos do Amazon Prime Video via navegador Chrome 9222 conectado.
     Implementação 100% fiel à função run_eventos_prime do Streaming_Scheduler.
@@ -870,6 +874,15 @@ def run_eventos_prime(url_camp: str, expected_camp: str = "Brasileirão serie A"
                 url = "https://www.primevideo.com" + url
 
             if nome_evento.strip() and dt:
+                # Filtro estrito de Data Início (idêntico ao Streaming_Scheduler)
+                if data_inicio_obj:
+                    try:
+                        ev_date_obj = datetime.strptime(dt, "%d/%m/%Y")
+                        if ev_date_obj < data_inicio_obj:
+                            continue
+                    except Exception:
+                        pass
+
                 jogo_limpo = prettify_match_name(nome_evento)
                 if not is_cbf_broadcast_authorized(expected_camp, jogo_limpo, "Amazon Prime"):
                     logger.info(f"[Prime] Jogo '{jogo_limpo}' descartado: sem direitos na tabela CBF para Amazon Prime.")
@@ -897,7 +910,11 @@ def run_eventos_prime(url_camp: str, expected_camp: str = "Brasileirão serie A"
     return eventos
 
 
-def run_eventos_dazn(url_camp: str, expected_camp: str = "Mundial de Clubes FIFA") -> List[Tuple[Any, ...]]:
+def run_eventos_dazn(
+    url_camp: str,
+    expected_camp: str = "Mundial de Clubes FIFA",
+    data_inicio_obj: Optional[datetime] = None
+) -> List[Tuple[Any, ...]]:
     """Extrai eventos do DAZN conectando ao Chrome 9222."""
     eventos: List[Tuple[Any, ...]] = []
     if not verificar_chrome_debug("9222"):
@@ -916,6 +933,13 @@ def run_eventos_dazn(url_camp: str, expected_camp: str = "Mundial de Clubes FIFA
         for ev in evs:
             jogo = re.sub(r'\s+[vVxX]\s+', ' x ', ev["Jogo"]).upper()
             dt_dict = format_datetime(ev["Data/hora"])
+            if data_inicio_obj and dt_dict.get("data"):
+                try:
+                    ev_date_obj = datetime.strptime(dt_dict["data"], "%d/%m/%Y")
+                    if ev_date_obj < data_inicio_obj:
+                        continue
+                except Exception:
+                    pass
             tup = (expected_camp, prettify_match_name(jogo), dt_dict["data"], dt_dict["hora"], var_nav, "15", "Dazn", ev["URL"])
             eventos.append(tup)
             var_nav = "Direita" if var_nav == "Esquerda" else "Esquerda"
@@ -925,7 +949,11 @@ def run_eventos_dazn(url_camp: str, expected_camp: str = "Mundial de Clubes FIFA
     return eventos
 
 
-def run_eventos_max(url_camp: str, expected_camp: str = "Campeonato Paulista") -> List[Tuple[Any, ...]]:
+def run_eventos_max(
+    url_camp: str,
+    expected_camp: str = "Campeonato Paulista",
+    data_inicio_obj: Optional[datetime] = None
+) -> List[Tuple[Any, ...]]:
     """Extrai eventos do Campeonato Paulista no Max (HBO) via Chrome 9222."""
     eventos: List[Tuple[Any, ...]] = []
     if not verificar_chrome_debug("9222"):
@@ -975,6 +1003,14 @@ def run_eventos_max(url_camp: str, expected_camp: str = "Campeonato Paulista") -
             if not dt:
                 continue
 
+            if data_inicio_obj:
+                try:
+                    ev_date_obj = datetime.strptime(dt, "%d/%m/%Y")
+                    if ev_date_obj < data_inicio_obj:
+                        continue
+                except Exception:
+                    pass
+
             titulo = re.sub(r"\s+Rodada\s+\d+.*$", "", info["titulo"], flags=re.IGNORECASE).strip()
             titulo = re.sub(r'\s+[vVxX]\s+', ' x ', titulo)
 
@@ -988,7 +1024,11 @@ def run_eventos_max(url_camp: str, expected_camp: str = "Campeonato Paulista") -
     return eventos
 
 
-def run_eventos_disney(url_camp: str, expected_camp: Optional[str] = "CONMEBOL Libertadores") -> List[Tuple[Any, ...]]:
+def run_eventos_disney(
+    url_camp: str,
+    expected_camp: Optional[str] = "CONMEBOL Libertadores",
+    data_inicio_obj: Optional[datetime] = None
+) -> List[Tuple[Any, ...]]:
     """Extrai eventos esportivos do Disney+ via Chrome 9222."""
     eventos: List[Tuple[Any, ...]] = []
     if not verificar_chrome_debug("9222"):
@@ -1027,6 +1067,13 @@ def run_eventos_disney(url_camp: str, expected_camp: Optional[str] = "CONMEBOL L
                                 lines = [l.strip() for l in it.text.split("\n") if l.strip()]
                                 if len(lines) >= 2:
                                     dt_dict = format_datetime(lines[0])
+                                    if data_inicio_obj and dt_dict.get("data"):
+                                        try:
+                                            ev_date_obj = datetime.strptime(dt_dict["data"], "%d/%m/%Y")
+                                            if ev_date_obj < data_inicio_obj:
+                                                continue
+                                        except Exception:
+                                            pass
                                     evento_nome = lines[1]
                                     a_tags = it.find_elements(By.TAG_NAME, "a")
                                     url_d = a_tags[0].get_attribute("href") if a_tags else ""
@@ -1046,6 +1093,7 @@ def run_eventos_disney(url_camp: str, expected_camp: Optional[str] = "CONMEBOL L
 def executar_varredura_plataformas(
     plataformas_ativas: Dict[str, bool],
     campeonatos_ativos: Dict[str, bool],
+    data_inicio_obj: Optional[datetime] = None,
     progress_callback: Optional[Callable[[str, float], None]] = None
 ) -> List[Tuple[Any, ...]]:
     """
@@ -1059,7 +1107,7 @@ def executar_varredura_plataformas(
             progress_callback("Coletando eventos do DAZN...", 0.15)
         if campeonatos_ativos.get("Mundial de Clubes FIFA"):
             url = "https://www.dazn.com/pt-BR/competition/Competition:dc4k1xh2984zbypbnunk7ncic"
-            todos_eventos.extend(run_eventos_dazn(url, "Mundial de Clubes FIFA"))
+            todos_eventos.extend(run_eventos_dazn(url, "Mundial de Clubes FIFA", data_inicio_obj=data_inicio_obj))
 
     # 2. Amazon Prime Video
     if plataformas_ativas.get("Amazon Prime"):
@@ -1067,12 +1115,12 @@ def executar_varredura_plataformas(
             progress_callback("Buscando Amazon Prime Video (Brasileirão Série A)...", 0.30)
         if campeonatos_ativos.get("Brasileirão serie A") or campeonatos_ativos.get("Brasileirão Série A"):
             url = "https://www.primevideo.com/tournament/amzn1.dv.icid.5a28c628-0310-42c0-8966-2f1f748488d3/ref=atv_hm_spo_c_NPzfck_2_1?jic=8%7CEgNhbGw%3D"
-            todos_eventos.extend(run_eventos_prime(url, "Brasileirão serie A"))
+            todos_eventos.extend(run_eventos_prime(url, "Brasileirão serie A", data_inicio_obj=data_inicio_obj))
         if progress_callback:
             progress_callback("Buscando Amazon Prime Video (Copa do Brasil)...", 0.45)
         if campeonatos_ativos.get("Copa do Brasil"):
             url = "https://www.primevideo.com/tournament/amzn1.dv.icid.6e097abf-f4c9-4638-ba1e-7ff95367e1c8/ref=atv_hm_spo_c_NPzfck_2_2?jic=8%7CEgNhbGw%3D"
-            todos_eventos.extend(run_eventos_prime(url, "Copa do Brasil"))
+            todos_eventos.extend(run_eventos_prime(url, "Copa do Brasil", data_inicio_obj=data_inicio_obj))
 
     # 3. Max
     if plataformas_ativas.get("Max"):
@@ -1080,7 +1128,7 @@ def executar_varredura_plataformas(
             progress_callback("Coletando eventos do Max (Campeonato Paulista)...", 0.60)
         if campeonatos_ativos.get("Campeonato Paulista"):
             url = "https://play.hbomax.com/sport/event/paulistao"
-            todos_eventos.extend(run_eventos_max(url, "Campeonato Paulista"))
+            todos_eventos.extend(run_eventos_max(url, "Campeonato Paulista", data_inicio_obj=data_inicio_obj))
 
     # 4. Disney+
     if plataformas_ativas.get("Disney"):
@@ -1088,10 +1136,10 @@ def executar_varredura_plataformas(
             progress_callback("Coletando eventos do Disney+...", 0.70)
         if campeonatos_ativos.get("CONMEBOL Libertadores"):
             url = "https://www.disneyplus.com/pt-br/browse/entity-1229387e-c683-4ef3-9f32-68824a7be427"
-            todos_eventos.extend(run_eventos_disney(url, "CONMEBOL Libertadores"))
+            todos_eventos.extend(run_eventos_disney(url, "CONMEBOL Libertadores", data_inicio_obj=data_inicio_obj))
         if campeonatos_ativos.get("CONMEBOL Sudamericana"):
             url = "https://www.disneyplus.com/pt-br/browse/entity-7bf8f49c-cc47-4d42-9a85-587631faee03"
-            todos_eventos.extend(run_eventos_disney(url, "CONMEBOL Sudamericana"))
+            todos_eventos.extend(run_eventos_disney(url, "CONMEBOL Sudamericana", data_inicio_obj=data_inicio_obj))
 
     return todos_eventos
 

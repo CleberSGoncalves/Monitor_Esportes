@@ -1027,6 +1027,10 @@ class ReporteEventosMixin:
         usar_disney = bool(self.re_plat_vars.get("Disney") and self.re_plat_vars["Disney"].get())
         somente_relatorio = bool(self.re_somente_relatorio_var.get())
         data_inicio = self.re_data_inicio_var.get().strip()
+        try:
+            data_inicio_obj = datetime.strptime(data_inicio, "%d/%m/%Y")
+        except Exception:
+            data_inicio_obj = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
         camps_ativos = {k: v.get() for k, v in self.re_camp_vars.items()}
         plats_ativos = {
@@ -1058,7 +1062,7 @@ class ReporteEventosMixin:
                     q.put(("status", "Atualização de eventos do DAZN...", 0.15))
                     try:
                         url_dazn = 'https://www.dazn.com/pt-BR/competition/Competition:dc4k1xh2984zbypbnunk7ncic'
-                        evs_dazn = run_eventos_dazn(url_dazn, expected_camp="Mundial de Clubes FIFA")
+                        evs_dazn = run_eventos_dazn(url_dazn, expected_camp="Mundial de Clubes FIFA", data_inicio_obj=data_inicio_obj)
                         for ev in evs_dazn:
                             q.put(("event", ev))
                             encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
@@ -1072,7 +1076,7 @@ class ReporteEventosMixin:
                         q.put(("status", "Buscando Amazon Prime - Brasileirão Série A...", 0.25))
                         try:
                             url_bsa = 'https://www.primevideo.com/tournament/amzn1.dv.icid.5a28c628-0310-42c0-8966-2f1f748488d3/ref=atv_hm_spo_c_NPzfck_2_1?jic=8%7CEgNhbGw%3D'
-                            evs_prime_bsa = run_eventos_prime(url_bsa, expected_camp="Brasileirão serie A")
+                            evs_prime_bsa = run_eventos_prime(url_bsa, expected_camp="Brasileirão serie A", data_inicio_obj=data_inicio_obj)
                             for ev in evs_prime_bsa:
                                 q.put(("event", ev))
                                 encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
@@ -1084,7 +1088,7 @@ class ReporteEventosMixin:
                         q.put(("status", "Buscando Amazon Prime - Copa do Brasil...", 0.35))
                         try:
                             url_cdb = 'https://www.primevideo.com/tournament/amzn1.dv.icid.6e097abf-f4c9-4638-ba1e-7ff95367e1c8/ref=atv_hm_spo_c_NPzfck_2_2?jic=8%7CEgNhbGw%3D'
-                            evs_prime_cdb = run_eventos_prime(url_cdb, expected_camp="Copa do Brasil")
+                            evs_prime_cdb = run_eventos_prime(url_cdb, expected_camp="Copa do Brasil", data_inicio_obj=data_inicio_obj)
                             for ev in evs_prime_cdb:
                                 q.put(("event", ev))
                                 encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
@@ -1097,7 +1101,7 @@ class ReporteEventosMixin:
                     q.put(("status", "Buscando Max - Campeonato Paulista...", 0.45))
                     try:
                         url_max = 'https://play.hbomax.com/sport/event/paulistao'
-                        evs_max = run_eventos_max(url_max, expected_camp="Campeonato Paulista")
+                        evs_max = run_eventos_max(url_max, expected_camp="Campeonato Paulista", data_inicio_obj=data_inicio_obj)
                         for ev in evs_max:
                             q.put(("event", ev))
                             encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
@@ -1111,7 +1115,7 @@ class ReporteEventosMixin:
                         q.put(("status", "Buscando Disney+ - CONMEBOL Libertadores...", 0.55))
                         try:
                             url_lib = 'https://www.disneyplus.com/pt-br/browse/entity-1229387e-c683-4ef3-9f32-68824a7be427'
-                            evs_disney_lib = run_eventos_disney(url_lib, expected_camp="CONMEBOL Libertadores")
+                            evs_disney_lib = run_eventos_disney(url_lib, expected_camp="CONMEBOL Libertadores", data_inicio_obj=data_inicio_obj)
                             for ev in evs_disney_lib:
                                 q.put(("event", ev))
                                 encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
@@ -1123,7 +1127,7 @@ class ReporteEventosMixin:
                         q.put(("status", "Buscando Disney+ - CONMEBOL Sudamericana...", 0.60))
                         try:
                             url_suda = 'https://www.disneyplus.com/pt-br/browse/entity-7bf8f49c-cc47-4d42-9a85-587631faee03'
-                            evs_disney_suda = run_eventos_disney(url_suda, expected_camp="CONMEBOL Sudamericana")
+                            evs_disney_suda = run_eventos_disney(url_suda, expected_camp="CONMEBOL Sudamericana", data_inicio_obj=data_inicio_obj)
                             for ev in evs_disney_suda:
                                 q.put(("event", ev))
                                 encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
@@ -1135,7 +1139,7 @@ class ReporteEventosMixin:
                 if usar_caze:
                     q.put(("status", "Atualização de eventos do Cazé TV...", 0.70))
                     try:
-                        caze_evs = obter_eventos_caze_tv()
+                        caze_evs = obter_eventos_caze_tv(data_inicio_obj=data_inicio_obj)
                         for c_ev in caze_evs:
                             q.put(("event", c_ev))
                             encontrados_plataformas.add((prettify_match_name(c_ev[1]), str(c_ev[2]).strip()))
@@ -1153,15 +1157,15 @@ class ReporteEventosMixin:
                         u_url = cfg.get("url", "")
                         if not n_camp or not u_url or not p_plat: continue
                         if p_plat == "Amazon Prime":
-                            extra_evs = run_eventos_prime(u_url, expected_camp=n_camp)
+                            extra_evs = run_eventos_prime(u_url, expected_camp=n_camp, data_inicio_obj=data_inicio_obj)
                         elif p_plat == "Dazn":
-                            extra_evs = run_eventos_dazn(u_url, expected_camp=n_camp)
+                            extra_evs = run_eventos_dazn(u_url, expected_camp=n_camp, data_inicio_obj=data_inicio_obj)
                         elif p_plat == "Max":
-                            extra_evs = run_eventos_max(u_url, expected_camp=n_camp)
+                            extra_evs = run_eventos_max(u_url, expected_camp=n_camp, data_inicio_obj=data_inicio_obj)
                         elif p_plat == "Disney":
-                            extra_evs = run_eventos_disney(u_url, expected_camp=n_camp)
+                            extra_evs = run_eventos_disney(u_url, expected_camp=n_camp, data_inicio_obj=data_inicio_obj)
                         elif p_plat == "Cazé TV":
-                            extra_evs = obter_eventos_canal_youtube("Cazé TV", u_url)
+                            extra_evs = obter_eventos_canal_youtube("Cazé TV", u_url, data_inicio_obj=data_inicio_obj)
                         else:
                             extra_evs = []
                         for ev in extra_evs:
@@ -1174,7 +1178,7 @@ class ReporteEventosMixin:
                         ch_nome = ch.get("nome", "YouTube")
                         ch_url = ch.get("url", "")
                         if not ch_url: continue
-                        yt_evs = obter_eventos_canal_youtube(ch_nome, ch_url)
+                        yt_evs = obter_eventos_canal_youtube(ch_nome, ch_url, data_inicio_obj=data_inicio_obj)
                         for ev in (yt_evs or []):
                             q.put(("event", ev))
                             encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
@@ -1267,9 +1271,21 @@ class ReporteEventosMixin:
         self.after(100, _poll_queue)
 
     def _re_inserir_evento_na_grade(self, row: Tuple[Any, ...]) -> None:
-        """Insere evento na Treeview sem duplicidade, substituindo fontes genéricas por canais de streaming oficiais."""
+        """Insere evento na Treeview sem duplicidade, respeitando estritamente a Data de Início."""
         if not row or len(row) < 3:
             return
+
+        # Garantia estrita anti-regressão: se a data do evento for anterior a Data Início, descarta
+        try:
+            d_inicio_str = self.re_data_inicio_var.get().strip()
+            if d_inicio_str and len(row) > 2:
+                d_inicio_obj = datetime.strptime(d_inicio_str, "%d/%m/%Y")
+                ev_d_obj = datetime.strptime(str(row[2]).strip(), "%d/%m/%Y")
+                if ev_d_obj < d_inicio_obj:
+                    return
+        except Exception:
+            pass
+
         novo_camp = str(row[0]).strip().lower()
         nova_partida = str(row[1]).strip().lower()
         nova_data = str(row[2]).strip().lower()
@@ -1301,14 +1317,34 @@ class ReporteEventosMixin:
         self._re_atualizar_kpis()
 
     def _re_carregar_dados_iniciais(self) -> None:
-        """Carrega dados existentes do arquivo streaming_data.csv na grade com alto desempenho."""
+        """Carrega dados existentes do arquivo streaming_data.csv na grade com alto desempenho, respeitando filtro de data."""
         linhas = carregar_streaming_csv()
         for i in self.re_tree.get_children():
             self.re_tree.delete(i)
+
+        d_inicio_obj = None
+        try:
+            d_inicio_str = self.re_data_inicio_var.get().strip()
+            if d_inicio_str:
+                d_inicio_obj = datetime.strptime(d_inicio_str, "%d/%m/%Y")
+        except Exception:
+            pass
+
+        inseridos = 0
         for idx, r in enumerate(linhas):
-            tag = "even" if idx % 2 == 0 else "odd"
+            if not r or len(r) < 3:
+                continue
+            if d_inicio_obj:
+                try:
+                    r_dt = datetime.strptime(str(r[2]).strip(), "%d/%m/%Y")
+                    if r_dt < d_inicio_obj:
+                        continue
+                except Exception:
+                    pass
+            tag = "even" if inseridos % 2 == 0 else "odd"
             self.re_tree.insert("", "end", values=r, tags=(tag,))
-        self.re_lbl_status.configure(text=f"Carregados {len(linhas)} eventos da base local streaming_data.csv.")
+            inseridos += 1
+        self.re_lbl_status.configure(text=f"Carregados {inseridos} eventos da base local streaming_data.csv.")
         self._re_atualizar_kpis()
 
     def _re_salvar_config_atual(self) -> None:

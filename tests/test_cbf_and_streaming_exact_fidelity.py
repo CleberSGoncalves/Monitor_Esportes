@@ -25,10 +25,16 @@ def test_carregar_streaming_csv_loads_data_and_skips_header():
     for r in rows:
         assert str(r[0]).strip().lower() != "campeonato", "A linha de cabeçalho não deve estar presente nos dados"
 
-def test_run_eventos_cbf_with_today_date_preserves_published_rounds():
-    # Testa com data de hoje (12/11/2026) onde todos os jogos do PDF da CBF terminaram em 08/11/2026
+def test_run_eventos_cbf_strict_date_filter_excludes_past_matches():
+    # Com Data Início em 12/11/2026, nenhum jogo de outubro/novembro (< 12/11) do PDF pode ser retornado
     camps = {"Brasileirão serie A": True, "Copa do Brasil": True, "Copa do Mundo": False}
     eventos = run_eventos_cbf(camps_ativos=camps, data_inicio_str="12/11/2026")
+    assert len(eventos) == 0, f"Nenhum jogo anterior a 12/11/2026 deveria ser retornado, mas obteve {len(eventos)}"
+
+def test_run_eventos_cbf_with_valid_start_date_loads_and_adjusts_timezone():
+    # Com Data Início em 01/10/2026, todos os jogos da tabela de outubro/novembro são carregados
+    camps = {"Brasileirão serie A": True, "Copa do Brasil": True, "Copa do Mundo": False}
+    eventos = run_eventos_cbf(camps_ativos=camps, data_inicio_str="01/10/2026")
     assert len(eventos) == 16, f"Deveria carregar os 16 jogos da tabela publicada pela CBF, obteve {len(eventos)}"
     
     # Valida fuso oficial de -1 hora da CBF
@@ -39,8 +45,9 @@ def test_run_eventos_cbf_with_today_date_preserves_published_rounds():
     assert inter_game[3] == "18:30", f"Horário ajustado deveria ser 18:30, obteve {inter_game[3]}"
 
 def test_run_eventos_cbf_with_copa_do_mundo_excel():
+    # Copa do Mundo ocorre em junho/julho de 2026
     camps = {"Brasileirão serie A": False, "Copa do Brasil": False, "Copa do Mundo": True}
-    eventos = run_eventos_cbf(camps_ativos=camps, data_inicio_str="12/11/2026")
+    eventos = run_eventos_cbf(camps_ativos=camps, data_inicio_str="01/06/2026")
     assert len(eventos) >= 70, f"Deveria carregar jogos da Copa do Mundo FIFA 2026, obteve {len(eventos)}"
     partidas = [e[1] for e in eventos]
     assert any("Brasil" in p for p in partidas), "Brasil deve estar na tabela da Copa do Mundo"

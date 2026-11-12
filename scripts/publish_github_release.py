@@ -18,23 +18,16 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.9"
-    release_name = "v2.5.9 - Fidelidade Estrita ao Streaming_Scheduler no Reporte de Eventos"
+    tag = "v2.5.10"
+    release_name = "v2.5.10 - Filtro Estrito de Data de Início Idêntico ao Streaming_Scheduler"
     body = (
-        "### Novidades da versão v2.5.9:\n"
-        "- 🎬 **Alinhamento e Fidelidade Estrita ao Streaming_Scheduler**:\n"
-        "  - Grade de eventos inicia 100% limpa ao abrir a aplicação, exatamente como no projeto original.\n"
-        "  - Botão 'Buscar Eventos' abre e navega de verdade nos portais oficiais das plataformas ativas (Amazon Prime Video, CazéTV, etc.).\n"
-        "  - Sincronização e suporte completo aos perfis de autenticação `TempProfile` e `TempProfile2` para manter sessões ativas sem exigir logins manuais repetidos.\n"
-        "- 🔗 **Prioridade das URLs Oficiais de Streaming**:\n"
-        "  - Confrontos encontrados na Amazon Prime Video agora capturam as URLs canônicas autênticas (ex: `https://www.primevideo.com/-/pt/detail/...`).\n"
-        "  - O pipeline da CBF (PDF) atua estritamente como retaguarda/fallback e nunca sobrepõe nem substitui eventos já encontrados nos carrosséis oficiais de streaming.\n"
-        "- 📅 **Parser de Datas Avançado em Português e Inglês**:\n"
-        "  - Suporte completo a formatos com abreviações de dias e meses (ex: `sáb., 14 de nov. 17:30 BRT`), formatos numéricos (`sábado, 1/08 17:00`), relativos (`Hoje às 20:00`) e formatos AM/PM em inglês.\n"
-        "- 🛡️ **Isolamento e Estabilidade de Runtime**:\n"
-        "  - Remoção de qualquer dependência externa ou acoplamento a caminhos absolutos fora do repositório.\n"
-        "  - Instalação e empacotamento completo de `selenium 4.52.0`, `webdriver-manager 4.1.2`, `PyGetWindow 0.0.9` e `amazoncaptcha`.\n"
-        "- 🧪 **118 Testes Automatizados Aprovados (100% de sucesso)**."
+        "### Novidades da versão v2.5.10:\n"
+        "- 📅 **Filtro Estrito e Incondicional de Data de Início (Streaming_Scheduler)**:\n"
+        "  - Remoção de qualquer exceção ou bypass que preservava rodadas passadas (< Data Início) da CBF.\n"
+        "  - Aplicação estrita da regra oficial: `if ev_date_obj < data_inicio_obj: continue` em todas as origens de dados (CBF PDF, Copa do Mundo Excel, Prime Video, DAZN, Max, Disney+ e Canais YouTube).\n"
+        "  - Blindagem adicional diretamente na inserção do Treeview (`_re_inserir_evento_na_grade`) e carregamento de CSV (`_re_carregar_dados_iniciais`), impedindo categoricamente que qualquer partida com data anterior à selecionada seja inserida ou exibida na grade.\n"
+        "- 🛡️ **Testes E2E Automatizados e Integridade de Build**:\n"
+        "  - 100% de aprovação na suíte de testes de fidelidade estrita (`test_cbf_and_streaming_exact_fidelity.py`), testes de integração e E2E da interface gráfica.\n"
     )
 
     headers = {

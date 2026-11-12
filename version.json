@@ -1,5 +1,5 @@
 {
-  "version": "2.5.9",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.9/Monitor_Esportes.exe",
-  "changelog": "v2.5.9: Alinhamento 100% fiel ao Streaming_Scheduler no Reporte de Eventos: inicializacao com grade limpa, busca ativa nos portais das plataformas (Amazon Prime Video com autenticacao via TempProfile e CazeTV), prioridade das URLs oficiais das plataformas sobre CBF PDF, parsing robusto de datas em portugues e ingles, e isolamento total de dados."
+  "version": "2.5.10",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.10/Monitor_Esportes.exe",
+  "changelog": "v2.5.10: Filtro estrito e incondicional de Data de Inicio identico ao Streaming_Scheduler: remocao de qualquer bypass de rodadas passadas (jogos anteriores a Data de Inicio nunca sao incluidos nem exibidos na grade), filtro em todas as fontes (CBF PDF, Copa do Mundo Excel, Prime Video, Dazn, Max, Disney e YouTube) e blindagem direta na insercao do grid."
 }

@@ -497,23 +497,6 @@ def run_eventos_cbf(
             extracted = parse_cbf_pdf(str(pdf_path), nome_camp)
             logger.info(f"[CBF] PDF {nome_camp} extraiu {len(extracted)} jogos.")
 
-            # Checa se há jogos futuros na tabela da CBF em relação à data solicitada
-            tem_futuros = False
-            for ev in extracted:
-                try:
-                    d_dt = datetime.strptime(ev["Data"], "%d/%m/%Y")
-                    if d_dt >= data_inicio_obj:
-                        tem_futuros = True
-                        break
-                except Exception:
-                    pass
-
-            if not tem_futuros:
-                logger.info(
-                    f"[CBF] Jogos do PDF {nome_camp} são da rodada oficial mais recente publicada pela CBF "
-                    f"(< {data_inicio_obj.strftime('%d/%m/%Y')}). Preservando todos os {len(extracted)} jogos."
-                )
-
             var_nav = "Esquerda"
             for ev in extracted:
                 # Regra oficial CBF: subtrai 1 hora dos horários de tabela da CBF
@@ -532,14 +515,13 @@ def run_eventos_cbf(
                 except Exception as e_fuso:
                     logger.warning(f"[CBF] Erro ao ajustar fuso CBF ({ev['Data']} {ev['Hora']}): {e_fuso}")
 
-                # Filtro de data: se houver jogos futuros, aplica o corte; se for rodada recente da CBF, mantém
-                if tem_futuros:
-                    try:
-                        ev_date_obj = datetime.strptime(data_ajustada, "%d/%m/%Y")
-                        if ev_date_obj < data_inicio_obj:
-                            continue
-                    except Exception:
+                # Filtro de Data estrito (Somente eventos futuros/atuais) usando a data ajustada - Idêntico ao Streaming_Scheduler
+                try:
+                    ev_date_obj = datetime.strptime(data_ajustada, "%d/%m/%Y")
+                    if ev_date_obj < data_inicio_obj:
                         continue
+                except Exception:
+                    continue
 
                 # Prioridade: se a partida já foi capturada diretamente pela plataforma (ex: Prime), descarta o PDF
                 norm_part = _deep_normalize_partida(ev["Jogo"])
@@ -582,25 +564,14 @@ def run_eventos_cbf(
         if xls_found:
             try:
                 copa_extracted = parse_copa_mundo_excel(xls_found)
-                copa_tem_futuros = False
-                for c_ev in copa_extracted:
-                    try:
-                        c_dt = datetime.strptime(c_ev["Data"], "%d/%m/%Y")
-                        if c_dt >= data_inicio_obj:
-                            copa_tem_futuros = True
-                            break
-                    except Exception:
-                        pass
-
                 var_nav_copa = "Esquerda"
                 for c_ev in copa_extracted:
-                    if copa_tem_futuros:
-                        try:
-                            c_date_obj = datetime.strptime(c_ev["Data"], "%d/%m/%Y")
-                            if c_date_obj < data_inicio_obj:
-                                continue
-                        except Exception:
-                            pass
+                    try:
+                        c_date_obj = datetime.strptime(c_ev["Data"], "%d/%m/%Y")
+                        if c_date_obj < data_inicio_obj:
+                            continue
+                    except Exception:
+                        continue
 
                     norm_copa = _deep_normalize_partida(c_ev["Jogo"])
                     if (norm_copa, c_ev["Data"]) in existing_set:
