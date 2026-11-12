@@ -18,19 +18,21 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.4"
-    release_name = "v2.5.4 - Sanitização de Destinatários e Persistência de Configuração"
+    tag = "v2.5.5"
+    release_name = "v2.5.5 - Scrapers Reais do Streaming_Scheduler e Varredura Fiel das Plataformas"
     body = (
-        "### Novidades da versão v2.5.4:\n"
-        "- 🛡️ **Sanitização Estrita do Campo Destinatários**:\n"
-        "  - Eliminação definitiva da exibição de hashes criptografados ou tokens Fernet ilegíveis.\n"
-        "  - Separação clara entre credenciais do remetente SMTP (`auth.xml`) e lista de e-mails de envio (`config.xml`).\n"
-        "  - Validação estrita de formato de e-mail e fallback transparente para e-mails salvos.\n"
-        "- 💾 **Persistência Automática em config.xml**:\n"
-        "  - Qualquer alteração manual digitada no campo 'Destinatários' é salva automaticamente no `config.xml` ao desfocar o campo (`FocusOut`).\n"
-        "  - Persistência sincronizada também ao disparar e-mail ou salvar CSV.\n"
-        "- 🧪 **Bateria Completa de 44 Testes Unitários e E2E Aprovada**:\n"
-        "  - Incluindo teste específico de não-vazamento de tokens e hashes de cifras na interface."
+        "### Novidades da versão v2.5.5:\n"
+        "- 🌐 **Restauração Completa dos Scrapers do Streaming_Scheduler**:\n"
+        "  - Busca real no Amazon Prime Video, DAZN, Max (HBO) e Disney+ diretamente via Chrome 9222.\n"
+        "  - Autenticação e gestão de sessões nativas (`loginprime`, `logindazn`, `loginmax`, `logindisney`) com suporte a Captcha e Shadow DOM.\n"
+        "  - Navegador Chrome abre de forma visível no desktop permitindo acompanhamento do usuário.\n"
+        "- 🛑 **Eliminação Total de Partidas Artificiais**:\n"
+        "  - Remoção definitiva do atalho `CBFScheduleFetcher` da aba Reporte de Eventos.\n"
+        "  - Prioridade estrita: Plataformas Oficiais de Streaming > Tabela CBF (PDF).\n"
+        "- 📄 **Pipeline CBF e Copa do Mundo 100% Consolidado**:\n"
+        "  - Download direto de PDFs da CBF (BSA e CDB) com ajuste oficial de fuso (-1h) e pulo inteligente de confrontos já coletados pelo Selenium.\n"
+        "  - Suporte à planilha da Copa do Mundo FIFA 2026 com ajuste de -2h.\n"
+        "- 🧪 **46 Testes Automatizados E2E Aprovados e Auditados por Subagente**."
     )
 
     headers = {

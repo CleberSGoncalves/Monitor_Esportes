@@ -232,3 +232,65 @@ class TestSeleniumServiceAndProfiles:
         log_path = get_app_path("log.txt")
         assert os.path.exists(log_path) or os.path.exists(os.path.join("config", "log.txt"))
 
+    def test_remover_duplicatas_prioritizes_platform_over_cbf(self):
+        import tkinter as tk
+        from tkinter import ttk
+        from modules.reporte_eventos.selenium_browser_service import remover_duplicatas
+
+        root = tk.Tk()
+        root.withdraw()
+        try:
+            tree = ttk.Treeview(root, columns=("camp", "jogo", "data", "hora", "nav", "min", "plat", "url"))
+            # 1. Jogo vindo da CBF (PDF)
+            item_cbf = tree.insert("", "end", values=("CBF - Brasileirão Série A", "Flamengo x Fluminense", "22/11/2026", "16:00", "Esquerda", "15", "CBF", "https://cbf.com.br/tabela.pdf"))
+            # 2. Mesmo jogo vindo da plataforma direta (Amazon Prime)
+            item_prime = tree.insert("", "end", values=("Brasileirão serie A", "Flamengo x Fluminense", "22/11/2026", "16:00", "Direita", "10", "Amazon Prime", "https://primevideo.com/event1"))
+
+            assert len(tree.get_children()) == 2
+            removidos = remover_duplicatas(tree)
+            assert removidos == 1
+            assert len(tree.get_children()) == 1
+
+            # Garante que o item restante é o da plataforma direta (Amazon Prime)
+            restante = tree.get_children()[0]
+            vals = tree.item(restante, "values")
+            assert vals[6] == "Amazon Prime", f"Deveria ter priorizado a plataforma, mas manteve: {vals}"
+        finally:
+            root.destroy()
+
+    def test_run_eventos_cbf_skips_existing_platform_matches(self):
+        from modules.reporte_eventos.cbf_pdf_service import run_eventos_cbf
+        from unittest.mock import patch
+
+        # Simula PDF extraindo 2 jogos
+        mock_extracted = [
+            {"Camp": "Brasileirão Série A", "Jogo": "Flamengo x Fluminense", "Data": "22/11/2026", "Hora": "17:00", "TV": "Amazon Prime"},
+            {"Camp": "Brasileirão Série A", "Jogo": "Palmeiras x Santos", "Data": "23/11/2026", "Hora": "17:00", "TV": "Cazé TV"},
+        ]
+
+        # Partida que a plataforma já encontrou
+        existing = [("Flamengo x Fluminense", "22/11/2026")]
+
+        with patch("modules.reporte_eventos.cbf_pdf_service.get_latest_cbf_url", return_value="https://cbf.com.br/fake.pdf"), \
+             patch("modules.reporte_eventos.cbf_pdf_service.requests.get") as mock_get, \
+             patch("modules.reporte_eventos.cbf_pdf_service.parse_cbf_pdf", return_value=mock_extracted):
+
+            mock_resp = mock_get.return_value
+            mock_resp.status_code = 200
+            mock_resp.content = b"%PDF-1.4 " + b"x" * 6000
+
+            res = run_eventos_cbf(
+                camps_ativos={"Brasileirão serie A": True, "Copa do Brasil": False, "Copa do Mundo": False},
+                data_inicio_str="20/11/2026",
+                existing_matches=existing
+            )
+
+            # Apenas Palmeiras x Santos deve ser retornado, pois Flamengo x Fluminense já foi coletado pela plataforma!
+            jogos_retornados = [r[1] for r in res]
+            assert "Palmeiras x Santos" in jogos_retornados
+            assert "Flamengo x Fluminense" not in jogos_retornados
+            # Valida fuso -1h aplicado (17:00 -> 16:00)
+            palmeiras_row = next(r for r in res if "Palmeiras" in r[1])
+            assert palmeiras_row[3] == "16:00"
+
+

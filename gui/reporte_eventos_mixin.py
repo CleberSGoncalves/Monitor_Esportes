@@ -62,8 +62,20 @@ from modules.reporte_eventos.selenium_browser_service import (
     verificar_chrome_debug,
     abrir_chrome,
     fechar_chrome_seguro,
+    obter_driver_conectado,
     obter_profile_dir,
+    run_eventos_prime,
+    run_eventos_dazn,
+    run_eventos_max,
+    run_eventos_disney,
     executar_varredura_plataformas,
+    padronizar_nomes_grid,
+    remover_duplicatas,
+    ajustartodootree,
+)
+from modules.reporte_eventos.cbf_pdf_service import (
+    run_eventos_cbf,
+    prettify_match_name,
 )
 from modules.reporte_eventos.email_report_service import (
     extrair_dados_html,
@@ -73,7 +85,6 @@ from modules.reporte_eventos.sharepoint_client import (
     push_events_to_sharepoint,
     _deep_normalize_partida,
 )
-from modules.cbf_schedule_fetcher import CBFScheduleFetcher
 
 logger = logging.getLogger(__name__)
 
@@ -979,7 +990,18 @@ class ReporteEventosMixin:
     # ── MÉTODOS DE BUSCA DE ALTA VELOCIDADE ───────────────────────────────────
 
     def _re_buscar_eventos(self) -> None:
-        """Executa a busca unificada de eventos de forma assíncrona, robusta e ultrarrápida."""
+        """
+        Executa a busca completa de eventos de forma 100% idêntica ao Streaming_Scheduler original:
+        1. Inicializa o Chrome DevTools 9222 com TempProfile visível se necessário ou em modo somente relatório.
+        2. Varre Dazn, Amazon Prime Video, Max e Disney+ conectando diretamente ao Chrome 9222.
+        3. Varre Cazé TV e canais do YouTube cadastrados via yt-dlp.
+        4. Varre campeonatos extras da aba Campeonatos.
+        5. Varre tabela oficial da CBF (PDF) e Copa do Mundo FIFA 2026 (Excel), aplicando os fusos oficiais (-1h / -2h) e pulando o que já foi achado no Selenium.
+        6. Padroniza os nomes para forma canônica e bonita (padronizar_nomes_grid).
+        7. Remove duplicatas preservando a prioridade Plataforma > CBF (remover_duplicatas).
+        8. Ordena cronologicamente e alterna Esquerda/Direita (ajustartodootree).
+        9. Se somente_relatorio, encerra o Chrome 9222.
+        """
         if self.re_busy:
             messagebox.showinfo("Aviso", "Uma busca de eventos já está em processamento.")
             return
@@ -992,13 +1014,13 @@ class ReporteEventosMixin:
 
         # Captura variáveis na thread principal
         usar_cbf = bool(self.re_plat_vars.get("CBF") and self.re_plat_vars["CBF"].get())
-        usar_copa = bool(self.re_camp_vars.get("Copa do Mundo") and self.re_camp_vars["Copa do Mundo"].get())
         usar_caze = bool(self.re_plat_vars.get("Cazé TV") and self.re_plat_vars["Cazé TV"].get())
         usar_prime = bool(self.re_plat_vars.get("Amazon Prime") and self.re_plat_vars["Amazon Prime"].get())
         usar_dazn = bool(self.re_plat_vars.get("Dazn") and self.re_plat_vars["Dazn"].get())
         usar_max = bool(self.re_plat_vars.get("Max") and self.re_plat_vars["Max"].get())
         usar_disney = bool(self.re_plat_vars.get("Disney") and self.re_plat_vars["Disney"].get())
         somente_relatorio = bool(self.re_somente_relatorio_var.get())
+        data_inicio = self.re_data_inicio_var.get().strip()
 
         camps_ativos = {k: v.get() for k, v in self.re_camp_vars.items()}
         plats_ativos = {
@@ -1007,6 +1029,13 @@ class ReporteEventosMixin:
             "Max": usar_max,
             "Disney": usar_disney,
         }
+
+        # Snapshot de partidas já no Treeview para evitar duplicações na CBF
+        existing_matches = []
+        for i in self.re_tree.get_children():
+            v = self.re_tree.item(i, "values")
+            if len(v) >= 3:
+                existing_matches.append((str(v[1]), str(v[2])))
 
         q = queue.Queue()
 
@@ -1017,52 +1046,88 @@ class ReporteEventosMixin:
                 precisa_chrome = somente_relatorio or any(plats_ativos.values())
                 if precisa_chrome:
                     if not verificar_chrome_debug("9222"):
-                        q.put(("status", "Iniciando Chrome DevTools (Porta 9222) com perfil TempProfile...", 0.08))
+                        q.put(("status", "Iniciando Chrome DevTools (Porta 9222) com perfil TempProfile...", 0.05))
                         abrir_chrome("9222")
+                        if somente_relatorio:
+                            time.sleep(5)
                     else:
-                        q.put(("status", "Chrome DevTools (Porta 9222) já ativo e conectado.", 0.12))
+                        q.put(("status", "Chrome DevTools (Porta 9222) ativo.", 0.08))
 
-                # 1. Carrega CBF Schedule Oficial de alta velocidade via CBFScheduleFetcher
-                if usar_cbf:
-                    q.put(("status", "Carregando partidas oficiais da CBF (PDFs)...", 0.25))
+                # 1. DAZN
+                if usar_dazn and camps_ativos.get("Mundial de Clubes FIFA"):
+                    q.put(("status", "Atualização de eventos do DAZN...", 0.15))
                     try:
-                        fetcher = CBFScheduleFetcher()
-                        matches = fetcher.get_upcoming_matches()
-                        for m in matches:
-                            t1 = m.get("team1") or m.get("home_team") or ""
-                            t2 = m.get("team2") or m.get("away_team") or ""
-                            if not t1 or not t2: continue
-                            jogo = prettify_match_name(f"{t1} x {t2}")
-                            camp = m.get("comp") or "Brasileirão serie A"
-                            data = m.get("date") or datetime.now().strftime("%d/%m/%Y")
-                            hora = m.get("time") or "19:00"
-                            tv = m.get("broadcaster") or m.get("platform") or "Amazon Prime"
-                            url = m.get("url") or ""
-                            tup = (camp, jogo, data, hora, "Esquerda", "15", tv, url)
-                            q.put(("event", tup))
+                        url_dazn = 'https://www.dazn.com/pt-BR/competition/Competition:dc4k1xh2984zbypbnunk7ncic'
+                        evs_dazn = run_eventos_dazn(url_dazn, expected_camp="Mundial de Clubes FIFA")
+                        for ev in evs_dazn:
+                            q.put(("event", ev))
                             total_inseridos += 1
-                    except Exception as e_cbf:
-                        logger.warning(f"[ReporteEventos] Aviso CBF Fetcher: {e_cbf}")
-                    q.put(("progress", 0.45))
+                    except Exception as e_dazn:
+                        logger.warning(f"[ReporteEventos] Erro DAZN: {e_dazn}")
 
-                # 2. Copa do Mundo FIFA 2026 (Planilha Excel com -2 Horas)
-                if usar_copa:
-                    q.put(("status", "Lendo planilha da Copa do Mundo FIFA 2026...", 0.55))
-                    try:
-                        xls_p = get_app_path("Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx")
-                        if os.path.exists(xls_p):
-                            copa_evs = parse_copa_mundo_excel(xls_p)
-                            for c_ev in copa_evs:
-                                tup = (c_ev["Camp"], c_ev["Jogo"], c_ev["Data"], c_ev["Hora"], "Esquerda", "15", c_ev["TV"], "")
-                                q.put(("event", tup))
+                # 2. Amazon Prime Video (Navegador real via Selenium)
+                if usar_prime:
+                    if camps_ativos.get("Brasileirão serie A") or camps_ativos.get("Brasileirão Série A"):
+                        q.put(("status", "Buscando Amazon Prime - Brasileirão Série A...", 0.25))
+                        try:
+                            url_bsa = 'https://www.primevideo.com/tournament/amzn1.dv.icid.5a28c628-0310-42c0-8966-2f1f748488d3/ref=atv_hm_spo_c_NPzfck_2_1?jic=8%7CEgNhbGw%3D'
+                            evs_prime_bsa = run_eventos_prime(url_bsa, expected_camp="Brasileirão serie A")
+                            for ev in evs_prime_bsa:
+                                q.put(("event", ev))
                                 total_inseridos += 1
-                    except Exception as e_copa:
-                        logger.warning(f"[ReporteEventos] Aviso Copa do Mundo: {e_copa}")
-                    q.put(("progress", 0.65))
+                        except Exception as e_p1:
+                            logger.warning(f"[ReporteEventos] Erro Prime BSA: {e_p1}")
 
-                # 3. Varredura rápida de canais YouTube ativos
+                    if camps_ativos.get("Copa do Brasil"):
+                        q.put(("status", "Buscando Amazon Prime - Copa do Brasil...", 0.35))
+                        try:
+                            url_cdb = 'https://www.primevideo.com/tournament/amzn1.dv.icid.6e097abf-f4c9-4638-ba1e-7ff95367e1c8/ref=atv_hm_spo_c_NPzfck_2_2?jic=8%7CEgNhbGw%3D'
+                            evs_prime_cdb = run_eventos_prime(url_cdb, expected_camp="Copa do Brasil")
+                            for ev in evs_prime_cdb:
+                                q.put(("event", ev))
+                                total_inseridos += 1
+                        except Exception as e_p2:
+                            logger.warning(f"[ReporteEventos] Erro Prime CDB: {e_p2}")
+
+                # 3. Max (HBO)
+                if usar_max and camps_ativos.get("Campeonato Paulista"):
+                    q.put(("status", "Buscando Max - Campeonato Paulista...", 0.45))
+                    try:
+                        url_max = 'https://play.hbomax.com/sport/event/paulistao'
+                        evs_max = run_eventos_max(url_max, expected_camp="Campeonato Paulista")
+                        for ev in evs_max:
+                            q.put(("event", ev))
+                            total_inseridos += 1
+                    except Exception as e_max:
+                        logger.warning(f"[ReporteEventos] Erro Max: {e_max}")
+
+                # 4. Disney+
+                if usar_disney:
+                    if camps_ativos.get("CONMEBOL Libertadores"):
+                        q.put(("status", "Buscando Disney+ - CONMEBOL Libertadores...", 0.55))
+                        try:
+                            url_lib = 'https://www.disneyplus.com/pt-br/browse/entity-1229387e-c683-4ef3-9f32-68824a7be427'
+                            evs_disney_lib = run_eventos_disney(url_lib, expected_camp="CONMEBOL Libertadores")
+                            for ev in evs_disney_lib:
+                                q.put(("event", ev))
+                                total_inseridos += 1
+                        except Exception as e_dis1:
+                            logger.warning(f"[ReporteEventos] Erro Disney Libertadores: {e_dis1}")
+
+                    if camps_ativos.get("CONMEBOL Sudamericana"):
+                        q.put(("status", "Buscando Disney+ - CONMEBOL Sudamericana...", 0.60))
+                        try:
+                            url_suda = 'https://www.disneyplus.com/pt-br/browse/entity-7bf8f49c-cc47-4d42-9a85-587631faee03'
+                            evs_disney_suda = run_eventos_disney(url_suda, expected_camp="CONMEBOL Sudamericana")
+                            for ev in evs_disney_suda:
+                                q.put(("event", ev))
+                                total_inseridos += 1
+                        except Exception as e_dis2:
+                            logger.warning(f"[ReporteEventos] Erro Disney Sudamericana: {e_dis2}")
+
+                # 5. Cazé TV
                 if usar_caze:
-                    q.put(("status", "Buscando transmissões do Cazé TV / YouTube...", 0.75))
+                    q.put(("status", "Atualização de eventos do Cazé TV...", 0.70))
                     try:
                         caze_evs = obter_eventos_caze_tv()
                         for c_ev in caze_evs:
@@ -1070,23 +1135,68 @@ class ReporteEventosMixin:
                             total_inseridos += 1
                     except Exception as e_caze:
                         logger.warning(f"[ReporteEventos] Aviso Cazé TV: {e_caze}")
-                    q.put(("progress", 0.85))
 
-                # 4. Varredura de plataformas de streaming no Chrome 9222
-                if any(plats_ativos.values()):
-                    q.put(("status", "Varrendo plataformas de streaming no Chrome 9222...", 0.90))
-                    try:
-                        plat_evs = executar_varredura_plataformas(plats_ativos, camps_ativos)
-                        for p_ev in plat_evs:
-                            q.put(("event", p_ev))
+                # 6. Campeonatos Extras e Canais do YouTube cadastrados
+                try:
+                    q.put(("status", "Buscando campeonatos adicionais e canais YouTube...", 0.80))
+                    for cfg in carregar_campeonatos_config():
+                        if not cfg.get("ativo", True): continue
+                        n_camp = cfg.get("campeonato", "")
+                        p_plat = cfg.get("plataforma", "")
+                        u_url = cfg.get("url", "")
+                        if not n_camp or not u_url or not p_plat: continue
+                        if p_plat == "Amazon Prime":
+                            extra_evs = run_eventos_prime(u_url, expected_camp=n_camp)
+                        elif p_plat == "Dazn":
+                            extra_evs = run_eventos_dazn(u_url, expected_camp=n_camp)
+                        elif p_plat == "Max":
+                            extra_evs = run_eventos_max(u_url, expected_camp=n_camp)
+                        elif p_plat == "Disney":
+                            extra_evs = run_eventos_disney(u_url, expected_camp=n_camp)
+                        elif p_plat == "Cazé TV":
+                            extra_evs = obter_eventos_canal_youtube("Cazé TV", u_url)
+                        else:
+                            extra_evs = []
+                        for ev in extra_evs:
+                            q.put(("event", ev))
                             total_inseridos += 1
-                    except Exception as e_plat:
-                        logger.warning(f"[ReporteEventos] Aviso plataformas streaming: {e_plat}")
 
+                    for ch in carregar_youtube_channels_config():
+                        if not ch.get("ativo", True): continue
+                        ch_nome = ch.get("nome", "YouTube")
+                        ch_url = ch.get("url", "")
+                        if not ch_url: continue
+                        yt_evs = obter_eventos_canal_youtube(ch_nome, ch_url)
+                        for ev in (yt_evs or []):
+                            q.put(("event", ev))
+                            total_inseridos += 1
+                except Exception as e_extra:
+                    logger.warning(f"[ReporteEventos] Aviso extras/YouTube: {e_extra}")
+
+                # 7. CBF Oficial (PDF e Copa do Mundo Excel) - Roda por último para não sobrepor plataformas
+                if usar_cbf:
+                    q.put(("status", "Processando tabela oficial da CBF (PDF) e Copa do Mundo...", 0.88))
+                    try:
+                        cbf_evs = run_eventos_cbf(camps_ativos, data_inicio_str=data_inicio, existing_matches=existing_matches)
+                        for ev in cbf_evs:
+                            q.put(("event", ev))
+                            total_inseridos += 1
+                    except Exception as e_cbf:
+                        logger.warning(f"[ReporteEventos] Erro CBF PDF: {e_cbf}")
+
+                # 8. Padronização e Deduplicação no grid
+                q.put(("status", "Padronizando nomes e organizando grade...", 0.95))
+                q.put(("standardize_and_dedup", None))
+
+                # 9. Fechamento seguro se em modo somente relatório
+                if somente_relatorio:
+                    fechar_chrome_seguro("9222")
+
+                # 10. Conclusão
                 if total_inseridos > 0:
                     msg_ok = f"Varredura concluída! {total_inseridos} eventos carregados com sucesso."
                 else:
-                    msg_ok = "Varredura concluída! Nenhum novo evento adicionado (jogos já constam na grade ou filtros sem novos confrontos)."
+                    msg_ok = "Varredura concluída! Nenhum novo evento adicionado."
 
                 logger.info(f"[ReporteEventos] {msg_ok}")
                 q.put(("done_success", msg_ok))
@@ -1111,6 +1221,11 @@ class ReporteEventosMixin:
                         self.re_progresso.set(msg[1])
                     elif kind == "event":
                         self._re_inserir_evento_na_grade(msg[1])
+                    elif kind == "standardize_and_dedup":
+                        padronizar_nomes_grid(self.re_tree)
+                        remover_duplicatas(self.re_tree)
+                        ajustartodootree(self.re_tree)
+                        self._re_atualizar_kpis()
                     elif kind == "done_success":
                         self.re_lbl_status.configure(text=msg[1])
                         self.re_lbl_process.configure(text="")

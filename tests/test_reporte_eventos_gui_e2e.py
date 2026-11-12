@@ -7,7 +7,7 @@ Valida de ponta a ponta:
 3. Dark Treeview (Reporte.Treeview) sem nenhum elemento bege ou branco cru (Win95/XP).
 4. Tabela de Campeonatos pré-carregada com 8 campeonatos oficiais e operantes.
 5. Tabela de Canais do YouTube pré-carregada com os 6 canais padrão.
-6. Busca assíncrona de eventos (_re_buscar_eventos) com CBFScheduleFetcher sem travar GUI.
+6. Busca assíncrona de eventos (_re_buscar_eventos) com scrapers oficiais e run_eventos_cbf sem travar GUI.
 7. Todos os botões e ações da interface (_re_toggle_start, _re_add_campeonato, _re_toggle_campeonato, _re_salvar_csv, _re_abrir_csv, _re_limpar_tree / _re_limpar_eventos).
 8. Popups modernos de duplo clique (ModernDatePopup, ModernTimePopup, ModernOptionPopup, ModernEditEntryPopup).
 9. Integração com a classe MonitorApp.
@@ -183,7 +183,7 @@ class TestCampeonatosPreloadedAndOperations:
 
 
 class TestEventSearchAsyncAndTreeInsertion:
-    """Validação 3: Varredura unificada assíncrona com CBFScheduleFetcher e inserção na grade."""
+    """Validação 3: Varredura unificada assíncrona com scrapers de streaming e run_eventos_cbf e inserção na grade."""
 
     def test_inserir_evento_na_grade_and_deduplication(self, app_instance):
         evento = ("Brasileirão serie A", "Flamengo x Palmeiras Teste E2E", "20/11/2026", "20:00", "Esquerda", "15", "Amazon Prime", "https://primevideo.com")
@@ -199,22 +199,24 @@ class TestEventSearchAsyncAndTreeInsertion:
         total_duplicado = len(app_instance.re_tree.get_children())
         assert total_duplicado == total_depois, "Deduplicação falhou: evento duplicado foi inserido!"
 
-    def test_async_event_search_with_cbf_fetcher(self, app_instance):
-        mock_matches = [
-            {"team1": "Corinthians", "team2": "São Paulo", "comp": "Brasileirão serie A", "date": "22/11/2026", "time": "16:00", "broadcaster": "Amazon Prime", "url": "https://primevideo.com"},
-            {"team1": "Grêmio", "team2": "Internacional", "comp": "Brasileirão serie A", "date": "23/11/2026", "time": "18:30", "broadcaster": "Cazé TV", "url": "https://youtube.com/@CazeTV"},
+    def test_async_event_search_with_platform_scrapers_and_cbf(self, app_instance):
+        mock_prime_evs = [
+            ("Brasileirão serie A", "Flamengo x Fluminense", "22/11/2026", "16:00", "Esquerda", "10", "Amazon Prime", "https://primevideo.com")
+        ]
+        mock_cbf_evs = [
+            ("CBF - Brasileirão Série A", "Corinthians x São Paulo", "23/11/2026", "16:00", "Direita", "15", "Cazé TV", "https://cbf.com.br")
         ]
 
-        with patch("gui.reporte_eventos_mixin.CBFScheduleFetcher") as mock_fetcher_cls, \
+        with patch("gui.reporte_eventos_mixin.run_eventos_prime", return_value=mock_prime_evs) as mock_prime, \
+             patch("gui.reporte_eventos_mixin.run_eventos_cbf", return_value=mock_cbf_evs) as mock_cbf, \
              patch("gui.reporte_eventos_mixin.obter_eventos_caze_tv", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.obter_eventos_canal_youtube", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.carregar_campeonatos_config", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.carregar_youtube_channels_config", return_value=[]), \
              patch("gui.reporte_eventos_mixin.verificar_chrome_debug", return_value=True), \
              patch("gui.reporte_eventos_mixin.abrir_chrome", return_value=True), \
-             patch("gui.reporte_eventos_mixin.executar_varredura_plataformas", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.fechar_chrome_seguro") as mock_close, \
              patch("gui.reporte_eventos_mixin.messagebox.showinfo") as mock_info:
-
-            mock_inst = MagicMock()
-            mock_inst.get_upcoming_matches.return_value = mock_matches
-            mock_fetcher_cls.return_value = mock_inst
 
             # Dispara busca assíncrona
             app_instance._re_buscar_eventos()
@@ -232,10 +234,10 @@ class TestEventSearchAsyncAndTreeInsertion:
             assert app_instance.re_busy is False, "A busca assíncrona não finalizou no tempo limite!"
             assert app_instance.re_btn_buscar.cget("state") == "normal", "Botão Buscar deve ser reabilitado após a varredura!"
 
-            # Valida presença dos jogos retornados pelo CBFScheduleFetcher
+            # Valida presença dos jogos retornados pelas plataformas e CBF
             jogos = [str(app_instance.re_tree.item(item, "values")[1]) for item in app_instance.re_tree.get_children()]
+            assert any("Flamengo x Fluminense" in j for j in jogos), f"Jogo Prime Video não encontrado na grade: {jogos}"
             assert any("Corinthians x São Paulo" in j for j in jogos), f"Jogo CBF não encontrado na grade: {jogos}"
-            assert any("Grêmio x Internacional" in j for j in jogos), f"Jogo CBF não encontrado na grade: {jogos}"
 
 
 class TestControlButtonsAndActions:

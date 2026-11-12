@@ -29,6 +29,7 @@ from .cbf_pdf_service import (
     is_cbf_broadcast_authorized,
     parse_cbf_pdf,
     parse_copa_mundo_excel,
+    run_eventos_cbf,
     prettify_match_name,
     canonical_team_name,
 )
@@ -52,6 +53,9 @@ from .selenium_browser_service import (
     run_eventos_max,
     run_eventos_disney,
     executar_varredura_plataformas,
+    padronizar_nomes_grid,
+    remover_duplicatas,
+    ajustartodootree,
 )
 
 from .email_report_service import (

@@ -1,5 +1,5 @@
 {
-  "version": "2.5.4",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.4/Monitor_Esportes.exe",
-  "changelog": "v2.5.4: Sanitização estrita e blindagem do campo Destinatários no Reporte de Eventos. Desacoplamento entre credenciais SMTP (auth.xml) e lista de e-mails destinatários (config.xml). Prevenção contra exibição de hashes criptografados ou tokens Fernet ilegíveis. Persistência automática das edições de destinatários em config.xml ao desfocar o campo."
+  "version": "2.5.5",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.5/Monitor_Esportes.exe",
+  "changelog": "v2.5.5: Restauração integral dos scrapers oficiais do Streaming_Scheduler (Prime Video, DAZN, Max, Disney+ e Cazé TV). Eliminação total de partidas fakes ou injeção indevida do CBFScheduleFetcher no Reporte de Eventos. Execução do Chrome 9222 visível em desktop com suporte a login/sessões e perfis TempProfile. Pipeline oficial com prioridade estrita Plataformas > CBF (PDF) e ordenação cronológica."
 }

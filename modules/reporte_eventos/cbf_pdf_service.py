@@ -14,10 +14,10 @@ import time
 import logging
 import unicodedata
 from datetime import datetime, timedelta
-from typing import Dict, List, Set, Tuple, Optional, Any
+from typing import Dict, List, Set, Tuple, Optional, Any, Callable
 import requests
 
-from .crypto_utils import get_app_path
+from .crypto_utils import get_app_path, get_config_dir, get_base_dir
 from .sharepoint_client import _deep_normalize_partida
 
 logger = logging.getLogger(__name__)
@@ -441,3 +441,158 @@ def parse_copa_mundo_excel(excel_path: str) -> List[Dict[str, Any]]:
     except Exception as e:
         logger.error(f"[Copa Mundo] Erro ao ler planilha {excel_path}: {e}")
     return extracted
+
+
+def run_eventos_cbf(
+    camps_ativos: Optional[Dict[str, bool]] = None,
+    data_inicio_str: str = "",
+    existing_matches: Optional[List[Tuple[str, str]]] = None,
+    progress_callback: Optional[Callable[[str, float], None]] = None
+) -> List[Tuple[Any, ...]]:
+    """
+    Executa a extração oficial de partidas dos PDFs da CBF (Brasileirão Série A e Copa do Brasil)
+    e da planilha da Copa do Mundo FIFA 2026 com ajuste de fuso (-1h CBF / -2h Copa) e filtro estrito de duplicatas.
+    Implementação 100% fiel à rotina run_eventos_cbf do Streaming_Scheduler.
+    """
+    from .sharepoint_client import _deep_normalize_partida
+
+    eventos: List[Tuple[Any, ...]] = []
+    if camps_ativos is None:
+        camps_ativos = {"Brasileirão serie A": True, "Copa do Brasil": True, "Copa do Mundo": True}
+
+    # Data de início para filtro
+    try:
+        data_inicio_obj = datetime.strptime(data_inicio_str, "%d/%m/%Y")
+    except Exception:
+        data_inicio_obj = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # Conjunto de jogos já existentes no grid para evitar sobreposição com scrapers de streaming
+    existing_set = set()
+    if existing_matches:
+        for j, d in existing_matches:
+            try:
+                norm_p = _deep_normalize_partida(str(j))
+                existing_set.add((norm_p, str(d).strip()))
+            except Exception:
+                pass
+
+    camps_to_process = []
+    if camps_ativos.get("Brasileirão serie A") or camps_ativos.get("Brasileirão Série A"):
+        url_bsa = get_latest_cbf_url("BSA")
+        if url_bsa:
+            camps_to_process.append({"nome": "Brasileirão Série A", "url_pdf": url_bsa})
+    if camps_ativos.get("Copa do Brasil"):
+        url_cdb = get_latest_cbf_url("CDB")
+        if url_cdb:
+            camps_to_process.append({"nome": "Copa do Brasil", "url_pdf": url_cdb})
+
+    cfg_dir = get_config_dir()
+    base_dir = get_base_dir()
+
+    for idx_camp, camp_info in enumerate(camps_to_process):
+        nome_camp = camp_info["nome"]
+        url_pdf = camp_info["url_pdf"]
+        if progress_callback:
+            progress_callback(f"Baixando PDF oficial: {nome_camp}...", 0.85 + (idx_camp * 0.04))
+
+        try:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+            resp = requests.get(url_pdf, headers=headers, verify=False, timeout=15)
+            if resp.status_code != 200 or len(resp.content) < 5000:
+                logger.warning(f"[CBF] PDF {nome_camp} indisponível (Status: {resp.status_code}, Tamanho: {len(resp.content)})")
+                continue
+
+            pdf_path = cfg_dir / f"temp_{nome_camp.replace(' ', '_')}.pdf"
+            with open(pdf_path, "wb") as f:
+                f.write(resp.content)
+
+            extracted = parse_cbf_pdf(str(pdf_path), nome_camp)
+            logger.info(f"[CBF] PDF {nome_camp} extraiu {len(extracted)} jogos.")
+
+            var_nav = "Esquerda"
+            for ev in extracted:
+                # Regra oficial CBF: subtrai 1 hora dos horários de tabela da CBF
+                data_ajustada = ev["Data"]
+                hora_ajustada = ev["Hora"]
+                try:
+                    for fmt_h in ("%H:%M", "%H:%M:%S"):
+                        try:
+                            dt_combined = datetime.strptime(f"{ev['Data']} {ev['Hora']}", f"%d/%m/%Y {fmt_h}")
+                            dt_ajustada = dt_combined - timedelta(hours=1)
+                            data_ajustada = dt_ajustada.strftime("%d/%m/%Y")
+                            hora_ajustada = dt_ajustada.strftime("%H:%M")
+                            break
+                        except Exception:
+                            pass
+                except Exception as e_fuso:
+                    logger.warning(f"[CBF] Erro ao ajustar fuso CBF ({ev['Data']} {ev['Hora']}): {e_fuso}")
+
+                # Filtro de data futura
+                try:
+                    ev_date_obj = datetime.strptime(data_ajustada, "%d/%m/%Y")
+                    if ev_date_obj < data_inicio_obj:
+                        continue
+                except Exception:
+                    continue
+
+                # Prioridade: se a partida já foi capturada diretamente pela plataforma (ex: Prime), descarta o PDF
+                norm_part = _deep_normalize_partida(ev["Jogo"])
+                if (norm_part, data_ajustada) in existing_set or (norm_part, ev["Data"]) in existing_set:
+                    logger.info(f"[CBF] Ignorando duplicata PDF (já coletada via plataforma): {ev['Jogo']} em {data_ajustada}")
+                    continue
+
+                plataformas_evento = [p.strip() for p in ev["TV"].split(",") if p.strip()]
+                plat_display = plataformas_evento[0] if plataformas_evento else "CBF"
+                cbf_camp = f"CBF - {nome_camp}" if "CBF" not in nome_camp.upper() else nome_camp
+                jogo_bonito = prettify_match_name(ev["Jogo"])
+
+                row = (cbf_camp, jogo_bonito, data_ajustada, hora_ajustada, var_nav, "15", plat_display, url_pdf)
+                eventos.append(row)
+                existing_set.add((norm_part, data_ajustada))
+                var_nav = "Direita" if var_nav == "Esquerda" else "Esquerda"
+        except Exception as e_camp:
+            logger.error(f"[CBF] Erro ao processar PDF {nome_camp}: {e_camp}")
+
+    # Copa do Mundo FIFA 2026 (Planilha Excel com -2 Horas)
+    if camps_ativos.get("Copa do Mundo"):
+        if progress_callback:
+            progress_callback("Lendo tabela oficial da Copa do Mundo FIFA 2026...", 0.93)
+        xls_candidates = [
+            cfg_dir / "Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx",
+            base_dir / "Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx",
+            Path(os.getcwd()) / "Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx",
+            Path(r"E:\desenvolvimento\Streaming_Scheduler\Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx"),
+        ]
+        xls_found = None
+        for xc in xls_candidates:
+            if xc.exists():
+                xls_found = str(xc)
+                break
+
+        if xls_found:
+            try:
+                copa_extracted = parse_copa_mundo_excel(xls_found)
+                var_nav_copa = "Esquerda"
+                for c_ev in copa_extracted:
+                    try:
+                        c_date_obj = datetime.strptime(c_ev["Data"], "%d/%m/%Y")
+                        if c_date_obj < data_inicio_obj:
+                            continue
+                    except Exception:
+                        pass
+
+                    norm_copa = _deep_normalize_partida(c_ev["Jogo"])
+                    if (norm_copa, c_ev["Data"]) in existing_set:
+                        continue
+
+                    row = ("Copa do Mundo FIFA 2026", c_ev["Jogo"], c_ev["Data"], c_ev["Hora"], var_nav_copa, "15", c_ev["TV"], "")
+                    eventos.append(row)
+                    existing_set.add((norm_copa, c_ev["Data"]))
+                    var_nav_copa = "Direita" if var_nav_copa == "Esquerda" else "Esquerda"
+            except Exception as e_copa_proc:
+                logger.error(f"[CBF] Erro ao processar tabela Copa do Mundo: {e_copa_proc}")
+
+    return eventos
+
