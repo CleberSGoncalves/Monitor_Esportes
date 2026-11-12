@@ -1,5 +1,5 @@
 {
-  "version": "2.5.8",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.8/Monitor_Esportes.exe",
-  "changelog": "v2.5.8: Refinamento dos relatorios da NBA: remocao de horario da tarja visual ('HIGHLIGHT OFICIAL DE COMPROVACAO'), calibracao de offset da etapa 7 (88% do video) no 4o quarto, preenchimento antecipado de jogos futuros agendados no SharePoint ('Relatorios_de_Jogos_NBA'), tolerancia de fuso horario (+/- 1 dia) em videos oficiais e correcao de NameError 'is_cov' em Canais Live."
+  "version": "2.5.9",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.9/Monitor_Esportes.exe",
+  "changelog": "v2.5.9: Alinhamento 100% fiel ao Streaming_Scheduler no Reporte de Eventos: inicializacao com grade limpa, busca ativa nos portais das plataformas (Amazon Prime Video com autenticacao via TempProfile e CazeTV), prioridade das URLs oficiais das plataformas sobre CBF PDF, parsing robusto de datas em portugues e ingles, e isolamento total de dados."
 }

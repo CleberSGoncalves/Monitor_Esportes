@@ -11,6 +11,7 @@ def run_command(cmd):
         sys.exit(result.returncode)
 
 def main():
+    os.environ["PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK"] = "True"
     project_root = Path(__file__).resolve().parents[1]
     os.chdir(project_root)
 
@@ -40,6 +41,13 @@ def main():
     # --noconsole: não abre janela de terminal
     # --add-data: inclui pastas e arquivos necessários
     
+    # Coletar apenas arquivos de configuração essenciais de config/ (ignorando TempProfile e caches)
+    config_datas = []
+    config_dir = project_root / "config"
+    for item in config_dir.iterdir():
+        if item.is_file() and not item.name.endswith(".part"):
+            config_datas.append(f"--add-data=\"config/{item.name};config\"")
+
     cmd = [
         str(project_root / ".venv" / "Scripts" / "pyinstaller"),
         "--noconsole",
@@ -48,7 +56,7 @@ def main():
         f"--paths={project_root}",
         f"--paths={project_root / 'gui'}",
         f"--add-data=\"{ctk_path};customtkinter/\"",
-        f"--add-data=\"config;config\"",
+    ] + config_datas + [
         f"--add-data=\"modules;modules\"",
         f"--add-data=\"core;core\"",
         f"--add-data=\"gui;gui\"",
@@ -75,12 +83,18 @@ def main():
         "--hidden-import=openpyxl",
         "--hidden-import=selenium",
         "--hidden-import=webdriver_manager",
+        "--hidden-import=pygetwindow",
+        "--hidden-import=amazoncaptcha",
         "--hidden-import=tkcalendar",
         "--hidden-import=modules.nba_autonomous_auditor",
         "--hidden-import=modules.nba_visual_proof_service",
         "--hidden-import=modules.nba_report_generator",
         "--hidden-import=modules.sharepoint_youtube_reporter",
         "--hidden-import=modules.reporte_eventos",
+        "--collect-submodules=selenium",
+        "--collect-submodules=webdriver_manager",
+        "--collect-submodules=pygetwindow",
+        "--collect-submodules=amazoncaptcha",
         "--collect-all=numpy",
         "--collect-all=pdfplumber",
         "--collect-all=fitz",
@@ -93,6 +107,9 @@ def main():
         "--collect-submodules=google.genai",
         "--collect-submodules=paddleocr",
         "--collect-all=cryptography",
+        "--exclude-module=google.genai.tests",
+        "--exclude-module=pytest",
+        "--exclude-module=tests",
         entry_point
     ]
 

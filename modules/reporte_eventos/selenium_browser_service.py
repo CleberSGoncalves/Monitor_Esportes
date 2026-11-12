@@ -35,15 +35,24 @@ from .sharepoint_client import _deep_normalize_partida, _obter_titulo_oficial_ca
 logger = logging.getLogger(__name__)
 
 PORTUGUESE_NUMERIC_DT_RE = re.compile(
-    r'(?:[A-Za-zçãéíóúâêô]+[-–]feira|[A-Za-zçãéíóúâêô]+),\s*(\d{1,2}/\d{1,2})\s+(\d{1,2}:\d{2})\s*(?:BRT)?',
+    r"\b(?:segunda-feira|terça-feira|quarta-feira|quinta-feira|sexta-feira|sábado|sabado|domingo|segunda|terça|terca|quarta|quinta|sexta|seg|ter|qua|qui|sex|sáb|sab|dom)\b\.?,\s*"
+    r"\d{1,2}/\d{2}\s+\d{1,2}:\d{2}(?:\s*BRT)?",
     re.IGNORECASE
 )
+
 PORTUGUESE_LITERAL_DT_RE = re.compile(
-    r'(?:[A-Za-zçãéíóúâêô]+[-–]feira|[A-Za-zçãéíóúâêô]+),\s*(\d{1,2})\s+de\s+([A-Za-zçãéíóúâêô.]+)\s+(\d{1,2}:\d{2})\s*(?:BRT)?',
+    r"\b(?:segunda-feira|terça-feira|quarta-feira|quinta-feira|sexta-feira|sábado|sabado|domingo|segunda|terça|terca|quarta|quinta|sexta|seg|ter|qua|qui|sex|sáb|sab|dom)\b\.?,\s*"
+    r"(\d{1,2})\s+de\s+"
+    r"([A-Za-zçãéíóúâêô.]+)\s+"
+    r"(\d{1,2}:\d{2})(?:\s*BRT)?",
     re.IGNORECASE
 )
+
 PRIME_DT_RE = re.compile(
-    r'(?:[A-Za-z]+,\s*)?([A-Za-z]+)\s+(\d{1,2})\s+(\d{1,2}(?::\d{2})?\s*(?:AM|PM))',
+    r"\b(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s+"
+    r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+"
+    r"\d{1,2}\s+"
+    r"\d{1,2}(?::\d{2})?\s*(?:AM|PM)\b",
     re.IGNORECASE
 )
 
@@ -53,7 +62,7 @@ MONTH_MAP_PT = {
 }
 
 def extract_prime_datetime(text: str) -> str:
-    """Extrai data/hora do Prime Video a partir de texto de card."""
+    """Extrai data/hora do Prime Video a partir de texto de card (Inglês ou Português)."""
     if not text:
         return ""
     m = PORTUGUESE_NUMERIC_DT_RE.search(text)
@@ -67,64 +76,87 @@ def extract_prime_datetime(text: str) -> str:
         return m.group(0).strip()
     return ""
 
-def format_datetime(data_str: str) -> Dict[str, str]:
-    """Converte strings de data/hora vindas das plataformas para {'data': 'dd/mm/YYYY', 'hora': 'HH:MM'}."""
-    if not data_str:
-        return {"data": "", "hora": ""}
-    
-    clean = re.sub(r'\s+', ' ', str(data_str)).replace('BRT', '').strip()
-    agora = datetime.now()
-    ano = agora.year
+def format_datetime(data_str: str, base_date: Any = None) -> Dict[str, str]:
+    """
+    Converte strings de data/hora vindas das plataformas (Prime/Max/etc)
+    para {"data": "dd/mm/YYYY", "hora": "HH:MM"}, fiel ao Streaming_Scheduler.
+    """
+    try:
+        if not data_str:
+            return {"data": "", "hora": ""}
 
-    # 1. Numérico PT: sábado, 1/08 17:00
-    m1 = PORTUGUESE_NUMERIC_DT_RE.search(clean)
-    if m1:
-        dia_mes, hora = m1.group(1), m1.group(2)
-        try:
-            d, m = dia_mes.split('/')
-            dt_obj = datetime(ano, int(m), int(d))
-            if dt_obj.date() < (agora.date() - timedelta(days=60)):
-                dt_obj = datetime(ano + 1, int(m), int(d))
-            return {"data": dt_obj.strftime("%d/%m/%Y"), "hora": hora}
-        except Exception:
-            pass
+        def _clean(s: str) -> str:
+            s = s.replace("\u00a0", " ")
+            for ch in ("\u200b", "\u200c", "\u200d", "\ufeff", "\u2066", "\u2067", "\u2068", "\u2069"):
+                s = s.replace(ch, "")
+            return re.sub(r"\s+", " ", s).strip()
 
-    # 2. Literal PT: quarta-feira, 22 de jul. 18:50
-    m2 = PORTUGUESE_LITERAL_DT_RE.search(clean)
-    if m2:
-        dia, mes_str, hora = m2.group(1), m2.group(2).lower()[:3], m2.group(3)
-        m_num = MONTH_MAP_PT.get(mes_str, agora.month)
-        try:
-            dt_obj = datetime(ano, m_num, int(dia))
-            if dt_obj.date() < (agora.date() - timedelta(days=60)):
-                dt_obj = datetime(ano + 1, m_num, int(dia))
-            return {"data": dt_obj.strftime("%d/%m/%Y"), "hora": hora}
-        except Exception:
-            pass
+        data_str = _clean(str(data_str))
+        now = datetime.now()
 
-    # 3. Formato simples dd/mm/YYYY HH:MM
-    m3 = re.search(r'(\d{1,2}/\d{1,2}/\d{2,4})\s+(\d{1,2}:\d{2})', clean)
-    if m3:
-        d_raw, h_raw = m3.group(1), m3.group(2)
-        try:
+        # 1. Hoje / Amanhã
+        low = data_str.lower()
+        if low.startswith("hoje"):
+            m_hoje = re.search(r"(\d{1,2}:\d{2})", data_str)
+            if m_hoje:
+                hh, mm = map(int, m_hoje.group(1).split(":"))
+                dt = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
+                return {"data": dt.strftime("%d/%m/%Y"), "hora": dt.strftime("%H:%M")}
+        if low.startswith("amanh"):
+            m_ama = re.search(r"(\d{1,2}:\d{2})", data_str)
+            if m_ama:
+                hh, mm = map(int, m_ama.group(1).split(":"))
+                dt = (now + timedelta(days=1)).replace(hour=hh, minute=mm, second=0, microsecond=0)
+                return {"data": dt.strftime("%d/%m/%Y"), "hora": dt.strftime("%H:%M")}
+
+        # 2. Literal PT: "sáb., 14 de nov. 17:30 BRT"
+        m_lit = PORTUGUESE_LITERAL_DT_RE.search(data_str)
+        if m_lit:
+            dia = int(m_lit.group(1))
+            mes_str = m_lit.group(2).lower().replace(".", "")[:3]
+            mes = MONTH_MAP_PT.get(mes_str, now.month)
+            hora = m_lit.group(3)
+            dt = datetime(now.year, mes, dia)
+            if dt.date() < (now.date() - timedelta(days=60)):
+                dt = datetime(now.year + 1, mes, dia)
+            return {"data": dt.strftime("%d/%m/%Y"), "hora": hora}
+
+        # 3. Numérico PT: "sábado, 1/08 17:00 BRT"
+        m_num = re.search(r"(\d{1,2})/(\d{2})\s+(\d{1,2}:\d{2})", data_str.lower())
+        if m_num:
+            dia = int(m_num.group(1))
+            mes = int(m_num.group(2))
+            hora = m_num.group(3)
+            dt = datetime(now.year, mes, dia)
+            if dt.date() < (now.date() - timedelta(days=60)):
+                dt = datetime(now.year + 1, mes, dia)
+            return {"data": dt.strftime("%d/%m/%Y"), "hora": hora}
+
+        # 4. Formato simples dd/mm/YYYY HH:MM
+        m_simples = re.search(r'(\d{1,2}/\d{1,2}/\d{2,4})\s+(\d{1,2}:\d{2})', data_str)
+        if m_simples:
+            d_raw, h_raw = m_simples.group(1), m_simples.group(2)
             parts = d_raw.split('/')
             if len(parts[2]) == 2:
                 d_raw = f"{parts[0]}/{parts[1]}/20{parts[2]}"
             return {"data": d_raw, "hora": h_raw}
-        except Exception:
-            pass
 
-    # 4. Formato Hoje / Amanhã
-    if "hoje" in clean.lower():
-        m_h = re.search(r'(\d{1,2}:\d{2})', clean)
-        h = m_h.group(1) if m_h else "19:00"
-        return {"data": agora.strftime("%d/%m/%Y"), "hora": h}
-    if "amanhã" in clean.lower() or "amanha" in clean.lower():
-        m_h = re.search(r'(\d{1,2}:\d{2})', clean)
-        h = m_h.group(1) if m_h else "19:00"
-        return {"data": (agora + timedelta(days=1)).strftime("%d/%m/%Y"), "hora": h}
+        # 5. Formato Inglês / Genérico Prime
+        data_str2 = data_str.title().replace("Pm", "PM").replace("Am", "AM")
+        data_str2 = re.sub(r"\s+", " ", data_str2)
+        for fmt in ("%b %d %I:%M %p", "%b %d %I %p", "%a, %b %d %I:%M %p", "%a, %b %d %I %p"):
+            try:
+                parsed = datetime.strptime(data_str2, fmt).replace(year=now.year)
+                if parsed < now - timedelta(days=1):
+                    parsed = parsed.replace(year=now.year + 1)
+                return {"data": parsed.strftime("%d/%m/%Y"), "hora": parsed.strftime("%H:%M")}
+            except Exception:
+                continue
 
-    return {"data": agora.strftime("%d/%m/%Y"), "hora": "19:00"}
+        return {"data": now.strftime("%d/%m/%Y"), "hora": "19:00"}
+    except Exception as e:
+        logger.debug(f"[format_datetime] Erro ao formatar '{data_str}': {e}")
+        return {"data": "", "hora": ""}
 
 
 def tem_numeros(texto: str) -> bool:
@@ -347,13 +379,18 @@ def obter_driver_conectado(porta_debug: str = "9222"):
     
     try:
         driver = webdriver.Chrome(options=chrome_options)
+        if driver.window_handles:
+            driver.switch_to.window(driver.window_handles[0])
         return driver
     except Exception as e:
         logger.warning(f"[Chrome] Falha ao conectar WebDriver direto: {e}. Tentando ChromeDriverManager...")
         from selenium.webdriver.chrome.service import Service
         from webdriver_manager.chrome import ChromeDriverManager
         service = Service(ChromeDriverManager().install())
-        return webdriver.Chrome(service=service, options=chrome_options)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        if driver.window_handles:
+            driver.switch_to.window(driver.window_handles[0])
+        return driver
 
 
 def clicar_com_espera_segura(driver, xpath: str, timeout: int = 10):
@@ -792,7 +829,7 @@ def run_eventos_prime(url_camp: str, expected_camp: str = "Brasileirão serie A"
                 except Exception:
                     pass
 
-            if "premiere" in nome_evento.lower():
+            if any(p in nome_evento.lower() for p in ("premiere", "pré-jogo", "pre-jogo", "pós-jogo", "pos-jogo", "react")):
                 continue
 
             data_hora = ""
@@ -811,10 +848,7 @@ def run_eventos_prime(url_camp: str, expected_camp: str = "Brasileirão serie A"
                     pass
 
             extracted = extract_prime_datetime(data_hora)
-            if not extracted:
-                continue
-
-            data_hora_formatada = format_datetime(extracted)
+            data_hora_formatada = format_datetime(extracted) if extracted else format_datetime(data_hora)
             dt = data_hora_formatada.get('data', '')
             hr = data_hora_formatada.get('hora', '19:00')
 
@@ -841,7 +875,7 @@ def run_eventos_prime(url_camp: str, expected_camp: str = "Brasileirão serie A"
                     logger.info(f"[Prime] Jogo '{jogo_limpo}' descartado: sem direitos na tabela CBF para Amazon Prime.")
                     continue
 
-                csv_row = (expected_camp, jogo_limpo, dt, hr, var_navegador, "10", "Amazon Prime", url)
+                csv_row = (expected_camp, jogo_limpo, dt, hr, var_navegador, "15", "Amazon Prime", url)
                 eventos.append(csv_row)
                 var_navegador = "Direita" if var_navegador == "Esquerda" else "Esquerda"
 

@@ -640,8 +640,8 @@ class ReporteEventosMixin:
         self.re_lbl_process = ctk.CTkLabel(self.re_toolbar, text="", font=ctk.CTkFont(size=11), text_color="#00CED1")
         self.re_lbl_process.pack(side="right", padx=6, pady=4)
 
-        # Carrega dados salvos em background sem travar UI
-        self.after(50, self._re_carregar_dados_iniciais)
+        # Atualiza contadores iniciais mantendo a grade limpa para nova varredura
+        self.after(50, self._re_atualizar_kpis)
 
     # ── SUB-ABA 2: LOGS (TOTALMENTE OPERANTE E RESPONSIVA) ───────────────────
 
@@ -1012,6 +1012,10 @@ class ReporteEventosMixin:
         self.re_btn_buscar.configure(state="disabled")
         self.re_lbl_status.configure(text="Iniciando varredura unificada...")
         self.re_progresso.set(0.05)
+
+        # Inicia com a grade limpa para buscar os eventos mais recentes nas plataformas
+        for i in self.re_tree.get_children():
+            self.re_tree.delete(i)
         self._re_atualizar_kpis()
 
         # Captura variáveis na thread principal
@@ -1032,17 +1036,11 @@ class ReporteEventosMixin:
             "Disney": usar_disney,
         }
 
-        # Snapshot de partidas já no Treeview para evitar duplicações na CBF
-        existing_matches = []
-        for i in self.re_tree.get_children():
-            v = self.re_tree.item(i, "values")
-            if len(v) >= 3:
-                existing_matches.append((str(v[1]), str(v[2])))
-
         q = queue.Queue()
 
         def _worker():
             total_inseridos = 0
+            encontrados_plataformas = set()
             try:
                 # 0. Abertura do Chrome DevTools se necessário ou em modo somente relatório
                 precisa_chrome = somente_relatorio or any(plats_ativos.values())
@@ -1063,6 +1061,7 @@ class ReporteEventosMixin:
                         evs_dazn = run_eventos_dazn(url_dazn, expected_camp="Mundial de Clubes FIFA")
                         for ev in evs_dazn:
                             q.put(("event", ev))
+                            encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
                             total_inseridos += 1
                     except Exception as e_dazn:
                         logger.warning(f"[ReporteEventos] Erro DAZN: {e_dazn}")
@@ -1076,6 +1075,7 @@ class ReporteEventosMixin:
                             evs_prime_bsa = run_eventos_prime(url_bsa, expected_camp="Brasileirão serie A")
                             for ev in evs_prime_bsa:
                                 q.put(("event", ev))
+                                encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
                                 total_inseridos += 1
                         except Exception as e_p1:
                             logger.warning(f"[ReporteEventos] Erro Prime BSA: {e_p1}")
@@ -1087,6 +1087,7 @@ class ReporteEventosMixin:
                             evs_prime_cdb = run_eventos_prime(url_cdb, expected_camp="Copa do Brasil")
                             for ev in evs_prime_cdb:
                                 q.put(("event", ev))
+                                encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
                                 total_inseridos += 1
                         except Exception as e_p2:
                             logger.warning(f"[ReporteEventos] Erro Prime CDB: {e_p2}")
@@ -1099,6 +1100,7 @@ class ReporteEventosMixin:
                         evs_max = run_eventos_max(url_max, expected_camp="Campeonato Paulista")
                         for ev in evs_max:
                             q.put(("event", ev))
+                            encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
                             total_inseridos += 1
                     except Exception as e_max:
                         logger.warning(f"[ReporteEventos] Erro Max: {e_max}")
@@ -1112,6 +1114,7 @@ class ReporteEventosMixin:
                             evs_disney_lib = run_eventos_disney(url_lib, expected_camp="CONMEBOL Libertadores")
                             for ev in evs_disney_lib:
                                 q.put(("event", ev))
+                                encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
                                 total_inseridos += 1
                         except Exception as e_dis1:
                             logger.warning(f"[ReporteEventos] Erro Disney Libertadores: {e_dis1}")
@@ -1123,6 +1126,7 @@ class ReporteEventosMixin:
                             evs_disney_suda = run_eventos_disney(url_suda, expected_camp="CONMEBOL Sudamericana")
                             for ev in evs_disney_suda:
                                 q.put(("event", ev))
+                                encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
                                 total_inseridos += 1
                         except Exception as e_dis2:
                             logger.warning(f"[ReporteEventos] Erro Disney Sudamericana: {e_dis2}")
@@ -1134,6 +1138,7 @@ class ReporteEventosMixin:
                         caze_evs = obter_eventos_caze_tv()
                         for c_ev in caze_evs:
                             q.put(("event", c_ev))
+                            encontrados_plataformas.add((prettify_match_name(c_ev[1]), str(c_ev[2]).strip()))
                             total_inseridos += 1
                     except Exception as e_caze:
                         logger.warning(f"[ReporteEventos] Aviso Cazé TV: {e_caze}")
@@ -1161,6 +1166,7 @@ class ReporteEventosMixin:
                             extra_evs = []
                         for ev in extra_evs:
                             q.put(("event", ev))
+                            encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
                             total_inseridos += 1
 
                     for ch in carregar_youtube_channels_config():
@@ -1171,6 +1177,7 @@ class ReporteEventosMixin:
                         yt_evs = obter_eventos_canal_youtube(ch_nome, ch_url)
                         for ev in (yt_evs or []):
                             q.put(("event", ev))
+                            encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))
                             total_inseridos += 1
                 except Exception as e_extra:
                     logger.warning(f"[ReporteEventos] Aviso extras/YouTube: {e_extra}")
@@ -1179,7 +1186,11 @@ class ReporteEventosMixin:
                 if usar_cbf:
                     q.put(("status", "Processando tabela oficial da CBF (PDF) e Copa do Mundo...", 0.88))
                     try:
-                        cbf_evs = run_eventos_cbf(camps_ativos, data_inicio_str=data_inicio, existing_matches=existing_matches)
+                        cbf_evs = run_eventos_cbf(
+                            camps_ativos,
+                            data_inicio_str=data_inicio,
+                            existing_matches=list(encontrados_plataformas)
+                        )
                         for ev in cbf_evs:
                             q.put(("event", ev))
                             total_inseridos += 1
@@ -1256,12 +1267,15 @@ class ReporteEventosMixin:
         self.after(100, _poll_queue)
 
     def _re_inserir_evento_na_grade(self, row: Tuple[Any, ...]) -> None:
-        """Insere evento na Treeview sem duplicidade (chave: Campeonato + Partida + Data)."""
+        """Insere evento na Treeview sem duplicidade, substituindo fontes genéricas por canais de streaming oficiais."""
         if not row or len(row) < 3:
             return
         novo_camp = str(row[0]).strip().lower()
         nova_partida = str(row[1]).strip().lower()
         nova_data = str(row[2]).strip().lower()
+        novo_canal = str(row[6]).strip().lower() if len(row) > 6 else ""
+        nova_url = str(row[7]).strip() if len(row) > 7 else ""
+        is_novo_cbf = "blob.core.windows.net" in nova_url or "cbf" in novo_canal
 
         for item_id in self.re_tree.get_children():
             vals = self.re_tree.item(item_id, "values")
@@ -1269,8 +1283,17 @@ class ReporteEventosMixin:
                 c_exist = str(vals[0]).strip().lower()
                 p_exist = str(vals[1]).strip().lower()
                 d_exist = str(vals[2]).strip().lower()
-                if c_exist == novo_camp and p_exist == nova_partida and d_exist == nova_data:
-                    return
+                c_exist_canal = str(vals[6]).strip().lower() if len(vals) > 6 else ""
+                c_exist_url = str(vals[7]).strip() if len(vals) > 7 else ""
+                is_exist_cbf = "blob.core.windows.net" in c_exist_url or "cbf" in c_exist_canal
+
+                if (p_exist == nova_partida and d_exist == nova_data) or (c_exist == novo_camp and p_exist == nova_partida):
+                    # Se o item existente é link CBF genérico e o novo é da plataforma oficial (Amazon Prime, CazéTV, etc.), substitui!
+                    if is_exist_cbf and not is_novo_cbf:
+                        self.re_tree.delete(item_id)
+                        break
+                    else:
+                        return
 
         idx = len(self.re_tree.get_children())
         tag = "even" if idx % 2 == 0 else "odd"

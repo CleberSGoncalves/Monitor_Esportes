@@ -96,7 +96,6 @@ def carregar_streaming_csv() -> List[List[str]]:
         str(cfg_dir / "streaming_data.csv"),
         str(cfg_dir / "data.csv"),
         os.path.join(os.getcwd(), "data.csv"),
-        r"E:\desenvolvimento\Streaming_Scheduler\data.csv",
     ]
     if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
         meipass = Path(sys._MEIPASS)
