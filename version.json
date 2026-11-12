@@ -1,5 +1,5 @@
 {
-  "version": "2.5.0",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.0/Monitor_Esportes.exe",
-  "changelog": "v2.5.0: Migração e integração completa do projeto Streaming_Scheduler para dentro do Monitor_Esportes na nova aba superior '📅 Reporte de Eventos'. Inclui todas as 6 sub-abas nativas (Streaming, Logs, Acessos, Campeonatos, Canais YouTube, FAQ), grade interativa de 8 colunas com popups para edição de data, horário e canais, extração CBF PDF (-1h), Copa do Mundo Excel (-2h), varredura de canais YouTube com validação CBF, sincronização SharePoint Graph API (com fallback Power Automate) e disparo SMTP com trava noturna e idempotência diária. Suíte de testes 100% aprovada."
+  "version": "2.5.1",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.1/Monitor_Esportes.exe",
+  "changelog": "v2.5.1: Reconstrução completa da aba '📅 Reporte de Eventos' com Dark Theme nativo (#0f172a / #182234 / #00CED1), CTkTabview moderno, Treeview escura estilizada (Reporte.Treeview) sem fundo bege/branco cru. Pré-carregamento automático dos 8 campeonatos oficiais (Brasileirão Série A, Série B, Copa do Brasil, Copa do Mundo 2026, Mundial de Clubes FIFA, Paulistão, Libertadores, Sudamericana). Busca ultrarrápida multi-motor assíncrona via CBFScheduleFetcher sem congelamento de interface. Novos popups modernos para data, horário e canais. Validação E2E com subagente 100% aprovada."
 }

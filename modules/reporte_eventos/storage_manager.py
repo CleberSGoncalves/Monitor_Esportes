@@ -48,18 +48,30 @@ def salvar_youtube_channels_config(lista: List[Dict[str, Any]]) -> None:
     except Exception as e:
         logger.error(f"[Storage] Erro ao salvar {caminho}: {e}")
 
+DEFAULT_CAMPEONATOS = [
+    {"campeonato": "CBF - Brasileirão Série A", "plataforma": "Amazon Prime", "url": "https://www.primevideo.com", "ativo": True},
+    {"campeonato": "CBF - Brasileirão Série B", "plataforma": "Disney", "url": "https://www.disneyplus.com", "ativo": True},
+    {"campeonato": "CBF - Copa do Brasil", "plataforma": "Amazon Prime", "url": "https://www.primevideo.com", "ativo": True},
+    {"campeonato": "Copa do Mundo FIFA 2026", "plataforma": "Cazé TV", "url": "https://www.youtube.com/@CazeTV", "ativo": True},
+    {"campeonato": "Mundial de Clubes FIFA", "plataforma": "Dazn", "url": "https://www.dazn.com", "ativo": True},
+    {"campeonato": "Campeonato Paulista", "plataforma": "Max", "url": "https://www.max.com", "ativo": True},
+    {"campeonato": "CONMEBOL Libertadores", "plataforma": "Disney", "url": "https://www.disneyplus.com", "ativo": True},
+    {"campeonato": "CONMEBOL Sudamericana", "plataforma": "Disney", "url": "https://www.disneyplus.com", "ativo": True},
+]
+
 def carregar_campeonatos_config() -> List[Dict[str, Any]]:
-    """Carrega campeonatos customizados de campeonatos_config.json."""
+    """Carrega campeonatos customizados de campeonatos_config.json, inicializando com os padrões se vazio."""
     caminho = get_app_path("campeonatos_config.json")
     if os.path.exists(caminho):
         try:
             with open(caminho, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                if isinstance(data, list):
+                if isinstance(data, list) and len(data) > 0:
                     return data
         except Exception as e:
             logger.warning(f"[Storage] Erro ao carregar {caminho}: {e}")
-    return []
+    salvar_campeonatos_config(DEFAULT_CAMPEONATOS)
+    return DEFAULT_CAMPEONATOS
 
 def salvar_campeonatos_config(lista: List[Dict[str, Any]]) -> None:
     """Salva campeonatos customizados em campeonatos_config.json."""

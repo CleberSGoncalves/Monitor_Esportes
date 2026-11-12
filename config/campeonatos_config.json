@@ -1,0 +1,50 @@
+[
+  {
+    "campeonato": "CBF - Brasileirão Série A",
+    "plataforma": "Amazon Prime",
+    "url": "https://www.primevideo.com",
+    "ativo": false
+  },
+  {
+    "campeonato": "CBF - Brasileirão Série B",
+    "plataforma": "Disney",
+    "url": "https://www.disneyplus.com",
+    "ativo": true
+  },
+  {
+    "campeonato": "CBF - Copa do Brasil",
+    "plataforma": "Amazon Prime",
+    "url": "https://www.primevideo.com",
+    "ativo": true
+  },
+  {
+    "campeonato": "Copa do Mundo FIFA 2026",
+    "plataforma": "Cazé TV",
+    "url": "https://www.youtube.com/@CazeTV",
+    "ativo": true
+  },
+  {
+    "campeonato": "Mundial de Clubes FIFA",
+    "plataforma": "Dazn",
+    "url": "https://www.dazn.com",
+    "ativo": true
+  },
+  {
+    "campeonato": "Campeonato Paulista",
+    "plataforma": "Max",
+    "url": "https://www.max.com",
+    "ativo": true
+  },
+  {
+    "campeonato": "CONMEBOL Libertadores",
+    "plataforma": "Disney",
+    "url": "https://www.disneyplus.com",
+    "ativo": true
+  },
+  {
+    "campeonato": "CONMEBOL Sudamericana",
+    "plataforma": "Disney",
+    "url": "https://www.disneyplus.com",
+    "ativo": true
+  }
+]
