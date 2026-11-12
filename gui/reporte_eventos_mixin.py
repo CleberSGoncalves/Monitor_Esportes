@@ -58,6 +58,8 @@ from modules.reporte_eventos.selenium_browser_service import (
     verificar_chrome_debug,
     abrir_chrome,
     fechar_chrome_seguro,
+    obter_profile_dir,
+    executar_varredura_plataformas,
 )
 from modules.reporte_eventos.email_report_service import (
     extrair_dados_html,
@@ -292,6 +294,23 @@ class ReporteEventosMixin:
         self.re_is_running = False
         self.re_loop_job_id = None
         self.re_busy = False
+
+        # Configura gravação ativa de logs em log.txt
+        try:
+            from logging.handlers import RotatingFileHandler
+            log_path = get_app_path("log.txt")
+            root_logger = logging.getLogger()
+            has_handler = any(isinstance(h, RotatingFileHandler) and getattr(h, 'baseFilename', '').endswith('log.txt') for h in root_logger.handlers)
+            if not has_handler:
+                fmt = logging.Formatter("%(asctime)s - %(levelname)s - %(filename)s %(lineno)d - %(message)s",
+                                        datefmt="%Y-%m-%d %H:%M:%S")
+                rot = RotatingFileHandler(log_path, maxBytes=5_000_000, backupCount=7, encoding="utf-8")
+                rot.setFormatter(fmt)
+                root_logger.addHandler(rot)
+                root_logger.setLevel(logging.INFO)
+            logger.info("[ReporteEventos] Aba Reporte de Eventos inicializada com sucesso.")
+        except Exception as e_log:
+            print(f"[Aviso] Falha ao configurar log rotativo: {e_log}")
 
     def _build_tab_reporte_eventos(self) -> None:
         """Constrói a interface dark moderna de Reporte de Eventos sob self.tab_reporte."""
@@ -716,21 +735,43 @@ class ReporteEventosMixin:
         self.re_busy = True
         self.re_btn_buscar.configure(state="disabled")
         self.re_lbl_status.configure(text="Iniciando varredura unificada...")
-        self.re_progresso.set(0.1)
+        self.re_progresso.set(0.05)
 
         # Captura variáveis na thread principal
         usar_cbf = bool(self.re_plat_vars.get("CBF") and self.re_plat_vars["CBF"].get())
         usar_copa = bool(self.re_camp_vars.get("Copa do Mundo") and self.re_camp_vars["Copa do Mundo"].get())
         usar_caze = bool(self.re_plat_vars.get("Cazé TV") and self.re_plat_vars["Cazé TV"].get())
+        usar_prime = bool(self.re_plat_vars.get("Amazon Prime") and self.re_plat_vars["Amazon Prime"].get())
+        usar_dazn = bool(self.re_plat_vars.get("Dazn") and self.re_plat_vars["Dazn"].get())
+        usar_max = bool(self.re_plat_vars.get("Max") and self.re_plat_vars["Max"].get())
+        usar_disney = bool(self.re_plat_vars.get("Disney") and self.re_plat_vars["Disney"].get())
+        somente_relatorio = bool(self.re_somente_relatorio_var.get())
+
+        camps_ativos = {k: v.get() for k, v in self.re_camp_vars.items()}
+        plats_ativos = {
+            "Amazon Prime": usar_prime,
+            "Dazn": usar_dazn,
+            "Max": usar_max,
+            "Disney": usar_disney,
+        }
 
         q = queue.Queue()
 
         def _worker():
             total_inseridos = 0
             try:
+                # 0. Abertura do Chrome DevTools se necessário ou em modo somente relatório
+                precisa_chrome = somente_relatorio or any(plats_ativos.values())
+                if precisa_chrome:
+                    if not verificar_chrome_debug("9222"):
+                        q.put(("status", "Iniciando Chrome DevTools (Porta 9222) com perfil TempProfile...", 0.08))
+                        abrir_chrome("9222")
+                    else:
+                        q.put(("status", "Chrome DevTools (Porta 9222) já ativo e conectado.", 0.12))
+
                 # 1. Carrega CBF Schedule Oficial de alta velocidade via CBFScheduleFetcher
                 if usar_cbf:
-                    q.put(("status", "Carregando calendário oficial da CBF...", 0.2))
+                    q.put(("status", "Carregando partidas oficiais da CBF (PDFs)...", 0.25))
                     try:
                         fetcher = CBFScheduleFetcher()
                         matches = fetcher.get_upcoming_matches()
@@ -749,11 +790,11 @@ class ReporteEventosMixin:
                             total_inseridos += 1
                     except Exception as e_cbf:
                         logger.warning(f"[ReporteEventos] Aviso CBF Fetcher: {e_cbf}")
-                    q.put(("progress", 0.4))
+                    q.put(("progress", 0.45))
 
                 # 2. Copa do Mundo FIFA 2026 (Planilha Excel com -2 Horas)
                 if usar_copa:
-                    q.put(("status", "Lendo planilha da Copa do Mundo FIFA 2026...", 0.5))
+                    q.put(("status", "Lendo planilha da Copa do Mundo FIFA 2026...", 0.55))
                     try:
                         xls_p = get_app_path("Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx")
                         if os.path.exists(xls_p):
@@ -764,11 +805,11 @@ class ReporteEventosMixin:
                                 total_inseridos += 1
                     except Exception as e_copa:
                         logger.warning(f"[ReporteEventos] Aviso Copa do Mundo: {e_copa}")
-                    q.put(("progress", 0.7))
+                    q.put(("progress", 0.65))
 
                 # 3. Varredura rápida de canais YouTube ativos
                 if usar_caze:
-                    q.put(("status", "Varrendo canal Cazé TV...", 0.8))
+                    q.put(("status", "Buscando transmissões do Cazé TV / YouTube...", 0.75))
                     try:
                         caze_evs = obter_eventos_caze_tv()
                         for c_ev in caze_evs:
@@ -776,8 +817,25 @@ class ReporteEventosMixin:
                             total_inseridos += 1
                     except Exception as e_caze:
                         logger.warning(f"[ReporteEventos] Aviso Cazé TV: {e_caze}")
+                    q.put(("progress", 0.85))
 
-                msg_ok = f"Varredura concluída! {total_inseridos} eventos carregados com sucesso."
+                # 4. Varredura de plataformas de streaming no Chrome 9222
+                if any(plats_ativos.values()):
+                    q.put(("status", "Varrendo plataformas de streaming no Chrome 9222...", 0.90))
+                    try:
+                        plat_evs = executar_varredura_plataformas(plats_ativos, camps_ativos)
+                        for p_ev in plat_evs:
+                            q.put(("event", p_ev))
+                            total_inseridos += 1
+                    except Exception as e_plat:
+                        logger.warning(f"[ReporteEventos] Aviso plataformas streaming: {e_plat}")
+
+                if total_inseridos > 0:
+                    msg_ok = f"Varredura concluída! {total_inseridos} eventos carregados com sucesso."
+                else:
+                    msg_ok = "Varredura concluída! Nenhum novo evento adicionado (jogos já constam na grade ou filtros sem novos confrontos)."
+
+                logger.info(f"[ReporteEventos] {msg_ok}")
                 q.put(("done_success", msg_ok))
             except Exception as ex:
                 logger.error(f"[ReporteEventos] Erro na busca: {ex}")
@@ -804,6 +862,7 @@ class ReporteEventosMixin:
                         self.re_progresso.set(1.0)
                         self.re_lbl_status.configure(text=msg[1])
                         messagebox.showinfo("Varredura Concluída", msg[1])
+                        self.after(400, self._re_filtrar_logs)
                     elif kind == "done_error":
                         messagebox.showerror("Erro", f"Falha na busca de eventos: {msg[1]}")
                     elif kind == "finished":
@@ -1015,7 +1074,8 @@ class ReporteEventosMixin:
             self.re_tree_logs.delete(i)
 
         log_path = get_app_path("log.txt")
-        if not os.path.exists(log_path): return
+        if not os.path.exists(log_path):
+            return
 
         tipo_filtro = self.re_log_tipo_var.get().strip().upper()
         if tipo_filtro == "TODOS": tipo_filtro = ""
@@ -1027,21 +1087,74 @@ class ReporteEventosMixin:
             d_ini = datetime.min
             d_fim = datetime.max
 
-        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
-            for line in f:
-                line = line.strip()
-                if not line: continue
-                m = re.match(r'^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+\[?(\w+)\]?\s*(.*)', line)
-                if m:
-                    dt_str, nivel, msg = m.groups()
-                    try:
-                        dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
-                        if not (d_ini <= dt <= d_fim): continue
-                    except Exception: pass
-                    if tipo_filtro and nivel.upper() != tipo_filtro: continue
-                    m_lin = re.search(r'\b(?:line|linha)\s+(\d+)', msg, re.I)
-                    linha_str = m_lin.group(1) if m_lin else "-"
-                    self.re_tree_logs.insert("", "end", values=(dt_str, nivel.upper(), linha_str, msg), tags=(nivel.upper(),))
+        linhas_filtradas = []
+        todas_linhas_brutas = []
+
+        try:
+            with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line: continue
+                    todas_linhas_brutas.append(line)
+
+                    # Formato 1: YYYY-MM-DD HH:MM:SS - NIVEL - arquivo.py 123 - mensagem
+                    partes = line.split(" - ", 2)
+                    if len(partes) >= 3:
+                        dt_str = partes[0].strip()
+                        nivel = partes[1].strip().upper()
+                        rest = partes[2].strip()
+
+                        m_lin = re.search(r'\b(?:line|linha)\s+(\d+)|(\w+\.py)\s+(\d+)', rest, re.I)
+                        linha_str = "-"
+                        if m_lin:
+                            linha_str = m_lin.group(1) or m_lin.group(3) or "-"
+                            msg_limpa = re.sub(r'(\w+\.py\s*)?line \d+|[\w/\\]+\.py \d+\s*-\s*', '', rest, flags=re.I).strip()
+                        else:
+                            msg_limpa = rest
+
+                        try:
+                            dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
+                            if tipo_filtro and nivel != tipo_filtro:
+                                continue
+                            if d_ini <= dt <= d_fim:
+                                linhas_filtradas.append((dt, nivel, linha_str, msg_limpa))
+                        except Exception:
+                            pass
+                    else:
+                        # Formato 2: Regex fallback
+                        m = re.match(r'^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+\[?(\w+)\]?\s*(.*)', line)
+                        if m:
+                            dt_str, nivel, msg = m.groups()
+                            try:
+                                dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
+                                if (not tipo_filtro or nivel.upper() == tipo_filtro) and (d_ini <= dt <= d_fim):
+                                    linhas_filtradas.append((dt, nivel.upper(), "-", msg))
+                            except Exception:
+                                pass
+        except Exception as e:
+            logger.error(f"[ReporteEventos] Erro ao ler log.txt: {e}")
+
+        if linhas_filtradas:
+            # Mais recentes primeiro
+            linhas_filtradas.sort(key=lambda x: x[0], reverse=True)
+            for dt, nivel, linha_num, msg in linhas_filtradas:
+                tag = nivel if nivel in ["ERROR", "WARNING", "INFO"] else ""
+                self.re_tree_logs.insert(
+                    "", "end",
+                    values=(dt.strftime("%d/%m/%Y %H:%M:%S"), nivel, linha_num, msg),
+                    tags=(tag,)
+                )
+        elif todas_linhas_brutas:
+            # Fallback seguro: se a data inicial/final não cobrir os logs antigos, exibe as últimas linhas
+            for raw in reversed(todas_linhas_brutas[-200:]):
+                partes = raw.split(" - ", 2)
+                if len(partes) >= 3:
+                    dt_s, niv, rest = partes[0].strip(), partes[1].strip().upper(), partes[2].strip()
+                    if tipo_filtro and niv != tipo_filtro: continue
+                    tag = niv if niv in ["ERROR", "WARNING", "INFO"] else ""
+                    self.re_tree_logs.insert("", "end", values=(dt_s, niv, "-", rest), tags=(tag,))
+                else:
+                    self.re_tree_logs.insert("", "end", values=("-", "INFO", "-", raw), tags=("INFO",))
 
     def _re_limpar_logs(self) -> None:
         if messagebox.askyesno("Limpar Logs", "Deseja esvaziar o arquivo log.txt?"):

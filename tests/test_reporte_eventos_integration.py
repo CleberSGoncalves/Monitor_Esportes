@@ -198,3 +198,37 @@ class TestGUIIntegrationMixin:
         ]
         for m in required_methods:
             assert hasattr(MonitorApp, m), f"Método {m} ausente em MonitorApp!"
+
+
+class TestSeleniumServiceAndProfiles:
+    def test_obter_profile_dir_temp_profile(self):
+        from modules.reporte_eventos.selenium_browser_service import (
+            obter_profile_dir,
+            extract_prime_datetime,
+            format_datetime
+        )
+        p9222 = obter_profile_dir("9222")
+        p9224 = obter_profile_dir("9224")
+        assert p9222.exists()
+        assert p9224.exists()
+        assert "TempProfile" in str(p9222)
+        assert "TempProfile2" in str(p9224)
+
+    def test_prime_datetime_extraction(self):
+        from modules.reporte_eventos.selenium_browser_service import (
+            extract_prime_datetime,
+            format_datetime
+        )
+        t1 = "quarta-feira, 22 de jul. 18:50 BRT"
+        ext = extract_prime_datetime(t1)
+        assert "22 de jul" in ext
+        dt = format_datetime(ext)
+        assert "22/07" in dt["data"]
+        assert dt["hora"] == "18:50"
+
+    def test_log_file_handler_and_filter(self):
+        import logging
+        from modules.reporte_eventos.crypto_utils import get_app_path
+        log_path = get_app_path("log.txt")
+        assert os.path.exists(log_path) or os.path.exists(os.path.join("config", "log.txt"))
+

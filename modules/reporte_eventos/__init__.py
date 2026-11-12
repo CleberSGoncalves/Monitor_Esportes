@@ -46,6 +46,12 @@ from .selenium_browser_service import (
     abrir_chrome,
     fechar_chrome_seguro,
     obter_driver_conectado,
+    obter_profile_dir,
+    run_eventos_prime,
+    run_eventos_dazn,
+    run_eventos_max,
+    run_eventos_disney,
+    executar_varredura_plataformas,
 )
 
 from .email_report_service import (

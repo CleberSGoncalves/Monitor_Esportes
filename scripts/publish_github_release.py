@@ -18,22 +18,23 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.1"
-    release_name = "v2.5.1 - Reconstrução Dark Theme da Aba 'Reporte de Eventos' & Busca Rápida Otimizada"
+    tag = "v2.5.2"
+    release_name = "v2.5.2 - Suporte a TempProfile/TempProfile2, Abertura Automática do Chrome & Correção de Logs"
     body = (
-        "### Novidades da versão v2.5.1:\n"
-        "- 🎨 **Reconstrução Visual Completa em Dark Theme Moderno**:\n"
-        "  - Eliminação de qualquer componente bege/branco cru (estilo Windows 95/XP).\n"
-        "  - Navegação nativa por `ctk.CTkTabview` integrado ao design system do Monitor_Esportes (`#0f172a`, `#182234`, `#00CED1`).\n"
-        "  - Estilização completa de Treeview (`Reporte.Treeview`) com fundo escuro, linhas alternadas `#142236`, cabeçalhos customizados `#1e293b` com texto ciano `#38bdf8`.\n"
-        "  - Popups modernos e responsivos para edição de data, horário (sliders modernos) e canais.\n"
-        "- ⚡ **Busca Multi-Motor Ultrarrápida e Assíncrona**:\n"
-        "  - Integração instantânea com `CBFScheduleFetcher` para alimentar a grade de eventos em menos de 1 segundo.\n"
-        "  - Processamento em daemon thread desacoplado da UI com barra de progresso em tempo real, sem congelar botões.\n"
-        "- ⚽ **Pré-carregamento Automático de Campeonatos**:\n"
-        "  - Aba de Campeonatos já abre 100% preenchida com os 8 principais torneios oficiais (Brasileirão Série A, Série B, Copa do Brasil, Copa do Mundo 2026, Mundial de Clubes FIFA, Paulistão, Libertadores, Sudamericana).\n"
-        "- 🧪 **Validação Automatizada com Subagente E2E**:\n"
-        "  - Teste de ponta a ponta executado e aprovado com sucesso."
+        "### Novidades da versão v2.5.2:\n"
+        "- 📁 **Detecção Flexível de Perfis do Chrome (TempProfile e TempProfile2)**:\n"
+        "  - O sistema agora detecta e utiliza automaticamente as pastas `TempProfile` e `TempProfile2` tanto se estiverem dentro da pasta `config/` (ex: `config\\TempProfile`) quanto na raiz da aplicação (ao lado do executável).\n"
+        "  - Confirmação de suporte completo aos arquivos `auth.xml` e `config.xml` em `config/`.\n"
+        "- 🌐 **Abertura Automática do Chrome (9222) ao Buscar Eventos**:\n"
+        "  - Ao clicar em 'Buscar Eventos' (especialmente com 'Somente Relatório' ou plataformas ativas), o Chrome abre instantaneamente na tela utilizando o perfil autenticado `TempProfile` com depuração remota na porta 9222.\n"
+        "  - Ativação de checagem ultrarrápida via socket (<1ms) para evitar qualquer travamento de rede.\n"
+        "- 📺 **Scrapers de Streaming Integrados (Amazon Prime, Dazn, Max, Disney)**:\n"
+        "  - Varredura de eventos ao vivo e agendados no Chrome 9222 com filtros de canais terceiros/Premiere e padronização de horários.\n"
+        "- 📋 **Logs em Tempo Real e Histórico Completo na Aba Logs**:\n"
+        "  - Gravação rotativa contínua via `RotatingFileHandler` em `log.txt` (até 5MB com 7 backups).\n"
+        "  - Parser robusto que aceita múltiplos formatos de log e exibe histórico recente caso a data selecionada não contenha registros.\n"
+        "- 🧪 **Cobertura de Testes E2E Expandida**:\n"
+        "  - Suíte completa de 40 testes automatizados (unitários, integração e GUI E2E) 100% aprovada."
     )
 
     headers = {

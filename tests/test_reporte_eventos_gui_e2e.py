@@ -207,6 +207,9 @@ class TestEventSearchAsyncAndTreeInsertion:
 
         with patch("gui.reporte_eventos_mixin.CBFScheduleFetcher") as mock_fetcher_cls, \
              patch("gui.reporte_eventos_mixin.obter_eventos_caze_tv", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.verificar_chrome_debug", return_value=True), \
+             patch("gui.reporte_eventos_mixin.abrir_chrome", return_value=True), \
+             patch("gui.reporte_eventos_mixin.executar_varredura_plataformas", return_value=[]), \
              patch("gui.reporte_eventos_mixin.messagebox.showinfo") as mock_info:
 
             mock_inst = MagicMock()

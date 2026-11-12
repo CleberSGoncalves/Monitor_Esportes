@@ -17,3 +17,7 @@ log.txt
 .idea/
 .vscode/
 .env
+TempProfile*
+**/TempProfile*
+profiles_chrome/
+**/profiles_chrome/

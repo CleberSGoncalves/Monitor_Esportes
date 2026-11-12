@@ -176,13 +176,15 @@ def obter_eventos_canal_youtube(
 
     ydl_opts_list = {
         'quiet': True, 'no_warnings': True, 'skip_download': True,
-        'extract_flat': True, 'playlistend': 25, 'ignoreerrors': True,
+        'extract_flat': True, 'playlistend': 15, 'ignoreerrors': True,
+        'socket_timeout': 8,
         'logger': _QuietLogger(),
     }
 
     ydl_opts_video = {
         'quiet': True, 'no_warnings': True, 'skip_download': True,
-        'ignore_no_formats_error': True, 'extractor_retries': 2,
+        'ignore_no_formats_error': True, 'extractor_retries': 1,
+        'socket_timeout': 6,
         'logger': _QuietLogger(),
     }
 

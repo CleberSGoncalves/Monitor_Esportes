@@ -1,5 +1,5 @@
 {
-  "version": "2.5.1",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.1/Monitor_Esportes.exe",
-  "changelog": "v2.5.1: Reconstrução completa da aba '📅 Reporte de Eventos' com Dark Theme nativo (#0f172a / #182234 / #00CED1), CTkTabview moderno, Treeview escura estilizada (Reporte.Treeview) sem fundo bege/branco cru. Pré-carregamento automático dos 8 campeonatos oficiais (Brasileirão Série A, Série B, Copa do Brasil, Copa do Mundo 2026, Mundial de Clubes FIFA, Paulistão, Libertadores, Sudamericana). Busca ultrarrápida multi-motor assíncrona via CBFScheduleFetcher sem congelamento de interface. Novos popups modernos para data, horário e canais. Validação E2E com subagente 100% aprovada."
+  "version": "2.5.2",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.2/Monitor_Esportes.exe",
+  "changelog": "v2.5.2: Suporte flexivel e automatico aos perfis TempProfile e TempProfile2 (na pasta config/ ou na raiz). Abertura automatica do Chrome 9222 com perfil autenticado ao buscar eventos. Ativacao dos scrapers de streaming (Amazon Prime, Dazn, Max, Disney). Gravacao continua em log.txt via RotatingFileHandler e parser robusto na aba Logs com historico recente. Checagem de porta DevTools via socket ultrarrapida."
 }
