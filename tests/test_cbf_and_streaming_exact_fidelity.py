@@ -93,3 +93,39 @@ def test_run_eventos_cbf_respects_existing_matches_from_platforms():
     partidas = [e[1] for e in evs]
     assert "Internacional x Corinthians" not in partidas, "Partida já extraída pela plataforma não deve ser sobreposta pela CBF"
 
+def test_auto_healing_and_start_methods_present_on_mixin():
+    from gui.reporte_eventos_mixin import ReporteEventosMixin
+    assert hasattr(ReporteEventosMixin, "_re_auto_start_if_needed"), "Deve conter método de auto-start inicial"
+    assert hasattr(ReporteEventosMixin, "_re_iniciar_watchdog_auto_healing"), "Deve conter método de watchdog auto-healing"
+
+def test_prime_video_discards_series_and_entertainment_titles():
+    import re
+    # Simula a regra implementada em run_eventos_prime
+    titulos_invalidos = [
+        "Todo Mundo Odeia O Chris - Season 3",
+        "Reacher - Primeira Temporada",
+        "The Rookie S8 - Season 8",
+        "Dois Homens E Meio: Primeira Temporada Comp",
+        "The Mentalist: 1ª Temporada Completa",
+        "Elle: Legalmente Loira - Temporada 1"
+    ]
+    for t in titulos_invalidos:
+        norm = re.sub(r'\s+[vVxX]\s+|\s+vs\.?\s+', ' x ', t, flags=re.I)
+        assert " x " not in norm, f"Título de entretenimento '{t}' não deve ser considerado partida esportiva"
+
+    titulos_validos = [
+        "Vasco da Gama x Palmeiras",
+        "Atlético-MG vs Grêmio",
+        "Santos X Palmeiras"
+    ]
+    for t in titulos_validos:
+        norm = re.sub(r'\s+[vVxX]\s+|\s+vs\.?\s+', ' x ', t, flags=re.I)
+        assert " x " in norm, f"Confronto '{t}' deve ser reconhecido como partida"
+
+def test_sharepoint_client_independence_from_external_project():
+    from pathlib import Path
+    sp_file = Path("modules/reporte_eventos/sharepoint_client.py")
+    content = sp_file.read_text(encoding="utf-8")
+    assert "from Streaming_Scheduler import" not in content, "Não deve haver dependência direta de import do Streaming_Scheduler"
+
+

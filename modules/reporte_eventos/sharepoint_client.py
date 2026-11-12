@@ -1474,7 +1474,7 @@ def push_events_to_sharepoint(items: List[Dict[str, Any]]) -> Dict[str, Any]:
 
     # Validação de direitos oficiais de transmissão CBF
     try:
-        from Streaming_Scheduler import is_cbf_broadcast_authorized
+        from modules.reporte_eventos.cbf_pdf_service import is_cbf_broadcast_authorized
         items_validos = []
         for it in items:
             c = it.get("Campeonato", "")

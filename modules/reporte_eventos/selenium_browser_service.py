@@ -836,6 +836,12 @@ def run_eventos_prime(
             if any(p in nome_evento.lower() for p in ("premiere", "pré-jogo", "pre-jogo", "pós-jogo", "pos-jogo", "react")):
                 continue
 
+            # Garante que seja um confronto esportivo entre equipes (Time A x Time B)
+            nome_norm_part = re.sub(r'\s+[vVxX]\s+|\s+vs\.?\s+', ' x ', nome_evento, flags=re.I)
+            if " x " not in nome_norm_part:
+                # Descarta séries, filmes e programas de entretenimento do Prime Video
+                continue
+
             data_hora = ""
             for selector in ("p.qKxeGx", "p.GNymT4"):
                 try:

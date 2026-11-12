@@ -1,5 +1,5 @@
 {
-  "version": "2.5.10",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.10/Monitor_Esportes.exe",
-  "changelog": "v2.5.10: Filtro estrito e incondicional de Data de Inicio identico ao Streaming_Scheduler: remocao de qualquer bypass de rodadas passadas (jogos anteriores a Data de Inicio nunca sao incluidos nem exibidos na grade), filtro em todas as fontes (CBF PDF, Copa do Mundo Excel, Prime Video, Dazn, Max, Disney e YouTube) e blindagem direta na insercao do grid."
+  "version": "2.5.11",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.11/Monitor_Esportes.exe",
+  "changelog": "v2.5.11: Auto-Healing ativo (auto-start 2s apos abertura e watchdog que religa o botao Start caso fique parado por 10 minutos), filtro de entretenimento no Prime Video (descarte de series/filmes que nao sao confrontos esportivos) e garantia de nao-duplicacao no SharePoint com total isolamento nativo."
 }

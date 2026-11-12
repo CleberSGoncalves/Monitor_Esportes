@@ -18,16 +18,18 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.10"
-    release_name = "v2.5.10 - Filtro Estrito de Data de Início Idêntico ao Streaming_Scheduler"
+    tag = "v2.5.11"
+    release_name = "v2.5.11 - Auto-Healing do Monitoramento e Blindagem Anti-Séries no Prime"
     body = (
-        "### Novidades da versão v2.5.10:\n"
-        "- 📅 **Filtro Estrito e Incondicional de Data de Início (Streaming_Scheduler)**:\n"
-        "  - Remoção de qualquer exceção ou bypass que preservava rodadas passadas (< Data Início) da CBF.\n"
-        "  - Aplicação estrita da regra oficial: `if ev_date_obj < data_inicio_obj: continue` em todas as origens de dados (CBF PDF, Copa do Mundo Excel, Prime Video, DAZN, Max, Disney+ e Canais YouTube).\n"
-        "  - Blindagem adicional diretamente na inserção do Treeview (`_re_inserir_evento_na_grade`) e carregamento de CSV (`_re_carregar_dados_iniciais`), impedindo categoricamente que qualquer partida com data anterior à selecionada seja inserida ou exibida na grade.\n"
-        "- 🛡️ **Testes E2E Automatizados e Integridade de Build**:\n"
-        "  - 100% de aprovação na suíte de testes de fidelidade estrita (`test_cbf_and_streaming_exact_fidelity.py`), testes de integração e E2E da interface gráfica.\n"
+        "### Novidades da versão v2.5.11:\n"
+        "- 🔄 **Auto-Healing e Auto-Start Idêntico ao Streaming_Scheduler**:\n"
+        "  - Auto-Start: o monitoramento é iniciado automaticamente 2 segundos após a abertura da aplicação.\n"
+        "  - Watchdog de Auto-Healing: monitora continuamente em segundo plano (thread dedicada); se o botão permanecer no estado 'Start' (parado) por mais de 10 minutos (600s), a aplicação religa o monitoramento sozinha.\n"
+        "- 🎬 **Filtro Estrito de Confrontos Esportivos no Prime Video**:\n"
+        "  - Descarte preventivo de séries, filmes e programas de entretenimento exibidos em carrosséis do Prime Video que não possuem estrutura de confronto (' x ' ou ' vs ').\n"
+        "- 📧 **Envio Seguro de E-mails & Idempotência no SharePoint**:\n"
+        "  - Disparo de e-mail com trava de segurança de madrugada (22h às 07h no agendamento automático) e envio imediato no modo manual.\n"
+        "  - Blindagem quádrupla anti-duplicação no SharePoint com total desacoplamento e isolamento nativo.\n"
     )
 
     headers = {

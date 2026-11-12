@@ -642,6 +642,9 @@ class ReporteEventosMixin:
 
         # Atualiza contadores iniciais mantendo a grade limpa para nova varredura
         self.after(50, self._re_atualizar_kpis)
+        # Auto-Start e Auto-Healing idêntico ao Streaming_Scheduler.py (linha 7942 e 7944)
+        self.after(2000, self._re_auto_start_if_needed)
+        self._re_iniciar_watchdog_auto_healing()
 
     # ── SUB-ABA 2: LOGS (TOTALMENTE OPERANTE E RESPONSIVA) ───────────────────
 
@@ -1445,6 +1448,41 @@ class ReporteEventosMixin:
             self.re_lbl_status.configure(text="Monitoramento contínuo ativo.")
             self._re_executar_ciclo_monitoramento()
         self._re_atualizar_kpis()
+
+    def _re_auto_start_if_needed(self) -> None:
+        """Inicia o monitoramento automaticamente 2 segundos após a inicialização (idêntico ao Streaming_Scheduler)."""
+        try:
+            if not getattr(self, "re_is_running", False):
+                logger.info("[ReporteEventos] Inicializando monitoramento contínuo automaticamente (Auto-Start)...")
+                self._re_toggle_start()
+        except Exception as e:
+            logger.debug(f"[ReporteEventos] Erro no auto-start: {e}")
+
+    def _re_iniciar_watchdog_auto_healing(self) -> None:
+        """
+        Thread de Auto-Healing idêntica à verificar_e_clicar do Streaming_Scheduler.py (linha 6677).
+        Se o botão ficar no estado 'Start' (parado) por 10 minutos (600 segundos), religa automaticamente.
+        """
+        def _watchdog_loop():
+            tempo_inicial = None
+            while True:
+                time.sleep(5)
+                try:
+                    is_rodando = getattr(self, "re_is_running", False)
+                    if not is_rodando:
+                        if tempo_inicial is None:
+                            tempo_inicial = time.time()
+                        elif time.time() - tempo_inicial >= 600:
+                            logger.info("[ReporteEventos Auto-Healing] Botão ficou em 'Start' por 10 minutos. Clicando e religando monitoramento...")
+                            self.after(0, self._re_auto_start_if_needed)
+                            tempo_inicial = None
+                    else:
+                        tempo_inicial = None
+                except Exception as ex:
+                    logger.debug(f"[ReporteEventos Watchdog] Erro: {ex}")
+
+        thread = threading.Thread(target=_watchdog_loop, daemon=True)
+        thread.start()
 
     def _re_executar_ciclo_monitoramento(self) -> None:
         if not self.re_is_running: return
