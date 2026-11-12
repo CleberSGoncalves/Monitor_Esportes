@@ -6,6 +6,7 @@ Portado e adaptado do Streaming_Scheduler para o Monitor_Esportes.
 
 import sys
 import os
+import re
 import xml.etree.ElementTree as ET
 import base64
 from pathlib import Path

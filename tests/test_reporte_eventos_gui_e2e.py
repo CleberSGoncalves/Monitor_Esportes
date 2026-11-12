@@ -239,6 +239,44 @@ class TestEventSearchAsyncAndTreeInsertion:
             assert any("Flamengo x Fluminense" in j for j in jogos), f"Jogo Prime Video não encontrado na grade: {jogos}"
             assert any("Corinthians x São Paulo" in j for j in jogos), f"Jogo CBF não encontrado na grade: {jogos}"
 
+    def test_async_event_search_somente_relatorio_no_name_error(self, app_instance):
+        """Validação crítica: modo Somente Relatório não dispara NameError (time.sleep) e fecha Chrome com segurança."""
+        for item in app_instance.re_tree.get_children():
+            app_instance.re_tree.delete(item)
+        app_instance.re_somente_relatorio_var.set(True)
+        assert app_instance.re_somente_relatorio_var.get() is True
+
+        with patch("gui.reporte_eventos_mixin.verificar_chrome_debug", return_value=False), \
+             patch("gui.reporte_eventos_mixin.abrir_chrome") as mock_abrir_chrome, \
+             patch("gui.reporte_eventos_mixin.time.sleep") as mock_sleep, \
+             patch("gui.reporte_eventos_mixin.run_eventos_prime", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.run_eventos_dazn", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.run_eventos_max", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.run_eventos_disney", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.run_eventos_cbf", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.obter_eventos_caze_tv", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.carregar_campeonatos_config", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.carregar_youtube_channels_config", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.obter_eventos_canal_youtube", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.fechar_chrome_seguro") as mock_fechar, \
+             patch("gui.reporte_eventos_mixin.messagebox.showinfo") as mock_info, \
+             patch("gui.reporte_eventos_mixin.messagebox.showerror") as mock_err:
+
+            app_instance._re_buscar_eventos()
+            assert app_instance.re_busy is True
+
+            timeout = 5.0
+            start_t = time.time()
+            while app_instance.re_busy and (time.time() - start_t) < timeout:
+                app_instance.update()
+                time.sleep(0.05)
+
+            app_instance.update()
+            assert app_instance.re_busy is False
+            assert mock_abrir_chrome.called, "abrir_chrome deve ser chamado no início!"
+            assert mock_sleep.called, "time.sleep(5) deve ser chamado sem NameError!"
+            assert mock_fechar.called, "fechar_chrome_seguro deve ser chamado ao final em modo somente relatório!"
+
 
 class TestControlButtonsAndActions:
     """Validação 4: Resposta funcional de todos os botões e comandos."""

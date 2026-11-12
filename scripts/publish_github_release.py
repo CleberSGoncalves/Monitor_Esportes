@@ -18,21 +18,17 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.5"
-    release_name = "v2.5.5 - Scrapers Reais do Streaming_Scheduler e Varredura Fiel das Plataformas"
+    tag = "v2.5.6"
+    release_name = "v2.5.6 - Correção Crítica de Importações e Varredura com Somente Relatório"
     body = (
-        "### Novidades da versão v2.5.5:\n"
-        "- 🌐 **Restauração Completa dos Scrapers do Streaming_Scheduler**:\n"
-        "  - Busca real no Amazon Prime Video, DAZN, Max (HBO) e Disney+ diretamente via Chrome 9222.\n"
-        "  - Autenticação e gestão de sessões nativas (`loginprime`, `logindazn`, `loginmax`, `logindisney`) com suporte a Captcha e Shadow DOM.\n"
-        "  - Navegador Chrome abre de forma visível no desktop permitindo acompanhamento do usuário.\n"
-        "- 🛑 **Eliminação Total de Partidas Artificiais**:\n"
-        "  - Remoção definitiva do atalho `CBFScheduleFetcher` da aba Reporte de Eventos.\n"
-        "  - Prioridade estrita: Plataformas Oficiais de Streaming > Tabela CBF (PDF).\n"
-        "- 📄 **Pipeline CBF e Copa do Mundo 100% Consolidado**:\n"
-        "  - Download direto de PDFs da CBF (BSA e CDB) com ajuste oficial de fuso (-1h) e pulo inteligente de confrontos já coletados pelo Selenium.\n"
-        "  - Suporte à planilha da Copa do Mundo FIFA 2026 com ajuste de -2h.\n"
-        "- 🧪 **46 Testes Automatizados E2E Aprovados e Auditados por Subagente**."
+        "### Novidades da versão v2.5.6:\n"
+        "- 🐛 **Correção Crítica de NameError na Varredura**:\n"
+        "  - Resolução definitiva do `NameError: name 'time' is not defined` no modo `Somente Relatório` e no controle do Chrome 9222.\n"
+        "  - Resolução de importações ausentes (`re` em `crypto_utils.py` e `Path` em `cbf_pdf_service.py`).\n"
+        "  - Correção de closures em blocos de exceção (`except Exception as e`) prevenindo erros de variável desfeita.\n"
+        "- 🛡️ **Auditoria Estática de Variáveis**:\n"
+        "  - Validação completa com Pyflakes em todos os módulos: 0 variáveis ou nomes indefinidos.\n"
+        "- 🧪 **47 Testes Automatizados E2E Aprovados (100% de sucesso)**."
     )
 
     headers = {

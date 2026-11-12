@@ -1,5 +1,5 @@
 {
-  "version": "2.5.5",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.5/Monitor_Esportes.exe",
-  "changelog": "v2.5.5: Restauração integral dos scrapers oficiais do Streaming_Scheduler (Prime Video, DAZN, Max, Disney+ e Cazé TV). Eliminação total de partidas fakes ou injeção indevida do CBFScheduleFetcher no Reporte de Eventos. Execução do Chrome 9222 visível em desktop com suporte a login/sessões e perfis TempProfile. Pipeline oficial com prioridade estrita Plataformas > CBF (PDF) e ordenação cronológica."
+  "version": "2.5.6",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.6/Monitor_Esportes.exe",
+  "changelog": "v2.5.6: Correção de NameError ('time', 're', 'Path' e closures de exceção) na esteira de varredura do Reporte de Eventos e modo Somente Relatório. Blindagem estática com zero variáveis indefinidas e 47 testes automatizados aprovados."
 }

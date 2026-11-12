@@ -13,6 +13,7 @@ import os
 import re
 import csv
 import json
+import time
 import queue
 import logging
 import threading
@@ -978,11 +979,12 @@ class ReporteEventosMixin:
 
                 self.after(0, _finish)
             except Exception as e:
-                def _error():
+                err_msg = str(e)
+                def _error(err=err_msg):
                     if btn:
                         btn.configure(state="normal", text=f"🌐 Chrome {porta}", fg_color="#262626")
                     self._re_atualizar_kpis()
-                    messagebox.showerror("Erro Chrome", f"Erro ao alternar Chrome na porta {porta}: {e}")
+                    messagebox.showerror("Erro Chrome", f"Erro ao alternar Chrome na porta {porta}: {err}")
                 self.after(0, _error)
 
         threading.Thread(target=_worker, daemon=True).start()
@@ -1843,7 +1845,8 @@ class ReporteEventosMixin:
                 self.re_lbl_status.configure(text="Sincronização concluída.")
                 self.after(0, lambda: messagebox.showinfo("SharePoint Sincronizado", msg_final))
             except Exception as e:
-                logger.error(f"[ReporteEventos] Erro ao buscar canais YouTube: {e}")
-                self.after(0, lambda: messagebox.showerror("Erro", f"Falha na busca dos canais: {e}"))
+                err_msg = str(e)
+                logger.error(f"[ReporteEventos] Erro ao buscar canais YouTube: {err_msg}")
+                self.after(0, lambda msg=err_msg: messagebox.showerror("Erro", f"Falha na busca dos canais: {msg}"))
 
         threading.Thread(target=_task, daemon=True).start()
