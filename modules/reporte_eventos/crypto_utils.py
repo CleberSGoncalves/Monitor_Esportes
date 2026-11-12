@@ -79,18 +79,27 @@ def criptografar(texto: str) -> str:
     return fernet.encrypt(texto.encode("utf-8")).decode("utf-8")
 
 def descriptografar(texto: str) -> str:
-    """Descriptografa uma string Fernet, ou retorna o texto original se não for válido."""
+    """Descriptografa uma string Fernet, ou retorna o texto original (se plaintext legível) ou vazio se for token ilegível."""
     if not texto:
         return ""
     try:
-        if not str(texto).startswith("gAAAA"):
-            return str(texto)
+        s_texto = str(texto).strip()
+        if not s_texto.startswith("gAAAA"):
+            # Se for token criptografado legado em base64 (sem @ e > 50 caracteres)
+            if len(s_texto) > 50 and "@" not in s_texto and not re.search(r'\s', s_texto):
+                try:
+                    fernet = Fernet(carregar_chave())
+                    return fernet.decrypt(s_texto.encode("utf-8")).decode("utf-8")
+                except Exception:
+                    # Token encriptado com chave desconhecida: nunca exibe o hash cru na tela
+                    return ""
+            return s_texto
         fernet = Fernet(carregar_chave())
-        return fernet.decrypt(str(texto).encode("utf-8")).decode("utf-8")
+        return fernet.decrypt(s_texto.encode("utf-8")).decode("utf-8")
     except InvalidToken:
-        return str(texto)
+        return ""
     except Exception as e:
-        return str(texto)
+        return ""
 
 def get_env_value(chave: str, caminho=None) -> str:
     """Retorna o valor descriptografado de uma chave em .env.enc ou .env."""

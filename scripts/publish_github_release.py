@@ -18,26 +18,19 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.3"
-    release_name = "v2.5.3 - Interface 100% Responsiva, Barra de KPIs Executivos & Zero Latência"
+    tag = "v2.5.4"
+    release_name = "v2.5.4 - Sanitização de Destinatários e Persistência de Configuração"
     body = (
-        "### Novidades da versão v2.5.3:\n"
-        "- 📊 **Barra Superior de KPIs Executivos (Padrão Canais Live)**:\n"
-        "  - 4 cards em destaque: 📅 EVENTOS NA GRADE, 📺 PLATAFORMAS ATIVAS, 🌐 CHROME DEVTOOLS e ⏱️ STATUS MONITOR.\n"
-        "- 📐 **Layout 100% Responsivo e Adaptativo**:\n"
-        "  - Eliminação de quebras de linha e corte de botões no topo.\n"
-        "  - Campo de destinatários de e-mail com expansão horizontal automática dinâmica (`fill=x, expand=True`).\n"
-        "  - Tabela principal responsiva com barra de rolagem vertical e horizontal (`sticky=nsew`).\n"
-        "- ⚡ **Zero Latência e Inicialização Instantânea (< 15ms)**:\n"
-        "  - Abertura suave sem atraso no carregamento da tela.\n"
-        "  - Gestão do Chrome DevTools (portas 9222 e 9224) 100% assíncrona em thread de segundo plano (zero congelamento de interface).\n"
-        "- 📁 **Atalhos Diretos para Pastas no Windows Explorer**:\n"
-        "  - Novos botões na sub-aba '🔐 Acessos': 'Abrir Pasta config/' e 'Pasta Perfis TempProfile'.\n"
-        "  - Instruções claras sobre a localização de `auth.xml`, `config.xml`, `TempProfile` e `TempProfile2`.\n"
-        "- 📋 **Visualização de Logs Instantânea com Histórico Recente**:\n"
-        "  - Busca multi-diretório de logs e preenchimento imediato sem necessidade de intervenção manual.\n"
-        "- 🧪 **43 Testes Automatizados E2E Aprovados**:\n"
-        "  - Validação completa de integridade de layout, controles, popups e responsividade."
+        "### Novidades da versão v2.5.4:\n"
+        "- 🛡️ **Sanitização Estrita do Campo Destinatários**:\n"
+        "  - Eliminação definitiva da exibição de hashes criptografados ou tokens Fernet ilegíveis.\n"
+        "  - Separação clara entre credenciais do remetente SMTP (`auth.xml`) e lista de e-mails de envio (`config.xml`).\n"
+        "  - Validação estrita de formato de e-mail e fallback transparente para e-mails salvos.\n"
+        "- 💾 **Persistência Automática em config.xml**:\n"
+        "  - Qualquer alteração manual digitada no campo 'Destinatários' é salva automaticamente no `config.xml` ao desfocar o campo (`FocusOut`).\n"
+        "  - Persistência sincronizada também ao disparar e-mail ou salvar CSV.\n"
+        "- 🧪 **Bateria Completa de 44 Testes Unitários e E2E Aprovada**:\n"
+        "  - Incluindo teste específico de não-vazamento de tokens e hashes de cifras na interface."
     )
 
     headers = {

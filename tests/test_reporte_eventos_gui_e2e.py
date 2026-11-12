@@ -427,3 +427,11 @@ class TestResponsivenessAndKPIs:
         assert hasattr(app_instance, "_re_abrir_pasta_config"), "Helper _re_abrir_pasta_config ausente!"
         assert hasattr(app_instance, "_re_abrir_pasta_perfis_chrome"), "Helper _re_abrir_pasta_perfis_chrome ausente!"
 
+    def test_recipient_email_sanitization_and_no_cipher_leak(self, app_instance):
+        # O campo de destinatários NUNCA deve conter hash criptografado ou tokens ilegíveis
+        val = app_instance.re_email_var.get()
+        assert "@" in val, f"Destinatário deve conter endereço de e-mail válido, obtido: {val}"
+        assert not val.startswith("gAAAA"), f"Hash Fernet vazou no campo de destinatário: {val}"
+        assert not val.startswith("eJG8"), f"Token criptografado vazou no campo de destinatário: {val}"
+
+

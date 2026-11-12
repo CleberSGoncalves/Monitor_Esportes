@@ -272,16 +272,49 @@ class ReporteEventosMixin:
 
     def _init_reporte_eventos(self) -> None:
         """Inicializa variáveis reativas e configurações de telemetria."""
-        self.re_refresh_var = ctk.StringVar(value="20")
-        self.re_data_inicio_var = ctk.StringVar(value=datetime.now().strftime("%d/%m/%Y"))
+        # 1. Carrega configurações salvas do config.xml
+        cfg_xml = carrega_config_xml() or {}
+        if not isinstance(cfg_xml, dict):
+            cfg_xml = {}
 
-        # Recupera e-mail de envio salvo com fallback seguro
-        cfg_emails = get_auth_value("email") or ""
-        self.re_email_var = ctk.StringVar(value=cfg_emails)
-        self.re_auto_email_var = ctk.BooleanVar(value=True)
-        self.re_hora_auto_email_var = ctk.StringVar(value="01:00")
-        self.re_auto_busca_var = ctk.BooleanVar(value=True)
-        self.re_somente_relatorio_var = ctk.BooleanVar(value=True)
+        # 2. Destinatários de e-mail (vem de <emails> no config.xml)
+        raw_emails = str(cfg_xml.get("emails", "")).strip()
+
+        # Validação estrita: descarta lixo encriptado, tokens de chave antiga ou strings sem @
+        def _is_valid_email_str(val: str) -> bool:
+            if not val or "@" not in val:
+                return False
+            # Descarta hashes, tokens base64 longos ou sem formato de e-mail
+            if val.startswith("gAAAA") or (len(val) > 40 and "@" not in val):
+                return False
+            partes = [p.strip() for p in val.replace(",", ";").split(";") if p.strip()]
+            return len(partes) > 0 and all("@" in p and "." in p for p in partes)
+
+        destinatarios = ""
+        if _is_valid_email_str(raw_emails):
+            destinatarios = raw_emails
+        else:
+            # Fallback seguro: saved_emails.json do Monitor_Esportes
+            try:
+                from gui.main_gui import _load_saved_emails
+                saved = _load_saved_emails()
+                if saved and isinstance(saved, list):
+                    valid_saved = [s.strip() for s in saved if isinstance(s, str) and "@" in s and "." in s]
+                    if valid_saved:
+                        destinatarios = ";".join(valid_saved)
+            except Exception:
+                pass
+
+        if not destinatarios:
+            destinatarios = "binhole@gmail.com;cleber.goncalves@kantaribopemedia.com"
+
+        self.re_email_var = ctk.StringVar(value=destinatarios)
+        self.re_refresh_var = ctk.StringVar(value=str(cfg_xml.get("refresh", "20")))
+        self.re_data_inicio_var = ctk.StringVar(value=datetime.now().strftime("%d/%m/%Y"))
+        self.re_hora_auto_email_var = ctk.StringVar(value=str(cfg_xml.get("hora_automatico", "01:00")))
+        self.re_auto_email_var = ctk.BooleanVar(value=bool(cfg_xml.get("check_automatico_Email", True)))
+        self.re_auto_busca_var = ctk.BooleanVar(value=bool(cfg_xml.get("check_automatico_Evento", True)))
+        self.re_somente_relatorio_var = ctk.BooleanVar(value=bool(cfg_xml.get("somente_relatorio", True)))
 
         # Plataformas ativas
         plats = carrega_config_xml("config.xml", "plataformas") or {}
@@ -531,6 +564,7 @@ class ReporteEventosMixin:
         ctk.CTkLabel(r2, text="Destinatários:", font=ctk.CTkFont(size=11), text_color="#888888").pack(side="left", padx=(0, 4))
         self.re_entry_email = ctk.CTkEntry(r2, textvariable=self.re_email_var, height=28, placeholder_text="email@dominio.com; outro@dominio.com")
         self.re_entry_email.pack(side="left", fill="x", expand=True, padx=(0, 6))
+        self.re_entry_email.bind("<FocusOut>", lambda e: self._re_salvar_config_atual())
 
         self.re_btn_email = ctk.CTkButton(
             r2, text="✉️ Disparar E-mail", width=125, height=28,
@@ -1136,9 +1170,28 @@ class ReporteEventosMixin:
         self.re_lbl_status.configure(text=f"Carregados {len(linhas)} eventos da base local streaming_data.csv.")
         self._re_atualizar_kpis()
 
+    def _re_salvar_config_atual(self) -> None:
+        """Salva as opções atuais da tela no config.xml para persistência de destinatários e preferências."""
+        try:
+            cfg = carrega_config_xml() or {}
+            dest = self.re_email_var.get().strip()
+            if dest and "@" in dest and not dest.startswith("gAAAA"):
+                cfg["emails"] = dest
+            cfg["refresh"] = self.re_refresh_var.get().strip()
+            cfg["hora_automatico"] = self.re_hora_auto_email_var.get().strip()
+            cfg["check_automatico_Email"] = bool(self.re_auto_email_var.get())
+            cfg["check_automatico_Evento"] = bool(self.re_auto_busca_var.get())
+            cfg["somente_relatorio"] = bool(self.re_somente_relatorio_var.get())
+            cfg["plataformas"] = {k: v.get() for k, v in self.re_plat_vars.items()}
+            cfg["campeonatos"] = {k: v.get() for k, v in self.re_camp_vars.items()}
+            salvar_config_xml(cfg)
+        except Exception as e:
+            logger.debug(f"[ReporteEventos] Erro ao salvar config.xml: {e}")
+
     def _re_salvar_csv(self) -> None:
         linhas = [list(self.re_tree.item(i, "values")) for i in self.re_tree.get_children()]
         salvar_streaming_csv(linhas)
+        self._re_salvar_config_atual()
         self._re_atualizar_kpis()
         messagebox.showinfo("Sucesso", f"{len(linhas)} eventos gravados com sucesso em config/streaming_data.csv!")
 
@@ -1217,6 +1270,7 @@ class ReporteEventosMixin:
         self.re_loop_job_id = self.after(ref_seg * 1000, self._re_executar_ciclo_monitoramento)
 
     def _re_enviar_email(self, forcar: bool = False) -> None:
+        self._re_salvar_config_atual()
         linhas = [list(self.re_tree.item(i, "values")) for i in self.re_tree.get_children()]
         dest = self.re_email_var.get().strip()
         ok, msg = enviar_email_relatorio(linhas, dest, forcar=forcar)

@@ -1,5 +1,5 @@
 {
-  "version": "2.5.3",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.3/Monitor_Esportes.exe",
-  "changelog": "v2.5.3: Interface do Reporte de Eventos totalmente reconstruída no padrão responsivo e executivo do Monitor_Esportes. Barra superior com 4 cards de KPIs (Eventos na Grade, Plataformas Ativas, Chrome DevTools, Status Monitor). Entrada de destinatários com expansão dinâmica e adaptativa. Inicialização e alternância ultrarrápida sem travamentos. Gestão assíncrona do Chrome DevTools 9222/9224 em segundo plano. Atalhos diretos para abrir as pastas config/ e TempProfile no Windows Explorer. Parser de logs robusto com visualização imediata."
+  "version": "2.5.4",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.4/Monitor_Esportes.exe",
+  "changelog": "v2.5.4: Sanitização estrita e blindagem do campo Destinatários no Reporte de Eventos. Desacoplamento entre credenciais SMTP (auth.xml) e lista de e-mails destinatários (config.xml). Prevenção contra exibição de hashes criptografados ou tokens Fernet ilegíveis. Persistência automática das edições de destinatários em config.xml ao desfocar o campo."
 }
