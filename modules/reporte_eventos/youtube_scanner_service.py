@@ -215,18 +215,43 @@ def obter_eventos_canal_youtube(
                 if not partida_extraida:
                     continue
 
-                p_norm = _deep_normalize_partida(partida_extraida)
-                in_bsa = p_norm in cbf_idx.get('brasileirao', {})
-                in_cdb = p_norm in cbf_idx.get('copa_do_brasil', {})
+                desc_raw = (entry.get('description') or '').strip()
+                info_champ = parse_youtube_title(titulo_raw, desc_raw)
 
-                if not (in_bsa or in_cdb):
+                if info_champ.get("is_copa_mundo"):
+                    camp_atribuido = "CBF - Copa do Mundo FIFA 2026"
+                elif info_champ.get("is_paulista"):
+                    camp_atribuido = "Campeonato Paulista"
+                elif info_champ.get("is_libertadores"):
+                    camp_atribuido = "CONMEBOL Libertadores"
+                elif info_champ.get("is_sudamericana"):
+                    camp_atribuido = "CONMEBOL Sudamericana"
+                elif info_champ.get("is_copa_brasil"):
+                    camp_atribuido = "CBF - Copa do Brasil"
+                elif info_champ.get("is_carioca"):
+                    camp_atribuido = "Campeonato Carioca"
+                elif info_champ.get("is_bundesliga"):
+                    camp_atribuido = "Bundesliga"
+                elif info_champ.get("is_brasileirao"):
+                    camp_atribuido = "CBF - Brasileirão Série A"
+                else:
+                    p_norm = _deep_normalize_partida(partida_extraida)
+                    in_bsa = p_norm in cbf_idx.get('brasileirao', {})
+                    in_cdb = p_norm in cbf_idx.get('copa_do_brasil', {})
+                    if in_bsa:
+                        camp_atribuido = "CBF - Brasileirão Série A"
+                    elif in_cdb:
+                        camp_atribuido = "CBF - Copa do Brasil"
+                    else:
+                        camp_atribuido = "Futebol"
+
+                partida_bonita = prettify_match_name(partida_extraida)
+                if not is_cbf_broadcast_authorized(camp_atribuido, partida_bonita, canal_nome):
                     logger.info(
-                        f"[YouTube Scanner] Jogo '{partida_extraida}' ({canal_nome}) descartado: "
-                        "não consta na tabela oficial da CBF."
+                        f"[YouTube Scanner] Jogo '{partida_bonita}' ({camp_atribuido}) descartado: "
+                        "sem direitos autorizados na tabela da CBF."
                     )
                     continue
-
-                camp_atribuido = "Brasileirão serie A" if in_bsa else "Copa do Brasil"
 
                 try:
                     with yt_dlp.YoutubeDL(ydl_opts_video) as ydv:

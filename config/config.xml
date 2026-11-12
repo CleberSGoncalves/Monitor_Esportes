@@ -6,11 +6,11 @@
   <check_automatico_Email>true</check_automatico_Email>
   <check_automatico_Evento>true</check_automatico_Evento>
   <somente_relatorio>true</somente_relatorio>
-  <plataforma_dazn>false</plataforma_dazn>
+  <plataforma_dazn>true</plataforma_dazn>
   <plataforma_prime>true</plataforma_prime>
   <plataforma_caze>true</plataforma_caze>
-  <plataforma_disney>false</plataforma_disney>
-  <plataforma_max>false</plataforma_max>
+  <plataforma_disney>true</plataforma_disney>
+  <plataforma_max>true</plataforma_max>
   <plataforma_cbf>true</plataforma_cbf>
   <camp_brasileirao_serie_a>true</camp_brasileirao_serie_a>
   <camp_brasileirao_serie_b>true</camp_brasileirao_serie_b>

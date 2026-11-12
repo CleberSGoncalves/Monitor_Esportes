@@ -2,7 +2,7 @@
 from PyInstaller.utils.hooks import collect_submodules
 from PyInstaller.utils.hooks import collect_all
 
-datas = [('E:\\desenvolvimento\\Monitor_Esportes\\.venv\\Lib\\site-packages\\customtkinter', 'customtkinter/'), ('config', 'config'), ('modules', 'modules'), ('core', 'core'), ('gui', 'gui'), ('templates', 'templates'), ('version.json', '.')]
+datas = [('E:\\desenvolvimento\\Monitor_Esportes\\.venv\\Lib\\site-packages\\customtkinter', 'customtkinter/'), ('config', 'config'), ('modules', 'modules'), ('core', 'core'), ('gui', 'gui'), ('templates', 'templates'), ('data.csv', '.'), ('Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx', '.'), ('version.json', '.')]
 binaries = []
 hiddenimports = ['gui', 'gui.canais_live_mixin', 'gui.nba_events_mixin', 'gui.reporte_eventos_mixin', 'gui.sharepoint_auth_modal', 'canais_live_mixin', 'nba_events_mixin', 'reporte_eventos_mixin', 'sharepoint_auth_modal', 'obsws_python', 'websocket', 'pdfplumber', 'pymupdf', 'fitz', 'pypdfium2', 'openpyxl', 'selenium', 'webdriver_manager', 'tkcalendar', 'modules.nba_autonomous_auditor', 'modules.nba_visual_proof_service', 'modules.nba_report_generator', 'modules.sharepoint_youtube_reporter', 'modules.reporte_eventos']
 hiddenimports += collect_submodules('obsws_python')

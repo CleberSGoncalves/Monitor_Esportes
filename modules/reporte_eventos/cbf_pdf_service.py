@@ -9,6 +9,7 @@ Aplica rigorosamente:
 """
 
 import os
+import sys
 import re
 import time
 import logging
@@ -349,27 +350,11 @@ def parse_cbf_pdf(pdf_path: str, nome_original: str) -> List[Dict[str, Any]]:
 
                     jogo_clean = prettify_match_name(f"{pt1.strip()} x {pt2.strip()}")
 
-                    # 🔥 REGRA CBF: Diminuir 1 hora de todos os jogos do PDF
-                    data_ajustada = current_date
-                    hora_ajustada = hora
-                    try:
-                        for fmt_h in ("%H:%M", "%H:%M:%S"):
-                            try:
-                                dt_combined = datetime.strptime(f"{current_date} {hora}", f"%d/%m/%Y {fmt_h}")
-                                dt_ajustada = dt_combined - timedelta(hours=1)
-                                data_ajustada = dt_ajustada.strftime("%d/%m/%Y")
-                                hora_ajustada = dt_ajustada.strftime("%H:%M")
-                                break
-                            except Exception:
-                                pass
-                    except Exception as e:
-                        logger.warning(f"[CBF Parse] Erro ao ajustar hora {current_date} {hora}: {e}")
-
                     extracted.append({
                         "Camp": nome_original,
                         "Jogo": jogo_clean,
-                        "Data": data_ajustada,
-                        "Hora": hora_ajustada,
+                        "Data": current_date,
+                        "Hora": hora,
                         "TV": tv_str
                     })
     except Exception as e:
@@ -512,6 +497,23 @@ def run_eventos_cbf(
             extracted = parse_cbf_pdf(str(pdf_path), nome_camp)
             logger.info(f"[CBF] PDF {nome_camp} extraiu {len(extracted)} jogos.")
 
+            # Checa se há jogos futuros na tabela da CBF em relação à data solicitada
+            tem_futuros = False
+            for ev in extracted:
+                try:
+                    d_dt = datetime.strptime(ev["Data"], "%d/%m/%Y")
+                    if d_dt >= data_inicio_obj:
+                        tem_futuros = True
+                        break
+                except Exception:
+                    pass
+
+            if not tem_futuros:
+                logger.info(
+                    f"[CBF] Jogos do PDF {nome_camp} são da rodada oficial mais recente publicada pela CBF "
+                    f"(< {data_inicio_obj.strftime('%d/%m/%Y')}). Preservando todos os {len(extracted)} jogos."
+                )
+
             var_nav = "Esquerda"
             for ev in extracted:
                 # Regra oficial CBF: subtrai 1 hora dos horários de tabela da CBF
@@ -530,13 +532,14 @@ def run_eventos_cbf(
                 except Exception as e_fuso:
                     logger.warning(f"[CBF] Erro ao ajustar fuso CBF ({ev['Data']} {ev['Hora']}): {e_fuso}")
 
-                # Filtro de data futura
-                try:
-                    ev_date_obj = datetime.strptime(data_ajustada, "%d/%m/%Y")
-                    if ev_date_obj < data_inicio_obj:
+                # Filtro de data: se houver jogos futuros, aplica o corte; se for rodada recente da CBF, mantém
+                if tem_futuros:
+                    try:
+                        ev_date_obj = datetime.strptime(data_ajustada, "%d/%m/%Y")
+                        if ev_date_obj < data_inicio_obj:
+                            continue
+                    except Exception:
                         continue
-                except Exception:
-                    continue
 
                 # Prioridade: se a partida já foi capturada diretamente pela plataforma (ex: Prime), descarta o PDF
                 norm_part = _deep_normalize_partida(ev["Jogo"])
@@ -566,6 +569,10 @@ def run_eventos_cbf(
             Path(os.getcwd()) / "Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx",
             Path(r"E:\desenvolvimento\Streaming_Scheduler\Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx"),
         ]
+        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+            xls_candidates.append(Path(sys._MEIPASS) / "Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx")
+            xls_candidates.append(Path(sys._MEIPASS) / "config" / "Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx")
+
         xls_found = None
         for xc in xls_candidates:
             if xc.exists():
@@ -575,23 +582,35 @@ def run_eventos_cbf(
         if xls_found:
             try:
                 copa_extracted = parse_copa_mundo_excel(xls_found)
-                var_nav_copa = "Esquerda"
+                copa_tem_futuros = False
                 for c_ev in copa_extracted:
                     try:
-                        c_date_obj = datetime.strptime(c_ev["Data"], "%d/%m/%Y")
-                        if c_date_obj < data_inicio_obj:
-                            continue
+                        c_dt = datetime.strptime(c_ev["Data"], "%d/%m/%Y")
+                        if c_dt >= data_inicio_obj:
+                            copa_tem_futuros = True
+                            break
                     except Exception:
                         pass
+
+                var_nav_copa = "Esquerda"
+                for c_ev in copa_extracted:
+                    if copa_tem_futuros:
+                        try:
+                            c_date_obj = datetime.strptime(c_ev["Data"], "%d/%m/%Y")
+                            if c_date_obj < data_inicio_obj:
+                                continue
+                        except Exception:
+                            pass
 
                     norm_copa = _deep_normalize_partida(c_ev["Jogo"])
                     if (norm_copa, c_ev["Data"]) in existing_set:
                         continue
 
-                    row = ("Copa do Mundo FIFA 2026", c_ev["Jogo"], c_ev["Data"], c_ev["Hora"], var_nav_copa, "15", c_ev["TV"], "")
+                    row = ("CBF - Copa do Mundo FIFA 2026", c_ev["Jogo"], c_ev["Data"], c_ev["Hora"], var_nav_copa, "15", c_ev["TV"], "https://www.youtube.com/@CazeTV/streams")
                     eventos.append(row)
                     existing_set.add((norm_copa, c_ev["Data"]))
                     var_nav_copa = "Direita" if var_nav_copa == "Esquerda" else "Esquerda"
+                logger.info(f"[CBF] Copa do Mundo carregou {len(copa_extracted)} jogos da planilha oficial.")
             except Exception as e_copa_proc:
                 logger.error(f"[CBF] Erro ao processar tabela Copa do Mundo: {e_copa_proc}")
 

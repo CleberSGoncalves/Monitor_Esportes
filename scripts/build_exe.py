@@ -53,6 +53,8 @@ def main():
         f"--add-data=\"core;core\"",
         f"--add-data=\"gui;gui\"",
         f"--add-data=\"templates;templates\"",
+        f"--add-data=\"data.csv;.\"",
+        f"--add-data=\"Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx;.\"",
         f"--add-data=\"version.json;.\"",
         # Hidden imports and submodules
         "--hidden-import=gui",

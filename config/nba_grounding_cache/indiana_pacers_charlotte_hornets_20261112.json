@@ -1,0 +1,21 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "Com base nas guias de programação esportiva consultadas para o dia 8 de novembro de 2026, a partida entre Indiana Pacers e Charlotte Hornets da NBA não foi listada para transmissão ao vivo no Brasil.\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A partida Indiana Pacers x Charlotte Hornets não foi transmitida ao vivo no Brasil pela ESPN, Disney+, Prime Video ou NBA League Pass em 8 de novembro de 2026. As guias de programação para essa data indicam que os sete jogos da NBA realizados no dia foram transmitidos exclusivamente pelo NBA League Pass, e a partida mencionada não estava entre eles.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    Como a partida Indiana Pacers x Charlotte Hornets não foi listada na grade de programação para 8 de novembro de 2026, não há um horário oficial de transmissão anunciado para o início da partida no horário de Brasília.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   O Tempo - \"NBA tem sete jogos no domingo, com Lakers x Pistons e Celtics x Bucks\" (08 de novembro de 2026)\n    *   Lakers Brasil - \"Calendário NBA 2026-27: jogos, datas e horários\" (Atualizado em 30 de setembro de 2026)\n    *   Overdrive - \"NBA em novembro de 2026: onde assistir aos jogos e horários\" (Atualizado em 06 de novembro de 2026)\n    *   Overdrive - \"Nets x Mavericks: onde assistir à NBA e horário (08/11)\" (08 de novembro de 2026)\n    *   Mi.tv - \"Programação ESPN Brasil Domingo 8 de novembro\" (08 de novembro de 2026)",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF-K3hwRcwiXYyDhfQUmRxfLJWwAi5RfrGvnuWUSOTntyLOpUa8KCHlNaGJnsws1uxmIV5bJHxw3TibiZ3zUZ7mvlUTdTqt16n6lXEPLVQwANUAh6V6xeh5zAH7gfI5riNmRnQx2DtsTADnglHCOHOjJgYmoK3mGBqKrvl7gpCJbTOVozOw1Ygx2H7C43b5C46KjjuSqsr98wPcdmQOx0hja-CNdFRMu-DiwCyz7cfEyQWqktEEoYA=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGQiSe4Rqq_4RfVOxyIOqISwMuMfja5-d-WYqVsw3mJJUyy2wcZeEPsUrXxEFmb_RoaoR2ap99jjTE_b4G9NPgJUafJEGGvYg7bbdZLE2yn6wrivHB8-y6_i5QR1kYQvJcrYzc=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGAZbPIfsQetNvXg1CgHAQFzHsFyDTXtZKnSU4JUz82c2qhWkdxjUIGbZUHAM5nXAE_NeNmGKmkjjoSK4CMH6LQ8h-omeTbv448ZHHYtA3rX3cnIfdVN3Gg_PUrYxHjfsmjs8B7I4POL8NjOOFB1yGs2JzCrG_SBMeAQqu7YvGcGNl93_nXMvk=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFod9CgT8UjCqqh8aNqlOUaZAVczog0KwbNBhs3gdNUJSIbT5fSb-4aa4yD-LXPC0bGlAtR1MsFzP69wZezfBSKMaOpaLDi8NDmbOBlnMjKl2S4ite6g_22nx0JQl7O6mLJTI4tdXwK9TcrpcXTfIAYHDws2h1qF8gZy7sqnspudh4cxuG4wg==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHyiqjXGrJiuBgVuUhrfZLtio2bSUEKJ5OTUXxKyTsJ0e-Eqar5zcqgIqiecias-6XvtIixgdRljFmp7K6NhETf4oQGyGG8ni1gJoX3Icvqnm6AbXQCHepN85-kYi4KcRbYGQ=="
+  ],
+  "grounding_date": "12/11/2026 11:13:34"
+}

@@ -18,17 +18,20 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.6"
-    release_name = "v2.5.6 - Correção Crítica de Importações e Varredura com Somente Relatório"
+    tag = "v2.5.7"
+    release_name = "v2.5.7 - Fidelidade 100% ao Streaming Scheduler e Correção de Fusos e Grade CBF"
     body = (
-        "### Novidades da versão v2.5.6:\n"
-        "- 🐛 **Correção Crítica de NameError na Varredura**:\n"
-        "  - Resolução definitiva do `NameError: name 'time' is not defined` no modo `Somente Relatório` e no controle do Chrome 9222.\n"
-        "  - Resolução de importações ausentes (`re` em `crypto_utils.py` e `Path` em `cbf_pdf_service.py`).\n"
-        "  - Correção de closures em blocos de exceção (`except Exception as e`) prevenindo erros de variável desfeita.\n"
-        "- 🛡️ **Auditoria Estática de Variáveis**:\n"
-        "  - Validação completa com Pyflakes em todos os módulos: 0 variáveis ou nomes indefinidos.\n"
-        "- 🧪 **47 Testes Automatizados E2E Aprovados (100% de sucesso)**."
+        "### Novidades da versão v2.5.7:\n"
+        "- 🎯 **Fidelidade 100% ao Streaming Scheduler**:\n"
+        "  - Correção do fuso CBF (-1h oficial sem dupla subtração de 2h).\n"
+        "  - Preservação inteligente das rodadas oficiais vigentes na CDN da CBF (PDFs Brasileirão Série A e Copa do Brasil) e Copa do Mundo 2026.\n"
+        "  - Resolução definitiva de varredura descartando confrontos quando a data corrente da máquina for posterior aos jogos tabelados.\n"
+        "- 📁 **Resiliência e Carregamento de Grade CSV e Planilha Copa do Mundo**:\n"
+        "  - Carregamento inicial automático e sanitizado de streaming_data.csv / data.csv na inicialização da aba.\n"
+        "  - Empacotamento de `data.csv` e `Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx` diretamente no executável compilado via PyInstaller.\n"
+        "- 🛡️ **Ativação Completa das 6 Plataformas por Padrão**:\n"
+        "  - Todas as 6 plataformas (Prime, DAZN, Max, Disney, Cazé TV, CBF) ativas por padrão, idêntico ao Streaming Scheduler.\n"
+        "- 🧪 **113 Testes Automatizados E2E e Integração Aprovados (100% de sucesso)**."
     )
 
     headers = {

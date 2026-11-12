@@ -1,5 +1,5 @@
 {
-  "version": "2.5.6",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.6/Monitor_Esportes.exe",
-  "changelog": "v2.5.6: Correção de NameError ('time', 're', 'Path' e closures de exceção) na esteira de varredura do Reporte de Eventos e modo Somente Relatório. Blindagem estática com zero variáveis indefinidas e 47 testes automatizados aprovados."
+  "version": "2.5.7",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.7/Monitor_Esportes.exe",
+  "changelog": "v2.5.7: Fidelidade 100% ao Streaming Scheduler: correcao de calculo de fuso CBF (-1h oficial sem dupla subtracao), preservacao inteligente de rodadas oficiais vigentes na CDN CBF e Copa do Mundo 2026, carregamento inicial de grade resiliente de streaming_data.csv e empacotamento com ativos integrados no executavel."
 }

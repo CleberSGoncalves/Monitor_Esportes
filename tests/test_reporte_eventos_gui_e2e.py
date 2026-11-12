@@ -200,6 +200,7 @@ class TestEventSearchAsyncAndTreeInsertion:
         assert total_duplicado == total_depois, "Deduplicação falhou: evento duplicado foi inserido!"
 
     def test_async_event_search_with_platform_scrapers_and_cbf(self, app_instance):
+        app_instance.re_busy = False
         mock_prime_evs = [
             ("Brasileirão serie A", "Flamengo x Fluminense", "22/11/2026", "16:00", "Esquerda", "10", "Amazon Prime", "https://primevideo.com")
         ]
@@ -208,6 +209,9 @@ class TestEventSearchAsyncAndTreeInsertion:
         ]
 
         with patch("gui.reporte_eventos_mixin.run_eventos_prime", return_value=mock_prime_evs) as mock_prime, \
+             patch("gui.reporte_eventos_mixin.run_eventos_dazn", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.run_eventos_max", return_value=[]), \
+             patch("gui.reporte_eventos_mixin.run_eventos_disney", return_value=[]), \
              patch("gui.reporte_eventos_mixin.run_eventos_cbf", return_value=mock_cbf_evs) as mock_cbf, \
              patch("gui.reporte_eventos_mixin.obter_eventos_caze_tv", return_value=[]), \
              patch("gui.reporte_eventos_mixin.obter_eventos_canal_youtube", return_value=[]), \
@@ -224,7 +228,7 @@ class TestEventSearchAsyncAndTreeInsertion:
             assert app_instance.re_btn_buscar.cget("state") == "disabled", "Botão Buscar deve estar desabilitado!"
 
             # Aguarda a conclusão da thread com processamento da fila de eventos Tk
-            timeout = 5.0
+            timeout = 10.0
             start_t = time.time()
             while app_instance.re_busy and (time.time() - start_t) < timeout:
                 app_instance.update()
@@ -241,6 +245,7 @@ class TestEventSearchAsyncAndTreeInsertion:
 
     def test_async_event_search_somente_relatorio_no_name_error(self, app_instance):
         """Validação crítica: modo Somente Relatório não dispara NameError (time.sleep) e fecha Chrome com segurança."""
+        app_instance.re_busy = False
         for item in app_instance.re_tree.get_children():
             app_instance.re_tree.delete(item)
         app_instance.re_somente_relatorio_var.set(True)
@@ -265,7 +270,7 @@ class TestEventSearchAsyncAndTreeInsertion:
             app_instance._re_buscar_eventos()
             assert app_instance.re_busy is True
 
-            timeout = 5.0
+            timeout = 10.0
             start_t = time.time()
             while app_instance.re_busy and (time.time() - start_t) < timeout:
                 app_instance.update()

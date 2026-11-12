@@ -1,0 +1,24 @@
+{
+  "verified": true,
+  "source": "Gemini Google Search Grounding",
+  "model": "gemini-2.5-flash",
+  "platforms": [
+    "Disney+",
+    "ESPN",
+    "Prime Video",
+    "NBA League Pass"
+  ],
+  "broadcast_schedule_time_brt": "",
+  "summary": "A partida da NBA entre Boston Celtics e Milwaukee Bucks, realizada em 8 de novembro de 2026, teve sua transmissão no Brasil da seguinte forma:\n\n1.  **Canais de TV e plataformas de streaming que transmitiram ao vivo no Brasil:**\n    A partida foi transmitida ao vivo no Brasil exclusivamente pelo **NBA League Pass**. Não houve confirmação de transmissão para este jogo específico nas grades da ESPN, Disney+ ou Prime Video.\n\n2.  **Horário oficial anunciado na grade para o início da transmissão (horário de Brasília):**\n    O horário oficial anunciado para o início da transmissão foi às **22h (horário de Brasília)**.\n\n3.  **Portais e links/fontes oficiais consultados:**\n    *   O Tempo - \"NBA tem sete jogos no domingo, com Lakers x Pistons e Celtics x Bucks\"\n    *   Overdrive - \"Celtics x Bucks: onde assistir à NBA e horário (08/11)\"\n    *   Overdrive - \"NBA em novembro de 2026: onde assistir aos jogos e horários\"\n    *   Hoop78 - \"Bucks x Celtics hoje: horário, onde assistir e escalações\"\n    *   365Scores - \"Milwaukee Bucks x Boston Celtics: onde assistir ao jogo da NBA hoje (8)\"\n    *   Overdrive - \"Nets x Mavericks: onde assistir à NBA e horário (08/11)\"\n    *   Lakers Brasil - \"Lakers x Pistons: Onde assistir, palpites e escalação (08/11)\"\n    *   365Scores - \"Chicago Bulls x Philadelphia 76ers: onde assistir ao jogo da NBA hoje (8)\"",
+  "reference_urls": [
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFk-bbgd4TyXH6LPq_oLUTZQ1HVoico285n0w-QQ8YD_tcD0RO9tWmoXiPsAPP7ltNEc1187fLGXfofhCDmFWaJxQP_66n32KmAuJMaoPJ0dxo5uqtxbJgVoXHL0Gz20FOBIXDKhy4AWTHqmsRF-F6gRovV5q59g8RiUpRqwFvMkuUm33KTHXsSLpl9QLNfNIJO2L-Wgyq1eOGuAsHTYS8VX_Cf7ZF14_s1kNUZDmeBVTGNDkozSYc=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE-5cWg0tNN6XEScNzVSrCbvhmcK-mnQMXJ8b-nEAiRL7ZIIczpDs_8DeIf8xBrWaygjjLQBmmnOeqCwJwJKfe0mXoXPY-n-rs86iRJ2tPmlEM3OH1oPjngmTyev0qwKkf9GMp4inOnJt18PNhebv6VK3rqaRsLi9uZIt3-a_9m3Y6Go3xX",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE9hQ5RkfS2OGte8EB8qnREyxZauyLRwPIE9BT8OtuWaXOxoRaSATmT4d9kLZ3lyH7oHdaxGlqwpMM8lBJsGsDaQyJzmAjC-ZBUOc8tb0_gtRaw9Cf-6p7srbcRdaNuyY4SzLc88qE4LJKB8xnGshjGvQmkCDx763hGKsZXcsB0XyJAptYIB4I=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE3fqLRdKYnxMsBKxc6mKin-Fr37RxetzF-NewLe2krVQCuVpJv87qVDFd6lpCh1_Jolabjk4TNmjgmtWl5Wdgaucs6ZwRwWvb3DxbZC_SqBQ_nWcm5SDxkyjcXfaNQ-oep022QnN6nIWoLMVu-9cOLRtWuZTVncszLa4_FPr68t1uMP5md266dYIdA3cibKgHF",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQESFjloDagjb-Z0-2fDuj9zgSnASQX0AIb5LmPQaI-yLJYKz9jR8HV4dvR_IGnBM3sQ8ql9oqyMBOgTc7s03h1jyrvqM2iaSM5gSocr3ygw8_Hx5Eio4JbUo2CvL4DObLG71vmeDcc0bVkoxdJiVhT64lA3cZysxsE_EmBswupXpC-3ujEsNna8nor5BtbTyc8=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGP62h4f3A0UKa1sWCDo_naimeKEm53lkKQHkwpE_jnIWuSP2WI5K2h3yZ6B_5tvE5F5eZHd8egpl9YD62q4SdqHQWx5SMet3xmKqOXdH34RDw3-tHFJWId2CRjsrPEFlOPByXuQMPZXimPANJ7A9ssViRe5lN1CMiwKAW-ZO7MFCP4OJNj6A==",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHY6wZvZPIP2_9kA14tMfB-TNEcpvUWeMo6NpbUzL_QuXsXn4rUuVK_VHU8XMktocB7_RfVwysQ6wLy2ourRcxKcXQHjn5S2NGzmmckVt_Zh7DJQZkeA5RkRPm9Na766NSrqEuJ57vGn_TKNbGoLC7sFiSti0JePqyjrKuvxTWsM7WxGTm_ypDFzH2cQgCIm5E=",
+    "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEAzJIfpchahwaFZQuRkgsdJ30aUoEB8UikDvL_KPTs4bYcVukZnVIeKXIFnJfIdJqo6X792TsVt0RZiYlm32QxWuXfJRNcy8evash6E71sWJ5VtFpS1JUstR6GS8xitMEondjpv4YI3l45zcsBOUhs7QPfbNuSrh5-OgtA3nUOUi7ANFCxts9ZzChmIy7V"
+  ],
+  "grounding_date": "12/11/2026 11:13:18"
+}

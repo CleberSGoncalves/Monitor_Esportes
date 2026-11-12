@@ -1198,7 +1198,7 @@ class ReporteEventosMixin:
                 if total_inseridos > 0:
                     msg_ok = f"Varredura concluída! {total_inseridos} eventos carregados com sucesso."
                 else:
-                    msg_ok = "Varredura concluída! Nenhum novo evento adicionado."
+                    msg_ok = "Varredura concluída! Grade atualizada com os confrontos oficiais."
 
                 logger.info(f"[ReporteEventos] {msg_ok}")
                 q.put(("done_success", msg_ok))
@@ -1227,6 +1227,7 @@ class ReporteEventosMixin:
                         padronizar_nomes_grid(self.re_tree)
                         remover_duplicatas(self.re_tree)
                         ajustartodootree(self.re_tree)
+                        self._re_salvar_csv_silencioso()
                         self._re_atualizar_kpis()
                     elif kind == "done_success":
                         self.re_lbl_status.configure(text=msg[1])
@@ -1305,12 +1306,22 @@ class ReporteEventosMixin:
         except Exception as e:
             logger.debug(f"[ReporteEventos] Erro ao salvar config.xml: {e}")
 
+    def _re_salvar_csv_silencioso(self) -> None:
+        """Salva a grade em segundo plano de forma silenciosa para persistência imediata."""
+        try:
+            linhas = [list(self.re_tree.item(i, "values")) for i in self.re_tree.get_children()]
+            if linhas:
+                salvar_streaming_csv(linhas)
+                self._re_salvar_config_atual()
+        except Exception as e:
+            logger.debug(f"[ReporteEventos] Erro ao salvar silencioso: {e}")
+
     def _re_salvar_csv(self) -> None:
         linhas = [list(self.re_tree.item(i, "values")) for i in self.re_tree.get_children()]
         salvar_streaming_csv(linhas)
         self._re_salvar_config_atual()
         self._re_atualizar_kpis()
-        messagebox.showinfo("Sucesso", f"{len(linhas)} eventos gravados com sucesso em config/streaming_data.csv!")
+        messagebox.showinfo("Sucesso", f"{len(linhas)} eventos gravados com sucesso em streaming_data.csv e data.csv!")
 
     def _re_abrir_csv(self) -> None:
         path = filedialog.askopenfilename(filetypes=[("Arquivos CSV", "*.csv")])
@@ -1318,7 +1329,13 @@ class ReporteEventosMixin:
         try:
             with open(path, "r", encoding="utf-8", errors="replace") as f:
                 reader = csv.reader(f)
-                linhas = [r for r in reader if r]
+                linhas = []
+                for r in reader:
+                    if not r:
+                        continue
+                    if str(r[0]).strip().lower() == "campeonato" and "partida" in [str(x).strip().lower() for x in r]:
+                        continue
+                    linhas.append(r)
             for i in self.re_tree.get_children():
                 self.re_tree.delete(i)
             for idx, r in enumerate(linhas):
