@@ -204,6 +204,15 @@ def abrir_chrome(porta_debug: str = "9222") -> bool:
         logger.error("[Chrome] Executável chrome.exe não encontrado no sistema.")
         return False
 
+    # Limpa locks residuais se a porta não está ativa para evitar conflito de processo
+    for lock_name in ("SingletonLock", "SingletonCookie", "SingletonSocket"):
+        try:
+            lf = profile_dir / lock_name
+            if lf.exists():
+                lf.unlink(missing_ok=True)
+        except Exception:
+            pass
+
     cmd = [
         chrome_exe,
         "--remote-debugging-address=127.0.0.1",

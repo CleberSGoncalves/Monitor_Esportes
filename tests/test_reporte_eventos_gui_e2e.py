@@ -389,9 +389,41 @@ class TestMonitorAppInheritanceAndIntegration:
             "_re_limpar_eventos",
             "_re_toggle_start",
             "_re_toggle_chrome",
+            "_re_atualizar_kpis",
+            "_re_abrir_pasta_config",
+            "_re_abrir_pasta_perfis_chrome",
             "_re_reload_camps_tv",
             "_re_reload_yt_tv",
             "_re_filtrar_logs",
         ]
         for m in metodos:
             assert hasattr(MonitorApp, m), f"Método {m} não encontrado na classe MonitorApp!"
+
+
+class TestResponsivenessAndKPIs:
+    """Validação 8: Barra de KPIs no padrão Canais Live e layout responsivo dinâmico."""
+
+    def test_kpi_widgets_exist_and_update(self, app_instance):
+        assert hasattr(app_instance, "re_kpi_eventos_count"), "KPI de eventos não instanciado!"
+        assert hasattr(app_instance, "re_kpi_plat_count"), "KPI de plataformas não instanciado!"
+        assert hasattr(app_instance, "re_kpi_chrome_status"), "KPI do Chrome não instanciado!"
+        assert hasattr(app_instance, "re_kpi_monitor_status"), "KPI do status não instanciado!"
+
+        # Testa chamada de atualização de KPIs
+        app_instance._re_atualizar_kpis()
+        assert app_instance.re_kpi_eventos_count.cget("text") is not None
+        assert "/" in app_instance.re_kpi_plat_count.cget("text")
+
+    def test_responsive_email_entry_and_treeview(self, app_instance):
+        # Entry de e-mail deve ter expansão horizontal para preencher tela
+        pack_info = app_instance.re_entry_email.pack_info()
+        assert pack_info.get("fill") == "x" or pack_info.get("expand") in (True, "1", 1), "Entry de e-mail deve expandir responsivamente!"
+
+        # Treeview deve ter rowconfigure e columnconfigure com peso
+        grid_info = app_instance.re_tree.grid_info()
+        assert set(grid_info.get("sticky")) == set("nsew"), f"Treeview deve ter sticky nsew para preencher a grade, obtido: {grid_info.get('sticky')}"
+
+    def test_folder_helpers_exist(self, app_instance):
+        assert hasattr(app_instance, "_re_abrir_pasta_config"), "Helper _re_abrir_pasta_config ausente!"
+        assert hasattr(app_instance, "_re_abrir_pasta_perfis_chrome"), "Helper _re_abrir_pasta_perfis_chrome ausente!"
+

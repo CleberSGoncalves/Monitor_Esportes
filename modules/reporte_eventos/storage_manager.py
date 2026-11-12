@@ -108,9 +108,9 @@ def salvar_streaming_csv(linhas: List[List[Any]]) -> None:
     except Exception as e:
         logger.error(f"[Storage] Erro ao salvar CSV {caminho}: {e}")
 
-def carrega_config_xml() -> Dict[str, Any]:
-    """Carrega dicionário com todas as configurações do config.xml."""
-    caminho = get_app_path("config.xml")
+def carrega_config_xml(caminho_ou_arquivo=None, secao=None) -> Any:
+    """Carrega dicionário com todas as configurações do config.xml (ou seção específica)."""
+    caminho = get_app_path(caminho_ou_arquivo or "config.xml")
     cfg = {
         "emails": "binhole@gmail.com",
         "refresh": "20",
@@ -138,7 +138,7 @@ def carrega_config_xml() -> Dict[str, Any]:
         }
     }
     if not os.path.exists(caminho):
-        return cfg
+        return cfg.get(secao, {}) if secao else cfg
 
     try:
         tree = ET.parse(caminho)
@@ -179,7 +179,7 @@ def carrega_config_xml() -> Dict[str, Any]:
 
     except Exception as e:
         logger.warning(f"[Storage] Erro ao processar config.xml: {e}")
-    return cfg
+    return cfg.get(secao, {}) if secao else cfg
 
 def salvar_config_xml(cfg: Dict[str, Any]) -> None:
     """Grava as configurações no config.xml."""

@@ -1,5 +1,5 @@
 {
-  "version": "2.5.2",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.2/Monitor_Esportes.exe",
-  "changelog": "v2.5.2: Suporte flexivel e automatico aos perfis TempProfile e TempProfile2 (na pasta config/ ou na raiz). Abertura automatica do Chrome 9222 com perfil autenticado ao buscar eventos. Ativacao dos scrapers de streaming (Amazon Prime, Dazn, Max, Disney). Gravacao continua em log.txt via RotatingFileHandler e parser robusto na aba Logs com historico recente. Checagem de porta DevTools via socket ultrarrapida."
+  "version": "2.5.3",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.3/Monitor_Esportes.exe",
+  "changelog": "v2.5.3: Interface do Reporte de Eventos totalmente reconstruída no padrão responsivo e executivo do Monitor_Esportes. Barra superior com 4 cards de KPIs (Eventos na Grade, Plataformas Ativas, Chrome DevTools, Status Monitor). Entrada de destinatários com expansão dinâmica e adaptativa. Inicialização e alternância ultrarrápida sem travamentos. Gestão assíncrona do Chrome DevTools 9222/9224 em segundo plano. Atalhos diretos para abrir as pastas config/ e TempProfile no Windows Explorer. Parser de logs robusto com visualização imediata."
 }
