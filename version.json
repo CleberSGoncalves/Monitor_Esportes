@@ -1,5 +1,5 @@
 {
-  "version": "2.5.13",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.13/Monitor_Esportes.exe",
-  "changelog": "v2.5.13: Resolucao definitiva de empacotamento PyInstaller para secret.key e auth.xml via _MEIPASS com auto-seeding na inicializacao, garantindo remetente kimsuportecaptacao@gmail.com e senha 100% descriptografados no executavel standalone."
+  "version": "2.5.14",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.14/Monitor_Esportes.exe",
+  "changelog": "v2.5.14: Disparo de e-mail assincrono em background thread (daemon) com indicador visual de envio e guarda de concorrencia, eliminando congelamento da interface Tkinter (Nao esta respondendo), com timeout otimizado para failover SMTP rapido."
 }

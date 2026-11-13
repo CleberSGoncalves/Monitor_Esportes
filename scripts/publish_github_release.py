@@ -18,18 +18,19 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.13"
-    release_name = "v2.5.13 - Resolução de Credenciais e Auto-Seeding PyInstaller"
+    tag = "v2.5.14"
+    release_name = "v2.5.14 - Disparo de E-mail Assíncrono sem Congelamento da Interface"
     body = (
-        "### Novidades da versão v2.5.13:\n"
-        "- 🔑 **Resolução Definitiva de Credenciais no Executável PyInstaller (_MEIPASS)**:\n"
-        "  - Resolução robusta de caminhos temporários do PyInstaller (`sys._MEIPASS`) para `secret.key`, `auth.xml`, `config.xml` e `.env`.\n"
-        "  - Auto-seeding e restauração automática na inicialização: caso o executável seja executado em diretório limpo ou com chave corrompida por versões anteriores, o sistema recupera a chave oficial e as credenciais empacotadas automaticamente.\n"
-        "  - Remetente `kimsuportecaptacao@gmail.com` e senha SMTP carregados e descriptografados com 100% de sucesso no binário standalone, eliminando o aviso de credenciais não configuradas.\n"
-        "- 📧 **Envio e Disparo de E-mail 100% Operacional**:\n"
-        "  - Disparo manual e agendado funcionando perfeitamente com failover SMTP duplo (Port 587 STARTTLS e Port 465 SSL).\n"
-        "- 🛡️ **Garantia de Persistência Local em config/**:\n"
-        "  - Todas as edições e alterações realizadas na aba 'Acessos' são salvas permanentemente no diretório local `config/`.\n"
+        "### Novidades da versão v2.5.14:\n"
+        "- 🚀 **Disparo de E-mail Assíncrono em Background Thread (Daemon)**:\n"
+        "  - O envio de e-mail agora é executado em thread dedicada em segundo plano, eliminando completamente qualquer travamento ou congelamento da interface gráfica Tkinter (`Não está respondendo`).\n"
+        "  - Indicador visual dinâmico no botão (`⏳ Enviando...`) com desativação temporária para prevenir múltiplos cliques concorrentes acidentais.\n"
+        "  - Restauração suave do botão e exibição de notificação ao concluir sem bloquear a thread principal do Windows.\n"
+        "- ⏱️ **Otimização de Timeout e Failover SMTP**:\n"
+        "  - Timeout de socket ajustado para 15 segundos por tentativa (Port 587 STARTTLS e Port 465 SSL Direto), permitindo failover rápido e prevenindo esperas desnecessárias.\n"
+        "  - Validação estrita de recusa de destinatários (`SMTPRecipientsRefused`).\n"
+        "- 🛡️ **Proteção contra Disparos Duplicados no Monitoramento Automático**:\n"
+        "  - Bloqueio de múltiplos disparos no mesmo minuto durante o ciclo automático de monitoramento.\n"
     )
 
     headers = {

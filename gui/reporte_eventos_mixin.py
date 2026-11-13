@@ -357,6 +357,8 @@ class ReporteEventosMixin:
         self.re_is_running = False
         self.re_loop_job_id = None
         self.re_busy = False
+        self._re_enviando_email = False
+        self._re_ultimo_minuto_auto_email = ""
 
         # Configura gravação ativa de logs em log.txt
         try:
@@ -1490,7 +1492,9 @@ class ReporteEventosMixin:
             if self.re_auto_email_var.get():
                 agora_str = datetime.now().strftime("%H:%M")
                 if agora_str == self.re_hora_auto_email_var.get().strip():
-                    self._re_enviar_email(forcar=False)
+                    if getattr(self, "_re_ultimo_minuto_auto_email", "") != agora_str:
+                        self._re_ultimo_minuto_auto_email = agora_str
+                        self._re_enviar_email(forcar=False)
         except Exception as e:
             logger.warning(f"[ReporteEventos] Erro no ciclo de monitoramento: {e}")
 
@@ -1501,14 +1505,60 @@ class ReporteEventosMixin:
         self.re_loop_job_id = self.after(ref_seg * 1000, self._re_executar_ciclo_monitoramento)
 
     def _re_enviar_email(self, forcar: bool = False) -> None:
+        if getattr(self, "_re_enviando_email", False):
+            if forcar:
+                messagebox.showwarning("Aviso E-mail", "O disparo de e-mail já está em andamento. Aguarde a conclusão...")
+            return
+
         self._re_salvar_config_atual()
         linhas = [list(self.re_tree.item(i, "values")) for i in self.re_tree.get_children()]
         dest = self.re_email_var.get().strip()
-        ok, msg = enviar_email_relatorio(linhas, dest, forcar=forcar)
-        if ok:
-            messagebox.showinfo("E-mail Enviado", msg)
-        else:
-            messagebox.showwarning("Aviso E-mail", msg)
+
+        if not dest:
+            if forcar:
+                messagebox.showwarning("Aviso E-mail", "Nenhum destinatário informado no campo Destinatários.")
+            return
+
+        if not linhas:
+            if forcar:
+                messagebox.showwarning("Aviso E-mail", "A grade de eventos está vazia. Não há dados para enviar.")
+            return
+
+        self._re_enviando_email = True
+        btn = getattr(self, "re_btn_email", None)
+        orig_text = "✉️ Disparar E-mail"
+        orig_color = "#059669"
+
+        if btn and btn.winfo_exists():
+            btn.configure(state="disabled", text="⏳ Enviando...", fg_color="#374151")
+
+        def _worker():
+            try:
+                ok, msg = enviar_email_relatorio(linhas, dest, forcar=forcar)
+            except Exception as ex:
+                ok, msg = False, f"Falha inesperada no envio de e-mail: {ex}"
+
+            def _finish():
+                self._re_enviando_email = False
+                if btn and btn.winfo_exists():
+                    btn.configure(state="normal", text=orig_text, fg_color=orig_color)
+                if forcar:
+                    if ok:
+                        messagebox.showinfo("E-mail Enviado", msg)
+                    else:
+                        messagebox.showwarning("Aviso E-mail", msg)
+                else:
+                    if ok:
+                        logger.info(f"[ReporteEventos] Auto e-mail enviado com sucesso: {msg}")
+                    else:
+                        logger.warning(f"[ReporteEventos] Auto e-mail não enviado: {msg}")
+
+            try:
+                self.after(0, _finish)
+            except Exception:
+                pass
+
+        threading.Thread(target=_worker, name="EmailReportWorker", daemon=True).start()
 
     # ── DOUBLE CLICK POPUPS ───────────────────────────────────────────────────
 

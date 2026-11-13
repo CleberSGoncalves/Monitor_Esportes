@@ -169,16 +169,18 @@ def enviar_email_relatorio(
                     logger.info(f"[SMTP] Tentando envio de e-mail (tentativa {tentativa}/3) via {est['nome']}...")
                     ctx = ssl.create_default_context()
                     if est["use_ssl"]:
-                        with smtplib.SMTP_SSL("smtp.gmail.com", est["port"], timeout=30, context=ctx) as server:
+                        with smtplib.SMTP_SSL("smtp.gmail.com", est["port"], timeout=15, context=ctx) as server:
                             server.ehlo()
                             server.login(remetente, senha)
                             refusals = server.sendmail(remetente, dests, msg.as_string())
                             if refusals:
                                 logger.warning(f"[SMTP] Destinatários com recusa parcial: {refusals}")
+                                if len(refusals) >= len(dests):
+                                    raise smtplib.SMTPRecipientsRefused(refusals)
                             enviado = True
                             break
                     else:
-                        with smtplib.SMTP("smtp.gmail.com", est["port"], timeout=30) as server:
+                        with smtplib.SMTP("smtp.gmail.com", est["port"], timeout=15) as server:
                             server.ehlo()
                             server.starttls(context=ctx)
                             server.ehlo()
@@ -186,6 +188,8 @@ def enviar_email_relatorio(
                             refusals = server.sendmail(remetente, dests, msg.as_string())
                             if refusals:
                                 logger.warning(f"[SMTP] Destinatários com recusa parcial: {refusals}")
+                                if len(refusals) >= len(dests):
+                                    raise smtplib.SMTPRecipientsRefused(refusals)
                             enviado = True
                             break
                 except Exception as e_tent:

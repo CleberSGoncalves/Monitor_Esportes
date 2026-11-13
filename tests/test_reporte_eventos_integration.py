@@ -242,6 +242,81 @@ class TestGUIIntegrationMixin:
         for m in required_methods:
             assert hasattr(MonitorApp, m), f"Método {m} ausente em MonitorApp!"
 
+    def test_re_enviar_email_is_asynchronous_background_thread(self):
+        import time
+        from unittest.mock import MagicMock, patch
+
+        class DummyApp(ReporteEventosMixin):
+            def __init__(self):
+                self._re_enviando_email = False
+                self.re_is_running = False
+                self.re_tree = MagicMock()
+                self.re_tree.get_children.return_value = ["item1"]
+                self.re_tree.item.return_value = {"values": ["Camp", "A x B", "13/11/2026", "19:00", "Esq", "15", "Cazé", "http://..."]}
+                self.re_email_var = MagicMock()
+                self.re_email_var.get.return_value = "teste@ibope.com"
+                self.re_btn_email = MagicMock()
+                self.re_btn_email.winfo_exists.return_value = True
+                self._after_callbacks = []
+
+            def _re_salvar_config_atual(self):
+                pass
+
+            def after(self, delay, func=None, *args):
+                if func:
+                    self._after_callbacks.append(func)
+                return 1
+
+        app = DummyApp()
+
+        def fake_enviar(*args, **kwargs):
+            time.sleep(0.15)
+            return True, "Enviado com sucesso"
+
+        with patch("gui.reporte_eventos_mixin.enviar_email_relatorio", side_effect=fake_enviar), \
+             patch("gui.reporte_eventos_mixin.messagebox") as mock_mb:
+
+            app._re_enviar_email(forcar=True)
+
+            # Verifica que o envio iniciou em background e não bloqueou
+            assert app._re_enviando_email is True
+            app.re_btn_email.configure.assert_any_call(state="disabled", text="⏳ Enviando...", fg_color="#374151")
+
+            # Aguarda a thread em background e executa os callbacks do after()
+            t0 = time.time()
+            while (app._re_enviando_email or app._after_callbacks) and (time.time() - t0) < 2.0:
+                time.sleep(0.03)
+                while app._after_callbacks:
+                    cb = app._after_callbacks.pop(0)
+                    cb()
+
+            assert app._re_enviando_email is False
+            app.re_btn_email.configure.assert_called_with(state="normal", text="✉️ Disparar E-mail", fg_color="#059669")
+            mock_mb.showinfo.assert_called_once_with("E-mail Enviado", "Enviado com sucesso")
+
+    def test_re_enviar_email_concurrent_guard(self):
+        from unittest.mock import MagicMock, patch
+
+        class DummyApp(ReporteEventosMixin):
+            def __init__(self):
+                self._re_enviando_email = True  # Já enviando
+                self.re_is_running = False
+                self.re_tree = MagicMock()
+                self.re_email_var = MagicMock()
+                self.re_btn_email = MagicMock()
+
+            def _re_salvar_config_atual(self):
+                pass
+
+        app = DummyApp()
+        with patch("gui.reporte_eventos_mixin.enviar_email_relatorio") as mock_enviar, \
+             patch("gui.reporte_eventos_mixin.messagebox.showwarning") as mock_warn:
+
+            app._re_enviar_email(forcar=True)
+            mock_warn.assert_called_once()
+            mock_enviar.assert_not_called()
+
+
 
 class TestSeleniumServiceAndProfiles:
     def test_obter_profile_dir_temp_profile(self):
