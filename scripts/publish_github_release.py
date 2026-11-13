@@ -18,18 +18,18 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.11"
-    release_name = "v2.5.11 - Auto-Healing do Monitoramento e Blindagem Anti-Séries no Prime"
+    tag = "v2.5.12"
+    release_name = "v2.5.12 - Sincronização de Acessos e Credenciais SMTP Ativas"
     body = (
-        "### Novidades da versão v2.5.11:\n"
-        "- 🔄 **Auto-Healing e Auto-Start Idêntico ao Streaming_Scheduler**:\n"
-        "  - Auto-Start: o monitoramento é iniciado automaticamente 2 segundos após a abertura da aplicação.\n"
-        "  - Watchdog de Auto-Healing: monitora continuamente em segundo plano (thread dedicada); se o botão permanecer no estado 'Start' (parado) por mais de 10 minutos (600s), a aplicação religa o monitoramento sozinha.\n"
-        "- 🎬 **Filtro Estrito de Confrontos Esportivos no Prime Video**:\n"
-        "  - Descarte preventivo de séries, filmes e programas de entretenimento exibidos em carrosséis do Prime Video que não possuem estrutura de confronto (' x ' ou ' vs ').\n"
-        "- 📧 **Envio Seguro de E-mails & Idempotência no SharePoint**:\n"
-        "  - Disparo de e-mail com trava de segurança de madrugada (22h às 07h no agendamento automático) e envio imediato no modo manual.\n"
-        "  - Blindagem quádrupla anti-duplicação no SharePoint com total desacoplamento e isolamento nativo.\n"
+        "### Novidades da versão v2.5.12:\n"
+        "- 🔑 **Sincronização Completa de Acessos e Credenciais (`acessos.zip`)**:\n"
+        "  - Integração dos arquivos oficiais `auth.xml`, `config.xml`, `secret.key` e `.env` sincronizados diretamente com o Streaming_Scheduler.\n"
+        "  - Credenciais de e-mail ativas do remetente `kimsuportecaptacao@gmail.com` descriptografadas com sucesso.\n"
+        "- 📧 **Envio Resiliente de E-mail via SMTP com Failover Duplo**:\n"
+        "  - Implementação da rotina resiliente de envio com failover automático: Port 587 (STARTTLS com duplo EHLO) e Port 465 (SSL Direto) com até 3 tentativas automáticas.\n"
+        "  - Lista completa de 9 destinatários oficiais carregada automaticamente do config.xml.\n"
+        "- 🔄 **Auto-Healing & Auto-Start 100% Funcionais**:\n"
+        "  - Início automático do monitoramento após 2 segundos e watchdog que religa o Start após 10 minutos se parado.\n"
     )
 
     headers = {

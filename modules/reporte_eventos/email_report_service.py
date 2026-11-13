@@ -153,12 +153,50 @@ def enviar_email_relatorio(
         part_html = MIMEText(corpo_html, "html", "utf-8")
         msg.attach(part_html)
 
-        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=30)
-        server.ehlo()
-        server.starttls()
-        server.login(remetente, senha)
-        server.sendmail(remetente, dests, msg.as_string())
-        server.quit()
+        import ssl
+        import time
+
+        estrategias = [
+            {"nome": "Port 587 (STARTTLS)", "use_ssl": False, "port": 587},
+            {"nome": "Port 465 (SSL Direto)", "use_ssl": True, "port": 465},
+        ]
+        ultimo_erro = None
+        enviado = False
+
+        for tentativa in range(1, 4):
+            for est in estrategias:
+                try:
+                    logger.info(f"[SMTP] Tentando envio de e-mail (tentativa {tentativa}/3) via {est['nome']}...")
+                    ctx = ssl.create_default_context()
+                    if est["use_ssl"]:
+                        with smtplib.SMTP_SSL("smtp.gmail.com", est["port"], timeout=30, context=ctx) as server:
+                            server.ehlo()
+                            server.login(remetente, senha)
+                            refusals = server.sendmail(remetente, dests, msg.as_string())
+                            if refusals:
+                                logger.warning(f"[SMTP] Destinatários com recusa parcial: {refusals}")
+                            enviado = True
+                            break
+                    else:
+                        with smtplib.SMTP("smtp.gmail.com", est["port"], timeout=30) as server:
+                            server.ehlo()
+                            server.starttls(context=ctx)
+                            server.ehlo()
+                            server.login(remetente, senha)
+                            refusals = server.sendmail(remetente, dests, msg.as_string())
+                            if refusals:
+                                logger.warning(f"[SMTP] Destinatários com recusa parcial: {refusals}")
+                            enviado = True
+                            break
+                except Exception as e_tent:
+                    ultimo_erro = e_tent
+                    logger.warning(f"[SMTP] Falha via {est['nome']} na tentativa {tentativa}/3: {e_tent}")
+                    time.sleep(1.5)
+            if enviado:
+                break
+
+        if not enviado:
+            raise ultimo_erro or Exception("Não foi possível conectar ao servidor SMTP após todas as tentativas.")
 
         _ULTIMO_HASH_ENVIADO = hash_hoje
         logger.info(f"[Email] Relatório enviado com sucesso para {len(dests)} destinatários!")

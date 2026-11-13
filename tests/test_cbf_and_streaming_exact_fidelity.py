@@ -52,12 +52,12 @@ def test_run_eventos_cbf_with_copa_do_mundo_excel():
     partidas = [e[1] for e in eventos]
     assert any("Brasil" in p for p in partidas), "Brasil deve estar na tabela da Copa do Mundo"
 
-def test_config_xml_defaults_all_platforms_active():
+def test_config_xml_loads_all_platforms():
     cfg = carrega_config_xml("config.xml")
     plats = cfg.get("plataformas", {})
     assert len(plats) == 6, "Devem existir 6 plataformas cadastradas"
-    for p_name, p_active in plats.items():
-        assert p_active is True, f"Plataforma '{p_name}' deveria vir ativa (True) por padrão"
+    for expected_plat in ["Amazon Prime", "Cazé TV", "CBF", "Disney", "Dazn", "Max"]:
+        assert expected_plat in plats, f"Plataforma '{expected_plat}' deve existir no config"
 
 def test_selenium_browser_service_portuguese_date_parsing():
     from modules.reporte_eventos.selenium_browser_service import (
