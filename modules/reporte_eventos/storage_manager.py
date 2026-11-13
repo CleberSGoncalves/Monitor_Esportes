@@ -227,7 +227,7 @@ def carrega_config_xml(caminho_ou_arquivo=None, secao=None) -> Any:
 
 def salvar_config_xml(cfg: Dict[str, Any]) -> None:
     """Grava as configurações no config.xml."""
-    caminho = get_app_path("config.xml")
+    caminho = get_app_path("config.xml", for_writing=True)
     try:
         root = ET.Element("credenciais")
         

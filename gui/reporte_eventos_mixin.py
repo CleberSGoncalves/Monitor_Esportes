@@ -1718,7 +1718,7 @@ class ReporteEventosMixin:
             import xml.etree.ElementTree as ET
             trees = {}
             for tag, (entry, fname) in self.re_acessos_entries.items():
-                p = get_app_path(fname)
+                p = get_app_path(fname, for_writing=True)
                 if p not in trees:
                     if os.path.exists(p):
                         trees[p] = ET.parse(p)

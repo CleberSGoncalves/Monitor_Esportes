@@ -64,6 +64,10 @@ def main():
         f"--add-data=\"data.csv;.\"",
         f"--add-data=\"Tabela_Completa_Copa_Mundo_2026_Fase_Grupos.xlsx;.\"",
         f"--add-data=\"version.json;.\"",
+        f"--add-data=\"acessos.zip;.\"",
+        f"--add-data=\"config/auth.xml;.\"",
+        f"--add-data=\"config/secret.key;.\"",
+        f"--add-data=\"config/config.xml;.\"",
         # Hidden imports and submodules
         "--hidden-import=gui",
         "--hidden-import=gui.canais_live_mixin",

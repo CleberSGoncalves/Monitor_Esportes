@@ -1,5 +1,5 @@
 {
-  "version": "2.5.12",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.12/Monitor_Esportes.exe",
-  "changelog": "v2.5.12: Integracao e sincronizacao completa de acessos.zip (auth.xml, config.xml, secret.key e .env com credenciais ativas do kimsuportecaptacao@gmail.com), failover SMTP duplo resiliente (Port 587 STARTTLS com duplo EHLO e Port 465 SSL Direto) e blindagem contra series/filmes no Prime Video."
+  "version": "2.5.13",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.13/Monitor_Esportes.exe",
+  "changelog": "v2.5.13: Resolucao definitiva de empacotamento PyInstaller para secret.key e auth.xml via _MEIPASS com auto-seeding na inicializacao, garantindo remetente kimsuportecaptacao@gmail.com e senha 100% descriptografados no executavel standalone."
 }

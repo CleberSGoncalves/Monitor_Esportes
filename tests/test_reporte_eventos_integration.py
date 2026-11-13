@@ -74,6 +74,49 @@ class TestReporteEventosCryptoAndConfig:
         assert "plataformas" in cfg
         assert "campeonatos" in cfg
 
+    def test_auth_credentials_loaded_and_decrypted(self):
+        # Valida que as credenciais ativas do remetente estao 100% carregadas e descriptografadas
+        email = get_auth_value("email")
+        senha = get_auth_value("senha")
+        assert email == "kimsuportecaptacao@gmail.com"
+        assert senha == "ufvgyhogyrqlvmqb"
+
+    def test_frozen_meipass_resolution_and_auto_healing(self, tmp_path, monkeypatch):
+        # Simula ambiente congelado PyInstaller com _MEIPASS
+        meipass_dir = tmp_path / "_MEIPASS_mock"
+        (meipass_dir / "config").mkdir(parents=True)
+        
+        # Copia os arquivos reais para a pasta mock do _MEIPASS
+        import shutil
+        from modules.reporte_eventos.crypto_utils import get_config_dir, carregar_chave, ensure_config_files
+        real_cfg = get_config_dir()
+        shutil.copy2(real_cfg / "auth.xml", meipass_dir / "config" / "auth.xml")
+        shutil.copy2(real_cfg / "secret.key", meipass_dir / "config" / "secret.key")
+        shutil.copy2(real_cfg / "config.xml", meipass_dir / "config" / "config.xml")
+
+        # Cria pasta de executável limpa
+        clean_exe_dir = tmp_path / "app_exe"
+        (clean_exe_dir / "config").mkdir(parents=True)
+        # Escreve uma secret.key corrompida/aleatoria simulando bug da v2.5.12
+        from cryptography.fernet import Fernet
+        bad_key = Fernet.generate_key()
+        with open(clean_exe_dir / "config" / "secret.key", "wb") as f:
+            f.write(bad_key)
+
+        import sys
+        monkeypatch.setattr(sys, "frozen", True, raising=False)
+        monkeypatch.setattr(sys, "_MEIPASS", str(meipass_dir), raising=False)
+        monkeypatch.setattr(sys, "executable", str(clean_exe_dir / "Monitor_Esportes.exe"))
+
+        # Executa auto-recuperacao
+        ensure_config_files()
+
+        # Valida que o email e senha sao descriptografados perfeitamente no ambiente congelado
+        email_frozen = get_auth_value("email")
+        senha_frozen = get_auth_value("senha")
+        assert email_frozen == "kimsuportecaptacao@gmail.com"
+        assert senha_frozen == "ufvgyhogyrqlvmqb"
+
 
 class TestSharepointDeepNormalization:
     def test_deep_normalize_order_invariance(self):
