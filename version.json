@@ -1,5 +1,5 @@
 {
-  "version": "2.5.14",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.14/Monitor_Esportes.exe",
-  "changelog": "v2.5.14: Disparo de e-mail assincrono em background thread (daemon) com indicador visual de envio e guarda de concorrencia, eliminando congelamento da interface Tkinter (Nao esta respondendo), com timeout otimizado para failover SMTP rapido."
+  "version": "2.5.15",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.15/Monitor_Esportes.exe",
+  "changelog": "v2.5.15: Sincronização em paralelo (dual-write) com Google Sheets via Apps Script Web App integrado ao fluxo do SharePoint, preservando integridade das transmissões e espelhando eventos em tempo real em background thread sem bloqueio de interface."
 }

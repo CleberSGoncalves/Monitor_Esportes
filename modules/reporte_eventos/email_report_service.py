@@ -8,8 +8,10 @@ Inclui:
 """
 
 import smtplib
+import socket
 import hashlib
 import logging
+from contextlib import contextmanager
 from datetime import datetime, date
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -20,6 +22,25 @@ from .crypto_utils import get_auth_value
 logger = logging.getLogger(__name__)
 
 _ULTIMO_HASH_ENVIADO = ""
+
+@contextmanager
+def _prefer_ipv4():
+    """
+    Prioriza endereços IPv4 (AF_INET) no socket.getaddrinfo.
+    Garante conexão imediata aos servidores SMTP da Google (smtp.gmail.com)
+    evitando timeouts de roteamento IPv6 que geram [WinError 10060].
+    """
+    orig_getaddrinfo = socket.getaddrinfo
+
+    def _ipv4_first_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+        res = orig_getaddrinfo(host, port, family, type, proto, flags)
+        return sorted(res, key=lambda x: 0 if x[0] == socket.AF_INET else 1)
+
+    socket.getaddrinfo = _ipv4_first_getaddrinfo
+    try:
+        yield
+    finally:
+        socket.getaddrinfo = orig_getaddrinfo
 
 def _hash_corpo(corpo: str) -> str:
     """Calcula hash SHA256 do corpo do e-mail para garantia de idempotência diária."""
@@ -163,41 +184,42 @@ def enviar_email_relatorio(
         ultimo_erro = None
         enviado = False
 
-        for tentativa in range(1, 4):
-            for est in estrategias:
-                try:
-                    logger.info(f"[SMTP] Tentando envio de e-mail (tentativa {tentativa}/3) via {est['nome']}...")
-                    ctx = ssl.create_default_context()
-                    if est["use_ssl"]:
-                        with smtplib.SMTP_SSL("smtp.gmail.com", est["port"], timeout=15, context=ctx) as server:
-                            server.ehlo()
-                            server.login(remetente, senha)
-                            refusals = server.sendmail(remetente, dests, msg.as_string())
-                            if refusals:
-                                logger.warning(f"[SMTP] Destinatários com recusa parcial: {refusals}")
-                                if len(refusals) >= len(dests):
-                                    raise smtplib.SMTPRecipientsRefused(refusals)
-                            enviado = True
-                            break
-                    else:
-                        with smtplib.SMTP("smtp.gmail.com", est["port"], timeout=15) as server:
-                            server.ehlo()
-                            server.starttls(context=ctx)
-                            server.ehlo()
-                            server.login(remetente, senha)
-                            refusals = server.sendmail(remetente, dests, msg.as_string())
-                            if refusals:
-                                logger.warning(f"[SMTP] Destinatários com recusa parcial: {refusals}")
-                                if len(refusals) >= len(dests):
-                                    raise smtplib.SMTPRecipientsRefused(refusals)
-                            enviado = True
-                            break
-                except Exception as e_tent:
-                    ultimo_erro = e_tent
-                    logger.warning(f"[SMTP] Falha via {est['nome']} na tentativa {tentativa}/3: {e_tent}")
-                    time.sleep(1.5)
-            if enviado:
-                break
+        with _prefer_ipv4():
+            for tentativa in range(1, 4):
+                for est in estrategias:
+                    try:
+                        logger.info(f"[SMTP] Tentando envio de e-mail (tentativa {tentativa}/3) via {est['nome']}...")
+                        ctx = ssl.create_default_context()
+                        if est["use_ssl"]:
+                            with smtplib.SMTP_SSL("smtp.gmail.com", est["port"], timeout=15, context=ctx) as server:
+                                server.ehlo()
+                                server.login(remetente, senha)
+                                refusals = server.sendmail(remetente, dests, msg.as_string())
+                                if refusals:
+                                    logger.warning(f"[SMTP] Destinatários com recusa parcial: {refusals}")
+                                    if len(refusals) >= len(dests):
+                                        raise smtplib.SMTPRecipientsRefused(refusals)
+                                enviado = True
+                                break
+                        else:
+                            with smtplib.SMTP("smtp.gmail.com", est["port"], timeout=15) as server:
+                                server.ehlo()
+                                server.starttls(context=ctx)
+                                server.ehlo()
+                                server.login(remetente, senha)
+                                refusals = server.sendmail(remetente, dests, msg.as_string())
+                                if refusals:
+                                    logger.warning(f"[SMTP] Destinatários com recusa parcial: {refusals}")
+                                    if len(refusals) >= len(dests):
+                                        raise smtplib.SMTPRecipientsRefused(refusals)
+                                enviado = True
+                                break
+                    except Exception as e_tent:
+                        ultimo_erro = e_tent
+                        logger.warning(f"[SMTP] Falha via {est['nome']} na tentativa {tentativa}/3: {e_tent}")
+                        time.sleep(1.0)
+                if enviado:
+                    break
 
         if not enviado:
             raise ultimo_erro or Exception("Não foi possível conectar ao servidor SMTP após todas as tentativas.")

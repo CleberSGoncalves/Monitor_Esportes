@@ -412,3 +412,82 @@ class TestSeleniumServiceAndProfiles:
             assert palmeiras_row[3] == "16:00"
 
 
+class TestGoogleSheetsSyncIntegration:
+    """Valida o serviço de espelhamento em paralelo com Google Sheets (Dual-Write)."""
+
+    def test_converter_evento_para_schema_google_sheets(self):
+        from modules.reporte_eventos.google_sheets_sync_service import (
+            converter_evento_para_schema_google_sheets,
+            formatar_data_para_google_sheets,
+            mapear_pvid_por_canal
+        )
+
+        raw = {
+            "Title": "CBF - Brasileirão Série A",
+            "Partida": "Palmeiras x Flamengo",
+            "Data": "2026-11-25T12:00:00Z",
+            "Hor_x00e1_rio": "16:00",
+            "Transmiss_x00e3_o": ["Cazé TV"],
+            "StatusdeEntrega": "Pendente",
+            "Programado_x0020_TV_x0020_BOX_x0": "NÃO"
+        }
+        conv = converter_evento_para_schema_google_sheets(raw)
+        assert conv["partida"] == "Palmeiras x Flamengo"
+        assert conv["campeonato"] == "CBF - Brasileirão Série A"
+        assert conv["data"] == "25/11/2026"
+        assert conv["mes"] == "Novembro"
+        assert conv["horario"] == "16:00"
+        assert conv["canal"] == "Cazé TV"
+        assert conv["pvid"] == "CAZETV - PV3623"
+        assert conv["status"] == "Pendente"
+        assert conv["programado"] == "NÃO"
+
+    def test_converter_tupla_para_schema_google_sheets(self):
+        from modules.reporte_eventos.google_sheets_sync_service import (
+            converter_tupla_para_schema_google_sheets
+        )
+
+        row = ("CBF - Brasileirão Série A", "Corinthians x Grêmio", "29/11/2026", "17:30", "Esquerda", "15", "Amazon Prime", "https://primevideo.com")
+        conv = converter_tupla_para_schema_google_sheets(row)
+        assert conv is not None
+        assert conv["partida"] == "Corinthians x Grêmio"
+        assert conv["data"] == "29/11/2026"
+        assert conv["mes"] == "Novembro"
+        assert conv["canal"] == "Amazon Prime"
+        assert conv["pvid"] == "Prime Video - PV3687"
+
+    def test_sync_events_to_google_sheets_mock(self):
+        from unittest.mock import patch, MagicMock
+        from modules.reporte_eventos.google_sheets_sync_service import sync_events_to_google_sheets
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = '{"status":"success","total_processados":1,"inseridos":1}'
+        mock_resp.headers = {"Content-Type": "application/json"}
+        mock_resp.json.return_value = {"status": "success", "total_processados": 1, "inseridos": 1}
+
+        with patch("modules.reporte_eventos.google_sheets_sync_service.requests.post", return_value=mock_resp) as mock_post:
+            events = [{
+                "partida": "Santos x São Paulo",
+                "data": "10/12/2026",
+                "horario": "19:00",
+                "canal": "Cazé TV"
+            }]
+            res = sync_events_to_google_sheets(events, webhook_url="https://mock.google.com/exec")
+            assert res["status"] == "success"
+            assert res["inseridos"] == 1
+            mock_post.assert_called_once()
+
+    def test_trigger_parallel_google_sheets_sync_non_blocking(self):
+        from unittest.mock import patch
+        from modules.reporte_eventos.google_sheets_sync_service import trigger_parallel_google_sheets_sync
+
+        with patch("modules.reporte_eventos.google_sheets_sync_service.sync_events_to_google_sheets") as mock_sync:
+            events = [{"partida": "Time A x Time B", "data": "01/12/2026"}]
+            thread = trigger_parallel_google_sheets_sync(events)
+            thread.join(timeout=2.0)
+            assert not thread.is_alive()
+            mock_sync.assert_called_once()
+
+
+

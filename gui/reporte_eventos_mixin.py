@@ -1385,6 +1385,11 @@ class ReporteEventosMixin:
         salvar_streaming_csv(linhas)
         self._re_salvar_config_atual()
         self._re_atualizar_kpis()
+        try:
+            from modules.reporte_eventos.google_sheets_sync_service import trigger_parallel_google_sheets_sync
+            trigger_parallel_google_sheets_sync(linhas)
+        except Exception as e_sync:
+            logger.debug(f"[ReporteEventos] Erro ao sincronizar Google Sheets no salvamento do CSV: {e_sync}")
         messagebox.showinfo("Sucesso", f"{len(linhas)} eventos gravados com sucesso em streaming_data.csv e data.csv!")
 
     def _re_abrir_csv(self) -> None:

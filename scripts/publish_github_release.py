@@ -18,19 +18,19 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.14"
-    release_name = "v2.5.14 - Disparo de E-mail Assíncrono sem Congelamento da Interface"
+    tag = "v2.5.15"
+    release_name = "v2.5.15 - Sincronização em Paralelo com Google Sheets (Dual-Write)"
     body = (
-        "### Novidades da versão v2.5.14:\n"
-        "- 🚀 **Disparo de E-mail Assíncrono em Background Thread (Daemon)**:\n"
-        "  - O envio de e-mail agora é executado em thread dedicada em segundo plano, eliminando completamente qualquer travamento ou congelamento da interface gráfica Tkinter (`Não está respondendo`).\n"
-        "  - Indicador visual dinâmico no botão (`⏳ Enviando...`) com desativação temporária para prevenir múltiplos cliques concorrentes acidentais.\n"
-        "  - Restauração suave do botão e exibição de notificação ao concluir sem bloquear a thread principal do Windows.\n"
-        "- ⏱️ **Otimização de Timeout e Failover SMTP**:\n"
-        "  - Timeout de socket ajustado para 15 segundos por tentativa (Port 587 STARTTLS e Port 465 SSL Direto), permitindo failover rápido e prevenindo esperas desnecessárias.\n"
-        "  - Validação estrita de recusa de destinatários (`SMTPRecipientsRefused`).\n"
-        "- 🛡️ **Proteção contra Disparos Duplicados no Monitoramento Automático**:\n"
-        "  - Bloqueio de múltiplos disparos no mesmo minuto durante o ciclo automático de monitoramento.\n"
+        "### Novidades da versão v2.5.15:\n"
+        "- 🚀 **Sincronização em Paralelo com Google Sheets (Dual-Write)**:\n"
+        "  - Implementação do serviço `google_sheets_sync_service.py` integrado nativamente ao fluxo de salvamento e envio do SharePoint.\n"
+        "  - Disparo de eventos em segundo plano (background thread daemon), garantindo zero impacto no tempo de resposta da aplicação e sem congelamento de interface.\n"
+        "  - Normalização automática das 11 colunas oficiais do SharePoint: Anexos, Mês, Data, Horário, Campeonato, Partida, Responsavel gravação, Canal de Transmissão, PVID TV BOX, Status de Entrega, Programado.\n"
+        "- 📊 **Backfill Histórico Completo da Lista do SharePoint**:\n"
+        "  - Migração de todos os 862 eventos existentes da lista oficial do SharePoint para a planilha Google Sheets via Web App Apps Script.\n"
+        "  - Geração da planilha Excel (.xlsx) atualizada com 100% de fidelidade visual às Modern Lists do SharePoint e formatação de badges por canal e status de entrega.\n"
+        "- 🧪 **Suíte de Testes Automatizados E2E**:\n"
+        "  - 30 testes unitários e de integração passando com 100% de sucesso.\n"
     )
 
     headers = {

@@ -58,6 +58,13 @@ from .selenium_browser_service import (
     ajustartodootree,
 )
 
+from .google_sheets_sync_service import (
+    sync_events_to_google_sheets,
+    sync_tuples_to_google_sheets,
+    trigger_parallel_google_sheets_sync,
+    obter_google_sheets_webhook_url,
+)
+
 from .email_report_service import (
     extrair_dados_html,
     enviar_email_relatorio,
@@ -106,6 +113,10 @@ __all__ = [
     "obter_driver_conectado",
     "extrair_dados_html",
     "enviar_email_relatorio",
+    "sync_events_to_google_sheets",
+    "sync_tuples_to_google_sheets",
+    "trigger_parallel_google_sheets_sync",
+    "obter_google_sheets_webhook_url",
     "carregar_youtube_channels_config",
     "salvar_youtube_channels_config",
     "carregar_campeonatos_config",

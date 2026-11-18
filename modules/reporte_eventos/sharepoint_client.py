@@ -1617,22 +1617,34 @@ def push_events_to_sharepoint(items: List[Dict[str, Any]]) -> Dict[str, Any]:
     logger.info(f"[Dedup Guard] {len(itens_novos)} novo(s) evento(s) serão enviados ao SharePoint ({skipped_count} já existiam).")
 
     # 5. Tentativa Principal com os itens estritamente inéditos via Graph API
+    res_final = None
     try:
         logger.info("[SharePoint] Iniciando envio direto via Microsoft Graph API...")
         res = _post_to_sharepoint_direct(itens_novos)
         res["total"] = len(items)
         res["skipped_existing"] = res.get("skipped_existing", 0) + skipped_count
         if res and (res.get("inserted", 0) > 0 or not res.get("errors")):
-            return res
+            res_final = res
     except Exception as e:
         logger.warning(f"[SharePoint] Falha na comunicação direta ({e}). Acionando Fallback Power Automate...", exc_info=True)
 
-    # 6. Fallback de Segurança: Power Automate (apenas com itens inéditos!)
-    logger.info("[SharePoint] Executando envio via Power Automate (Fallback com itens inéditos)...")
-    res_flow = _post_to_flow(itens_novos)
-    res_flow["total"] = len(items)
-    res_flow["skipped_existing"] = res_flow.get("skipped_existing", 0) + skipped_count
-    return res_flow
+    if not res_final:
+        # 6. Fallback de Segurança: Power Automate (apenas com itens inéditos!)
+        logger.info("[SharePoint] Executando envio via Power Automate (Fallback com itens inéditos)...")
+        res_flow = _post_to_flow(itens_novos)
+        res_flow["total"] = len(items)
+        res_flow["skipped_existing"] = res_flow.get("skipped_existing", 0) + skipped_count
+        res_final = res_flow
+
+    # 7. Sincronização em Paralelo com Google Sheets (Dual-Write)
+    try:
+        from modules.reporte_eventos.google_sheets_sync_service import trigger_parallel_google_sheets_sync
+        trigger_parallel_google_sheets_sync(items)
+        logger.info("[SharePoint] Sincronização em paralelo para Google Sheets disparada com sucesso.")
+    except Exception as e_gs:
+        logger.debug(f"[SharePoint] Falha ao disparar sincronização paralela com Google Sheets: {e_gs}")
+
+    return res_final
 
 def push_event_from_tuple(row: Tuple[Any, ...]) -> Dict[str, Any]:
 
