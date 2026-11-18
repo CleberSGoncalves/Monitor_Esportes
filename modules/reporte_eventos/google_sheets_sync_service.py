@@ -258,3 +258,23 @@ def trigger_parallel_google_sheets_sync(
     t = threading.Thread(target=_worker, daemon=True, name="GoogleSheetsParallelSyncThread")
     t.start()
     return t
+
+def request_format_all_google_sheets(webhook_url: Optional[str] = None, timeout: int = 30) -> Dict[str, Any]:
+    """
+    Solicita ao Apps Script a formatação completa de todas as linhas e ativação de
+    formatação condicional na planilha Google Sheets.
+    """
+    url = webhook_url or obter_google_sheets_webhook_url()
+    try:
+        resp = requests.post(
+            url,
+            json={"action": "format_all"},
+            headers={"Content-Type": "application/json"},
+            timeout=timeout
+        )
+        if resp.status_code == 200:
+            return resp.json() if "{" in resp.text else {"status": "success", "raw": resp.text}
+        return {"status": "http_error", "code": resp.status_code, "error": resp.text}
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+

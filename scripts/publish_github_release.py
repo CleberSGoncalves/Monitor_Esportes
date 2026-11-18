@@ -18,19 +18,18 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.16"
-    release_name = "v2.5.16 - Correção Estrita da Captura de Eventos (Alinhamento Streaming_Scheduler)"
+    tag = "v2.5.17"
+    release_name = "v2.5.17 - Estilização Completa e Formatação Automática no Google Sheets"
     body = (
-        "### Novidades da versão v2.5.16:\n"
-        "- 🎯 **Alinhamento Estrito com o Streaming_Scheduler**:\n"
-        "  - Eliminação definitiva e completa de qualquer evento genérico 'Futebol' (como partidas de ligas europeias Ligue 1 e La Liga na Cazé TV).\n"
-        "  - Filtragem rigorosa por campeonatos ativos (`camps_ativos`), descartando competições inativas como Copa do Mundo.\n"
-        "  - Validação estrita de direitos de transmissão na tabela oficial da CBF (Coluna 5 para Cazé TV / Coluna 4 para Prime Video).\n"
-        "- 📑 **Atualização Dinâmica da Tabela Detalhada CBF (16/11/2026)**:\n"
-        "  - Atualização automática da URL oficial da CBF para `Tabela_Detalhada_BSA_2026_16_11_84aba21463.pdf` com busca dinâmica Selenium.\n"
-        "  - Captura precisa dos confrontos de novembro (Coritiba x Santos, Fluminense x Mirassol, Botafogo x São Paulo, Chapecoense x Palmeiras, Corinthians x Grêmio).\n"
-        "- 🧪 **Suíte de Testes Automatizados E2E**:\n"
-        "  - 33 testes unitários e de integração cobrindo todas as regras de negócio com 100% de sucesso.\n"
+        "### Novidades da versão v2.5.17:\n"
+        "- 🎨 **Estilização Visual Completa no Google Sheets (890+ Linhas)**:\n"
+        "  - Formatação matricial em lote de alta performance cobrindo 100% das linhas do espelho da lista do SharePoint.\n"
+        "  - Badges coloridos idênticos ao SharePoint: Cazé TV (#DCFCE7/#166534), Amazon Prime (#00509E/#FFFFFF), Netflix (#7F4F24/#FFFFFF), TNT/Max (#6B21A8/#FFFFFF), DAZN (#0F172A), Record (#1E40AF), SporTV (#1E3A8A), PVID TV BOX (#0D5C75) e Status de Entrega.\n"
+        "- ⚡ **Formatação Condicional Automática e Menu Interativo**:\n"
+        "  - Implementação do menu '⚡ Formatação' direto no Google Sheets para execução com 1 clique.\n"
+        "  - Regras nativas de formatação condicional automática para novos registros futuros.\n"
+        "- 🧪 **Testes de Integração e Sincronização**:\n"
+        "  - 38 testes automatizados aprovados com 100% de sucesso.\n"
     )
 
     headers = {

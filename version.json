@@ -1,5 +1,5 @@
 {
-  "version": "2.5.16",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.16/Monitor_Esportes.exe",
-  "changelog": "v2.5.16: Correção definitiva da captura de eventos no Reporte de Eventos em conformidade estrita com o Streaming_Scheduler: eliminação total de eventos genéricos 'Futebol' (ligas europeias), filtragem rigorosa por campeonatos ativos (descarte de Copa do Mundo inativa), validação oficial na tabela de direitos CBF (coluna 5 Cazé TV / coluna 4 Prime Video) e atualização dinâmica da Tabela Detalhada CBF (16/11/2026)."
+  "version": "2.5.17",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.17/Monitor_Esportes.exe",
+  "changelog": "v2.5.17: Suporte completo a estilização e formatação visual em lote no Google Sheets (890+ linhas) com badges coloridos (Cazé TV, Amazon Prime, Netflix, TNT, Record, PVID TV BOX), regras de formatação condicional automática nativas e função remota de formatação no Google Apps Script."
 }

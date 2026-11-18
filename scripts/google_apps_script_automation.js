@@ -25,11 +25,227 @@ function formatarDataBR(val, ss) {
   return s;
 }
 
+/**
+ * MENU SUPERIOR NO GOOGLE SHEETS
+ * Aparece automaticamente ao abrir a planilha
+ */
+function onOpen() {
+  try {
+    SpreadsheetApp.getUi()
+      .createMenu("⚡ Formatação")
+      .addItem("🎨 Formatar Toda a Planilha (890+ Linhas)", "formatarTodaPlanilha")
+      .addItem("🛡️ Ativar Formatação Condicional Automática", "configurarFormatacaoCondicional")
+      .addToUi();
+  } catch (e) {
+    // Modo headless / sem UI
+  }
+}
+
+/**
+ * FORMATA 100% DA PLANILHA EM ALTA PERFORMANCE (OPERAÇÕES MATRICIAIS)
+ * Aplica badges de cores idênticos ao SharePoint em todas as linhas existentes
+ */
+function formatarTodaPlanilha() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Programação de eventos - Stream") || ss.getActiveSheet();
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return 0;
+
+  const numRows = lastRow - 1;
+  const numCols = 11;
+  const range = sheet.getRange(2, 1, numRows, numCols);
+  const values = range.getValues();
+
+  const backgrounds = [];
+  const fontColors = [];
+  const fontWeights = [];
+  const alignments = [];
+
+  for (let i = 0; i < numRows; i++) {
+    const rowVal = values[i];
+    const rBg = [];
+    const rFont = [];
+    const rWeight = [];
+    const rAlign = [];
+
+    const canalStr = String(rowVal[7] || "").toLowerCase().trim();
+    const pvidStr = String(rowVal[8] || "").trim();
+    const statusStr = String(rowVal[9] || "").toLowerCase().trim();
+    const progStr = String(rowVal[10] || "").toLowerCase().trim();
+
+    // Cor de fundo suave padrão da linha (Warm Beige como no SharePoint)
+    const baseBg = "#FFFBEB";
+    const baseText = "#0F172A";
+
+    for (let j = 0; j < numCols; j++) {
+      let cellBg = baseBg;
+      let cellFont = baseText;
+      let cellWeight = "normal";
+      let cellAlign = "center";
+
+      if (j === 0) { // Anexos
+        cellAlign = "center";
+      } else if (j === 1) { // Mês
+        cellAlign = "center";
+      } else if (j === 2) { // Data
+        cellAlign = "center";
+      } else if (j === 3) { // Horário
+        cellAlign = "center";
+      } else if (j === 4) { // Campeonato
+        cellAlign = "left";
+      } else if (j === 5) { // Partida (Verde escuro negrito)
+        cellAlign = "left";
+        cellFont = "#166534";
+        cellWeight = "bold";
+      } else if (j === 6) { // Responsavel gravação
+        cellAlign = "left";
+      } else if (j === 7) { // Canal de Transmissão (Badge oficial)
+        cellAlign = "center";
+        cellWeight = "bold";
+        if (canalStr.includes("cazé") || canalStr.includes("caze")) {
+          cellBg = "#DCFCE7"; cellFont = "#166534";
+        } else if (canalStr.includes("prime") || canalStr.includes("amazon")) {
+          cellBg = "#00509E"; cellFont = "#FFFFFF";
+        } else if (canalStr.includes("netflix")) {
+          cellBg = "#7F4F24"; cellFont = "#FFFFFF";
+        } else if (canalStr.includes("tnt") || canalStr.includes("max") || canalStr.includes("hbo")) {
+          cellBg = "#6B21A8"; cellFont = "#FFFFFF";
+        } else if (canalStr.includes("dazn")) {
+          cellBg = "#0F172A"; cellFont = "#F8FAFC";
+        } else if (canalStr.includes("record")) {
+          cellBg = "#1E40AF"; cellFont = "#FFFFFF";
+        } else if (canalStr.includes("sport") || canalStr.includes("premiere")) {
+          cellBg = "#1E3A8A"; cellFont = "#FFFFFF";
+        } else if (canalStr.includes("disney")) {
+          cellBg = "#1E293B"; cellFont = "#FFFFFF";
+        } else if (canalStr.includes("paramount")) {
+          cellBg = "#0284C7"; cellFont = "#FFFFFF";
+        } else if (canalStr.includes("globo") || canalStr.includes("ge")) {
+          cellBg = "#E11D48"; cellFont = "#FFFFFF";
+        } else if (canalStr && canalStr !== "nenhuma") {
+          cellBg = "#334155"; cellFont = "#FFFFFF";
+        }
+      } else if (j === 8) { // PVID TV BOX (Badge Verde Petróleo)
+        cellAlign = "center";
+        if (pvidStr) {
+          cellBg = "#0D5C75"; cellFont = "#FFFFFF"; cellWeight = "bold";
+        }
+      } else if (j === 9) { // Status de Entrega
+        cellAlign = "center";
+        cellWeight = "bold";
+        if (statusStr.includes("exibido") && !statusStr.includes("não") && !statusStr.includes("nao")) {
+          cellBg = "#DCFCE7"; cellFont = "#166534";
+        } else if (statusStr.includes("não") || statusStr.includes("nao") || statusStr.includes("cancel")) {
+          cellBg = "#FEE2E2"; cellFont = "#991B1B";
+        } else {
+          cellBg = "#FEF3C7"; cellFont = "#92400E"; // Pendente
+        }
+      } else if (j === 10) { // Programado
+        cellAlign = "center";
+        cellWeight = "bold";
+        if (progStr.includes("sim")) {
+          cellBg = "#DCFCE7"; cellFont = "#166534";
+        } else {
+          cellBg = "#F1F5F9"; cellFont = "#475569";
+        }
+      }
+
+      rBg.push(cellBg);
+      rFont.push(cellFont);
+      rWeight.push(cellWeight);
+      rAlign.push(cellAlign);
+    }
+
+    backgrounds.push(rBg);
+    fontColors.push(rFont);
+    fontWeights.push(rWeight);
+    alignments.push(rAlign);
+  }
+
+  // Aplica as formatações em lote único ultrarrápido
+  range.setBackgrounds(backgrounds);
+  range.setFontColors(fontColors);
+  range.setFontWeights(fontWeights);
+  range.setHorizontalAlignments(alignments);
+  range.setVerticalAlignment("middle");
+  range.setFontFamily("Segoe UI");
+  range.setFontSize(10);
+  range.setBorder(true, true, true, true, true, true, "#E2E8F0", SpreadsheetApp.BorderStyle.SOLID);
+
+  // Altura padronizada de 24px em todas as linhas de dados
+  sheet.setRowHeights(2, numRows, 24);
+
+  // Cabeçalho Oficial
+  const headRange = sheet.getRange(1, 1, 1, 11);
+  headRange.setBackground("#F8FAFC");
+  headRange.setFontColor("#1E293B");
+  headRange.setFontWeight("bold");
+  headRange.setFontFamily("Segoe UI");
+  headRange.setFontSize(10);
+  headRange.setVerticalAlignment("middle");
+  headRange.setBorder(true, true, true, true, true, true, "#CBD5E1", SpreadsheetApp.BorderStyle.SOLID);
+  sheet.setRowHeight(1, 28);
+  sheet.setFrozenRows(1);
+
+  return numRows;
+}
+
+/**
+ * FORMATAÇÃO CONDICIONAL AUTOMÁTICA NATIVA
+ * Garante que qualquer linha nova adicionada no futuro seja colorida automaticamente!
+ */
+function configurarFormatacaoCondicional() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Programação de eventos - Stream") || ss.getActiveSheet();
+  sheet.clearConditionalFormatRules();
+
+  const rules = [];
+  const canalRange = sheet.getRange("H2:H5000");
+  const pvidRange = sheet.getRange("I2:I5000");
+  const statusRange = sheet.getRange("J2:J5000");
+  const progRange = sheet.getRange("K2:K5000");
+
+  // Regras de Canais
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("Cazé").setBackground("#DCFCE7").setFontColor("#166534").setBold(true).setRanges([canalRange]).build());
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("Prime").setBackground("#00509E").setFontColor("#FFFFFF").setBold(true).setRanges([canalRange]).build());
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("Netflix").setBackground("#7F4F24").setFontColor("#FFFFFF").setBold(true).setRanges([canalRange]).build());
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("TNT").setBackground("#6B21A8").setFontColor("#FFFFFF").setBold(true).setRanges([canalRange]).build());
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("Max").setBackground("#6B21A8").setFontColor("#FFFFFF").setBold(true).setRanges([canalRange]).build());
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("dazn").setBackground("#0F172A").setFontColor("#F8FAFC").setBold(true).setRanges([canalRange]).build());
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("Record").setBackground("#1E40AF").setFontColor("#FFFFFF").setBold(true).setRanges([canalRange]).build());
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("Sport").setBackground("#1E3A8A").setFontColor("#FFFFFF").setBold(true).setRanges([canalRange]).build());
+
+  // Regra de PVID (Qualquer texto não vazio)
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenCellNotEmpty().setBackground("#0D5C75").setFontColor("#FFFFFF").setBold(true).setRanges([pvidRange]).build());
+
+  // Regras de Status
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("Exibido").setBackground("#DCFCE7").setFontColor("#166534").setBold(true).setRanges([statusRange]).build());
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("Não").setBackground("#FEE2E2").setFontColor("#991B1B").setBold(true).setRanges([statusRange]).build());
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("Pendente").setBackground("#FEF3C7").setFontColor("#92400E").setBold(true).setRanges([statusRange]).build());
+
+  // Regras de Programado
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("SIM").setBackground("#DCFCE7").setFontColor("#166534").setBold(true).setRanges([progRange]).build());
+  rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextContains("NÃO").setBackground("#F1F5F9").setFontColor("#475569").setBold(true).setRanges([progRange]).build());
+
+  sheet.setConditionalFormatRules(rules);
+}
+
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName("Programação de eventos - Stream") || ss.getActiveSheet();
+    
+    // Ação: Formatar toda a planilha imediatamente
+    if (data.action === "format_all") {
+      const formatadas = formatarTodaPlanilha();
+      configurarFormatacaoCondicional();
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        action: "format_all",
+        linhas_formatadas: formatadas
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
     
     // Suporte para substituição completa em bloco (batch rápido)
     if (data.action === "replace_all" && Array.isArray(data.events)) {
@@ -52,6 +268,8 @@ function doPost(e) {
           ev.programado || "NÃO"
         ]);
         sheet.getRange(2, 1, rows.length, 11).setValues(rows);
+        formatarTodaPlanilha();
+        configurarFormatacaoCondicional();
       }
       return ContentService.createTextOutput(JSON.stringify({
         status: "success",
@@ -132,6 +350,11 @@ function doPost(e) {
       chavesExistentes.add(chave);
       inseridos++;
     });
+
+    // Se houve novos itens inseridos, reaplica formatação visual completa
+    if (inseridos > 0) {
+      formatarTodaPlanilha();
+    }
     
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
@@ -391,7 +614,12 @@ function renderWebPage(events) {
     .badge-netflix { background: var(--sp-netflix-bg); color: var(--sp-netflix-txt); }
     .badge-tnt { background: var(--sp-tnt-bg); color: var(--sp-tnt-txt); }
     .badge-dazn { background: var(--sp-dazn-bg); color: var(--sp-dazn-txt); }
-    .badge-default { background: #E2E8F0; color: #334155; }
+    .badge-record { background: #1E40AF; color: #FFFFFF; }
+    .badge-sportv { background: #1E3A8A; color: #FFFFFF; }
+    .badge-disney { background: #1E293B; color: #FFFFFF; }
+    .badge-paramount { background: #0284C7; color: #FFFFFF; }
+    .badge-globo { background: #E11D48; color: #FFFFFF; }
+    .badge-default { background: #334155; color: #FFFFFF; }
     .badge-pvid { background: var(--sp-pvid-bg); color: var(--sp-pvid-txt); font-family: monospace; font-size: 11px; }
     .badge-pendente { background: var(--sp-pend-bg); color: var(--sp-pend-txt); }
     .badge-exibido { background: var(--sp-exib-bg); color: var(--sp-exib-txt); }
@@ -490,8 +718,13 @@ function renderWebPage(events) {
       if (c.includes("cazé") || c.includes("caze")) return '<span class="badge badge-caze">' + canal + '</span>';
       if (c.includes("prime") || c.includes("amazon")) return '<span class="badge badge-prime">' + canal + '</span>';
       if (c.includes("netflix")) return '<span class="badge badge-netflix">' + canal + '</span>';
-      if (c.includes("tnt") || c.includes("max")) return '<span class="badge badge-tnt">' + canal + '</span>';
+      if (c.includes("tnt") || c.includes("max") || c.includes("hbo")) return '<span class="badge badge-tnt">' + canal + '</span>';
       if (c.includes("dazn")) return '<span class="badge badge-dazn">' + canal + '</span>';
+      if (c.includes("record")) return '<span class="badge badge-record">' + canal + '</span>';
+      if (c.includes("sport") || c.includes("premiere")) return '<span class="badge badge-sportv">' + canal + '</span>';
+      if (c.includes("disney")) return '<span class="badge badge-disney">' + canal + '</span>';
+      if (c.includes("paramount")) return '<span class="badge badge-paramount">' + canal + '</span>';
+      if (c.includes("globo") || c.includes("ge")) return '<span class="badge badge-globo">' + canal + '</span>';
       return '<span class="badge badge-default">' + (canal || "-") + '</span>';
     }
 

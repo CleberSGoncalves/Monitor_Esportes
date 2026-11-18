@@ -75,6 +75,24 @@ def build_sharepoint_exact_sheet():
     badge_dazn_fill = PatternFill(start_color="0F172A", end_color="0F172A", fill_type="solid")
     badge_dazn_font = Font(name="Segoe UI", size=10, bold=True, color="F8FAFC")
 
+    badge_record_fill = PatternFill(start_color="1E40AF", end_color="1E40AF", fill_type="solid")
+    badge_record_font = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+
+    badge_sportv_fill = PatternFill(start_color="1E3A8A", end_color="1E3A8A", fill_type="solid")
+    badge_sportv_font = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+
+    badge_disney_fill = PatternFill(start_color="1E293B", end_color="1E293B", fill_type="solid")
+    badge_disney_font = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+
+    badge_paramount_fill = PatternFill(start_color="0284C7", end_color="0284C7", fill_type="solid")
+    badge_paramount_font = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+
+    badge_globo_fill = PatternFill(start_color="E11D48", end_color="E11D48", fill_type="solid")
+    badge_globo_font = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+
+    badge_outro_fill = PatternFill(start_color="334155", end_color="334155", fill_type="solid")
+    badge_outro_font = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
+
     # PVID TV BOX (Verde Petróleo / Teal)
     pvid_fill = PatternFill(start_color="0D5C75", end_color="0D5C75", fill_type="solid")
     pvid_font = Font(name="Segoe UI", size=10, bold=True, color="FFFFFF")
@@ -162,6 +180,24 @@ def build_sharepoint_exact_sheet():
                 elif "dazn" in canal_val:
                     cell.fill = badge_dazn_fill
                     cell.font = badge_dazn_font
+                elif "record" in canal_val:
+                    cell.fill = badge_record_fill
+                    cell.font = badge_record_font
+                elif "sport" in canal_val or "premiere" in canal_val:
+                    cell.fill = badge_sportv_fill
+                    cell.font = badge_sportv_font
+                elif "disney" in canal_val:
+                    cell.fill = badge_disney_fill
+                    cell.font = badge_disney_font
+                elif "paramount" in canal_val:
+                    cell.fill = badge_paramount_fill
+                    cell.font = badge_paramount_font
+                elif "globo" in canal_val or "ge" in canal_val:
+                    cell.fill = badge_globo_fill
+                    cell.font = badge_globo_font
+                elif canal_val.strip() and canal_val.strip() != "nenhuma":
+                    cell.fill = badge_outro_fill
+                    cell.font = badge_outro_font
             elif col_idx == 9:  # PVID TV BOX (Badge Teal)
                 cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.fill = pvid_fill
