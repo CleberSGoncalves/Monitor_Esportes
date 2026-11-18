@@ -1,19 +1,14 @@
 /**
- * GOOGLE APPS SCRIPT - SINCRONIZAÇÃO EM PARALELO DE EVENTOS ESPORTIVOS
- * Espelho Oficial da Lista SharePoint: 'Suporte Captação - Programação de eventos - Streaming'
+ * GOOGLE APPS SCRIPT - PORTAL WEB & SINCRONIZAÇÃO EM PARALELO
+ * Lista Oficial: 'Suporte Captação - Programação de eventos - Streaming'
  * 
- * 11 Colunas Oficiais do SharePoint:
- * 1. Anexos
- * 2. Mês
- * 3. Data
- * 4. Horário
- * 5. Campeonato
- * 6. Partida
- * 7. Responsavel gravação
- * 8. Canal de Transmissão
- * 9. PVID TV BOX
- * 10. Status de Entrega
- * 11. Programado
+ * Funcionalidades:
+ * 1. doGet:
+ *    - Se acessado pelo navegador (URL padrão): Renderiza um Portal Web interativo,
+ *      moderno, responsivo com busca instantânea, filtros por canal, data e status.
+ *    - Se chamado com '?format=json' ou '?api=1': Retorna JSON puro para integrações Python.
+ * 2. doPost:
+ *    - Recebe novos eventos enviados pelo Monitor de Esportes em tempo real e insere com desduplicação.
  */
 
 function formatarDataBR(val, ss) {
@@ -101,7 +96,6 @@ function doPost(e) {
         return; // Pula duplicata
       }
       
-      // Mapeia o Mês automaticamente pela data se não fornecido
       let mesStr = ev.mes || "";
       if (!mesStr && dataStr.includes("/")) {
         const partes = dataStr.split("/");
@@ -111,7 +105,6 @@ function doPost(e) {
         }
       }
       
-      // Mapeia PVID TV BOX sugerido pelo canal
       let pvidStr = ev.pvid || "";
       if (!pvidStr) {
         const cLow = canalStr.toLowerCase();
@@ -159,24 +152,419 @@ function doGet(e) {
   const sheet = ss.getSheetByName("Programação de eventos - Stream") || ss.getActiveSheet();
   const lastRow = sheet.getLastRow();
   
-  if (lastRow <= 1) {
-    return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  let results = [];
+  if (lastRow > 1) {
+    const values = sheet.getRange(2, 1, lastRow - 1, 11).getValues();
+    results = values.map(r => ({
+      anexos: r[0],
+      mes: r[1],
+      data: formatarDataBR(r[2], ss),
+      horario: r[3],
+      campeonato: r[4],
+      partida: r[5],
+      responsavel: r[6],
+      canal: r[7],
+      pvid: r[8],
+      status_entrega: r[9],
+      programado: r[10]
+    }));
   }
   
-  const values = sheet.getRange(2, 1, lastRow - 1, 11).getValues();
-  const results = values.map(r => ({
-    anexos: r[0],
-    mes: r[1],
-    data: formatarDataBR(r[2], ss),
-    horario: r[3],
-    campeonato: r[4],
-    partida: r[5],
-    responsavel: r[6],
-    canal: r[7],
-    pvid: r[8],
-    status_entrega: r[9],
-    programado: r[10]
-  }));
+  // Se chamado com ?format=json ou ?api=1, retorna JSON puro para o Monitor_Esportes
+  if (e && e.parameter && (e.parameter.format === 'json' || e.parameter.api === '1')) {
+    return ContentService.createTextOutput(JSON.stringify(results)).setMimeType(ContentService.MimeType.JSON);
+  }
   
-  return ContentService.createTextOutput(JSON.stringify(results)).setMimeType(ContentService.MimeType.JSON);
+  // Caso contrário, gera a Página Web Oficial interativa
+  const htmlContent = renderWebPage(results);
+  return HtmlService.createHtmlOutput(htmlContent)
+    .setTitle("Programação de Eventos - Streaming | Suporte Captação")
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function renderWebPage(events) {
+  const jsonString = JSON.stringify(events);
+  
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Programação de Eventos - Streaming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sp-header-bg: #F8FAFC;
+      --sp-border: #E2E8F0;
+      --sp-row-bg: #FFFBEB;
+      --sp-text: #1E293B;
+      --sp-caze-bg: #DCFCE7;
+      --sp-caze-txt: #166534;
+      --sp-prime-bg: #00509E;
+      --sp-prime-txt: #FFFFFF;
+      --sp-netflix-bg: #7F4F24;
+      --sp-netflix-txt: #FFFFFF;
+      --sp-tnt-bg: #6B21A8;
+      --sp-tnt-txt: #FFFFFF;
+      --sp-dazn-bg: #0F172A;
+      --sp-dazn-txt: #F8FAFC;
+      --sp-pvid-bg: #0D5C75;
+      --sp-pvid-txt: #FFFFFF;
+      --sp-pend-bg: #FEF3C7;
+      --sp-pend-txt: #92400E;
+      --sp-exib-bg: #DCFCE7;
+      --sp-exib-txt: #166534;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
+      background: #F1F5F9;
+      color: var(--sp-text);
+      padding: 16px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      overflow: hidden;
+      border: 1px solid var(--sp-border);
+    }
+    .header-bar {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      color: #FFFFFF;
+      padding: 20px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-title h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header-title p {
+      font-size: 13px;
+      color: #94A3B8;
+      margin-top: 4px;
+    }
+    .stats-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .stat-pill {
+      background: rgba(255,255,255,0.1);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .controls-bar {
+      background: #FFFFFF;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--sp-border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 16px 10px 38px;
+      border-radius: 8px;
+      border: 1px solid #CBD5E1;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      border-color: #2563EB;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94A3B8;
+      font-size: 15px;
+    }
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-select {
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 1px solid #CBD5E1;
+      font-size: 13px;
+      background: #FFFFFF;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+    }
+    .btn-action {
+      background: #0284C7;
+      color: #FFFFFF;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-action:hover { background: #0369A1; }
+    .table-wrapper {
+      overflow-x: auto;
+      max-height: 75vh;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+    thead th {
+      background: var(--sp-header-bg);
+      color: #475569;
+      font-weight: 700;
+      padding: 12px 14px;
+      border-bottom: 2px solid #CBD5E1;
+      border-right: 1px solid var(--sp-border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    tbody tr {
+      background: var(--sp-row-bg);
+      border-bottom: 1px solid var(--sp-border);
+      transition: background 0.15s;
+    }
+    tbody tr:hover {
+      background: #FEF3C7;
+    }
+    tbody td {
+      padding: 10px 14px;
+      border-right: 1px solid var(--sp-border);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .td-center { text-align: center; }
+    .partida-cell {
+      font-weight: 700;
+      color: #166534;
+      white-space: normal;
+      min-width: 220px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+    .badge-caze { background: var(--sp-caze-bg); color: var(--sp-caze-txt); }
+    .badge-prime { background: var(--sp-prime-bg); color: var(--sp-prime-txt); }
+    .badge-netflix { background: var(--sp-netflix-bg); color: var(--sp-netflix-txt); }
+    .badge-tnt { background: var(--sp-tnt-bg); color: var(--sp-tnt-txt); }
+    .badge-dazn { background: var(--sp-dazn-bg); color: var(--sp-dazn-txt); }
+    .badge-default { background: #E2E8F0; color: #334155; }
+    .badge-pvid { background: var(--sp-pvid-bg); color: var(--sp-pvid-txt); font-family: monospace; font-size: 11px; }
+    .badge-pendente { background: var(--sp-pend-bg); color: var(--sp-pend-txt); }
+    .badge-exibido { background: var(--sp-exib-bg); color: var(--sp-exib-txt); }
+    .badge-nao-exibido { background: #FEE2E2; color: #991B1B; }
+    .footer-bar {
+      padding: 12px 24px;
+      background: #F8FAFC;
+      border-top: 1px solid var(--sp-border);
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #64748B;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 8px; }
+      .header-bar { padding: 14px 16px; }
+      .controls-bar { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-bar">
+      <div class="header-title">
+        <h1>⚽ Suporte Captação - Programação de Eventos (Streaming)</h1>
+        <p>Espelho Web Oficial em Tempo Real | Sincronizado com SharePoint e Monitor de Esportes</p>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-pill">Total: <span id="count-total">0</span></div>
+        <div class="stat-pill" style="background:#166534;">Cazé TV: <span id="count-caze">0</span></div>
+        <div class="stat-pill" style="background:#00509E;">Amazon Prime: <span id="count-prime">0</span></div>
+        <div class="stat-pill" style="background:#7F4F24;">Netflix: <span id="count-netflix">0</span></div>
+      </div>
+    </div>
+    
+    <div class="controls-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" class="search-input" placeholder="Pesquisar por time, partida, campeonato, canal ou data...">
+      </div>
+      <div class="filter-group">
+        <select id="filter-canal" class="filter-select">
+          <option value="">Todos os Canais</option>
+          <option value="Cazé TV">Cazé TV</option>
+          <option value="Amazon Prime">Amazon Prime</option>
+          <option value="Netflix">Netflix</option>
+          <option value="TNT">TNT / Max</option>
+          <option value="dazn">DAZN</option>
+        </select>
+        <select id="filter-status" class="filter-select">
+          <option value="">Todos os Status</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Exibido">Exibido</option>
+          <option value="Não Exibido">Não Exibido</option>
+        </select>
+        <button class="btn-action" onclick="window.print()">🖨️ Imprimir</button>
+      </div>
+    </div>
+    
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th class="td-center">#</th>
+            <th class="td-center">Mês</th>
+            <th class="td-center">Data</th>
+            <th class="td-center">Horário</th>
+            <th>Campeonato</th>
+            <th>Partida</th>
+            <th>Responsável Gravação</th>
+            <th class="td-center">Canal de Transmissão</th>
+            <th class="td-center">PVID TV BOX</th>
+            <th class="td-center">Status de Entrega</th>
+            <th class="td-center">Programado</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- Linhas renderizadas via Javascript -->
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="footer-bar">
+      <div>Mostrando <b id="count-showing">0</b> eventos filtrados</div>
+      <div>Atualização Automática Conectada via Google Apps Script & Monitor de Esportes</div>
+    </div>
+  </div>
+
+  <script>
+    const allEvents = ${jsonString};
+    
+    function getChannelBadge(canal) {
+      const c = String(canal || "").toLowerCase();
+      if (c.includes("cazé") || c.includes("caze")) return '<span class="badge badge-caze">' + canal + '</span>';
+      if (c.includes("prime") || c.includes("amazon")) return '<span class="badge badge-prime">' + canal + '</span>';
+      if (c.includes("netflix")) return '<span class="badge badge-netflix">' + canal + '</span>';
+      if (c.includes("tnt") || c.includes("max")) return '<span class="badge badge-tnt">' + canal + '</span>';
+      if (c.includes("dazn")) return '<span class="badge badge-dazn">' + canal + '</span>';
+      return '<span class="badge badge-default">' + (canal || "-") + '</span>';
+    }
+
+    function getStatusBadge(status) {
+      const s = String(status || "").toLowerCase();
+      if (s.includes("exibido") && !s.includes("não")) return '<span class="badge badge-exibido">' + status + '</span>';
+      if (s.includes("não") || s.includes("nao") || s.includes("cancelado")) return '<span class="badge badge-nao-exibido">' + status + '</span>';
+      return '<span class="badge badge-pendente">' + (status || "Pendente") + '</span>';
+    }
+
+    function renderTable() {
+      const q = document.getElementById("search-input").value.toLowerCase();
+      const fCanal = document.getElementById("filter-canal").value.toLowerCase();
+      const fStatus = document.getElementById("filter-status").value.toLowerCase();
+      
+      const tbody = document.getElementById("table-body");
+      tbody.innerHTML = "";
+      
+      let count = 0;
+      let cazeCount = 0;
+      let primeCount = 0;
+      let netflixCount = 0;
+      
+      allEvents.forEach((ev, idx) => {
+        const cStr = String(ev.canal || "").toLowerCase();
+        if (cStr.includes("cazé") || cStr.includes("caze")) cazeCount++;
+        if (cStr.includes("prime") || cStr.includes("amazon")) primeCount++;
+        if (cStr.includes("netflix")) netflixCount++;
+        
+        // Filtros
+        if (fCanal && !cStr.includes(fCanal)) return;
+        if (fStatus && !String(ev.status_entrega || "").toLowerCase().includes(fStatus)) return;
+        
+        // Busca
+        if (q) {
+          const fullText = (
+            ev.partida + " " + ev.campeonato + " " + ev.data + " " +
+            ev.canal + " " + ev.responsavel + " " + ev.pvid
+          ).toLowerCase();
+          if (!fullText.includes(q)) return;
+        }
+        
+        count++;
+        const tr = document.createElement("tr");
+        tr.innerHTML = \`
+          <td class="td-center" style="color:#64748B; font-weight:600;">\${count}</td>
+          <td class="td-center">\${ev.mes || '-'}</td>
+          <td class="td-center" style="font-weight:600;">\${ev.data || '-'}</td>
+          <td class="td-center">\${ev.horario || '-'}</td>
+          <td>\${ev.campeonato || '-'}</td>
+          <td class="partida-cell">\${ev.partida || '-'}</td>
+          <td>\${ev.responsavel || '-'}</td>
+          <td class="td-center">\${getChannelBadge(ev.canal)}</td>
+          <td class="td-center"><span class="badge badge-pvid">\${ev.pvid || '-'}</span></td>
+          <td class="td-center">\${getStatusBadge(ev.status_entrega)}</td>
+          <td class="td-center">\${ev.programado || 'NÃO'}</td>
+        \`;
+        tbody.appendChild(tr);
+      });
+      
+      document.getElementById("count-total").innerText = allEvents.length;
+      document.getElementById("count-caze").innerText = cazeCount;
+      document.getElementById("count-prime").innerText = primeCount;
+      document.getElementById("count-netflix").innerText = netflixCount;
+      document.getElementById("count-showing").innerText = count;
+    }
+
+    document.getElementById("search-input").addEventListener("input", renderTable);
+    document.getElementById("filter-canal").addEventListener("change", renderTable);
+    document.getElementById("filter-status").addEventListener("change", renderTable);
+
+    renderTable();
+  </script>
+</body>
+</html>`;
 }
