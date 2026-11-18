@@ -152,7 +152,8 @@ def obter_eventos_canal_youtube(
     canal_nome: str,
     canal_url: str,
     data_inicio_obj: Optional[datetime] = None,
-    cbf_idx: Optional[Dict[str, Any]] = None
+    cbf_idx: Optional[Dict[str, Any]] = None,
+    camps_ativos: Optional[Dict[str, bool]] = None
 ) -> List[Tuple[Any, ...]]:
     """
     Busca eventos agendados no YouTube via yt-dlp e valida na tabela oficial CBF.
@@ -161,6 +162,20 @@ def obter_eventos_canal_youtube(
     """
     if cbf_idx is None:
         cbf_idx = get_cbf_rights_index()
+
+    if camps_ativos is None:
+        try:
+            from .storage_manager import carrega_config_xml
+            camps_ativos = carrega_config_xml("campeonatos") or {}
+        except Exception:
+            camps_ativos = {}
+
+    ativo_bsa = bool(camps_ativos.get("Brasileirão serie A") or camps_ativos.get("Brasileirão Série A", True))
+    ativo_cdb = bool(camps_ativos.get("Copa do Brasil", True))
+    ativo_paulista = bool(camps_ativos.get("Campeonato Paulista", True))
+    ativo_copa_mundo = bool(camps_ativos.get("Copa do Mundo", False))
+    ativo_libertadores = bool(camps_ativos.get("CONMEBOL Libertadores", False))
+    ativo_sudamericana = bool(camps_ativos.get("CONMEBOL Sudamericana", False))
 
     if data_inicio_obj is None:
         data_inicio_obj = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -176,7 +191,7 @@ def obter_eventos_canal_youtube(
 
     ydl_opts_list = {
         'quiet': True, 'no_warnings': True, 'skip_download': True,
-        'extract_flat': True, 'playlistend': 15, 'ignoreerrors': True,
+        'extract_flat': True, 'playlistend': 20, 'ignoreerrors': True,
         'socket_timeout': 8,
         'logger': _QuietLogger(),
     }
@@ -218,38 +233,45 @@ def obter_eventos_canal_youtube(
                 desc_raw = (entry.get('description') or '').strip()
                 info_champ = parse_youtube_title(titulo_raw, desc_raw)
 
-                if info_champ.get("is_copa_mundo"):
-                    camp_atribuido = "CBF - Copa do Mundo FIFA 2026"
-                elif info_champ.get("is_paulista"):
-                    camp_atribuido = "Campeonato Paulista"
-                elif info_champ.get("is_libertadores"):
-                    camp_atribuido = "CONMEBOL Libertadores"
-                elif info_champ.get("is_sudamericana"):
-                    camp_atribuido = "CONMEBOL Sudamericana"
-                elif info_champ.get("is_copa_brasil"):
-                    camp_atribuido = "CBF - Copa do Brasil"
-                elif info_champ.get("is_carioca"):
-                    camp_atribuido = "Campeonato Carioca"
-                elif info_champ.get("is_bundesliga"):
-                    camp_atribuido = "Bundesliga"
-                elif info_champ.get("is_brasileirao"):
+                # Identificação estrita alinhada com Streaming_Scheduler
+                camp_atribuido = None
+                if info_champ.get("is_brasileirao") and ativo_bsa:
                     camp_atribuido = "CBF - Brasileirão Série A"
+                elif info_champ.get("is_copa_brasil") and ativo_cdb:
+                    camp_atribuido = "CBF - Copa do Brasil"
+                elif info_champ.get("is_paulista") and ativo_paulista:
+                    camp_atribuido = "Campeonato Paulista"
+                elif info_champ.get("is_copa_mundo") and ativo_copa_mundo:
+                    camp_atribuido = "CBF - Copa do Mundo FIFA 2026"
+                elif info_champ.get("is_libertadores") and ativo_libertadores:
+                    camp_atribuido = "CONMEBOL Libertadores"
+                elif info_champ.get("is_sudamericana") and ativo_sudamericana:
+                    camp_atribuido = "CONMEBOL Sudamericana"
                 else:
+                    # Tenta validar se a partida consta na tabela oficial da CBF
                     p_norm = _deep_normalize_partida(partida_extraida)
                     in_bsa = p_norm in cbf_idx.get('brasileirao', {})
                     in_cdb = p_norm in cbf_idx.get('copa_do_brasil', {})
-                    if in_bsa:
+                    if in_bsa and ativo_bsa:
                         camp_atribuido = "CBF - Brasileirão Série A"
-                    elif in_cdb:
+                    elif in_cdb and ativo_cdb:
                         camp_atribuido = "CBF - Copa do Brasil"
                     else:
-                        camp_atribuido = "Futebol"
+                        # DESCARTE ABSOLUTO: Nunca aceita campeonatos não mapeados ou inativos (zero eventos 'Futebol')
+                        logger.info(
+                            f"[YouTube Scanner] Jogo '{partida_extraida}' ({canal_nome}) descartado: "
+                            "campeonato inativo ou não consta na tabela oficial da CBF."
+                        )
+                        continue
+
+                if not camp_atribuido or camp_atribuido.strip().lower() == "futebol":
+                    continue
 
                 partida_bonita = prettify_match_name(partida_extraida)
                 if not is_cbf_broadcast_authorized(camp_atribuido, partida_bonita, canal_nome):
                     logger.info(
                         f"[YouTube Scanner] Jogo '{partida_bonita}' ({camp_atribuido}) descartado: "
-                        "sem direitos autorizados na tabela da CBF."
+                        f"sem direitos autorizados na tabela da CBF para {canal_nome}."
                     )
                     continue
 
@@ -286,7 +308,6 @@ def obter_eventos_canal_youtube(
 
                 data_formatada = dt_local.strftime('%d/%m/%Y')
                 hora_formatada = dt_local.strftime('%H:%M') if ts else "19:00"
-                partida_bonita = prettify_match_name(partida_extraida)
 
                 evento_tuple = (
                     camp_atribuido,
@@ -304,10 +325,14 @@ def obter_eventos_canal_youtube(
 
     return eventos
 
-def obter_eventos_caze_tv(data_inicio_obj: Optional[datetime] = None) -> List[Tuple[Any, ...]]:
+def obter_eventos_caze_tv(
+    data_inicio_obj: Optional[datetime] = None,
+    camps_ativos: Optional[Dict[str, bool]] = None
+) -> List[Tuple[Any, ...]]:
     """Scanner especializado para o canal CazéTV."""
     return obter_eventos_canal_youtube(
         canal_nome="Cazé TV",
         canal_url="https://www.youtube.com/@CazeTV/streams",
-        data_inicio_obj=data_inicio_obj
+        data_inicio_obj=data_inicio_obj,
+        camps_ativos=camps_ativos
     )

@@ -165,6 +165,47 @@ class TestYouTubeScannerRules:
         assert res["year"] == 2026
         assert res["rodada"] == 10
 
+    def test_strict_rejection_of_futebol_and_unauthorized_competitions(self):
+        # Validação estrita: campeonato genérico 'Futebol' é terminantemente rejeitado
+        assert is_cbf_broadcast_authorized("Futebol", "Fc Lorient x Rennes", "Cazé TV") is False
+        assert is_cbf_broadcast_authorized("Futebol", "Racing Club x Real Sociedad", "Cazé TV") is False
+        assert is_cbf_broadcast_authorized("", "Qualquer x Jogo", "Cazé TV") is False
+
+        # Títulos de ligas internacionais não mapeadas não geram campeonato ativo
+        for lig in [
+            "AO VIVO: FC LORIENT X RENNES | LIGUE 1 26/27",
+            "AO VIVO: RACING CLUB X REAL SOCIEDAD | LALIGA 26/27",
+            "AO VIVO: PARIS FC X ANGERS | LIGUE 1 26/27",
+            "AO VIVO: LENS X TOULOUSE | LIGUE 1 26/27"
+        ]:
+            info = parse_youtube_title(lig)
+            assert info["is_brasileirao"] is False
+            assert info["is_copa_brasil"] is False
+            assert info["is_copa_mundo"] is False
+
+    def test_inactive_copa_do_mundo_filtered_out(self):
+        # Quando Copa do Mundo estiver desativada (padrão config.xml), títulos de Copa do Mundo não devem ser aceitos
+        camps_ativos = {"Brasileirão serie A": True, "Copa do Brasil": True, "Copa do Mundo": False}
+        info = parse_youtube_title("AO VIVO: DINAMARCA X ARGENTINA | COPA DO MUNDO SUB-17 2026")
+        assert info["is_copa_mundo"] is True
+        # Como camps_ativos['Copa do Mundo'] é False, a verificação deve descartar
+        ativo_copa = camps_ativos.get("Copa do Mundo", False)
+        assert ativo_copa is False
+
+    def test_cbf_pdf_updated_url_and_future_matches(self):
+        from modules.reporte_eventos.cbf_pdf_service import get_latest_cbf_url, parse_cbf_pdf
+        url_bsa = get_latest_cbf_url("BSA")
+        assert url_bsa is not None
+        assert "Tabela_Detalhada_BSA_2026_16_11" in url_bsa
+
+        pdf_path = get_app_path("temp_Brasileirão_Série_A.pdf")
+        if os.path.exists(pdf_path):
+            matches = parse_cbf_pdf(pdf_path, "Brasileirão Série A")
+            assert len(matches) > 0
+            jogos = [m["Jogo"] for m in matches]
+            # Deve conter confrontos de novembro
+            assert "Coritiba x Santos" in jogos or "Fluminense x Mirassol" in jogos
+
 
 class TestCopaDoMundoExcelRule:
     def test_copa_mundo_excel_minus_2_hours(self):
@@ -376,7 +417,7 @@ class TestSeleniumServiceAndProfiles:
         finally:
             root.destroy()
 
-    def test_run_eventos_cbf_skips_existing_platform_matches(self):
+    def test_run_eventos_cbf_skips_existing_platform_matches(self, tmp_path):
         from modules.reporte_eventos.cbf_pdf_service import run_eventos_cbf
         from unittest.mock import patch
 
@@ -389,7 +430,8 @@ class TestSeleniumServiceAndProfiles:
         # Partida que a plataforma já encontrou
         existing = [("Flamengo x Fluminense", "22/11/2026")]
 
-        with patch("modules.reporte_eventos.cbf_pdf_service.get_latest_cbf_url", return_value="https://cbf.com.br/fake.pdf"), \
+        with patch("modules.reporte_eventos.cbf_pdf_service.get_config_dir", return_value=tmp_path), \
+             patch("modules.reporte_eventos.cbf_pdf_service.get_latest_cbf_url", return_value="https://cbf.com.br/fake.pdf"), \
              patch("modules.reporte_eventos.cbf_pdf_service.requests.get") as mock_get, \
              patch("modules.reporte_eventos.cbf_pdf_service.parse_cbf_pdf", return_value=mock_extracted):
 

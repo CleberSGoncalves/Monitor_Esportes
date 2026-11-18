@@ -1,5 +1,5 @@
 {
-  "version": "2.5.15",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.15/Monitor_Esportes.exe",
-  "changelog": "v2.5.15: Sincronização em paralelo (dual-write) com Google Sheets via Apps Script Web App integrado ao fluxo do SharePoint, preservando integridade das transmissões e espelhando eventos em tempo real em background thread sem bloqueio de interface."
+  "version": "2.5.16",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.16/Monitor_Esportes.exe",
+  "changelog": "v2.5.16: Correção definitiva da captura de eventos no Reporte de Eventos em conformidade estrita com o Streaming_Scheduler: eliminação total de eventos genéricos 'Futebol' (ligas europeias), filtragem rigorosa por campeonatos ativos (descarte de Copa do Mundo inativa), validação oficial na tabela de direitos CBF (coluna 5 Cazé TV / coluna 4 Prime Video) e atualização dinâmica da Tabela Detalhada CBF (16/11/2026)."
 }

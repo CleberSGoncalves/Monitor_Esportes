@@ -18,19 +18,19 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.15"
-    release_name = "v2.5.15 - Sincronização em Paralelo com Google Sheets (Dual-Write)"
+    tag = "v2.5.16"
+    release_name = "v2.5.16 - Correção Estrita da Captura de Eventos (Alinhamento Streaming_Scheduler)"
     body = (
-        "### Novidades da versão v2.5.15:\n"
-        "- 🚀 **Sincronização em Paralelo com Google Sheets (Dual-Write)**:\n"
-        "  - Implementação do serviço `google_sheets_sync_service.py` integrado nativamente ao fluxo de salvamento e envio do SharePoint.\n"
-        "  - Disparo de eventos em segundo plano (background thread daemon), garantindo zero impacto no tempo de resposta da aplicação e sem congelamento de interface.\n"
-        "  - Normalização automática das 11 colunas oficiais do SharePoint: Anexos, Mês, Data, Horário, Campeonato, Partida, Responsavel gravação, Canal de Transmissão, PVID TV BOX, Status de Entrega, Programado.\n"
-        "- 📊 **Backfill Histórico Completo da Lista do SharePoint**:\n"
-        "  - Migração de todos os 862 eventos existentes da lista oficial do SharePoint para a planilha Google Sheets via Web App Apps Script.\n"
-        "  - Geração da planilha Excel (.xlsx) atualizada com 100% de fidelidade visual às Modern Lists do SharePoint e formatação de badges por canal e status de entrega.\n"
+        "### Novidades da versão v2.5.16:\n"
+        "- 🎯 **Alinhamento Estrito com o Streaming_Scheduler**:\n"
+        "  - Eliminação definitiva e completa de qualquer evento genérico 'Futebol' (como partidas de ligas europeias Ligue 1 e La Liga na Cazé TV).\n"
+        "  - Filtragem rigorosa por campeonatos ativos (`camps_ativos`), descartando competições inativas como Copa do Mundo.\n"
+        "  - Validação estrita de direitos de transmissão na tabela oficial da CBF (Coluna 5 para Cazé TV / Coluna 4 para Prime Video).\n"
+        "- 📑 **Atualização Dinâmica da Tabela Detalhada CBF (16/11/2026)**:\n"
+        "  - Atualização automática da URL oficial da CBF para `Tabela_Detalhada_BSA_2026_16_11_84aba21463.pdf` com busca dinâmica Selenium.\n"
+        "  - Captura precisa dos confrontos de novembro (Coritiba x Santos, Fluminense x Mirassol, Botafogo x São Paulo, Chapecoense x Palmeiras, Corinthians x Grêmio).\n"
         "- 🧪 **Suíte de Testes Automatizados E2E**:\n"
-        "  - 30 testes unitários e de integração passando com 100% de sucesso.\n"
+        "  - 33 testes unitários e de integração cobrindo todas as regras de negócio com 100% de sucesso.\n"
     )
 
     headers = {

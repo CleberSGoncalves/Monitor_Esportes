@@ -1144,7 +1144,7 @@ class ReporteEventosMixin:
                 if usar_caze:
                     q.put(("status", "Atualização de eventos do Cazé TV...", 0.70))
                     try:
-                        caze_evs = obter_eventos_caze_tv(data_inicio_obj=data_inicio_obj)
+                        caze_evs = obter_eventos_caze_tv(data_inicio_obj=data_inicio_obj, camps_ativos=camps_ativos)
                         for c_ev in caze_evs:
                             q.put(("event", c_ev))
                             encontrados_plataformas.add((prettify_match_name(c_ev[1]), str(c_ev[2]).strip()))
@@ -1170,7 +1170,7 @@ class ReporteEventosMixin:
                         elif p_plat == "Disney":
                             extra_evs = run_eventos_disney(u_url, expected_camp=n_camp, data_inicio_obj=data_inicio_obj)
                         elif p_plat == "Cazé TV":
-                            extra_evs = obter_eventos_canal_youtube("Cazé TV", u_url, data_inicio_obj=data_inicio_obj)
+                            extra_evs = obter_eventos_canal_youtube("Cazé TV", u_url, data_inicio_obj=data_inicio_obj, camps_ativos=camps_ativos)
                         else:
                             extra_evs = []
                         for ev in extra_evs:
@@ -1183,7 +1183,7 @@ class ReporteEventosMixin:
                         ch_nome = ch.get("nome", "YouTube")
                         ch_url = ch.get("url", "")
                         if not ch_url: continue
-                        yt_evs = obter_eventos_canal_youtube(ch_nome, ch_url, data_inicio_obj=data_inicio_obj)
+                        yt_evs = obter_eventos_canal_youtube(ch_nome, ch_url, data_inicio_obj=data_inicio_obj, camps_ativos=camps_ativos)
                         for ev in (yt_evs or []):
                             q.put(("event", ev))
                             encontrados_plataformas.add((prettify_match_name(ev[1]), str(ev[2]).strip()))

@@ -128,9 +128,49 @@ def prettify_match_name(match_name: str) -> str:
 _CBF_RIGHTS_CACHE: Dict[str, Dict[Tuple[str, ...], Set[str]]] = {}
 
 def get_latest_cbf_url(comp_type: str) -> Optional[str]:
-    """Retorna a URL mais recente da Tabela Detalhada no portal CBF ou fallback homologado."""
+    """Retorna a URL mais recente da Tabela Detalhada no portal CBF via busca dinâmica ou fallback homologado."""
+    if comp_type == "BSA":
+        url = "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026"
+    elif comp_type == "CDB":
+        url = "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026"
+    else:
+        return None
+
+    try:
+        from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
+        from selenium.webdriver.common.by import By
+        import time
+
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+
+        driver = webdriver.Chrome(options=chrome_options)
+        try:
+            driver.get(url)
+            time.sleep(5)
+            links = driver.find_elements(By.TAG_NAME, "a")
+            for a in links:
+                try:
+                    href = a.get_attribute("href")
+                    if href and ("Tabela_Detalhada" in href or "tabela_detalhada" in href) and href.endswith(".pdf"):
+                        logger.info(f"[CBF] URL dinâmica encontrada para {comp_type}: {href}")
+                        return href
+                except Exception:
+                    pass
+        finally:
+            try:
+                driver.quit()
+            except Exception:
+                pass
+    except Exception as e:
+        logger.debug(f"[CBF] Falha ao buscar URL dinâmica da CBF ({comp_type}): {e}")
+
     fallbacks = {
-        "BSA": "https://stcbfsiteprdimgbrs.blob.core.windows.net/img-site/cdn/Tabela_Detalhada_BSA_2026_05_10_cd1e0860b2.pdf",
+        "BSA": "https://stcbfsiteprdimgbrs.blob.core.windows.net/img-site/cdn/Tabela_Detalhada_BSA_2026_16_11_84aba21463.pdf",
         "CDB": "https://stcbfsiteprdimgbrs.blob.core.windows.net/img-site/cdn/Tabela_Detalhada_Copa_do_Brasil_2026_07_10_0c40ca55b3.pdf"
     }
     return fallbacks.get(comp_type)
@@ -250,8 +290,12 @@ def get_cbf_rights_index(force_reload: bool = False) -> Dict[str, Dict[Tuple[str
 
 def is_cbf_broadcast_authorized(camp_name: str, match_name: str, platform_name: str) -> bool:
     """Valida se o canal/plataforma tem autorização oficial na tabela CBF."""
-    c_lower = str(camp_name).lower()
-    p_lower = str(platform_name).lower()
+    c_lower = str(camp_name).lower().strip()
+    p_lower = str(platform_name).lower().strip()
+
+    # Rejeita terminantemente campeonatos genéricos não autorizados
+    if not c_lower or 'futebol' in c_lower:
+        return False
 
     is_bsa = 'brasileir' in c_lower or 'serie a' in c_lower
     is_cdb = 'copa do brasil' in c_lower
