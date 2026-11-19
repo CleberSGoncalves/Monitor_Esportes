@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Gerador do Portal Web Oficial do Suporte Captação (Kantar IBOPE Media).
+Gerador do Portal Web Oficial do Suporte Captação (IBOPE).
 Gera um portal intranet moderno, autônomo e 100% independente do SharePoint legado.
 Contém todos os módulos nativos:
  - Hero Banner 1:1 com SharePoint (fundo azul marinho, nós de rede SVG, clima, grade 3x3 branca interna)
@@ -1167,7 +1167,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       <button class="nav-pill-btn" onclick="toggleDarkMode()" title="Alternar Modo Escuro / Claro">
         <span id="dark-mode-icon">🌙</span> Modo Operacional
       </button>
-      <div class="user-avatar" id="top-user-avatar" title="Kantar IBOPE Media — Suporte Captação">CG</div>
+      <div class="user-avatar" id="top-user-avatar" title="IBOPE — Suporte Captação">CG</div>
     </div>
   </header>
 
@@ -1178,7 +1178,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="site-brand-icon">SC</div>
         <div class="site-brand-info">
           <h2>Suporte e Captação</h2>
-          <p>Kantar IBOPE Media — Central Autônoma de Operações & Ingest</p>
+          <p>IBOPE — Central Autônoma de Operações & Ingest</p>
         </div>
       </div>
 
@@ -1946,7 +1946,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <!-- RODAPÉ CORPORATIVO -->
   <footer class="site-footer">
     <div class="site-footer-container">
-      <div><b>Kantar IBOPE Media</b> — Central de Operações & Suporte Captação © 2026</div>
+      <div><b>IBOPE</b> — Central de Operações & Suporte Captação © 2026</div>
       <div>Portal 100% Autônomo e Integrado com Google Workspace</div>
     </div>
   </footer>
