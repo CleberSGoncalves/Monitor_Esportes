@@ -279,6 +279,388 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       margin-top: 2px;
     }
 
+    /* NAVEGAÇÃO SUPERIOR ESTILO SHAREPOINT MODERNO COM DROPDOWNS */
+    .sp-top-nav-bar {
+      background: #004578;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 100;
+    }
+
+    .sp-top-nav-container {
+      width: 100%;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+      min-height: 48px;
+    }
+
+    .sp-nav-menus {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .sp-nav-menus::-webkit-scrollbar {
+      display: none;
+    }
+
+    .sp-menu-item {
+      position: relative;
+    }
+
+    .sp-menu-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: #DEECF9;
+      padding: 12px 14px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .sp-menu-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .sp-menu-btn.active {
+      color: #FFFFFF;
+      border-bottom-color: #50E6FF;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .sp-caret {
+      font-size: 9px;
+      opacity: 0.8;
+      transition: transform 0.2s ease;
+    }
+
+    .sp-menu-item:hover .sp-caret {
+      transform: rotate(180deg);
+    }
+
+    /* DROPDOWN MENU FLYOUT */
+    .sp-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      min-width: 280px;
+      background: #FFFFFF;
+      border-radius: 4px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+      border: 1px solid #E2E8F0;
+      padding: 6px 0;
+      display: none;
+      z-index: 1000;
+      animation: fadeInDropdown 0.15s ease;
+    }
+
+    @keyframes fadeInDropdown {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .sp-menu-item:hover .sp-dropdown-menu,
+    .sp-menu-item:focus-within .sp-dropdown-menu {
+      display: block;
+    }
+
+    .sp-dropdown-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 18px;
+      color: #1E293B;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .sp-dropdown-link:hover {
+      background: #F1F5F9;
+      color: #0078D4;
+    }
+
+    .sp-dropdown-link .item-count-badge {
+      margin-left: auto;
+      font-size: 11px;
+      color: #64748B;
+      background: #F1F5F9;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .sp-dropdown-divider {
+      height: 1px;
+      background: #E2E8F0;
+      margin: 4px 0;
+    }
+
+    /* PAINEL DE OCORRÊNCIAS ESTILO SHAREPOINT LIST (1:1 COM IMAGEM DO USUÁRIO) */
+    .sp-list-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0 8px 0;
+      margin-bottom: 4px;
+    }
+
+    .sp-list-main-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1E293B;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sp-list-main-title .star-icon {
+      font-size: 14px;
+      color: #94A3B8;
+      cursor: pointer;
+    }
+
+    /* BARRA DE COMANDOS / AÇÕES DO SHAREPOINT */
+    .sp-command-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0 10px 0;
+      border-bottom: 1px solid #E2E8F0;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .sp-command-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .sp-btn-new {
+      background: #004578;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 2px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .sp-btn-new:hover {
+      background: #003366;
+    }
+
+    .sp-btn-cmd {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #334155;
+      border-radius: 2px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .sp-btn-cmd:hover {
+      background: #F1F5F9;
+      border-color: #E2E8F0;
+    }
+
+    .sp-command-search {
+      min-width: 280px;
+      position: relative;
+    }
+
+    .sp-command-search input {
+      width: 100%;
+      border: 1px solid #CBD5E1;
+      border-radius: 4px;
+      padding: 6px 12px 6px 30px;
+      font-size: 12.5px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+
+    .sp-command-search input:focus {
+      border-color: #0078D4;
+    }
+
+    .sp-command-search::before {
+      content: '🔍';
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    /* BARRA DE EXIBIÇÕES (VIEWS) */
+    .sp-views-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid #E2E8F0;
+      margin-bottom: 10px;
+      padding-bottom: 2px;
+      overflow-x: auto;
+    }
+
+    .sp-view-tab {
+      background: transparent;
+      border: none;
+      border-bottom: 2.5px solid transparent;
+      color: #64748B;
+      padding: 6px 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .sp-view-tab:hover {
+      color: #0F172A;
+    }
+
+    .sp-view-tab.active {
+      color: #0078D4;
+      border-bottom-color: #0078D4;
+    }
+
+    /* BARRA DE FILTROS ATIVOS (PILLS) */
+    .sp-filter-pills-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 12.5px;
+      color: #64748B;
+      flex-wrap: wrap;
+    }
+
+    .sp-filter-pill {
+      background: #E0F2FE;
+      color: #0369A1;
+      border-radius: 14px;
+      padding: 3px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid #BAE6FD;
+    }
+
+    .sp-filter-pill-purple {
+      background: #F3E8FF;
+      color: #7E22CE;
+      border-color: #E9D5FF;
+    }
+
+    .sp-pill-close {
+      cursor: pointer;
+      font-weight: 700;
+      opacity: 0.7;
+    }
+
+    .sp-pill-close:hover {
+      opacity: 1;
+    }
+
+    .sp-btn-clear-filters {
+      background: none;
+      border: none;
+      color: #0078D4;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      margin-left: 6px;
+    }
+
+    .sp-btn-clear-filters:hover {
+      text-decoration: underline;
+    }
+
+    /* BADGES ESPECÍFICOS DO PAINEL DE OCORRÊNCIAS */
+    .sp-badge {
+      display: inline-block;
+      border-radius: 12px;
+      padding: 2.5px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .sp-badge-em-andamento { background: #38BDF8; color: #FFFFFF; }
+    .sp-badge-feedback { background: #8B5CF6; color: #FFFFFF; }
+    .sp-badge-concluido { background: #10B981; color: #FFFFFF; }
+
+    .sp-badge-dark { background: #475569; color: #FFFFFF; }
+    .sp-badge-amber { background: #D97706; color: #FFFFFF; }
+    .sp-badge-teal { background: #0D9488; color: #FFFFFF; }
+    .sp-badge-red { background: #EF4444; color: #FFFFFF; }
+    .sp-badge-purple { background: #7C3AED; color: #FFFFFF; }
+
+    .sp-badge-yellow { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+    .sp-badge-blue { background: #DBEAFE; color: #1E40AF; border: 1px solid #BFDBFE; }
+    .sp-badge-red-soft { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+    .sp-badge-indigo { background: #E0E7FF; color: #3730A3; border: 1px solid #C7D2FE; }
+    .sp-badge-cyan { background: #CFFAFE; color: #155E75; border: 1px solid #A5F3FC; }
+    .sp-badge-orange { background: #FFEDD5; color: #9A3412; border: 1px solid #FED7AA; }
+    .sp-badge-gray { background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB; }
+
+    .sp-badge-sim { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+    .sp-badge-nao { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+
+    .sp-badge-n1 { background: #38BDF8; color: #FFFFFF; }
+    .sp-badge-solucionado { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+    .sp-badge-vinicius { background: #0F766E; color: #FFFFFF; }
+    .sp-badge-lucieudes { background: #93C5FD; color: #1E3A8A; }
+
+    .sp-redmine-link {
+      color: #0078D4;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .sp-redmine-link:hover {
+      text-decoration: underline;
+    }
+
     .nav-menu-tabs {
       display: flex;
       gap: 2px;
@@ -1184,21 +1566,94 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
       </div>
 
-      <div class="nav-menu-tabs">
-        <button class="tab-link active" onclick="showPane('home')">🏠 Início</button>
-        <button class="tab-link" onclick="showPane('escala')">💼 Escala de Trabalho 2026</button>
-        <button class="tab-link" onclick="showPane('streaming')">⚽ Programação Streaming (__EVENTS_COUNT__)</button>
-        <button class="tab-link" onclick="showPane('hospedeiros')">📞 Hospedeiros (__HOSPEDEIROS_COUNT__)</button>
-        <button class="tab-link" onclick="showPane('ocorrencias')">🚨 Ocorrências (__OCORRENCIAS_COUNT__)</button>
-        <button class="tab-link" onclick="showPane('procedimentos')">📖 Procedimentos N1 (__PROCEDIMENTOS_COUNT__)</button>
-        <button class="tab-link" onclick="showPane('documentos')">📁 Documentos (__DOCUMENTOS_COUNT__)</button>
-        <button class="tab-link" onclick="showPane('dashboard')">📊 Dashboard</button>
-        <button class="tab-link" onclick="showPane('metas')">🎯 Metas</button>
-        <button class="tab-link" onclick="showPane('projetos')">🚀 Projetos</button>
-        <button class="tab-link" onclick="showPane('receptores')">📡 Receptores & TV BOX</button>
-        <button class="tab-link" onclick="showPane('equipe')">👥 Equipe</button>
-        <button class="tab-link" id="nav-tab-permissoes" onclick="showPane('permissoes')">🔐 Permissões (__PERMS_COUNT__)</button>
-        <button class="tab-link" onclick="showPane('links')">🔗 Links</button>
+      <div class="sp-nav-menus">
+        <!-- Página Inicial -->
+        <div class="sp-menu-item">
+          <button class="sp-menu-btn tab-link active" onclick="showPane('home')">Página Inicial</button>
+        </div>
+
+        <!-- Documentos ⌵ -->
+        <div class="sp-menu-item">
+          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">Documentos <span class="sp-caret">⌵</span></button>
+          <div class="sp-dropdown-menu">
+            <a class="sp-dropdown-link" onclick="showPane('escala')">💼 Escala de Trabalho 2026</a>
+            <a class="sp-dropdown-link" onclick="showPane('procedimentos')">📖 Procedimentos N1 <span class="item-count-badge">__PROCEDIMENTOS_COUNT__</span></a>
+            <a class="sp-dropdown-link" onclick="showPane('documentos')">📁 Documentos Compartilhados <span class="item-count-badge">__DOCUMENTOS_COUNT__</span></a>
+            <a class="sp-dropdown-link" onclick="showPane('capacitacao')">📋 Ficha de Capacitação</a>
+            <a class="sp-dropdown-link" onclick="showPane('tratativa')">📑 Tratativa de Problemas de Captação</a>
+            <a class="sp-dropdown-link" onclick="showPane('doctecnicos')">📡 Documentos Técnicos (PayTV)</a>
+          </div>
+        </div>
+
+        <!-- Administração ⌵ -->
+        <div class="sp-menu-item">
+          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">Administração <span class="sp-caret">⌵</span></button>
+          <div class="sp-dropdown-menu">
+            <a class="sp-dropdown-link" onclick="showPane('metas')">🎯 Metas & OKRs da Equipe</a>
+            <a class="sp-dropdown-link" onclick="showPane('contratos')">📝 Controle de Contratos Parceiros</a>
+            <a class="sp-dropdown-link" onclick="showPane('fornecedores')">🏢 Avaliação Técnica de Fornecedores</a>
+            <a class="sp-dropdown-link" onclick="showPane('solicitacoes')">🔑 Solicitações de Acesso</a>
+          </div>
+        </div>
+
+        <!-- Qualidade ⌵ -->
+        <div class="sp-menu-item">
+          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">Qualidade <span class="sp-caret">⌵</span></button>
+          <div class="sp-dropdown-menu">
+            <a class="sp-dropdown-link" onclick="showPane('sla')">⏱️ SLA de Atendimento</a>
+            <a class="sp-dropdown-link" onclick="showPane('dashboard')">📊 Dashboard & Indicadores</a>
+            <a class="sp-dropdown-link" onclick="showPane('notificacoes')">🔔 Análise de Notificações</a>
+            <a class="sp-dropdown-link" onclick="showPane('backup')">💾 Validação de Backup</a>
+            <a class="sp-dropdown-link" onclick="showPane('analisedados')">📈 Análise de Dados</a>
+            <a class="sp-dropdown-link" onclick="showPane('falhas')">⚠️ Confirmação de Falhas</a>
+          </div>
+        </div>
+
+        <!-- Contato ⌵ -->
+        <div class="sp-menu-item">
+          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">Contato <span class="sp-caret">⌵</span></button>
+          <div class="sp-dropdown-menu">
+            <a class="sp-dropdown-link" onclick="showPane('hospedeiros')">📞 Contato Técnico de Hospedeiros <span class="item-count-badge">__HOSPEDEIROS_COUNT__</span></a>
+            <a class="sp-dropdown-link" onclick="showPane('antenistas')">🛠️ Contatos de Antenistas <span class="item-count-badge">5</span></a>
+            <a class="sp-dropdown-link" onclick="showPane('equipe')">👥 Equipe do Suporte Captação</a>
+          </div>
+        </div>
+
+        <!-- DEV ⌵ -->
+        <div class="sp-menu-item">
+          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">DEV <span class="sp-caret">⌵</span></button>
+          <div class="sp-dropdown-menu">
+            <a class="sp-dropdown-link" onclick="showPane('automacoes')">🤖 Repositório de Automações</a>
+            <a class="sp-dropdown-link" onclick="showPane('redmine')">🐞 Redmine (Demandas)</a>
+            <a class="sp-dropdown-link" onclick="showPane('hosts')">📡 Cadastro de Hosts <span class="item-count-badge">__HOSTS_COUNT__</span></a>
+            <a class="sp-dropdown-link" onclick="showPane('cidades')">🏙️ Mapeamento de Cidades e Emissoras</a>
+          </div>
+        </div>
+
+        <!-- Suporte ⌵ -->
+        <div class="sp-menu-item">
+          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">Suporte <span class="sp-caret">⌵</span></button>
+          <div class="sp-dropdown-menu">
+            <a class="sp-dropdown-link" onclick="showPane('ocorrencias')">🚨 Painel de Ocorrências <span class="item-count-badge">__OCORRENCIAS_COUNT__</span></a>
+            <a class="sp-dropdown-link" onclick="showPane('streaming')">⚽ Programação Streaming <span class="item-count-badge">__EVENTS_COUNT__</span></a>
+            <a class="sp-dropdown-link" onclick="showPane('gestaoservicos')">⚙️ Painel de Gestão de Serviços dos CS</a>
+            <a class="sp-dropdown-link" onclick="showPane('monitoramentocanais')">📺 Monitoramento de Canais CS</a>
+            <a class="sp-dropdown-link" onclick="showPane('redescs')">🌐 Configurações de Rede do CS</a>
+            <a class="sp-dropdown-link" onclick="showPane('redepcd')">🖥️ Mapeamento de Rede do CPD</a>
+            <a class="sp-dropdown-link" onclick="showPane('remoto')">🎮 Acesso Remoto & América Central</a>
+            <a class="sp-dropdown-link" onclick="showPane('relatoriosjogos')">🏀 Relatórios de Jogos (YouTube & NBA)</a>
+          </div>
+        </div>
+
+        <!-- Links de Internet dos Parceiros -->
+        <div class="sp-menu-item">
+          <button class="sp-menu-btn tab-link" onclick="showPane('links')">Links de Internet dos Parceiros</button>
+        </div>
+
+        <!-- Permissões (RBAC) -->
+        <div class="sp-menu-item action-admin-only" id="nav-tab-permissoes">
+          <button class="sp-menu-btn tab-link" onclick="showPane('permissoes')">🔐 Permissões</button>
+        </div>
       </div>
     </div>
   </nav>
@@ -1626,33 +2081,84 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
     </div>
 
-    <!-- ABA 5: PAINEL DE OCORRÊNCIAS (500 REGISTROS NATIVOS) -->
+    <!-- ABA 5: PAINEL DE OCORRÊNCIAS & HISTÓRICO DE INCIDENTES (1:1 COM SHAREPOINT) -->
     <div id="pane-ocorrencias" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🚨 Painel de Ocorrências & Histórico de Incidentes (__OCORRENCIAS_COUNT__ Casos)</h2>
-        <p class="section-desc">Histórico completo de incidentes operacionais, diagnóstico de falhas em equipamentos e ações corretivas.</p>
+      
+      <!-- BARRA DE COMANDOS DO SHAREPOINT -->
+      <div class="sp-command-bar">
+        <div class="sp-command-left">
+          <button class="sp-btn-new action-admin-only" onclick="alert('Formulário de Nova Ocorrência conectado ao SharePoint')">
+            <span>+</span> Novo
+          </button>
+          <button class="sp-btn-cmd" onclick="toggleOcoCompact()">
+            <span>田</span> Editar no modo de exibição de grade
+          </button>
+          <button class="sp-btn-cmd" onclick="renderOcorrenciasTable()">
+            <span>↺</span> Atualizar
+          </button>
+          <button class="sp-btn-cmd" onclick="exportOcorrenciasCSV()">
+            <span>📥</span> Exportar CSV
+          </button>
+        </div>
+        <div class="sp-command-search">
+          <input type="text" id="search-oco-box" placeholder="Pesquisar nesta lista..." oninput="renderOcorrenciasTable()">
+        </div>
       </div>
 
-      <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-oco-box" class="search-field" placeholder="🔍 Buscar por título, praça, equipamento ou sintoma de problema...">
-        </div>
-        <div>
-          <button class="btn-action btn-action-primary" onclick="exportOcorrenciasCSV()">📥 Exportar Ocorrências CSV</button>
-        </div>
+      <!-- TÍTULO DA LISTA -->
+      <div class="sp-list-header-row">
+        <h2 class="sp-list-main-title">
+          Painel de Ocorrências <span class="star-icon">☆</span>
+        </h2>
       </div>
 
+      <!-- EXIBIÇÕES (VIEWS) -->
+      <div class="sp-views-bar">
+        <button class="sp-view-tab active" id="view-tab-emandamento" onclick="switchOcoView('emandamento')">
+          Em andamento - Lista <span style="font-size: 10px;">⌵</span>
+        </button>
+        <button class="sp-view-tab" id="view-tab-recuperacao" onclick="switchOcoView('recuperacao')">
+          Em recuperação
+        </button>
+        <button class="sp-view-tab" id="view-tab-operacao" onclick="switchOcoView('operacao')">
+          Operação
+        </button>
+        <button class="sp-view-tab" id="view-tab-todos" onclick="switchOcoView('todos')">
+          Todos os Itens
+        </button>
+      </div>
+
+      <!-- BARRA DE FILTROS ATIVOS -->
+      <div class="sp-filter-pills-bar" id="oco-filter-pills-wrap">
+        <span>Status:</span>
+        <span class="sp-filter-pill" id="pill-emandamento">
+          Em andamento <span class="sp-pill-close" onclick="toggleStatusFilter('Em andamento')">✕</span>
+        </span>
+        <span class="sp-filter-pill sp-filter-pill-purple" id="pill-feedback">
+          Feedback <span class="sp-pill-close" onclick="toggleStatusFilter('Feedback')">✕</span>
+        </span>
+        <button class="sp-btn-clear-filters" onclick="clearOcoFilters()">Limpar ✕</button>
+      </div>
+
+      <!-- TABELA DO SHAREPOINT (13 COLUNAS OFICIAIS) -->
       <div class="sp-table-wrap">
         <div class="sp-table-scroll">
           <table class="sp-list-table">
             <thead>
               <tr>
-                <th class="td-center">#</th>
-                <th>Título da Ocorrência</th>
-                <th>CS / Praça</th>
-                <th>Equipamento</th>
-                <th>Problema Identificado</th>
-                <th>Ações Executadas</th>
+                <th style="min-width: 120px;">Status</th>
+                <th style="min-width: 130px; cursor: pointer;" onclick="toggleOcoSort()">Criado ↓</th>
+                <th style="min-width: 190px;">Host</th>
+                <th style="min-width: 70px;">CS</th>
+                <th style="min-width: 110px;">Veículo</th>
+                <th style="min-width: 140px;">Equipamento</th>
+                <th style="min-width: 140px;">Tipo do Problema</th>
+                <th style="min-width: 110px;" class="td-center">Em recuperação</th>
+                <th style="min-width: 120px;" class="td-center">GravaçãoStreaming</th>
+                <th style="min-width: 120px;" class="td-center">Informar Operação</th>
+                <th style="min-width: 250px;">Ações executadas</th>
+                <th style="min-width: 130px;">Area/Responsável</th>
+                <th style="min-width: 80px;" class="td-center">Redmine</th>
               </tr>
             </thead>
             <tbody id="oco-table-body">
@@ -1661,8 +2167,104 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           </table>
         </div>
       </div>
+
+      <div style="margin-top: 10px; font-size: 12.5px; color: var(--sp-text-secondary); display: flex; justify-content: space-between; align-items: center;">
+        <div>Mostrando <b id="showing-oco-count" style="color: var(--sp-theme-primary);">0</b> de <b id="total-oco-count">0</b> ocorrências</div>
+        <div style="color: #64748B; font-size: 11.5px;">Sincronizado diretamente do SharePoint Oficial</div>
+      </div>
+    </div>
+
+    <!-- SUBMENU: CONTATOS DE ANTENISTAS -->
+    <div id="pane-antenistas" class="pane-container">
+      <div class="sp-command-bar">
+        <div class="sp-command-left">
+          <button class="sp-btn-new action-admin-only" onclick="alert('Formulário de Novo Contato')"><span>+</span> Novo</button>
+          <button class="sp-btn-cmd" onclick="renderAntenistasTable()"><span>↺</span> Atualizar</button>
+        </div>
+        <div class="sp-command-search">
+          <input type="text" id="search-ante-box" placeholder="Pesquisar antenistas..." oninput="renderAntenistasTable()">
+        </div>
+      </div>
+      <div class="sp-list-header-row">
+        <h2 class="sp-list-main-title">Contatos de Antenistas <span class="star-icon">☆</span></h2>
+      </div>
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th style="min-width: 150px;">Nome / Contato</th>
+                <th style="min-width: 120px;">Cidade / Praça</th>
+                <th style="min-width: 140px;">Especialidade / Cargo</th>
+                <th style="min-width: 180px;">Empresa</th>
+                <th style="min-width: 140px;">Telefone Comercial</th>
+                <th style="min-width: 140px;">Telefone Celular</th>
+              </tr>
+            </thead>
+            <tbody id="ante-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMENU: CADASTRO DE HOSTS -->
+    <div id="pane-hosts" class="pane-container">
+      <div class="sp-command-bar">
+        <div class="sp-command-left">
+          <button class="sp-btn-new action-admin-only" onclick="alert('Novo Host')"><span>+</span> Novo Host</button>
+          <button class="sp-btn-cmd" onclick="renderHostsTable()"><span>↺</span> Atualizar</button>
+        </div>
+        <div class="sp-command-search">
+          <input type="text" id="search-hosts-box" placeholder="Pesquisar hosts ou cidades..." oninput="renderHostsTable()">
+        </div>
+      </div>
+      <div class="sp-list-header-row">
+        <h2 class="sp-list-main-title">Cadastro - Hosts (220 Praças Ativas) <span class="star-icon">☆</span></h2>
+      </div>
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;" class="td-center">ID</th>
+                <th style="min-width: 250px;">Código do Host / Praça</th>
+                <th style="min-width: 120px;" class="td-center">Status</th>
+                <th style="min-width: 150px;" class="td-center">Ações Rápidas</th>
+              </tr>
+            </thead>
+            <tbody id="hosts-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
       <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
-        Mostrando <b id="showing-oco-count" style="color: var(--sp-theme-primary);">0</b> ocorrências registradas
+        Mostrando <b id="showing-hosts-count" style="color: var(--sp-theme-primary);">0</b> de 220 hosts cadastrados
+      </div>
+    </div>
+
+    <!-- SUBMENU GENÉRICO: VISUALIZADOR DE LISTAS NATIVAS DO SHAREPOINT -->
+    <div id="pane-list-viewer" class="pane-container">
+      <div class="sp-command-bar">
+        <div class="sp-command-left">
+          <button class="sp-btn-new action-admin-only" onclick="alert('Conectado ao SharePoint')"><span>+</span> Novo Item</button>
+          <button class="sp-btn-cmd" onclick="showPane('home')"><span>🏠</span> Voltar ao Início</button>
+        </div>
+      </div>
+      <div class="sp-list-header-row">
+        <h2 class="sp-list-main-title" id="list-viewer-title">Lista do SharePoint <span class="star-icon">☆</span></h2>
+      </div>
+      <div class="card" style="padding: 24px; border-left: 4px solid #0078D4;">
+        <h3 id="list-viewer-subtitle" style="font-size: 16px; color: #1E293B; margin-bottom: 8px;">Módulo Integrado ao SharePoint</h3>
+        <p id="list-viewer-desc" style="color: #64748B; font-size: 13.5px; line-height: 1.5; margin-bottom: 16px;">
+          Esta lista está sincronizada com a esteira oficial do SharePoint Online da Central de Suporte e Captação.
+        </p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;" id="list-viewer-actions">
+          <button class="btn-action btn-action-primary" onclick="showPane('home')">Ir para Página Inicial</button>
+          <button class="btn-action btn-action-secondary" onclick="showPane('ocorrencias')">Ver Painel de Ocorrências</button>
+        </div>
       </div>
     </div>
 
@@ -1962,6 +2564,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     let allProcedimentos = __PROCEDIMENTOS_JSON__;
     let allDocumentos = __DOCUMENTOS_JSON__;
     let allEscalaMonths = __ESCALA_JSON__;
+    let allAntenistas = __ANTENISTAS_JSON__;
+    let allHosts = __HOSTS_JSON__;
 
     let currentRole = "admin";
     let currentMonth = "Novembro";
@@ -1998,11 +2602,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       }
     }
 
-    function showPane(paneId) {
+    function showPane(paneId, title, desc) {
       document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.pane-container').forEach(pane => pane.classList.remove('active'));
 
-      const targetPane = document.getElementById('pane-' + paneId);
+      let targetPane = document.getElementById('pane-' + paneId);
+      if (!targetPane) {
+        // Se for uma lista genérica do SharePoint, abre o visualizador de listas
+        targetPane = document.getElementById('pane-list-viewer');
+        if (targetPane) {
+          const tEl = document.getElementById('list-viewer-title');
+          const dEl = document.getElementById('list-viewer-desc');
+          if (tEl) tEl.innerHTML = (title || 'Lista do SharePoint: ' + paneId) + ' <span class="star-icon">☆</span>';
+          if (dEl) dEl.innerText = desc || 'Esta lista está sincronizada com a esteira oficial do SharePoint Online da Central de Suporte e Captação.';
+        }
+      }
+
       if (targetPane) targetPane.classList.add('active');
 
       document.querySelectorAll('.tab-link').forEach(btn => {
@@ -2011,8 +2626,34 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
       });
 
+      // Fechar dropdowns abertos
+      document.querySelectorAll('.sp-menu-item').forEach(item => item.classList.remove('open'));
+
+      // Marcar menu pai como ativo
+      document.querySelectorAll('.sp-dropdown-menu').forEach(menu => {
+        if (menu.innerHTML.includes("'" + paneId + "'")) {
+          const parentBtn = menu.parentElement.querySelector('.sp-menu-btn');
+          if (parentBtn) parentBtn.classList.add('active');
+        }
+      });
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    function toggleDropdown(btn) {
+      const parent = btn.parentElement;
+      const isOpen = parent.classList.contains('open');
+      document.querySelectorAll('.sp-menu-item').forEach(item => item.classList.remove('open'));
+      if (!isOpen) {
+        parent.classList.add('open');
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.sp-menu-item')) {
+        document.querySelectorAll('.sp-menu-item').forEach(item => item.classList.remove('open'));
+      }
+    });
 
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
@@ -2310,37 +2951,285 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       document.getElementById("showing-hosp-count").innerText = count;
     }
 
+    let currentOcoView = "emandamento";
+    let activeStatusFilters = ["Em andamento", "Feedback"];
+    let ocoSortAsc = false;
+
+    function switchOcoView(viewName) {
+      currentOcoView = viewName;
+      document.querySelectorAll(".sp-view-tab").forEach(tab => tab.classList.remove("active"));
+      const activeTab = document.getElementById("view-tab-" + viewName);
+      if (activeTab) activeTab.classList.add("active");
+
+      const pillWrap = document.getElementById("oco-filter-pills-wrap");
+      if (viewName === "emandamento") {
+        activeStatusFilters = ["Em andamento", "Feedback"];
+        if (pillWrap) pillWrap.style.display = "flex";
+        const p1 = document.getElementById("pill-emandamento");
+        const p2 = document.getElementById("pill-feedback");
+        if (p1) p1.style.display = "inline-flex";
+        if (p2) p2.style.display = "inline-flex";
+      } else {
+        if (pillWrap) pillWrap.style.display = "none";
+      }
+
+      renderOcorrenciasTable();
+    }
+
+    function toggleStatusFilter(statusName) {
+      if (activeStatusFilters.includes(statusName)) {
+        activeStatusFilters = activeStatusFilters.filter(s => s !== statusName);
+        if (statusName === "Em andamento") {
+          const p = document.getElementById("pill-emandamento");
+          if (p) p.style.display = "none";
+        } else if (statusName === "Feedback") {
+          const p = document.getElementById("pill-feedback");
+          if (p) p.style.display = "none";
+        }
+      } else {
+        activeStatusFilters.push(statusName);
+        if (statusName === "Em andamento") {
+          const p = document.getElementById("pill-emandamento");
+          if (p) p.style.display = "inline-flex";
+        } else if (statusName === "Feedback") {
+          const p = document.getElementById("pill-feedback");
+          if (p) p.style.display = "inline-flex";
+        }
+      }
+      renderOcorrenciasTable();
+    }
+
+    function clearOcoFilters() {
+      switchOcoView("todos");
+    }
+
+    function toggleOcoSort() {
+      ocoSortAsc = !ocoSortAsc;
+      renderOcorrenciasTable();
+    }
+
+    function formatSPDate(isoStr) {
+      if (!isoStr) return '-';
+      const d = new Date(isoStr);
+      if (isNaN(d.getTime())) return isoStr;
+      const pad = n => String(n).padStart(2, '0');
+      return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
     function renderOcorrenciasTable() {
       const sBox = document.getElementById("search-oco-box");
-      const q = sBox ? sBox.value.toLowerCase() : "";
+      const q = sBox ? sBox.value.toLowerCase().trim() : "";
       const tbody = document.getElementById("oco-table-body");
       if (!tbody) return;
       tbody.innerHTML = "";
 
-      let count = 0;
-      allOcorrencias.forEach((o, i) => {
-        const cs = Array.isArray(o.CS) ? o.CS.join(", ") : (o.CS || '-');
-        const eq = Array.isArray(o.Equipamento) ? o.Equipamento.join(", ") : (o.Equipamento || '-');
-        const prob = o.Problema || o.Problema0 || '-';
-        const acoes = o.A_x00e7__x00f5_esexecutadas || '-';
+      let list = allOcorrencias.slice();
 
-        if (q) {
-          const t = ((o.Title||'') + " " + cs + " " + eq + " " + prob + " " + acoes).toLowerCase();
-          if (!t.includes(q)) return;
+      // 1. Filtragem por View
+      if (currentOcoView === "emandamento") {
+        if (activeStatusFilters.length > 0) {
+          list = list.filter(o => activeStatusFilters.includes(o.Status));
         }
+      } else if (currentOcoView === "recuperacao") {
+        list = list.filter(o => String(o.EmRecuperacao || "").toLowerCase() === "sim");
+      } else if (currentOcoView === "operacao") {
+        list = list.filter(o => Boolean(o.InformarOperacao));
+      }
+
+      // 2. Filtragem por busca
+      if (q) {
+        list = list.filter(o => {
+          const cs = Array.isArray(o.CS) ? o.CS.join(" ") : (o.CS || "");
+          const eq = Array.isArray(o.Equipamento) ? o.Equipamento.join(" ") : (o.Equipamento || "");
+          const host = o.HostName || "";
+          const str = (o.Status + " " + host + " " + cs + " " + (o.Veiculo||"") + " " + eq + " " + (o.TipoProblema||"") + " " + (o.AcoesExecutadas||"") + " " + (o.AreaResponsavel||"") + " " + (o.Redmine||"")).toLowerCase();
+          return str.includes(q);
+        });
+      }
+
+      // 3. Ordenação
+      list.sort((a, b) => {
+        const da = new Date(a.Criado || 0).getTime();
+        const db = new Date(b.Criado || 0).getTime();
+        return ocoSortAsc ? (da - db) : (db - da);
+      });
+
+      let count = 0;
+      list.forEach((o) => {
         count++;
         const tr = document.createElement("tr");
+
+        // Status badge
+        let statusBadge = `<span class="sp-badge sp-badge-concluido">Concluído</span>`;
+        if (o.Status === "Em andamento") {
+          statusBadge = `<span class="sp-badge sp-badge-em-andamento">Em andamento</span>`;
+        } else if (o.Status === "Feedback") {
+          statusBadge = `<span class="sp-badge sp-badge-feedback">Feedback</span>`;
+        }
+
+        // Host
+        const hostName = o.HostName || o.hostLookupId || '-';
+
+        // CS
+        const csStr = Array.isArray(o.CS) ? o.CS.join(", ") : (o.CS || '-');
+
+        // Veículo
+        const veiculoStr = o.Veiculo || '-';
+
+        // Equipamento Badges
+        let equipBadges = '';
+        const eqList = Array.isArray(o.Equipamento) ? o.Equipamento : [o.Equipamento];
+        eqList.filter(Boolean).forEach(eq => {
+          let badgeClass = 'sp-badge-dark';
+          const eqUpper = String(eq).toUpperCase();
+          if (eqUpper.includes("ROTEADOR") || eqUpper.includes("SWITCH")) badgeClass = 'sp-badge-amber';
+          else if (eqUpper.includes("MAQUINA")) badgeClass = 'sp-badge-teal';
+          else if (eqUpper.includes("TOMATE")) badgeClass = 'sp-badge-red';
+          else if (eqUpper.includes("WADT")) badgeClass = 'sp-badge-purple';
+          equipBadges += `<span class="sp-badge ${badgeClass}" style="margin-right: 4px;">${eq}</span>`;
+        });
+        if (!equipBadges) equipBadges = '-';
+
+        // Tipo do Problema
+        let tipoBadgeClass = 'sp-badge-gray';
+        const tipo = o.TipoProblema || '-';
+        const tUpper = String(tipo).toUpperCase();
+        if (tUpper.includes("SEM SINAL")) tipoBadgeClass = 'sp-badge-yellow';
+        else if (tUpper.includes("SEM COMUNICAÇÃO")) tipoBadgeClass = 'sp-badge-blue';
+        else if (tUpper.includes("NÃO ESTÁ GRAVANDO") || tUpper.includes("NÃO GRAVA")) tipoBadgeClass = 'sp-badge-red-soft';
+        else if (tUpper.includes("SEM DETECÇÃO")) tipoBadgeClass = 'sp-badge-indigo';
+        else if (tUpper.includes("IMAGEM CONGELADA")) tipoBadgeClass = 'sp-badge-cyan';
+        else if (tUpper.includes("SEM ENERGIA")) tipoBadgeClass = 'sp-badge-orange';
+        const tipoBadge = tipo !== '-' ? `<span class="sp-badge ${tipoBadgeClass}">${tipo}</span>` : '-';
+
+        // Em recuperação
+        const emRecup = (String(o.EmRecuperacao).toLowerCase() === 'sim') ?
+          `<span class="sp-badge sp-badge-sim">Sim</span>` :
+          `<span class="sp-badge sp-badge-nao">Não</span>`;
+
+        // Gravação Streaming
+        const gravStream = (String(o.GravacaoStreaming).toLowerCase() === 'sim') ?
+          `<span class="sp-badge sp-badge-sim">Sim</span>` :
+          `<span class="sp-badge sp-badge-nao">Não</span>`;
+
+        // Informar Operação
+        const infOper = o.InformarOperacao ? `<span style="color: #10B981; font-weight: bold; font-size: 15px;">✓</span>` : '';
+
+        // Ações Executadas
+        const acoes = o.AcoesExecutadas || '-';
+
+        // Área / Responsável
+        let areaBadge = o.AreaResponsavel || '-';
+        if (o.AreaResponsavel === "N1") {
+          areaBadge = `<span class="sp-badge sp-badge-n1">N1</span>`;
+        } else if (String(o.AreaResponsavel).includes("Solucionado")) {
+          areaBadge = `<span class="sp-badge sp-badge-solucionado">${o.AreaResponsavel}</span>`;
+        } else if (String(o.AreaResponsavel).includes("Vinicius")) {
+          areaBadge = `<span class="sp-badge sp-badge-vinicius">Vinicius Dantas</span>`;
+        } else if (String(o.AreaResponsavel).includes("Lucieudes")) {
+          areaBadge = `<span class="sp-badge sp-badge-lucieudes">Lucieudes Victor</span>`;
+        } else if (o.AreaResponsavel) {
+          areaBadge = `<span class="sp-badge sp-badge-blue">${o.AreaResponsavel}</span>`;
+        }
+
+        // Redmine
+        let redmineHtml = '-';
+        if (o.Redmine) {
+          const rNum = String(o.Redmine).replace('.0', '').trim();
+          redmineHtml = `<a href="http://10.1.0.39/redmine/issues/${rNum}" target="_blank" class="sp-redmine-link">#${rNum}</a>`;
+        }
+
         tr.innerHTML = `
-          <td class="td-center" style="color: #64748B;">${count}</td>
-          <td><b>${o.Title || 'Ocorrência #' + (i+1)}</b></td>
-          <td><span style="font-weight: 600; color: #0078D4;">${cs}</span></td>
-          <td><span class="badge badge-default">${eq}</span></td>
-          <td style="color: #DC2626;">${prob}</td>
-          <td style="color: #166534;">${acoes}</td>
+          <td>${statusBadge}</td>
+          <td style="color: #64748B; font-size: 12px; white-space: nowrap;">${formatSPDate(o.Criado)}</td>
+          <td><a href="javascript:void(0)" onclick="searchHostInOco('${encodeURIComponent(hostName)}')" style="color: #0078D4; font-weight: 600; text-decoration: none;">${hostName}</a></td>
+          <td><span style="font-weight: 600; color: #475569;">${csStr}</span></td>
+          <td><b>${veiculoStr}</b></td>
+          <td>${equipBadges}</td>
+          <td>${tipoBadge}</td>
+          <td class="td-center">${emRecup}</td>
+          <td class="td-center">${gravStream}</td>
+          <td class="td-center">${infOper}</td>
+          <td style="color: #334155; font-size: 12.5px; max-width: 320px;">${acoes}</td>
+          <td>${areaBadge}</td>
+          <td class="td-center">${redmineHtml}</td>
         `;
         tbody.appendChild(tr);
       });
+
       document.getElementById("showing-oco-count").innerText = count;
+      document.getElementById("total-oco-count").innerText = allOcorrencias.length;
+    }
+
+    function searchHostInOco(encodedHost) {
+      const hostName = decodeURIComponent(encodedHost);
+      showPane('ocorrencias');
+      const sBox = document.getElementById("search-oco-box");
+      if (sBox) {
+        sBox.value = hostName;
+        renderOcorrenciasTable();
+      }
+    }
+
+    function renderAntenistasTable() {
+      const sBox = document.getElementById("search-ante-box");
+      const q = sBox ? sBox.value.toLowerCase().trim() : "";
+      const tbody = document.getElementById("ante-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      allAntenistas.forEach((a) => {
+        const nome = a.Title || '-';
+        const cidade = a.field_0 || '-';
+        const cargo = a.Cargo || 'Técnico em Antenas';
+        const empresa = a.Empresa || '-';
+        const telCom = a.Telefone_x0020_Comercial || '-';
+        const telCel = a.Telefone_x0020_Celular || '-';
+
+        if (q) {
+          const str = (nome + " " + cidade + " " + cargo + " " + empresa + " " + telCom + " " + telCel).toLowerCase();
+          if (!str.includes(q)) return;
+        }
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><b>${nome}</b></td>
+          <td><span style="font-weight: 600; color: #0078D4;">${cidade}</span></td>
+          <td><span class="badge badge-default">${cargo}</span></td>
+          <td>${empresa}</td>
+          <td>${telCom}</td>
+          <td style="color: #10B981; font-weight: 600;">${telCel}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderHostsTable() {
+      const sBox = document.getElementById("search-hosts-box");
+      const q = sBox ? sBox.value.toLowerCase().trim() : "";
+      const tbody = document.getElementById("hosts-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let count = 0;
+      Object.keys(allHosts).sort((a,b) => Number(a) - Number(b)).forEach((id) => {
+        const name = allHosts[id];
+        if (q && !name.toLowerCase().includes(q) && !id.includes(q)) return;
+        count++;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-center" style="color: #64748B;">${id}</td>
+          <td><b>${name}</b></td>
+          <td class="td-center"><span class="sp-badge sp-badge-concluido">Ativo</span></td>
+          <td class="td-center">
+            <button class="btn-action btn-action-secondary" onclick="searchHostInOco('${encodeURIComponent(name)}')">Ver Incidentes</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      const cEl = document.getElementById("showing-hosts-count");
+      if (cEl) cEl.innerText = count;
     }
 
     function renderProcedimentosTable() {
@@ -2475,14 +3364,28 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     }
 
     function exportOcorrenciasCSV() {
-      const rows = [["Indice","Titulo","CS","Equipamento","Problema","Acoes"]];
-      allOcorrencias.forEach((o, i) => {
-        const cs = Array.isArray(o.CS) ? o.CS.join(";") : (o.CS || '');
-        const eq = Array.isArray(o.Equipamento) ? o.Equipamento.join(";") : (o.Equipamento || '');
-        rows.push([i+1, o.Title||'', cs, eq, o.Problema||o.Problema0||'', o.A_x00e7__x00f5_esexecutadas||'']);
+      const rows = [["Status","Criado","Host","CS","Veiculo","Equipamento","TipoProblema","EmRecuperacao","GravacaoStreaming","InformarOperacao","AcoesExecutadas","AreaResponsavel","Redmine"]];
+      allOcorrencias.forEach((o) => {
+        const cs = Array.isArray(o.CS) ? o.CS.join("; ") : (o.CS || '');
+        const eq = Array.isArray(o.Equipamento) ? o.Equipamento.join("; ") : (o.Equipamento || '');
+        rows.push([
+          o.Status || '',
+          formatSPDate(o.Criado),
+          o.HostName || o.hostLookupId || '',
+          cs,
+          o.Veiculo || '',
+          eq,
+          o.TipoProblema || '',
+          o.EmRecuperacao || 'Não',
+          o.GravacaoStreaming || 'Não',
+          o.InformarOperacao ? 'Sim' : 'Não',
+          o.AcoesExecutadas || '',
+          o.AreaResponsavel || '',
+          o.Redmine || ''
+        ]);
       });
       const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join(String.fromCharCode(13, 10));
-      downloadCSV(csv, "painel_ocorrencias_historico.csv");
+      downloadCSV(csv, "painel_ocorrencias_sharepoint_completo.csv");
     }
 
     function exportPermsCSV() {
@@ -2567,12 +3470,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     window.exportOcorrenciasCSV = exportOcorrenciasCSV;
     window.exportPermsCSV = exportPermsCSV;
     window.syncLiveAPI = syncLiveAPI;
+    window.switchOcoView = switchOcoView;
+    window.toggleStatusFilter = toggleStatusFilter;
+    window.clearOcoFilters = clearOcoFilters;
+    window.toggleOcoSort = toggleOcoSort;
+    window.searchHostInOco = searchHostInOco;
+    window.toggleDropdown = toggleDropdown;
+    window.renderAntenistasTable = renderAntenistasTable;
+    window.renderHostsTable = renderHostsTable;
 
     // Inicialização
     initEscalaMonths();
     renderTable();
     renderHospedeirosTable();
     renderOcorrenciasTable();
+    renderAntenistasTable();
+    renderHostsTable();
     renderProcedimentosTable();
     renderDocumentosTable();
     renderPermsTable();
@@ -2620,6 +3533,24 @@ def generate_portal():
     procedimentos = standalone_data.get("procedimentos", [])
     documentos_lib = standalone_data.get("escala_trabalho", [])
     antenistas = standalone_data.get("contatos_antenistas", [])
+
+    # Carregar Hosts cadastrados (220 hosts)
+    hosts_path = os.path.join(base_dir, "config", "cadastro_hosts_all.json")
+    hosts_dict = {}
+    if os.path.exists(hosts_path):
+        with open(hosts_path, "r", encoding="utf-8") as f:
+            hosts_dict = json.load(f)
+
+    # Carregar Ocorrências Live Sincronizadas do SharePoint (1.000 Casos)
+    live_oco_path = os.path.join(base_dir, "config", "painel_ocorrencias_clean_live.json")
+    if os.path.exists(live_oco_path):
+        with open(live_oco_path, "r", encoding="utf-8") as f:
+            ocorrencias = json.load(f)
+
+    # Mesclar nome legível do Host em cada ocorrência
+    for o in ocorrencias:
+        hid = str(o.get("hostLookupId") or "")
+        o["HostName"] = hosts_dict.get(hid) or hid or "-"
 
     hospedeiros_json_str = json.dumps(hospedeiros, ensure_ascii=False)
     ocorrencias_json_str = json.dumps(ocorrencias, ensure_ascii=False)
@@ -2728,6 +3659,8 @@ def generate_portal():
     html_content = html_content.replace("__EVENTS_JSON__", events_json_str)
     html_content = html_content.replace("__HOSPEDEIROS_JSON__", hospedeiros_json_str)
     html_content = html_content.replace("__OCORRENCIAS_JSON__", ocorrencias_json_str)
+    html_content = html_content.replace("__ANTENISTAS_JSON__", json.dumps(antenistas, ensure_ascii=False))
+    html_content = html_content.replace("__HOSTS_JSON__", json.dumps(hosts_dict, ensure_ascii=False))
     html_content = html_content.replace("__PROCEDIMENTOS_JSON__", procedimentos_json_str)
     html_content = html_content.replace("__DOCUMENTOS_JSON__", documentos_json_str)
     html_content = html_content.replace("__ESCALA_JSON__", escala_json_str)
@@ -2735,6 +3668,7 @@ def generate_portal():
     html_content = html_content.replace("__EVENTS_COUNT__", str(len(events)))
     html_content = html_content.replace("__HOSPEDEIROS_COUNT__", str(len(hospedeiros)))
     html_content = html_content.replace("__OCORRENCIAS_COUNT__", str(len(ocorrencias)))
+    html_content = html_content.replace("__HOSTS_COUNT__", str(len(hosts_dict)))
     html_content = html_content.replace("__PROCEDIMENTOS_COUNT__", str(len(procedimentos)))
     html_content = html_content.replace("__DOCUMENTOS_COUNT__", str(len(documentos_lib)))
     html_content = html_content.replace("__PERMS_COUNT__", str(len(all_permissions)))

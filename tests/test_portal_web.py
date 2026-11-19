@@ -110,11 +110,29 @@ def test_build_portal_web_creates_file_and_validates_sharepoint_replica_and_rbac
         "pane-home", "pane-escala", "pane-streaming", "pane-hospedeiros",
         "pane-ocorrencias", "pane-procedimentos", "pane-documentos",
         "pane-dashboard", "pane-metas", "pane-projetos", "pane-receptores",
-        "pane-equipe", "pane-permissoes", "pane-links"
+        "pane-equipe", "pane-permissoes", "pane-links", "pane-antenistas", "pane-hosts"
     ]
     for pane in required_panes:
         assert f'id="{pane}"' in content, f"Aba obrigatória {pane} não encontrada no HTML"
 
     assert "window.showPane = showPane;" in content
     assert "window.selectEscalaMonth = selectEscalaMonth;" in content
+    assert "window.switchOcoView = switchOcoView;" in content
+    assert "window.toggleStatusFilter = toggleStatusFilter;" in content
+
+    # 13. Validação do Painel de Ocorrências 1:1 com SharePoint (13 colunas e views oficiais)
+    assert "view-tab-emandamento" in content
+    assert "view-tab-recuperacao" in content
+    assert "view-tab-operacao" in content
+    assert "view-tab-todos" in content
+    assert "pill-emandamento" in content
+    assert "pill-feedback" in content
+    assert "Em recuperação" in content
+    assert "GravaçãoStreaming" in content
+    assert "Informar Operação" in content
+    assert "Ações executadas" in content
+    assert "Area/Responsável" in content
+    assert "Redmine" in content
+    assert "allHosts" in content
+    assert "allAntenistas" in content
 
