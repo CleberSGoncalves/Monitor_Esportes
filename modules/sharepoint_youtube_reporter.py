@@ -175,6 +175,20 @@ class SharePointYouTubeReporter:
                     )
                     if r_fields and r_fields.status_code in (200, 201):
                         logger.info(f"🎉 [SharePoint YouTube] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca 'Relatorio Jogos Youtube'!")
+                        try:
+                            from modules.portal_sync import PortalSyncManager
+                            PortalSyncManager.sync_report_to_portal(
+                                pdf_path=pdf_path,
+                                drive_name="Relatorio Jogos Youtube",
+                                category="youtube",
+                                filename=sp_filename,
+                                partida=partida,
+                                campeonato=campeonato,
+                                plataforma=canal,
+                                confianca=confianca
+                            )
+                        except Exception as e_portal:
+                            logger.warning(f"[PortalSync] Aviso ao sincronizar YouTube com portal web: {e_portal}")
                         return True
                     err_text = r_fields.text if r_fields else ""
                 except requests.HTTPError as he:
@@ -203,6 +217,20 @@ class SharePointYouTubeReporter:
                     logger.warning(f"[SharePoint YouTube] Metadados parciais (tentativa {attempt+1}): {err_text[:200]}")
                     break
 
+            try:
+                from modules.portal_sync import PortalSyncManager
+                PortalSyncManager.sync_report_to_portal(
+                    pdf_path=pdf_path,
+                    drive_name="Relatorio Jogos Youtube",
+                    category="youtube",
+                    filename=sp_filename,
+                    partida=partida,
+                    campeonato=campeonato,
+                    plataforma=canal,
+                    confianca=confianca
+                )
+            except Exception as e_portal:
+                logger.warning(f"[PortalSync] Aviso ao sincronizar YouTube com portal web: {e_portal}")
             return True
 
         except SharePointAuthRequiredError:

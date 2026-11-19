@@ -3143,6 +3143,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
       }
 
+      // Atualizar renderizações de abas estáticas
+      if (paneId === 'permissoes') renderPermsTable();
+      else if (paneId === 'hospedeiros') renderHospedeirosTable();
+      else if (paneId === 'ocorrencias') renderOcorrenciasTable();
+      else if (paneId === 'streaming') renderTable();
+      else if (paneId === 'antenistas') renderAntenistasTable();
+      else if (paneId === 'hosts') renderHostsTable();
+
       document.querySelectorAll('.tab-link').forEach(btn => {
         if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + paneId + "'")) {
           btn.classList.add('active');
@@ -3840,7 +3848,23 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       if (!tbody) return;
       tbody.innerHTML = "";
 
-      allPermissions.forEach((p, i) => {
+      const searchInput = document.getElementById("search-perm-box");
+      const q = searchInput ? searchInput.value.toLowerCase().trim() : "";
+
+      const filtered = allPermissions.filter(p => {
+        if (!q) return true;
+        const name = (p.name || "").toLowerCase();
+        const email = (p.email || "").toLowerCase();
+        const type = (p.type || "").toLowerCase();
+        const sp_role = (p.sp_role || "").toLowerCase();
+        const google_role = (p.google_role || "").toLowerCase();
+        const cargo = (p.cargo || "").toLowerCase();
+        const scope = (p.scope || "").toLowerCase();
+        return name.includes(q) || email.includes(q) || type.includes(q) ||
+               sp_role.includes(q) || google_role.includes(q) || cargo.includes(q) || scope.includes(q);
+      });
+
+      filtered.forEach((p, i) => {
         let badgeClass = "badge-role-read";
         if (p.google_role === "Administrador") badgeClass = "badge-role-owner";
         else if (p.google_role === "Operador") badgeClass = "badge-role-write";

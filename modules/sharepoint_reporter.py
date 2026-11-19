@@ -685,8 +685,23 @@ class SharePointReporter:
             r_fields = cls.request_with_retry("PATCH", fields_url, headers=headers, json=fields_payload, timeout=20)
 
             if r_fields.status_code in (200, 201):
-
                 logger.info(f"🎉 [SharePoint] PDF '{sp_filename}' e 7 metadados sincronizados com sucesso!")
+                
+                # Sincronização em paralelo para o Portal Web (Google Sites / GitHub Pages)
+                try:
+                    from modules.portal_sync import PortalSyncManager
+                    PortalSyncManager.sync_report_to_portal(
+                        pdf_path=pdf_path,
+                        drive_name="Relatorios_de_Jogos",
+                        category="futebol",
+                        filename=sp_filename,
+                        partida=partida,
+                        campeonato=campeonato,
+                        plataforma=plataforma,
+                        confianca=confianca
+                    )
+                except Exception as e_portal:
+                    logger.warning(f"[PortalSync] Aviso ao sincronizar com portal web: {e_portal}")
 
                 return True
 

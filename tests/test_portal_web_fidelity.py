@@ -119,8 +119,27 @@ try:
     assert 'Power BI' in dash_text
     print("Dashboard verified with authentic Power BI panels!")
 
+    print("\n=== TEST 11: CONTROLE DE ACESSOS & RBAC (52) ===")
+    driver.execute_script("showPane('permissoes');")
+    time.sleep(0.2)
+    pane = driver.find_element(By.CSS_SELECTOR, '.pane-container.active').get_attribute('id')
+    assert pane == 'pane-permissoes', f"Expected pane-permissoes, got {pane}"
+    perm_rows = driver.find_elements(By.CSS_SELECTOR, '#perms-table-body tr')
+    print(f"Permissões rows: {len(perm_rows)}")
+    assert len(perm_rows) == 52, f"Expected 52 permissions, got {len(perm_rows)}"
+    
+    # Test search filter
+    search_box = driver.find_element(By.ID, 'search-perm-box')
+    search_box.send_keys('Cleber')
+    time.sleep(0.2)
+    search_rows = driver.find_elements(By.CSS_SELECTOR, '#perms-table-body tr')
+    print(f"Permissões search 'Cleber': {len(search_rows)}")
+    assert len(search_rows) == 2, f"Expected 2 matches for Cleber, got {len(search_rows)}"
+    search_box.clear()
+    driver.execute_script("document.getElementById('search-perm-box').value = ''; renderPermsTable();")
+
     print("\n========================================================")
-    print("ALL 10 VERIFICATIONS PASSED WITH 100% SUCCESS!")
+    print("ALL 11 VERIFICATIONS PASSED WITH 100% SUCCESS!")
     print("========================================================")
 
 finally:

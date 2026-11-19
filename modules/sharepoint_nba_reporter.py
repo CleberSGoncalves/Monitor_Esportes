@@ -171,6 +171,20 @@ class SharePointNBAReporter:
                 r_fields = SharePointReporter.request_with_retry("PATCH", fields_url, headers=json_headers, json=fields_payload, timeout=20)
                 if r_fields.status_code in (200, 201):
                     logger.info(f"🎉 [SharePoint NBA] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca NBA!")
+                    try:
+                        from modules.portal_sync import PortalSyncManager
+                        PortalSyncManager.sync_report_to_portal(
+                            pdf_path=pdf_path,
+                            drive_name="Relatorios_de_Jogos_NBA",
+                            category="nba",
+                            filename=sp_filename,
+                            partida=f"{away_tri} @ {home_tri}",
+                            campeonato="NBA",
+                            plataforma=plat_norm,
+                            confianca=conf_val
+                        )
+                    except Exception as e_portal:
+                        logger.warning(f"[PortalSync] Aviso ao sincronizar NBA com portal web: {e_portal}")
                     return True
                 
                 err_text = r_fields.text
@@ -184,6 +198,20 @@ class SharePointNBAReporter:
                     logger.warning(f"[SharePoint NBA] Upload concluído, mas falha ao gravar metadados (tentativa {attempt+1}): {r_fields.status_code} - {err_text[:200]}")
                     break
 
+            try:
+                from modules.portal_sync import PortalSyncManager
+                PortalSyncManager.sync_report_to_portal(
+                    pdf_path=pdf_path,
+                    drive_name="Relatorios_de_Jogos_NBA",
+                    category="nba",
+                    filename=sp_filename,
+                    partida=f"{away_tri} @ {home_tri}",
+                    campeonato="NBA",
+                    plataforma=plat_norm,
+                    confianca=conf_val
+                )
+            except Exception as e_portal:
+                logger.warning(f"[PortalSync] Aviso ao sincronizar NBA com portal web: {e_portal}")
             return True
 
         except SharePointAuthRequiredError:
