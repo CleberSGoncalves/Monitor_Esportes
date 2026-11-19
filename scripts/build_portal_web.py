@@ -27,7 +27,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suporte e Captação | Portal Oficial & Central Autônoma</title>
+  <title>Suporte Captação | Portal Oficial & Central Autônoma</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -1595,7 +1595,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="waffle-dot"></div><div class="waffle-dot"></div><div class="waffle-dot"></div>
       </div>
       <div class="suite-title">
-        Google Sites <span>| Suporte e Captação</span>
+        Google Sites <span>| Suporte Captação</span>
       </div>
     </div>
 
@@ -1625,7 +1625,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       <div class="site-brand-row">
         <div class="site-brand-icon">SC</div>
         <div class="site-brand-info">
-          <h2>Suporte e Captação</h2>
+          <h2>Suporte Captação</h2>
           <p>IBOPE — Central Autônoma de Operações & Ingest</p>
         </div>
       </div>
@@ -1763,9 +1763,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         <div class="hero-top-row">
           <div class="hero-title-area">
-            <h1 class="hero-main-title">Suporte e Captação</h1>
+            <h1 class="hero-main-title">Suporte Captação</h1>
             <p class="hero-description">
-              Bem vindo(a) ao site da equipe de Suporte e Captação! Aqui você pode encontrar informações sobre problemas técnicos, verificar o status das ocorrências, localizar documentos e dados referentes à área e muito mais.
+              Bem vindo(a) ao site da equipe de Suporte Captação! Aqui você pode encontrar informações sobre problemas técnicos, verificar o status das ocorrências, localizar documentos e dados referentes à área e muito mais.
             </p>
           </div>
 
@@ -2333,7 +2333,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
 
       <p id="drive-viewer-desc" style="color: #64748B; font-size: 13px; margin: 4px 0 14px 0; line-height: 1.5;">
-        Biblioteca oficial sincronizada 1:1 com o Microsoft SharePoint Online da Central de Suporte e Captação.
+        Biblioteca oficial sincronizada 1:1 com o Microsoft SharePoint Online da Central de Suporte Captação.
       </p>
 
       <div class="filter-bar">
@@ -2457,7 +2457,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
 
       <p id="list-viewer-desc" style="color: #64748B; font-size: 13px; margin: 4px 0 14px 0; line-height: 1.5;">
-        Esta lista está sincronizada 1:1 com a esteira oficial do SharePoint Online da Central de Suporte e Captação.
+        Esta lista está sincronizada 1:1 com a esteira oficial do SharePoint Online da Central de Suporte Captação.
       </p>
 
       <div class="filter-bar">
@@ -2577,7 +2577,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <!-- ABA 12: EQUIPE -->
     <div id="pane-equipe" class="pane-container">
       <div class="section-title-wrap">
-        <h2 class="section-title">👥 Equipe de Suporte e Captação</h2>
+        <h2 class="section-title">👥 Equipe Suporte Captação</h2>
         <p class="section-desc">Quadro oficial de liderança, operadores técnicos e especialistas de ingest.</p>
       </div>
       <div class="sp-table-wrap">
