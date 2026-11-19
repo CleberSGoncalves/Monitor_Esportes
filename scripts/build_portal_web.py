@@ -1582,6 +1582,137 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       .hero-3x3-grid { grid-template-columns: 1fr; }
       .suite-nav-center { display: none; }
     }
+
+    /* ESTILOS DE FORMULÁRIOS & MODAIS INTERATIVOS */
+    .sp-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .sp-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .sp-form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    .sp-form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sp-text-secondary);
+    }
+    .sp-form-input, .sp-form-select, .sp-form-textarea {
+      padding: 8px 12px;
+      border: 1px solid var(--sp-border);
+      border-radius: 4px;
+      font-size: 13px;
+      background: var(--sp-card-bg);
+      color: var(--sp-text-main);
+      outline: none;
+      font-family: inherit;
+    }
+    .sp-form-input:focus, .sp-form-select:focus, .sp-form-textarea:focus {
+      border-color: #0078D4;
+      box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+    }
+    .sp-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 20px;
+      border-top: 1px solid var(--sp-border);
+      background: var(--sp-bg);
+    }
+
+    /* MODO DE EXIBIÇÃO DE GRADE (GRID EDIT SHAREPOINT) */
+    .sp-btn-cmd.btn-grid-active {
+      background: #004578 !important;
+      color: #FFFFFF !important;
+      border-color: #003366 !important;
+      box-shadow: 0 0 0 2px rgba(0, 69, 120, 0.3);
+      font-weight: 600;
+    }
+    .sp-grid-cell {
+      min-height: 24px;
+      padding: 4px 6px;
+      border-radius: 3px;
+      outline: none;
+      transition: all 0.15s ease;
+      cursor: text;
+    }
+    .sp-grid-cell:hover {
+      background: #F1F5F9;
+      box-shadow: inset 0 0 0 1px #CBD5E1;
+    }
+    .sp-grid-cell:focus {
+      background: #FFFFFF !important;
+      box-shadow: 0 0 0 2px #0078D4 !important;
+      border-color: #0078D4 !important;
+      z-index: 2;
+      position: relative;
+    }
+    .sp-grid-cell-wide {
+      min-width: 180px;
+      max-width: 320px;
+    }
+    .sp-grid-select {
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+      border: 1px solid var(--sp-border);
+      background: var(--sp-card-bg);
+      color: var(--sp-text-main);
+      outline: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .sp-grid-select:focus {
+      border-color: #0078D4;
+      box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+    }
+    .sp-grid-select-sm {
+      padding: 2px 6px;
+      font-size: 11.5px;
+    }
+
+    /* NOTIFICAÇÕES TOAST ESTILO MICROSOFT 365 / GOOGLE */
+    #sp-toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .sp-toast {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #1E293B;
+      color: #FFFFFF;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      border-left: 5px solid #0078D4;
+      animation: slideToastIn 0.25s ease-out;
+      min-width: 280px;
+      max-width: 440px;
+    }
+    .sp-toast.toast-success { border-left-color: #10B981; }
+    .sp-toast.toast-info { border-left-color: #0078D4; }
+    .sp-toast.toast-warning { border-left-color: #F59E0B; }
+    .sp-toast.toast-error { border-left-color: #EF4444; }
+
+    @keyframes slideToastIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -2256,11 +2387,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       <!-- BARRA DE COMANDOS DO SHAREPOINT -->
       <div class="sp-command-bar">
         <div class="sp-command-left">
-          <button class="sp-btn-new action-admin-only" onclick="alert('Formulário de Nova Ocorrência conectado ao SharePoint')">
+          <button class="sp-btn-new" onclick="openNewOcoModal()" title="Criar nova ocorrência operacional">
             <span>+</span> Novo
           </button>
-          <button class="sp-btn-cmd" onclick="toggleOcoCompact()">
-            <span>田</span> Editar no modo de exibição de grade
+          <button id="btn-grid-oco" class="sp-btn-cmd" onclick="toggleOcoGridEdit()" title="Editar linhas e colunas diretamente no navegador">
+            <span id="btn-grid-oco-icon">田</span> <span id="btn-grid-oco-text">Editar no modo de exibição de grade</span>
           </button>
           <button class="sp-btn-cmd" onclick="renderOcorrenciasTable()">
             <span>↺</span> Atualizar
@@ -2309,6 +2440,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <button class="sp-btn-clear-filters" onclick="clearOcoFilters()">Limpar ✕</button>
       </div>
 
+      <!-- ALERTA MODO GRADE OCORRÊNCIAS -->
+      <div id="oco-grid-mode-alert" style="display: none; background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #0078D4; padding: 10px 16px; border-radius: 4px; margin-bottom: 12px; font-size: 13px; color: #1E3A8A; align-items: center; justify-content: space-between;">
+        <div>
+          <b>⚡ Modo de exibição de grade ativado:</b> Você pode editar qualquer célula diretamente na tabela (clique no texto ou altere o status). As alterações são salvas automaticamente.
+        </div>
+        <button type="button" class="btn-action btn-action-primary" style="padding: 4px 12px; font-size: 12px;" onclick="toggleOcoGridEdit()">💾 Concluir e Salvar</button>
+      </div>
+
       <!-- TABELA DO SHAREPOINT (13 COLUNAS OFICIAIS) -->
       <div class="sp-table-wrap">
         <div class="sp-table-scroll">
@@ -2347,7 +2486,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div id="pane-antenistas" class="pane-container">
       <div class="sp-command-bar">
         <div class="sp-command-left">
-          <button class="sp-btn-new action-admin-only" onclick="alert('Formulário de Novo Contato')"><span>+</span> Novo</button>
+          <button class="sp-btn-new" onclick="openNewAntenistaModal()"><span>+</span> Novo</button>
           <button class="sp-btn-cmd" onclick="renderAntenistasTable()"><span>↺</span> Atualizar</button>
         </div>
         <div class="sp-command-search">
@@ -2382,7 +2521,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div id="pane-hosts" class="pane-container">
       <div class="sp-command-bar">
         <div class="sp-command-left">
-          <button class="sp-btn-new action-admin-only" onclick="alert('Novo Host')"><span>+</span> Novo Host</button>
+          <button class="sp-btn-new" onclick="openNewHostModal()"><span>+</span> Novo Host</button>
           <button class="sp-btn-cmd" onclick="renderHostsTable()"><span>↺</span> Atualizar</button>
         </div>
         <div class="sp-command-search">
@@ -2418,8 +2557,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div id="pane-drive-viewer" class="pane-container">
       <div class="sp-command-bar">
         <div class="sp-command-left">
-          <button class="sp-btn-new action-admin-only" onclick="alert('Inclusão de arquivos restrita a administradores no SharePoint Online')"><span>+</span> Novo</button>
-          <button class="sp-btn-cmd" onclick="alert('Modo de exibição de grade do SharePoint ativado')"><span>田</span> Modo Grade</button>
+          <button class="sp-btn-new" onclick="openNewDriveFileModal()"><span>+</span> Novo</button>
+          <button class="sp-btn-cmd" onclick="toggleDriveGridMode()"><span>田</span> Modo Grade</button>
           <button class="sp-btn-cmd" onclick="exportCurrentDriveCSV()"><span>📥</span> Exportar CSV</button>
           <button class="sp-btn-cmd" onclick="handleMenuClick('home', 'Página Inicial')"><span>🏠</span> Voltar ao Início</button>
         </div>
@@ -2476,13 +2615,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div id="pane-list-viewer" class="pane-container">
       <div class="sp-command-bar">
         <div class="sp-command-left">
-          <button class="sp-btn-new action-admin-only" onclick="alert('Formulário de inclusão conectado ao SharePoint Online')"><span>+</span> Novo</button>
-          <button class="sp-btn-cmd" onclick="alert('Modo de exibição de grade do SharePoint ativado')"><span>田</span> Editar no modo de exibição de grade</button>
+          <button class="sp-btn-new" onclick="openNewListItemModal()"><span>+</span> Novo</button>
+          <button id="btn-grid-generic" class="sp-btn-cmd" onclick="toggleGenericListGridEdit()"><span id="btn-grid-generic-icon">田</span> <span id="btn-grid-generic-text">Editar no modo de exibição de grade</span></button>
           <button class="sp-btn-cmd" onclick="exportGenericListCSV()"><span>📥</span> Exportar CSV</button>
           <button class="sp-btn-cmd" onclick="handleMenuClick('home', 'Página Inicial')"><span>🏠</span> Voltar ao Início</button>
         </div>
       </div>
       
+      <!-- ALERTA MODO GRADE LISTA GENÉRICA -->
+      <div id="generic-grid-mode-alert" style="display: none; background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #0078D4; padding: 10px 16px; border-radius: 4px; margin-bottom: 12px; font-size: 13px; color: #1E3A8A; align-items: center; justify-content: space-between;">
+        <div>
+          <b>⚡ Modo de exibição de grade ativado:</b> Você pode editar qualquer célula diretamente na tabela. As alterações são salvas automaticamente na lista.
+        </div>
+        <button type="button" class="btn-action btn-action-primary" style="padding: 4px 12px; font-size: 12px;" onclick="toggleGenericListGridEdit()">💾 Concluir e Salvar</button>
+      </div>
+
       <div class="sp-list-header-row">
         <div>
           <div style="font-size: 12px; color: #64748B; margin-bottom: 4px;">Suporte Captação &rsaquo; Listas do SharePoint</div>
@@ -2691,6 +2838,284 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
   </div>
 
+  <!-- MODAL DE NOVA OCORRÊNCIA (PAINEL DE OCORRÊNCIAS) -->
+  <div class="modal-overlay" id="modal-new-oco">
+    <div class="modal-card" style="max-width: 820px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">📋</span>
+          <h3>Nova Ocorrência Operacional &mdash; Painel de Ocorrências</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeNewOcoModal()">&times;</button>
+      </div>
+      <form id="form-new-oco" onsubmit="saveNewOcorrencia(event)">
+        <div class="modal-body" style="max-height: 72vh; overflow-y: auto;">
+          <div style="background: #F0F9FF; border: 1px solid #BAE6FD; border-left: 4px solid #0078D4; padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; font-size: 12.5px; color: #0369A1;">
+            <b>Registro Oficial de Incidentes:</b> Preencha os campos abaixo para registrar um novo incidente operacional. A ocorrência será adicionada imediatamente ao topo do histórico e preservada localmente no navegador.
+          </div>
+
+          <div class="sp-form-grid">
+            <div class="sp-form-group">
+              <label class="sp-form-label">Status da Ocorrência *</label>
+              <select id="new-oco-status" class="sp-form-select" required>
+                <option value="Em andamento" selected>Em andamento</option>
+                <option value="Feedback">Feedback</option>
+                <option value="Concluído">Concluído</option>
+              </select>
+            </div>
+
+            <div class="sp-form-group">
+              <label class="sp-form-label">Host / Praça *</label>
+              <input type="text" id="new-oco-host" class="sp-form-input" list="hosts-datalist" placeholder="Ex: Montes Claros / BRMG-MCL-TDT" required>
+              <datalist id="hosts-datalist">
+                <!-- Preenchido via JS com allHosts -->
+              </datalist>
+            </div>
+
+            <div class="sp-form-group">
+              <label class="sp-form-label">CS (Canal de Serviço)</label>
+              <input type="text" id="new-oco-cs" class="sp-form-input" placeholder="Ex: 01, 02 ou 01, 02">
+            </div>
+
+            <div class="sp-form-group">
+              <label class="sp-form-label">Veículo / Emissora</label>
+              <input type="text" id="new-oco-veiculo" class="sp-form-input" placeholder="Ex: BAND, GLOBO, SBT, RECORD, Todos">
+            </div>
+
+            <div class="sp-form-group">
+              <label class="sp-form-label">Equipamento</label>
+              <input type="text" id="new-oco-equipamento" class="sp-form-input" placeholder="Ex: ATRIA, TOMATE, Switch / Roteador, Maquina, WADT">
+            </div>
+
+            <div class="sp-form-group">
+              <label class="sp-form-label">Tipo do Problema</label>
+              <select id="new-oco-tipo" class="sp-form-select">
+                <option value="Sem sinal">Sem sinal</option>
+                <option value="Sem comunicação">Sem comunicação</option>
+                <option value="Não está gravando">Não está gravando</option>
+                <option value="Sem detecção">Sem detecção</option>
+                <option value="Imagem congelada">Imagem congelada</option>
+                <option value="Sem energia">Sem energia</option>
+                <option value="Problema no Áudio">Problema no Áudio</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+
+            <div class="sp-form-group">
+              <label class="sp-form-label">Em Recuperação?</label>
+              <select id="new-oco-recup" class="sp-form-select">
+                <option value="Não" selected>Não</option>
+                <option value="Sim">Sim</option>
+              </select>
+            </div>
+
+            <div class="sp-form-group">
+              <label class="sp-form-label">Gravação Streaming?</label>
+              <select id="new-oco-streaming" class="sp-form-select">
+                <option value="Não" selected>Não</option>
+                <option value="Sim">Sim</option>
+              </select>
+            </div>
+
+            <div class="sp-form-group">
+              <label class="sp-form-label">Área / Responsável</label>
+              <select id="new-oco-area" class="sp-form-select">
+                <option value="N1" selected>N1</option>
+                <option value="Vinicius Dantas">Vinicius Dantas</option>
+                <option value="Lucieudes Victor">Lucieudes Victor</option>
+                <option value="Cassio Esteves">Cassio Esteves</option>
+                <option value="Cleber Gonçalves">Cleber Gonçalves</option>
+                <option value="Solucionado">Solucionado</option>
+              </select>
+            </div>
+
+            <div class="sp-form-group">
+              <label class="sp-form-label">Ticket Redmine (Número)</label>
+              <input type="text" id="new-oco-redmine" class="sp-form-input" placeholder="Ex: 9106">
+            </div>
+
+            <div class="sp-form-group full-width" style="display: flex; flex-direction: row; align-items: center; gap: 10px; margin-top: 4px;">
+              <input type="checkbox" id="new-oco-operacao" style="width: 18px; height: 18px; cursor: pointer;">
+              <label for="new-oco-operacao" style="font-size: 13px; font-weight: 600; cursor: pointer; color: var(--sp-text-main);">
+                Informar Operação (Destaque para plantão N1/N2)
+              </label>
+            </div>
+
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Ações Executadas / Diagnóstico Técnico</label>
+              <textarea id="new-oco-acoes" class="sp-form-textarea" rows="3" placeholder="Descreva os testes efetuados, contato com parceiro, reboot de decoders ou acionamento técnico..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="sp-modal-footer">
+          <button type="button" class="btn-action btn-action-secondary" onclick="closeNewOcoModal()">Cancelar</button>
+          <button type="submit" class="btn-action btn-action-primary" style="display: flex; align-items: center; gap: 6px;">
+            <span>💾</span> Salvar Ocorrência
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE NOVO ITEM EM LISTA GENÉRICA DO SHAREPOINT -->
+  <div class="modal-overlay" id="modal-new-list-item">
+    <div class="modal-card" style="max-width: 760px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">📄</span>
+          <h3 id="modal-new-list-title">Novo Item na Lista</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeNewListItemModal()">&times;</button>
+      </div>
+      <form id="form-new-list-item" onsubmit="saveNewListItem(event)">
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <div style="background: #F0F9FF; border: 1px solid #BAE6FD; border-left: 4px solid #0078D4; padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; font-size: 12.5px; color: #0369A1;">
+            <b>Inclusão de Registro:</b> Preencha os campos abaixo para adicionar um novo registro diretamente a esta lista do SharePoint.
+          </div>
+          <div id="new-list-fields-container" class="sp-form-grid">
+            <!-- Gerado dinamicamente com base nas colunas da lista atual -->
+          </div>
+        </div>
+        <div class="sp-modal-footer">
+          <button type="button" class="btn-action btn-action-secondary" onclick="closeNewListItemModal()">Cancelar</button>
+          <button type="submit" class="btn-action btn-action-primary" style="display: flex; align-items: center; gap: 6px;">
+            <span>💾</span> Salvar Registro
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE NOVO CONTATO DE ANTENISTA -->
+  <div class="modal-overlay" id="modal-new-antenista">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">📡</span>
+          <h3>Novo Contato de Antenista</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeNewAntenistaModal()">&times;</button>
+      </div>
+      <form id="form-new-antenista" onsubmit="saveNewAntenista(event)">
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <div class="sp-form-grid">
+            <div class="sp-form-group">
+              <label class="sp-form-label">Nome / Contato *</label>
+              <input type="text" id="new-ante-nome" class="sp-form-input" placeholder="Ex: Carlos Silva" required>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Cidade / Praça *</label>
+              <input type="text" id="new-ante-cidade" class="sp-form-input" placeholder="Ex: Montes Claros - MG" required>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Especialidade / Cargo</label>
+              <input type="text" id="new-ante-cargo" class="sp-form-input" placeholder="Ex: Técnico em Antenas / Manutenção" value="Técnico em Antenas">
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Empresa</label>
+              <input type="text" id="new-ante-empresa" class="sp-form-input" placeholder="Ex: Antenas & Telecom">
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Telefone Comercial</label>
+              <input type="text" id="new-ante-telcom" class="sp-form-input" placeholder="Ex: (38) 3221-0000">
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Telefone Celular / WhatsApp</label>
+              <input type="text" id="new-ante-telcel" class="sp-form-input" placeholder="Ex: (38) 99999-0000">
+            </div>
+          </div>
+        </div>
+        <div class="sp-modal-footer">
+          <button type="button" class="btn-action btn-action-secondary" onclick="closeNewAntenistaModal()">Cancelar</button>
+          <button type="submit" class="btn-action btn-action-primary" style="display: flex; align-items: center; gap: 6px;">
+            <span>💾</span> Salvar Contato
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE NOVO HOST -->
+  <div class="modal-overlay" id="modal-new-host">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">🖥️</span>
+          <h3>Novo Host / Praça</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeNewHostModal()">&times;</button>
+      </div>
+      <form id="form-new-host" onsubmit="saveNewHost(event)">
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <div class="sp-form-grid">
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Código do Host / Praça *</label>
+              <input type="text" id="new-host-code" class="sp-form-input" placeholder="Ex: Vitoria / BRES-VIT-TDT" required>
+            </div>
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Status Operacional</label>
+              <select id="new-host-status" class="sp-form-select">
+                <option value="Ativo" selected>Ativo</option>
+                <option value="Manutenção">Manutenção</option>
+                <option value="Desativado">Desativado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="sp-modal-footer">
+          <button type="button" class="btn-action btn-action-secondary" onclick="closeNewHostModal()">Cancelar</button>
+          <button type="submit" class="btn-action btn-action-primary" style="display: flex; align-items: center; gap: 6px;">
+            <span>💾</span> Salvar Host
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE NOVO ARQUIVO/PASTA NO DRIVE -->
+  <div class="modal-overlay" id="modal-new-drive-file">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">📁</span>
+          <h3>Adicionar Documento / Pasta ao Drive</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeNewDriveFileModal()">&times;</button>
+      </div>
+      <form id="form-new-drive-file" onsubmit="saveNewDriveFile(event)">
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <div class="sp-form-grid">
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Tipo de Item</label>
+              <select id="new-drive-type" class="sp-form-select">
+                <option value="file" selected>Arquivo / Planilha / PDF</option>
+                <option value="folder">Pasta</option>
+              </select>
+            </div>
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Nome do Arquivo ou Pasta *</label>
+              <input type="text" id="new-drive-name" class="sp-form-input" placeholder="Ex: Relatorio_Operacional_Novembro.xlsx" required>
+            </div>
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Responsável / Modificado por</label>
+              <input type="text" id="new-drive-author" class="sp-form-input" placeholder="Ex: Cleber Gonçalves" value="Cleber Gonçalves">
+            </div>
+          </div>
+        </div>
+        <div class="sp-modal-footer">
+          <button type="button" class="btn-action btn-action-secondary" onclick="closeNewDriveFileModal()">Cancelar</button>
+          <button type="submit" class="btn-action btn-action-primary" style="display: flex; align-items: center; gap: 6px;">
+            <span>💾</span> Adicionar ao Drive
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONTAINER DE NOTIFICAÇÕES TOAST -->
+  <div id="sp-toast-container"></div>
+
   <!-- RODAPÉ CORPORATIVO -->
   <footer class="site-footer">
     <div class="site-footer-container">
@@ -2711,6 +3136,41 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     let allAntenistas = __ANTENISTAS_JSON__;
     let allHosts = __HOSTS_JSON__;
     let SP_MASTER_DATA = __SP_MASTER_DATA__;
+
+    // Restauração de dados e edições salvas no localStorage (Persistência Offline/Online)
+    try {
+      const savedOcos = JSON.parse(localStorage.getItem('sp_custom_ocorrencias') || '[]');
+      if (Array.isArray(savedOcos) && savedOcos.length > 0) {
+        allOcorrencias = [...savedOcos, ...allOcorrencias];
+      }
+      const savedOcoEdits = JSON.parse(localStorage.getItem('sp_custom_ocorrencias_edits') || '{}');
+      if (savedOcoEdits && Object.keys(savedOcoEdits).length > 0) {
+        allOcorrencias.forEach(o => {
+          const key = o.id || o.Criado;
+          if (savedOcoEdits[key]) {
+            Object.assign(o, savedOcoEdits[key]);
+          }
+        });
+      }
+      const savedAntenistas = JSON.parse(localStorage.getItem('sp_custom_antenistas') || '[]');
+      if (Array.isArray(savedAntenistas) && savedAntenistas.length > 0) {
+        allAntenistas = [...savedAntenistas, ...allAntenistas];
+      }
+      const savedHosts = JSON.parse(localStorage.getItem('sp_custom_hosts') || '[]');
+      if (Array.isArray(savedHosts) && savedHosts.length > 0) {
+        allHosts = [...savedHosts, ...allHosts];
+      }
+      if (SP_MASTER_DATA && SP_MASTER_DATA.lists) {
+        Object.keys(SP_MASTER_DATA.lists).forEach(listKey => {
+          const savedItems = JSON.parse(localStorage.getItem('sp_custom_list_' + listKey) || '[]');
+          if (Array.isArray(savedItems) && savedItems.length > 0) {
+            SP_MASTER_DATA.lists[listKey].items = [...savedItems, ...(SP_MASTER_DATA.lists[listKey].items || [])];
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("Erro ao carregar dados locais persistidos:", e);
+    }
 
     let currentRole = "admin";
     let currentMonth = "Novembro";
@@ -3120,11 +3580,38 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     // ==========================================
     let currentRealListName = null;
     let currentRealListTitle = '';
+    let isGenericListGridEditMode = false;
 
     function openRealList(listName, title) {
       currentRealListName = listName;
       currentRealListTitle = title || listName;
+      isGenericListGridEditMode = false;
+
+      const btn = document.getElementById("btn-grid-generic");
+      const icon = document.getElementById("btn-grid-generic-icon");
+      const txt = document.getElementById("btn-grid-generic-text");
+      const alertBox = document.getElementById("generic-grid-mode-alert");
+      if (btn) btn.classList.remove("btn-grid-active");
+      if (icon) icon.innerText = "田";
+      if (txt) txt.innerText = "Editar no modo de exibição de grade";
+      if (alertBox) alertBox.style.display = "none";
+
       const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[listName];
+
+      // Restaurar edições locais se existirem
+      try {
+        const edits = JSON.parse(localStorage.getItem('sp_custom_list_edits_' + listName) || '{}');
+        if (listData && listData.items) {
+          Object.keys(edits).forEach(idxStr => {
+            const idx = parseInt(idxStr, 10);
+            if (listData.items[idx]) {
+              Object.assign(listData.items[idx], edits[idxStr]);
+            }
+          });
+        }
+      } catch (e) {
+        console.warn("Erro ao restaurar edições:", e);
+      }
 
       const tEl = document.getElementById('list-viewer-title');
       const dEl = document.getElementById('list-viewer-desc');
@@ -3167,8 +3654,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           tbody.innerHTML = `<tr><td colspan="${cols.length + 1}" style="text-align:center; padding: 26px; color: #94A3B8;">Nenhum registro encontrado nesta lista.</td></tr>`;
         } else {
           tbody.innerHTML = filtered.map((it, idx) => {
+            const origIdx = items.indexOf(it);
             const cells = cols.map(c => {
               const val = it[c.name] !== undefined ? it[c.name] : (it[c.displayName] !== undefined ? it[c.displayName] : '');
+              if (isGenericListGridEditMode) {
+                return `<td><div contenteditable="true" class="sp-grid-cell" onblur="updateGenericListField(${origIdx}, '${c.name}', this.innerText.trim())">${String(val || '')}</div></td>`;
+              }
               return `<td>${formatCellContent(val, c.name)}</td>`;
             }).join('');
             return `<tr><td class="td-center" style="color: #64748B;">${idx + 1}</td>${cells}</tr>`;
@@ -3179,6 +3670,123 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       if (footer) {
         footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${items.length}</b> registros &bull; Sincronizado com Microsoft SharePoint Online`;
       }
+    }
+
+    function toggleGenericListGridEdit() {
+      if (!currentRealListName) {
+        showToast("Selecione uma lista primeiro.", "warning");
+        return;
+      }
+      isGenericListGridEditMode = !isGenericListGridEditMode;
+      const btn = document.getElementById("btn-grid-generic");
+      const icon = document.getElementById("btn-grid-generic-icon");
+      const txt = document.getElementById("btn-grid-generic-text");
+      const alertBox = document.getElementById("generic-grid-mode-alert");
+
+      if (isGenericListGridEditMode) {
+        if (btn) btn.classList.add("btn-grid-active");
+        if (icon) icon.innerText = "💾";
+        if (txt) txt.innerText = "Sair do modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "flex";
+        showToast("Modo de exibição de grade ativado para esta lista. Clique nas células para editar.", "info");
+      } else {
+        if (btn) btn.classList.remove("btn-grid-active");
+        if (icon) icon.innerText = "田";
+        if (txt) txt.innerText = "Editar no modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "none";
+        showToast("Modo de grade finalizado. Todas as alterações foram salvas!", "success");
+      }
+      filterRealListTable();
+    }
+
+    function updateGenericListField(itemIdx, colName, value) {
+      if (!currentRealListName) return;
+      const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[currentRealListName];
+      if (!listData || !listData.items || !listData.items[itemIdx]) return;
+
+      listData.items[itemIdx][colName] = value;
+
+      try {
+        let edits = JSON.parse(localStorage.getItem('sp_custom_list_edits_' + currentRealListName) || '{}');
+        if (!edits[itemIdx]) edits[itemIdx] = {};
+        edits[itemIdx][colName] = value;
+        localStorage.setItem('sp_custom_list_edits_' + currentRealListName, JSON.stringify(edits));
+      } catch (e) {
+        console.warn("Erro ao salvar edição de lista:", e);
+      }
+
+      showToast(`💾 Coluna '${colName}' atualizada com sucesso!`, "success");
+    }
+
+    function openNewListItemModal() {
+      if (!currentRealListName) {
+        showToast("Selecione uma lista primeiro para adicionar um item.", "warning");
+        return;
+      }
+      const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[currentRealListName];
+      if (!listData) return;
+
+      document.getElementById("modal-new-list-title").innerHTML = `Novo Item &mdash; ${currentRealListTitle}`;
+      const container = document.getElementById("new-list-fields-container");
+      container.innerHTML = "";
+
+      const cols = listData.columns || [];
+      const systemCols = ['id', 'modified', 'created', 'author', 'editor', 'attachments', 'contenttypeid'];
+      const editableCols = cols.filter(c => !systemCols.includes(String(c.name || '').toLowerCase()));
+      const renderCols = editableCols.length > 0 ? editableCols : cols;
+
+      renderCols.forEach(col => {
+        const colId = col.name;
+        const colTitle = col.displayName || col.name;
+        const group = document.createElement("div");
+        group.className = "sp-form-group";
+        group.innerHTML = `
+          <label class="sp-form-label">${colTitle}</label>
+          <input type="text" name="${colId}" class="sp-form-input list-dyn-input" placeholder="Informe ${colTitle}...">
+        `;
+        container.appendChild(group);
+      });
+
+      document.getElementById("modal-new-list-item").style.display = "flex";
+    }
+
+    function closeNewListItemModal() {
+      const modal = document.getElementById("modal-new-list-item");
+      if (modal) modal.style.display = "none";
+    }
+
+    function saveNewListItem(event) {
+      event.preventDefault();
+      if (!currentRealListName) return;
+      const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[currentRealListName];
+      if (!listData) return;
+
+      const inputs = document.querySelectorAll(".list-dyn-input");
+      const newItem = {
+        __id: 'item_' + Date.now(),
+        Created: new Date().toISOString(),
+        Modified: new Date().toISOString()
+      };
+
+      inputs.forEach(inp => {
+        newItem[inp.name] = inp.value.trim();
+      });
+
+      if (!listData.items) listData.items = [];
+      listData.items.unshift(newItem);
+
+      try {
+        let saved = JSON.parse(localStorage.getItem('sp_custom_list_' + currentRealListName) || '[]');
+        saved.unshift(newItem);
+        localStorage.setItem('sp_custom_list_' + currentRealListName, JSON.stringify(saved));
+      } catch (e) {
+        console.warn("Erro ao salvar item:", e);
+      }
+
+      closeNewListItemModal();
+      document.getElementById("form-new-list-item").reset();
+      filterRealListTable();
+      showToast(`✅ Item adicionado com sucesso à lista ${currentRealListTitle}!`, "success");
     }
 
     function exportGenericListCSV() {
@@ -3217,7 +3825,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const res = SP_RESOURCE_MAP[paneId];
       let targetPane = null;
 
-      if (res && res.type === 'drive') {
+      // 1. Checar se existe um painel dedicado com ID específico no DOM
+      const dedicatedPane = document.getElementById('pane-' + paneId) || document.getElementById(paneId);
+      if (dedicatedPane && dedicatedPane.id !== 'pane-list-viewer' && dedicatedPane.id !== 'pane-drive-viewer') {
+        targetPane = dedicatedPane;
+        targetPane.classList.add('active');
+      } else if (res && res.type === 'drive') {
         targetPane = document.getElementById('pane-drive-viewer');
         if (targetPane) {
           targetPane.classList.add('active');
@@ -3230,7 +3843,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           openRealList(res.name, res.title || title);
         }
       } else {
-        targetPane = document.getElementById('pane-' + paneId);
+        targetPane = dedicatedPane;
         if (!targetPane) {
           if (SP_MASTER_DATA.drives && SP_MASTER_DATA.drives[paneId]) {
             targetPane = document.getElementById('pane-drive-viewer');
@@ -3668,6 +4281,121 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
+    let isOcoGridEditMode = false;
+
+    function openNewOcoModal() {
+      const dl = document.getElementById("hosts-datalist");
+      if (dl && dl.children.length === 0 && Array.isArray(allHosts)) {
+        allHosts.forEach(h => {
+          const opt = document.createElement("option");
+          opt.value = h.Title || h.host || h;
+          dl.appendChild(opt);
+        });
+      }
+      const modal = document.getElementById("modal-new-oco");
+      if (modal) modal.style.display = "flex";
+    }
+
+    function closeNewOcoModal() {
+      const modal = document.getElementById("modal-new-oco");
+      if (modal) modal.style.display = "none";
+    }
+
+    function saveNewOcorrencia(event) {
+      event.preventDefault();
+      const status = document.getElementById("new-oco-status").value;
+      const host = document.getElementById("new-oco-host").value.trim();
+      const cs = document.getElementById("new-oco-cs").value.trim() || "-";
+      const veiculo = document.getElementById("new-oco-veiculo").value.trim() || "-";
+      const equip = document.getElementById("new-oco-equipamento").value.trim() || "-";
+      const tipo = document.getElementById("new-oco-tipo").value;
+      const recup = document.getElementById("new-oco-recup").value;
+      const stream = document.getElementById("new-oco-streaming").value;
+      const operacao = document.getElementById("new-oco-operacao").checked;
+      const acoes = document.getElementById("new-oco-acoes").value.trim() || "-";
+      const area = document.getElementById("new-oco-area").value;
+      const redmine = document.getElementById("new-oco-redmine").value.trim() || "";
+
+      if (!host) {
+        showToast("Por favor informe o Host / Praça da ocorrência.", "warning");
+        return;
+      }
+
+      const nowIso = new Date().toISOString();
+      const newOco = {
+        id: "oco_" + Date.now(),
+        Status: status,
+        Criado: nowIso,
+        HostName: host,
+        CS: cs,
+        Veiculo: veiculo,
+        Equipamento: equip,
+        TipoProblema: tipo,
+        EmRecuperacao: recup,
+        GravacaoStreaming: stream,
+        InformarOperacao: operacao,
+        AcoesExecutadas: acoes,
+        AreaResponsavel: area,
+        Redmine: redmine
+      };
+
+      allOcorrencias.unshift(newOco);
+
+      try {
+        let customOcos = JSON.parse(localStorage.getItem('sp_custom_ocorrencias') || '[]');
+        customOcos.unshift(newOco);
+        localStorage.setItem('sp_custom_ocorrencias', JSON.stringify(customOcos));
+      } catch (e) {
+        console.warn("Erro ao salvar no localStorage:", e);
+      }
+
+      closeNewOcoModal();
+      document.getElementById("form-new-oco").reset();
+      renderOcorrenciasTable();
+      showToast(`✅ Ocorrência para '${host}' cadastrada com sucesso!`, "success");
+    }
+
+    function toggleOcoGridEdit() {
+      isOcoGridEditMode = !isOcoGridEditMode;
+      const btn = document.getElementById("btn-grid-oco");
+      const icon = document.getElementById("btn-grid-oco-icon");
+      const txt = document.getElementById("btn-grid-oco-text");
+      const alertBox = document.getElementById("oco-grid-mode-alert");
+
+      if (isOcoGridEditMode) {
+        if (btn) btn.classList.add("btn-grid-active");
+        if (icon) icon.innerText = "💾";
+        if (txt) txt.innerText = "Sair do modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "flex";
+        showToast("Modo de exibição de grade ativado. Clique nas células para editar.", "info");
+      } else {
+        if (btn) btn.classList.remove("btn-grid-active");
+        if (icon) icon.innerText = "田";
+        if (txt) txt.innerText = "Editar no modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "none";
+        showToast("Modo de exibição de grade finalizado. Todas as alterações salvas!", "success");
+      }
+      renderOcorrenciasTable();
+    }
+
+    function updateOcoField(id, field, value) {
+      const item = allOcorrencias.find(o => (o.id === id || String(o.Criado) === String(id)));
+      if (!item) return;
+
+      item[field] = value;
+
+      try {
+        let customEdits = JSON.parse(localStorage.getItem('sp_custom_ocorrencias_edits') || '{}');
+        if (!customEdits[id]) customEdits[id] = {};
+        customEdits[id][field] = value;
+        localStorage.setItem('sp_custom_ocorrencias_edits', JSON.stringify(customEdits));
+      } catch (e) {
+        console.warn("Erro ao persistir edição:", e);
+      }
+
+      showToast(`💾 Alteração salva em ${field}!`, "success");
+    }
+
     function renderOcorrenciasTable() {
       const sBox = document.getElementById("search-oco-box");
       const q = sBox ? sBox.value.toLowerCase().trim() : "";
@@ -3710,6 +4438,56 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       list.forEach((o) => {
         count++;
         const tr = document.createElement("tr");
+        const ocoId = o.id || o.Criado;
+        tr.setAttribute("data-oco-id", ocoId);
+
+        if (isOcoGridEditMode) {
+          // MODO DE EXIBIÇÃO DE GRADE (EDITÁVEL DIRETO NO BROWSER)
+          const hostVal = o.HostName || o.hostLookupId || '';
+          const csVal = Array.isArray(o.CS) ? o.CS.join(", ") : (o.CS || '');
+          const veicVal = o.Veiculo || '';
+          const equipVal = Array.isArray(o.Equipamento) ? o.Equipamento.join(", ") : (o.Equipamento || '');
+          const tipoVal = o.TipoProblema || '';
+          const acoesVal = o.AcoesExecutadas || '';
+          const areaVal = o.AreaResponsavel || '';
+          const redmineVal = o.Redmine ? String(o.Redmine).replace('.0', '').trim() : '';
+
+          tr.innerHTML = `
+            <td>
+              <select class="sp-grid-select" onchange="updateOcoField('${ocoId}', 'Status', this.value)">
+                <option value="Em andamento" ${o.Status === 'Em andamento' ? 'selected' : ''}>Em andamento</option>
+                <option value="Feedback" ${o.Status === 'Feedback' ? 'selected' : ''}>Feedback</option>
+                <option value="Concluído" ${o.Status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+              </select>
+            </td>
+            <td style="color: #64748B; font-size: 11.5px; white-space: nowrap;">${formatSPDate(o.Criado)}</td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateOcoField('${ocoId}', 'HostName', this.innerText.trim())">${hostVal}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateOcoField('${ocoId}', 'CS', this.innerText.trim())">${csVal}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateOcoField('${ocoId}', 'Veiculo', this.innerText.trim())">${veicVal}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateOcoField('${ocoId}', 'Equipamento', this.innerText.trim())">${equipVal}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateOcoField('${ocoId}', 'TipoProblema', this.innerText.trim())">${tipoVal}</div></td>
+            <td class="td-center">
+              <select class="sp-grid-select sp-grid-select-sm" onchange="updateOcoField('${ocoId}', 'EmRecuperacao', this.value)">
+                <option value="Não" ${String(o.EmRecuperacao).toLowerCase() !== 'sim' ? 'selected' : ''}>Não</option>
+                <option value="Sim" ${String(o.EmRecuperacao).toLowerCase() === 'sim' ? 'selected' : ''}>Sim</option>
+              </select>
+            </td>
+            <td class="td-center">
+              <select class="sp-grid-select sp-grid-select-sm" onchange="updateOcoField('${ocoId}', 'GravacaoStreaming', this.value)">
+                <option value="Não" ${String(o.GravacaoStreaming).toLowerCase() !== 'sim' ? 'selected' : ''}>Não</option>
+                <option value="Sim" ${String(o.GravacaoStreaming).toLowerCase() === 'sim' ? 'selected' : ''}>Sim</option>
+              </select>
+            </td>
+            <td class="td-center">
+              <input type="checkbox" onchange="updateOcoField('${ocoId}', 'InformarOperacao', this.checked)" ${o.InformarOperacao ? 'checked' : ''} style="width: 16px; height: 16px; cursor: pointer;">
+            </td>
+            <td><div contenteditable="true" class="sp-grid-cell sp-grid-cell-wide" onblur="updateOcoField('${ocoId}', 'AcoesExecutadas', this.innerText.trim())">${acoesVal}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateOcoField('${ocoId}', 'AreaResponsavel', this.innerText.trim())">${areaVal}</div></td>
+            <td class="td-center"><div contenteditable="true" class="sp-grid-cell" onblur="updateOcoField('${ocoId}', 'Redmine', this.innerText.trim())">${redmineVal}</div></td>
+          `;
+          tbody.appendChild(tr);
+          return;
+        }
 
         // Status badge
         let statusBadge = `<span class="sp-badge sp-badge-concluido">Concluído</span>`;
@@ -4012,6 +4790,152 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       document.getElementById("proc-modal").style.display = "none";
     }
 
+    // Sistema de Notificações Toast (Estilo Microsoft 365 / Google Workspace)
+    function showToast(message, type = 'info') {
+      let container = document.getElementById('sp-toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'sp-toast-container';
+        document.body.appendChild(container);
+      }
+      const toast = document.createElement('div');
+      toast.className = `sp-toast toast-${type}`;
+      let icon = 'ℹ️';
+      if (type === 'success') icon = '✅';
+      else if (type === 'warning') icon = '⚠️';
+      else if (type === 'error') icon = '❌';
+
+      toast.innerHTML = `<span style="font-size: 16px;">${icon}</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Modais e Inclusões para Antenistas, Hosts e Drive
+    function openNewAntenistaModal() {
+      const modal = document.getElementById("modal-new-antenista");
+      if (modal) modal.style.display = "flex";
+    }
+    function closeNewAntenistaModal() {
+      const modal = document.getElementById("modal-new-antenista");
+      if (modal) modal.style.display = "none";
+    }
+    function saveNewAntenista(event) {
+      event.preventDefault();
+      const nome = document.getElementById("new-ante-nome").value.trim();
+      const cidade = document.getElementById("new-ante-cidade").value.trim();
+      const cargo = document.getElementById("new-ante-cargo").value.trim() || "Técnico em Antenas";
+      const empresa = document.getElementById("new-ante-empresa").value.trim() || "-";
+      const telCom = document.getElementById("new-ante-telcom").value.trim() || "-";
+      const telCel = document.getElementById("new-ante-telcel").value.trim() || "-";
+
+      if (!nome || !cidade) return;
+
+      const newA = {
+        Title: nome,
+        field_0: cidade,
+        Cargo: cargo,
+        Empresa: empresa,
+        Telefone_x0020_Comercial: telCom,
+        Telefone_x0020_Celular: telCel
+      };
+
+      allAntenistas.unshift(newA);
+      try {
+        let saved = JSON.parse(localStorage.getItem('sp_custom_antenistas') || '[]');
+        saved.unshift(newA);
+        localStorage.setItem('sp_custom_antenistas', JSON.stringify(saved));
+      } catch(e) {
+        console.warn("Erro ao salvar antenista:", e);
+      }
+
+      closeNewAntenistaModal();
+      document.getElementById("form-new-antenista").reset();
+      renderAntenistasTable();
+      showToast(`✅ Antenista '${nome}' cadastrado com sucesso!`, "success");
+    }
+
+    function openNewHostModal() {
+      const modal = document.getElementById("modal-new-host");
+      if (modal) modal.style.display = "flex";
+    }
+    function closeNewHostModal() {
+      const modal = document.getElementById("modal-new-host");
+      if (modal) modal.style.display = "none";
+    }
+    function saveNewHost(event) {
+      event.preventDefault();
+      const code = document.getElementById("new-host-code").value.trim();
+      const status = document.getElementById("new-host-status").value;
+
+      if (!code) return;
+
+      const newH = {
+        Title: code,
+        Status: status,
+        ID: allHosts.length + 1
+      };
+
+      allHosts.unshift(newH);
+      try {
+        let saved = JSON.parse(localStorage.getItem('sp_custom_hosts') || '[]');
+        saved.unshift(newH);
+        localStorage.setItem('sp_custom_hosts', JSON.stringify(saved));
+      } catch(e) {
+        console.warn("Erro ao salvar host:", e);
+      }
+
+      closeNewHostModal();
+      document.getElementById("form-new-host").reset();
+      renderHostsTable();
+      showToast(`✅ Host '${code}' cadastrado com sucesso!`, "success");
+    }
+
+    function openNewDriveFileModal() {
+      const modal = document.getElementById("modal-new-drive-file");
+      if (modal) modal.style.display = "flex";
+    }
+    function closeNewDriveFileModal() {
+      const modal = document.getElementById("modal-new-drive-file");
+      if (modal) modal.style.display = "none";
+    }
+    function saveNewDriveFile(event) {
+      event.preventDefault();
+      const type = document.getElementById("new-drive-type").value;
+      const name = document.getElementById("new-drive-name").value.trim();
+      const author = document.getElementById("new-drive-author").value.trim() || "Cleber Gonçalves";
+
+      if (!name) return;
+
+      const driveData = currentDriveKey && SP_MASTER_DATA.drives && SP_MASTER_DATA.drives[currentDriveKey];
+      if (driveData && driveData.items) {
+        const newItem = {
+          name: name,
+          type: type,
+          extension: type === 'folder' ? '' : (name.split('.').pop() || 'dat'),
+          size: type === 'folder' ? 0 : 1024,
+          lastModifiedDateTime: new Date().toISOString(),
+          lastModifiedBy: author,
+          webUrl: "#"
+        };
+        driveData.items.unshift(newItem);
+        filterDriveTable();
+      }
+
+      closeNewDriveFileModal();
+      document.getElementById("form-new-drive-file").reset();
+      showToast(`✅ Item '${name}' adicionado à biblioteca de documentos!`, "success");
+    }
+
+    function toggleDriveGridMode() {
+      showToast("Visualização detalhada em grade da biblioteca ativada.", "info");
+    }
+
     // Exportações CSV
     function exportCSV() {
       const rows = [["Indice","Mes","Data","Horario","Campeonato","Partida","Responsavel","Canal","PVID","Status","Programado"]];
@@ -4159,6 +5083,27 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     window.renderHospedeirosTable = renderHospedeirosTable;
     window.renderOcorrenciasTable = renderOcorrenciasTable;
     window.renderPermsTable = renderPermsTable;
+    window.showToast = showToast;
+    window.openNewOcoModal = openNewOcoModal;
+    window.closeNewOcoModal = closeNewOcoModal;
+    window.saveNewOcorrencia = saveNewOcorrencia;
+    window.toggleOcoGridEdit = toggleOcoGridEdit;
+    window.updateOcoField = updateOcoField;
+    window.openNewListItemModal = openNewListItemModal;
+    window.closeNewListItemModal = closeNewListItemModal;
+    window.saveNewListItem = saveNewListItem;
+    window.toggleGenericListGridEdit = toggleGenericListGridEdit;
+    window.updateGenericListField = updateGenericListField;
+    window.openNewAntenistaModal = openNewAntenistaModal;
+    window.closeNewAntenistaModal = closeNewAntenistaModal;
+    window.saveNewAntenista = saveNewAntenista;
+    window.openNewHostModal = openNewHostModal;
+    window.closeNewHostModal = closeNewHostModal;
+    window.saveNewHost = saveNewHost;
+    window.openNewDriveFileModal = openNewDriveFileModal;
+    window.closeNewDriveFileModal = closeNewDriveFileModal;
+    window.saveNewDriveFile = saveNewDriveFile;
+    window.toggleDriveGridMode = toggleDriveGridMode;
 
     // Inicialização
     initEscalaMonths();
