@@ -2,22 +2,2574 @@
 """
 Gerador do Portal Web Oficial do Suporte Captação (Kantar IBOPE Media).
 Gera um portal intranet moderno, autônomo e 100% independente do SharePoint legado.
-Contém todos os módulos nativos (Streaming 862 jogos, 500 Contatos Hospedeiros,
-500 Ocorrências, POPs/Procedimentos, Escala de Plantão, TV Box PVIDs e Matriz RBAC).
+Contém todos os módulos nativos:
+ - Hero Banner 1:1 com SharePoint (fundo azul marinho, nós de rede SVG, clima, grade 3x3 branca interna)
+ - Escala de Trabalho 2026 completa (todos os meses, turnos, Artigo 66 da CLT, SobreAviso, download xlsx)
+ - Streaming (862 jogos sincronizados com CazéTV, Prime Video, Netflix, TNT, Record, DAZN)
+ - Contatos Hospedeiros (500 contatos em todas as cidades com busca e exportação CSV)
+ - Painel de Ocorrências (500 ocorrências e histórico de incidentes)
+ - Procedimentos N1 (68 guias e POPs operacionais)
+ - Documentos (Repositório de arquivos da equipe)
+ - Dashboard & Indicadores (Métricas, SLAs, disponibilidade)
+ - Metas & Projetos (OKRs e iniciativas estratégicas)
+ - Receptores & TV BOX (PVIDs PV3623, PV3687, PV3679)
+ - Equipe & Plantão (Contatos da liderança e operadores)
+ - Controle de Acessos & RBAC (36 permissões mapeadas)
 """
 
 import os
 import json
 import csv
+import shutil
+
+HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suporte e Captação | Portal Oficial & Central Autônoma</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sp-theme-primary: #0078D4;
+      --sp-theme-dark: #004578;
+      --sp-theme-dark-alt: #106EBE;
+      --sp-theme-light: #DEECF9;
+      --sp-theme-lighter: #EFF6FC;
+      --sp-body-bg: #FAF9F8;
+      --sp-card-bg: #FFFFFF;
+      --sp-text-main: #323130;
+      --sp-text-secondary: #605E5C;
+      --sp-text-muted: #A19F9D;
+      --sp-border: #EDEBE9;
+      --sp-border-hover: #C8C6C4;
+      --sp-nav-bg: #0078D4;
+      --shadow-card: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
+      --shadow-hover: 0 3.2px 7.2px 0 rgba(0, 0, 0, 0.132), 0 0.6px 1.8px 0 rgba(0, 0, 0, 0.108);
+
+      /* Badges & Status */
+      --badge-caze-bg: #DCFCE7;
+      --badge-caze-txt: #166534;
+      --badge-prime-bg: #00509E;
+      --badge-prime-txt: #FFFFFF;
+      --badge-netflix-bg: #7F4F24;
+      --badge-netflix-txt: #FFFFFF;
+      --badge-tnt-bg: #6B21A8;
+      --badge-tnt-txt: #FFFFFF;
+      --badge-record-bg: #1E40AF;
+      --badge-record-txt: #FFFFFF;
+      --badge-dazn-bg: #0F172A;
+      --badge-dazn-txt: #F8FAFC;
+      --badge-pvid-bg: #0D5C75;
+      --badge-pvid-txt: #FFFFFF;
+      --badge-pend-bg: #FEF3C7;
+      --badge-pend-txt: #92400E;
+      --badge-exib-bg: #DCFCE7;
+      --badge-exib-txt: #166534;
+      --badge-nao-bg: #FEE2E2;
+      --badge-nao-txt: #991B1B;
+    }
+
+    body.dark-mode {
+      --sp-body-bg: #121212;
+      --sp-card-bg: #1E1E1E;
+      --sp-text-main: #E0E0E0;
+      --sp-text-secondary: #AAAAAA;
+      --sp-text-muted: #777777;
+      --sp-border: #2D2D2D;
+      --sp-border-hover: #444444;
+      --sp-theme-lighter: #1A365D;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      background: var(--sp-body-bg);
+      color: var(--sp-text-main);
+      overflow-x: hidden;
+    }
+
+    /* 1. SUITE NAV BAR (TOPMOST HEADER) */
+    .suite-nav {
+      height: 48px;
+      background: #001f3f;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      width: 100%;
+      box-sizing: border-box;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .suite-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .waffle-icon {
+      width: 20px;
+      height: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5px;
+      cursor: pointer;
+    }
+
+    .waffle-dot {
+      background: #FFFFFF;
+      border-radius: 1px;
+    }
+
+    .suite-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .suite-title span {
+      font-weight: 300;
+      opacity: 0.85;
+    }
+
+    .suite-nav-center {
+      flex: 1;
+      max-width: 480px;
+      margin: 0 20px;
+    }
+
+    .suite-search-box {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 4px;
+      padding: 6px 12px;
+      color: #FFFFFF;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .suite-search-box::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .suite-search-box:focus {
+      background: #FFFFFF;
+      color: #1A365D;
+    }
+
+    .suite-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #004578;
+      border: 2px solid #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF;
+      cursor: pointer;
+    }
+
+    .nav-pill-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #FFFFFF;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    .nav-pill-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .role-switcher-select {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #FFFFFF;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .role-switcher-select option {
+      background: #001f3f;
+      color: #FFFFFF;
+    }
+
+    /* 2. SITE NAVIGATION & HUB TITLE */
+    .site-nav-bar {
+      background: #004578;
+      border-bottom: 2px solid #003359;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .site-nav-container {
+      width: 100%;
+      padding: 12px 24px 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-sizing: border-box;
+    }
+
+    .site-brand-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .site-brand-icon {
+      width: 44px;
+      height: 44px;
+      background: #0078D4;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    .site-brand-info h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+    }
+
+    .site-brand-info p {
+      font-size: 12px;
+      color: #DEECF9;
+      margin-top: 2px;
+    }
+
+    .nav-menu-tabs {
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-menu-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-link {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: #DEECF9;
+      padding: 9px 15px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .tab-link:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .tab-link.active {
+      color: #FFFFFF;
+      border-bottom-color: #50E6FF;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px 4px 0 0;
+    }
+
+    /* 3. MAIN BODY & PANES */
+    .main-body {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .pane-container {
+      display: none;
+      width: 100%;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .pane-container.active {
+      display: block;
+    }
+
+    #pane-home {
+      padding: 0;
+      width: 100%;
+    }
+
+    /* ========================================================================= */
+    /* HERO BANNER 1:1 COM SHAREPOINT (FUNDO AZUL MARINHO + SVG CONSTELLATION)   */
+    /* ========================================================================= */
+    .hero-banner {
+      background: radial-gradient(circle at 85% 30%, #063970 0%, #021b38 60%, #010f22 100%);
+      width: 100%;
+      padding: 36px 40px 48px 40px;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+      color: #FFFFFF;
+    }
+
+    .hero-network-svg {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 55%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.75;
+    }
+
+    .hero-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      position: relative;
+      z-index: 2;
+      margin-bottom: 24px;
+    }
+
+    .hero-title-area {
+      max-width: 650px;
+    }
+
+    .hero-main-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+    }
+
+    .hero-description {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #CBD5E1;
+      margin: 0;
+    }
+
+    .hero-weather-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 4px;
+      padding: 12px 18px;
+      min-width: 220px;
+      text-align: right;
+      backdrop-filter: blur(6px);
+    }
+
+    .weather-city {
+      font-size: 13px;
+      color: #E2E8F0;
+      font-weight: 600;
+    }
+
+    .weather-temp-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin: 4px 0;
+    }
+
+    .weather-degrees {
+      font-size: 28px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .weather-details {
+      font-size: 11px;
+      color: #94A3B8;
+    }
+
+    /* 3x3 Grid de botões brancos dentro do banner */
+    .hero-3x3-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      max-width: 880px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-card {
+      background: #FFFFFF;
+      border-radius: 4px;
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      color: #0F172A;
+      font-weight: 600;
+      font-size: 13.5px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      transition: all 0.15s ease-in-out;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      user-select: none;
+    }
+
+    .hero-card:hover {
+      transform: translateY(-2px);
+      background: #F8FAFC;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .hero-card-icon {
+      font-size: 16px;
+      color: #0078D4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ÁREA INFERIOR DA HOME */
+    .home-lower-body {
+      width: 100%;
+      padding: 32px 40px;
+      background: #F3F4F6;
+      box-sizing: border-box;
+    }
+
+    body.dark-mode .home-lower-body {
+      background: #121212;
+    }
+
+    .contact-callout-box {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 4px;
+      overflow: hidden;
+      max-width: 440px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    body.dark-mode .contact-callout-box {
+      background: #1E1E1E;
+      border-color: #333333;
+    }
+
+    .contact-callout-header {
+      background: #475569;
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 16px;
+    }
+
+    .contact-callout-body {
+      padding: 16px;
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    body.dark-mode .contact-callout-body {
+      color: #CBD5E1;
+    }
+
+    .contact-callout-body p {
+      margin: 0 0 14px 0;
+    }
+
+    .btn-contact-action {
+      display: inline-block;
+      background: #002B49;
+      color: #FFFFFF !important;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 8px 16px;
+      border-radius: 3px;
+      transition: background 0.15s ease;
+    }
+
+    .btn-contact-action:hover {
+      background: #004578;
+    }
+
+    .home-redmine-center {
+      display: flex;
+      justify-content: center;
+      margin: 28px 0;
+    }
+
+    .btn-sugestoes-sharepoint {
+      background: #002B49;
+      color: #FFFFFF !important;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 22px;
+      border-radius: 3px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      transition: all 0.15s ease;
+    }
+
+    .btn-sugestoes-sharepoint:hover {
+      background: #004578;
+      transform: translateY(-1px);
+    }
+
+    .home-section-links {
+      margin-top: 24px;
+    }
+
+    .section-title-wrap {
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--sp-text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--sp-text-secondary);
+      margin-top: 4px;
+    }
+
+    .waffle-links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .waffle-link-card {
+      background: var(--sp-card-bg);
+      border: 1px solid var(--sp-border);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--sp-text-main);
+      box-shadow: var(--shadow-card);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .waffle-link-card:hover {
+      border-color: var(--sp-theme-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .waffle-link-icon {
+      font-size: 26px;
+    }
+
+    .waffle-link-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* ========================================================================= */
+    /* MÓDULO NATIVO DE ESCALA DE TRABALHO 2026 (CLT 66, CALENDÁRIO, PLANTÕES)   */
+    /* ========================================================================= */
+    .clt-banner-alert {
+      background: #FFFBEB;
+      border: 1px solid #FCD34D;
+      border-left: 6px solid #D97706;
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      color: #92400E;
+    }
+
+    body.dark-mode .clt-banner-alert {
+      background: #3B2A10;
+      border-color: #854D0E;
+      color: #FDE68A;
+    }
+
+    .clt-icon {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .clt-content h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #78350F;
+    }
+
+    body.dark-mode .clt-content h4 {
+      color: #FDE68A;
+    }
+
+    .clt-content p {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .month-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .month-pill-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--sp-border);
+      background: var(--sp-card-bg);
+      color: var(--sp-text-main);
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .month-pill-btn:hover {
+      border-color: #0078D4;
+      color: #0078D4;
+    }
+
+    .month-pill-btn.active {
+      background: #0078D4;
+      border-color: #0078D4;
+      color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0,120,212,0.3);
+    }
+
+    .escala-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .escala-inputs-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .escala-table-scroll {
+      overflow-x: auto;
+      border: 1px solid var(--sp-border);
+      border-radius: 6px;
+      background: #FFFFFF;
+      max-height: 600px;
+      box-shadow: var(--shadow-card);
+    }
+
+    body.dark-mode .escala-table-scroll {
+      background: #1E1E1E;
+    }
+
+    .escala-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .escala-table th, .escala-table td {
+      padding: 7px 9px;
+      border: 1px solid #E2E8F0;
+      text-align: center;
+    }
+
+    body.dark-mode .escala-table th, body.dark-mode .escala-table td {
+      border-color: #333333;
+    }
+
+    .escala-table th {
+      background: #F8FAFC;
+      color: #334155;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    body.dark-mode .escala-table th {
+      background: #27272A;
+      color: #E4E4E7;
+    }
+
+    .escala-table th.th-sticky-left, .escala-table td.td-sticky-left {
+      position: sticky;
+      left: 0;
+      background: #FFFFFF;
+      z-index: 1;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    body.dark-mode .escala-table th.th-sticky-left, body.dark-mode .escala-table td.td-sticky-left {
+      background: #1E1E1E;
+    }
+
+    .escala-table th.th-sticky-left {
+      background: #F1F5F9;
+      z-index: 3;
+    }
+
+    body.dark-mode .escala-table th.th-sticky-left {
+      background: #27272A;
+    }
+
+    .escala-badge {
+      display: inline-block;
+      min-width: 24px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .escala-badge-t { background: #DCFCE7; color: #166534; }
+    .escala-badge-f { background: #F1F5F9; color: #64748B; }
+    .escala-badge-ferias { background: #FEF3C7; color: #92400E; }
+    .escala-badge-bh { background: #DBEAFE; color: #1E40AF; }
+    .escala-badge-vf { background: #FEE2E2; color: #991B1B; }
+    .escala-badge-fj { background: #CCFBF1; color: #115E59; }
+    .escala-badge-dayoff { background: #FCE7F3; color: #9D174D; }
+    .escala-badge-tr { background: #EDE9FE; color: #6D28D9; }
+    .escala-badge-ag { background: #FEF08A; color: #854D0E; }
+    .escala-badge-sm { background: #D1FAE5; color: #065F46; }
+
+    /* LEGENDA E SOBREAVISO */
+    .escala-footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .escala-info-card {
+      background: var(--sp-card-bg);
+      border: 1px solid var(--sp-border);
+      border-radius: 6px;
+      padding: 18px 22px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .escala-info-card h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--sp-text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legenda-chips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+    }
+
+    .legenda-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--sp-text-secondary);
+    }
+
+    .sobreaviso-schedule-list {
+      list-style: none;
+      font-size: 13px;
+      color: var(--sp-text-secondary);
+      line-height: 1.6;
+    }
+
+    .sobreaviso-schedule-list li {
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* KPI CARDS & TABLES GERAIS */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-box {
+      background: var(--sp-card-bg);
+      border: 1px solid var(--sp-border);
+      border-radius: 6px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow-card);
+      border-left: 4px solid var(--sp-theme-primary);
+    }
+
+    .kpi-box-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sp-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .kpi-box-val {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--sp-text-main);
+      margin: 6px 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .kpi-box-sub {
+      font-size: 11px;
+      color: var(--sp-text-muted);
+    }
+
+    .filter-bar {
+      background: var(--sp-card-bg);
+      border: 1px solid var(--sp-border);
+      border-radius: 6px;
+      padding: 12px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .filter-inputs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .search-field, .select-field {
+      padding: 8px 12px;
+      border: 1px solid var(--sp-border);
+      border-radius: 4px;
+      font-size: 13px;
+      background: var(--sp-card-bg);
+      color: var(--sp-text-main);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-field {
+      min-width: 280px;
+      flex: 1;
+    }
+
+    .search-field:focus, .select-field:focus {
+      border-color: var(--sp-theme-primary);
+      box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+    }
+
+    .btn-action {
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-action-primary {
+      background: var(--sp-theme-primary);
+      color: #FFFFFF;
+    }
+
+    .btn-action-primary:hover {
+      background: var(--sp-theme-dark);
+    }
+
+    .btn-action-secondary {
+      background: var(--sp-theme-lighter);
+      color: var(--sp-theme-dark);
+      border: 1px solid #C7E0F4;
+    }
+
+    .btn-action-secondary:hover {
+      background: #DEECF9;
+    }
+
+    .sp-table-wrap {
+      background: var(--sp-card-bg);
+      border: 1px solid var(--sp-border);
+      border-radius: 6px;
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+
+    .sp-table-scroll {
+      max-height: 640px;
+      overflow-y: auto;
+    }
+
+    .sp-list-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .sp-list-table th {
+      background: #FAF9F8;
+      color: var(--sp-text-secondary);
+      font-weight: 600;
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 2px solid var(--sp-border);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    body.dark-mode .sp-list-table th {
+      background: #27272A;
+      color: #E4E4E7;
+    }
+
+    .sp-list-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--sp-border);
+      color: var(--sp-text-main);
+    }
+
+    .sp-list-table tr:hover td {
+      background: rgba(0, 120, 212, 0.04);
+    }
+
+    .td-center {
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
+
+    .badge-caze { background: var(--badge-caze-bg); color: var(--badge-caze-txt); }
+    .badge-prime { background: var(--badge-prime-bg); color: var(--badge-prime-txt); }
+    .badge-netflix { background: var(--badge-netflix-bg); color: var(--badge-netflix-txt); }
+    .badge-tnt { background: var(--badge-tnt-bg); color: var(--badge-tnt-txt); }
+    .badge-record { background: var(--badge-record-bg); color: var(--badge-record-txt); }
+    .badge-dazn { background: var(--badge-dazn-bg); color: var(--badge-dazn-txt); }
+    .badge-default { background: #E2E8F0; color: #334155; }
+
+    .badge-pvid {
+      background: var(--badge-pvid-bg);
+      color: var(--badge-pvid-txt);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .badge-pendente { background: var(--badge-pend-bg); color: var(--badge-pend-txt); }
+    .badge-exibido { background: var(--badge-exib-bg); color: var(--badge-exib-txt); }
+    .badge-nao-exibido { background: var(--badge-nao-bg); color: var(--badge-nao-txt); }
+
+    .badge-role-owner { background: #EDE9FE; color: #6D28D9; border: 1px solid #DDD6FE; }
+    .badge-role-write { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+    .badge-role-read { background: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }
+
+    /* MODAL DE PROCEDIMENTOS */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: var(--sp-card-bg);
+      border-radius: 8px;
+      max-width: 760px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border: 1px solid var(--sp-border);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      background: #004578;
+      color: #FFFFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--sp-text-main);
+    }
+
+    /* FOOTER */
+    .site-footer {
+      background: var(--sp-card-bg);
+      border-top: 1px solid var(--sp-border);
+      padding: 20px 24px;
+      margin-top: 32px;
+    }
+
+    .site-footer-container {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      font-size: 12px;
+      color: var(--sp-text-secondary);
+    }
+
+    @media (max-width: 900px) {
+      .hero-3x3-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-top-row { flex-direction: column; }
+      .escala-footer-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-3x3-grid { grid-template-columns: 1fr; }
+      .suite-nav-center { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. SUITE NAV (GOOGLE WORKSPACE / MICROSOFT 365 TOPBAR) -->
+  <header class="suite-nav">
+    <div class="suite-nav-left">
+      <div class="waffle-icon" title="Menu Corporativo">
+        <div class="waffle-dot"></div><div class="waffle-dot"></div><div class="waffle-dot"></div>
+        <div class="waffle-dot"></div><div class="waffle-dot"></div><div class="waffle-dot"></div>
+        <div class="waffle-dot"></div><div class="waffle-dot"></div><div class="waffle-dot"></div>
+      </div>
+      <div class="suite-title">
+        Google Sites <span>| Suporte e Captação</span>
+      </div>
+    </div>
+
+    <div class="suite-nav-center">
+      <input type="text" class="suite-search-box" id="global-search" placeholder="Pesquisar partidas, contatos, ocorrências, procedimentos...">
+    </div>
+
+    <div class="suite-nav-right">
+      <select id="user-role-select" class="role-switcher-select" onchange="onRoleChange()" title="Simulador de Perfil de Acesso">
+        <option value="admin">👤 Cleber Gonçalves (Gestor/Admin)</option>
+        <option value="operador">🛠️ Operador Suporte N1/N2</option>
+        <option value="leitor">👁️ Visitante (NOC / SAC / Consulta)</option>
+      </select>
+
+      <button class="nav-pill-btn" onclick="toggleDarkMode()" title="Alternar Modo Escuro / Claro">
+        <span id="dark-mode-icon">🌙</span> Modo Operacional
+      </button>
+      <div class="user-avatar" id="top-user-avatar" title="Kantar IBOPE Media — Suporte Captação">CG</div>
+    </div>
+  </header>
+
+  <!-- 2. SITE NAVIGATION & HUB TITLE -->
+  <nav class="site-nav-bar">
+    <div class="site-nav-container">
+      <div class="site-brand-row">
+        <div class="site-brand-icon">SC</div>
+        <div class="site-brand-info">
+          <h2>Suporte e Captação</h2>
+          <p>Kantar IBOPE Media — Central Autônoma de Operações & Ingest</p>
+        </div>
+      </div>
+
+      <div class="nav-menu-tabs">
+        <button class="tab-link active" onclick="showPane('home')">🏠 Início</button>
+        <button class="tab-link" onclick="showPane('escala')">💼 Escala de Trabalho 2026</button>
+        <button class="tab-link" onclick="showPane('streaming')">⚽ Programação Streaming (__EVENTS_COUNT__)</button>
+        <button class="tab-link" onclick="showPane('hospedeiros')">📞 Hospedeiros (__HOSPEDEIROS_COUNT__)</button>
+        <button class="tab-link" onclick="showPane('ocorrencias')">🚨 Ocorrências (__OCORRENCIAS_COUNT__)</button>
+        <button class="tab-link" onclick="showPane('procedimentos')">📖 Procedimentos N1 (__PROCEDIMENTOS_COUNT__)</button>
+        <button class="tab-link" onclick="showPane('documentos')">📁 Documentos (__DOCUMENTOS_COUNT__)</button>
+        <button class="tab-link" onclick="showPane('dashboard')">📊 Dashboard</button>
+        <button class="tab-link" onclick="showPane('metas')">🎯 Metas</button>
+        <button class="tab-link" onclick="showPane('projetos')">🚀 Projetos</button>
+        <button class="tab-link" onclick="showPane('receptores')">📡 Receptores & TV BOX</button>
+        <button class="tab-link" onclick="showPane('equipe')">👥 Equipe</button>
+        <button class="tab-link" id="nav-tab-permissoes" onclick="showPane('permissoes')">🔐 Permissões (__PERMS_COUNT__)</button>
+        <button class="tab-link" onclick="showPane('links')">🔗 Links</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 3. CONTEÚDO PRINCIPAL (MAIN BODY) -->
+  <main class="main-body">
+
+    <!-- ABA 1: HOME PAGE NATIVA (BANNER 1:1 COM SHAREPOINT) -->
+    <div id="pane-home" class="pane-container active">
+
+      <!-- HERO BANNER -->
+      <section class="hero-banner">
+        <!-- SVG Constellation Network Background -->
+        <svg class="hero-network-svg" viewBox="0 0 800 400" preserveAspectRatio="none">
+          <defs>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <line x1="350" y1="80" x2="480" y2="130" stroke="rgba(0, 210, 255, 0.35)" stroke-width="1.5" />
+          <line x1="480" y1="130" x2="620" y2="70" stroke="rgba(0, 210, 255, 0.4)" stroke-width="1.5" />
+          <line x1="480" y1="130" x2="560" y2="240" stroke="rgba(0, 210, 255, 0.3)" stroke-width="1.5" />
+          <line x1="620" y1="70" x2="720" y2="160" stroke="rgba(0, 210, 255, 0.4)" stroke-width="1.5" />
+          <line x1="560" y1="240" x2="720" y2="160" stroke="rgba(0, 210, 255, 0.35)" stroke-width="1.5" />
+          <line x1="560" y1="240" x2="450" y2="320" stroke="rgba(0, 210, 255, 0.3)" stroke-width="1.5" />
+          <line x1="720" y1="160" x2="780" y2="280" stroke="rgba(0, 210, 255, 0.35)" stroke-width="1.5" />
+          <line x1="450" y1="320" x2="610" y2="350" stroke="rgba(0, 210, 255, 0.3)" stroke-width="1.5" />
+          <line x1="610" y1="350" x2="780" y2="280" stroke="rgba(0, 210, 255, 0.3)" stroke-width="1.5" />
+          <!-- Nodes -->
+          <circle cx="350" cy="80" r="5" fill="#00d2ff" filter="url(#glow)" />
+          <circle cx="480" cy="130" r="7" fill="#ffffff" filter="url(#glow)" />
+          <circle cx="620" cy="70" r="6" fill="#00d2ff" filter="url(#glow)" />
+          <circle cx="560" cy="240" r="7" fill="#00d2ff" filter="url(#glow)" />
+          <circle cx="720" cy="160" r="8" fill="#ffffff" filter="url(#glow)" />
+          <circle cx="450" cy="320" r="5" fill="#00d2ff" filter="url(#glow)" />
+          <circle cx="610" cy="350" r="6" fill="#00d2ff" filter="url(#glow)" />
+          <circle cx="780" cy="280" r="6" fill="#ffffff" filter="url(#glow)" />
+        </svg>
+
+        <div class="hero-top-row">
+          <div class="hero-title-area">
+            <h1 class="hero-main-title">Suporte e Captação</h1>
+            <p class="hero-description">
+              Bem vindo(a) ao site da equipe de Suporte e Captação! Aqui você pode encontrar informações sobre problemas técnicos, verificar o status das ocorrências, localizar documentos e dados referentes à área e muito mais.
+            </p>
+          </div>
+
+          <div class="hero-weather-card">
+            <div class="weather-city">São Paulo, Brasil</div>
+            <div class="weather-temp-row">
+              <span style="font-size: 24px;">🌧️</span>
+              <span class="weather-degrees">21°C</span>
+            </div>
+            <div class="weather-details">Chuva leve &bull; 31°/19° &bull; 18/11/2026 &bull; MSN Clima</div>
+          </div>
+        </div>
+
+        <!-- Grade 3x3 de Botões Brancos Idênticos ao SharePoint -->
+        <div class="hero-3x3-grid">
+          <div class="hero-card" onclick="showPane('hospedeiros')">
+            <div class="hero-card-icon">📞</div>
+            <div>Contatos Hospedeiros</div>
+          </div>
+
+          <div class="hero-card" onclick="showPane('documentos')">
+            <div class="hero-card-icon">📁</div>
+            <div>Documentos</div>
+          </div>
+
+          <div class="hero-card" onclick="showPane('escala')">
+            <div class="hero-card-icon">💼</div>
+            <div>Escala de Trabalho</div>
+          </div>
+
+          <div class="hero-card" onclick="showPane('dashboard')">
+            <div class="hero-card-icon">📊</div>
+            <div>Dashboard & Indicadores</div>
+          </div>
+
+          <div class="hero-card" onclick="showPane('metas')">
+            <div class="hero-card-icon">🎯</div>
+            <div>Metas</div>
+          </div>
+
+          <div class="hero-card" onclick="showPane('ocorrencias')">
+            <div class="hero-card-icon">📋</div>
+            <div>Painel de Ocorrências</div>
+          </div>
+
+          <div class="hero-card" onclick="showPane('procedimentos')">
+            <div class="hero-card-icon">📄</div>
+            <div>Procedimentos N1</div>
+          </div>
+
+          <div class="hero-card" onclick="showPane('projetos')">
+            <div class="hero-card-icon">📁</div>
+            <div>Projetos</div>
+          </div>
+
+          <div class="hero-card" onclick="showPane('streaming')">
+            <div class="hero-card-icon">📡</div>
+            <div>((•)) Programação de Eventos...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ÁREA INFERIOR DA PÁGINA (CHAMADA E LINKS EXTERNOS) -->
+      <section class="home-lower-body">
+        <div class="contact-callout-box">
+          <div class="contact-callout-header">Entre em contato com a nossa equipe</div>
+          <div class="contact-callout-body">
+            <p>Precisa de suporte imediato ou alinhamento técnico com o plantão da Captação? Chame diretamente no Teams.</p>
+            <a href="https://teams.microsoft.com/l/team/19:DbmEit-Jw5Egnzv9KJysAxgT20jeLg_9HvF-OtRncrE1@thread.tacv2/conversations?groupId=b85ee2f2-68d9-461a-8ba8-d4eecbf19d94&tenantId=1e355c04-e0a4-42ed-8e2d-7351591f0ef1" target="_blank" class="btn-contact-action">
+              Enviar uma mensagem
+            </a>
+          </div>
+        </div>
+
+        <div class="home-redmine-center">
+          <a href="http://10.1.0.39/redmine/projects/suporte-captacao-demandas-sharepoint/issues?set_filter=1&tracker_id=3" target="_blank" class="btn-sugestoes-sharepoint">
+            Sugestões e Melhorias para SharePoint (Redmine)
+          </a>
+        </div>
+
+        <div class="home-section-links">
+          <div class="section-title-wrap">
+            <h3 class="section-title">🌐 Links Externos</h3>
+            <p class="section-desc">Acesso rápido aos sistemas corporativos, telemetria e ferramentas de trabalho diário.</p>
+          </div>
+
+          <div class="waffle-links-grid">
+            <a href="https://mediadna.kantaribopemedia.com/mediadna/Comum/PaginaInicial.aspx" target="_blank" class="waffle-link-card">
+              <span class="waffle-link-icon">🧬</span>
+              <span class="waffle-link-title">Site - Media DNA</span>
+            </a>
+            <a href="http://10.1.0.39/redmine/login" target="_blank" class="waffle-link-card">
+              <span class="waffle-link-icon">📑</span>
+              <span class="waffle-link-title">Redmine</span>
+            </a>
+            <a href="https://zbxsrvbr.kantaribopemedia.com/zabbix/zabbix.php?action=dashboard.view&dashboardid=152" target="_blank" class="waffle-link-card">
+              <span class="waffle-link-icon">🖥️</span>
+              <span class="waffle-link-title">Zabbix</span>
+            </a>
+            <a href="https://rhopen.kantar.com/" target="_blank" class="waffle-link-card">
+              <span class="waffle-link-icon">👥</span>
+              <span class="waffle-link-title">RH Open</span>
+            </a>
+            <a href="https://kantarit.service-now.com/mykantarservices?id=hr_dashboard_home" target="_blank" class="waffle-link-card">
+              <span class="waffle-link-icon">🎫</span>
+              <span class="waffle-link-title">Service Now</span>
+            </a>
+            <a href="https://wd3.myworkday.com/wday/authgwy/kantar/login.htmld" target="_blank" class="waffle-link-card">
+              <span class="waffle-link-icon">💼</span>
+              <span class="waffle-link-title">Workday</span>
+            </a>
+            <a href="https://grafana.kantaribopemedia.com/d/LnH9Oq-Sk/atria-capture?orgId=1" target="_blank" class="waffle-link-card">
+              <span class="waffle-link-icon">📈</span>
+              <span class="waffle-link-title">Grafana</span>
+            </a>
+            <a href="https://portalbsd.com.br/" target="_blank" class="waffle-link-card">
+              <span class="waffle-link-icon">📡</span>
+              <span class="waffle-link-title">Portal BSD</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ABA 2: ESCALA DE TRABALHO 2026 COMPLETA (TODOS OS MESES & ARTIGO 66 CLT) -->
+    <div id="pane-escala" class="pane-container">
+      
+      <!-- Aviso Legal Artigo 66 da CLT -->
+      <div class="clt-banner-alert">
+        <div class="clt-icon">⚖️</div>
+        <div class="clt-content">
+          <h4>AVISO OBRIGATÓRIO — ARTIGO 66 DA CLT & JORNADAS DE DESCANSO</h4>
+          <p>
+            <b>Conforme o Artigo 66 da CLT</b>, deve ser estritamente respeitado um intervalo mínimo de <b>11 (onze) horas consecutivas de descanso</b> entre duas jornadas de trabalho.<br>
+            📢 <b>PESSOAL:</b> Lembrem-se de retornar para o trabalho <b>SEMPRE 11 HORAS APÓS A ÚLTIMA JORNADA</b>, garantindo a conformidade trabalhista e o bem-estar da equipe.
+          </p>
+        </div>
+      </div>
+
+      <!-- Navegador de Meses -->
+      <div class="month-pills-row" id="escala-month-pills">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+
+      <!-- Controles de Filtro da Escala -->
+      <div class="escala-controls-row">
+        <div class="escala-inputs-group">
+          <input type="text" id="escala-search-box" class="search-field" placeholder="🔍 Buscar operador ou matrícula..." style="min-width: 240px;">
+          <select id="escala-filter-equipe" class="select-field">
+            <option value="">Todas as Equipes</option>
+            <option value="Monitoração">Suporte Técnico - Monitoração</option>
+            <option value="Captação">Suporte Técnico - Captação</option>
+          </select>
+          <select id="escala-filter-turno" class="select-field">
+            <option value="">Todos os Horários</option>
+            <option value="06:00">Manhã (06:00 - 15:00)</option>
+            <option value="10:00">Intermediário (10:00 - 19:00)</option>
+            <option value="14:00">Tarde (14:00 - 23:00)</option>
+            <option value="22:50">Madrugada (22:50 - 06:10 / 23:00 - 06:00)</option>
+            <option value="08:00">Captação / N2 (08:00 - 17:00)</option>
+          </select>
+        </div>
+        <div>
+          <a href="Escala_de_trabalho_2026.xlsx" download class="btn-action btn-action-primary" title="Baixar arquivo oficial da escala">
+            📥 Baixar Planilha Oficial (.xlsx)
+          </a>
+        </div>
+      </div>
+
+      <!-- Tabela Interativa de Operadores do Mês -->
+      <div class="escala-table-scroll">
+        <table class="escala-table" id="escala-main-table">
+          <thead id="escala-table-head">
+            <!-- Headers renderizados dinamicamente com os dias do mês -->
+          </thead>
+          <tbody id="escala-table-body">
+            <!-- Operadores e dias renderizados dinamicamente -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tabela de Atividades Operacionais Diárias (Chamados, Incidentes, SobreAviso) -->
+      <div style="margin-top: 24px;">
+        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--sp-text-main);">
+          📋 Atividades Diárias & Distribuição de Responsabilidades
+        </h4>
+        <div class="escala-table-scroll">
+          <table class="escala-table" id="escala-atividades-table">
+            <thead id="escala-atividades-head">
+              <!-- Dias do mês -->
+            </thead>
+            <tbody id="escala-atividades-body">
+              <!-- Atividades renderizadas dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Plantão Fim de Ano (Natal & Ano Novo) -->
+      <div id="escala-fim-ano-wrap" style="margin-top: 24px; display: none;">
+        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--sp-text-main);">
+          🎄 Escala Especial de Fim de Ano (Natal 2026 e Ano Novo 2026/2027)
+        </h4>
+        <div class="escala-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th>Período / Data</th>
+                <th>Manhã (06h - 15h)</th>
+                <th>Tarde (14h - 23h)</th>
+                <th>Madrugada (22h50 - 06h10)</th>
+                <th>Plantão SobreAviso (N2)</th>
+              </tr>
+            </thead>
+            <tbody id="escala-fim-ano-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Legenda Oficial & Regras de SobreAviso -->
+      <div class="escala-footer-grid">
+        <div class="escala-info-card">
+          <h4>🏷️ Legenda de Códigos da Escala</h4>
+          <div class="legenda-chips-grid">
+            <div class="legenda-chip"><span class="escala-badge escala-badge-t">T</span> Tele-Trabalho</div>
+            <div class="legenda-chip"><span class="escala-badge escala-badge-f">F</span> Folga</div>
+            <div class="legenda-chip"><span class="escala-badge escala-badge-ferias">FER</span> Férias</div>
+            <div class="legenda-chip"><span class="escala-badge escala-badge-bh">BH</span> Banco de Horas</div>
+            <div class="legenda-chip"><span class="escala-badge escala-badge-vf">VF</span> Venda de Folga</div>
+            <div class="legenda-chip"><span class="escala-badge escala-badge-fj">FJ</span> Folga Justificada</div>
+            <div class="legenda-chip"><span class="escala-badge escala-badge-dayoff">DAY</span> Aniversário</div>
+            <div class="legenda-chip"><span class="escala-badge escala-badge-tr">TR</span> Treinamento</div>
+            <div class="legenda-chip"><span class="escala-badge escala-badge-ag">AG</span> Abono Gestor</div>
+            <div class="legenda-chip"><span class="escala-badge escala-badge-sm">SM</span> Saúde Mental</div>
+          </div>
+        </div>
+
+        <div class="escala-info-card">
+          <h4>⏰ Regras de Horários de SobreAviso</h4>
+          <ul class="sobreaviso-schedule-list">
+            <li>🌙 <b>Na Semana:</b> 19h00 às 08h00 do dia seguinte.</li>
+            <li>🏖️ <b>Fins de Semana e Feriados:</b> Período Integral (24h ininterruptas).</li>
+            <li>🔄 <b>Acionamento N2:</b> Quando o suporte N2 for acionado no final de semana, apontar como <b>VF (Venda de Folga)</b>.</li>
+            <li>⚖️ <b>Intervalo Interjornada:</b> Intervalo de 11h respeitado obrigatoriamente após qualquer atendimento.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ABA 3: PROGRAMAÇÃO STREAMING COMPLETA (862 JOGOS) -->
+    <div id="pane-streaming" class="pane-container">
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-box-label">Total de Confrontos</div>
+          <div class="kpi-box-val" id="kpi-total">__EVENTS_COUNT__</div>
+          <div class="kpi-box-sub">Base Oficial Sincronizada</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #10B981;">
+          <div class="kpi-box-label">Cazé TV</div>
+          <div class="kpi-box-val" id="kpi-caze">0</div>
+          <div class="kpi-box-sub">YouTube Live & PPV</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #00509E;">
+          <div class="kpi-box-label">Amazon Prime</div>
+          <div class="kpi-box-val" id="kpi-prime">0</div>
+          <div class="kpi-box-sub">Prime Video Sports</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #7F4F24;">
+          <div class="kpi-box-label">Netflix</div>
+          <div class="kpi-box-val" id="kpi-netflix">0</div>
+          <div class="kpi-box-sub">NFL & Eventos Especiais</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #8B5CF6;">
+          <div class="kpi-box-label">TNT / Max / Record</div>
+          <div class="kpi-box-val" id="kpi-outros">0</div>
+          <div class="kpi-box-sub">Paulistão & Carioca</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-inputs">
+          <input type="text" id="search-box" class="search-field" placeholder="🔍 Buscar partida, campeonato, responsável ou data...">
+          <select id="filter-canal" class="select-field">
+            <option value="">Todos os Canais</option>
+            <option value="cazé">Cazé TV</option>
+            <option value="prime">Amazon Prime Video</option>
+            <option value="netflix">Netflix</option>
+            <option value="tnt">TNT / Max</option>
+            <option value="record">Record</option>
+            <option value="dazn">DAZN</option>
+          </select>
+          <select id="filter-status" class="select-field">
+            <option value="">Todos os Status</option>
+            <option value="pendente">Pendente</option>
+            <option value="exibido">Exibido</option>
+            <option value="não exibido">Não Exibido</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-action btn-action-secondary action-admin-only" onclick="syncLiveAPI()">🔄 Sincronizar em Tempo Real</button>
+          <button class="btn-action btn-action-primary" onclick="exportCSV()">📥 Exportar CSV</button>
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center">#</th>
+                <th class="td-center">Mês</th>
+                <th class="td-center">Data</th>
+                <th class="td-center">Horário</th>
+                <th>Campeonato</th>
+                <th>Partida</th>
+                <th>Responsável Gravação</th>
+                <th class="td-center">Canal de Transmissão</th>
+                <th class="td-center">PVID TV BOX</th>
+                <th class="td-center">Status de Entrega</th>
+                <th class="td-center">Programado</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary); display: flex; justify-content: space-between;">
+        <div>Mostrando <b id="showing-count" style="color: var(--sp-theme-primary);">0</b> eventos filtrados</div>
+        <div>Padrão Oficial Google Workspace & Central Autônoma</div>
+      </div>
+    </div>
+
+    <!-- ABA 4: CONTATOS HOSPEDEIROS (500 REGISTROS NATIVOS) -->
+    <div id="pane-hospedeiros" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📞 Contatos Técnicos de Hospedeiros (__HOSPEDEIROS_COUNT__ Registros)</h2>
+        <p class="section-desc">Diretório completo de centrais e técnicos de recepção e captação em todas as praças.</p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-inputs">
+          <input type="text" id="search-hosp-box" class="search-field" placeholder="🔍 Buscar por cidade, técnico, especialidade ou telefone...">
+        </div>
+        <div>
+          <button class="btn-action btn-action-primary" onclick="exportHospedeirosCSV()">📥 Exportar Hospedeiros CSV</button>
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center">#</th>
+                <th>Cidade / Praça</th>
+                <th>Nome do Técnico / Central</th>
+                <th>Especialidade</th>
+                <th>Telefone Comercial</th>
+                <th>Telefone Celular</th>
+              </tr>
+            </thead>
+            <tbody id="hosp-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
+        Mostrando <b id="showing-hosp-count" style="color: var(--sp-theme-primary);">0</b> contatos
+      </div>
+    </div>
+
+    <!-- ABA 5: PAINEL DE OCORRÊNCIAS (500 REGISTROS NATIVOS) -->
+    <div id="pane-ocorrencias" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🚨 Painel de Ocorrências & Histórico de Incidentes (__OCORRENCIAS_COUNT__ Casos)</h2>
+        <p class="section-desc">Histórico completo de incidentes operacionais, diagnóstico de falhas em equipamentos e ações corretivas.</p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-inputs">
+          <input type="text" id="search-oco-box" class="search-field" placeholder="🔍 Buscar por título, praça, equipamento ou sintoma de problema...">
+        </div>
+        <div>
+          <button class="btn-action btn-action-primary" onclick="exportOcorrenciasCSV()">📥 Exportar Ocorrências CSV</button>
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center">#</th>
+                <th>Título da Ocorrência</th>
+                <th>CS / Praça</th>
+                <th>Equipamento</th>
+                <th>Problema Identificado</th>
+                <th>Ações Executadas</th>
+              </tr>
+            </thead>
+            <tbody id="oco-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
+        Mostrando <b id="showing-oco-count" style="color: var(--sp-theme-primary);">0</b> ocorrências registradas
+      </div>
+    </div>
+
+    <!-- ABA 6: PROCEDIMENTOS N1 (68 POPS NATIVOS) -->
+    <div id="pane-procedimentos" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📖 Procedimentos Operacionais Padrão (POPs N1) (__PROCEDIMENTOS_COUNT__ Itens)</h2>
+        <p class="section-desc">Manuais de atendimento rápido, guias de reset de TV BOX, contingência e configurações técnicas.</p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-inputs">
+          <input type="text" id="search-proc-box" class="search-field" placeholder="🔍 Buscar procedimento por nome ou palavra-chave...">
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center">#</th>
+                <th>Nome do Procedimento / Manual</th>
+                <th>Tipo de Arquivo</th>
+                <th>Data de Atualização</th>
+                <th class="td-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="proc-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
+        Mostrando <b id="showing-proc-count" style="color: var(--sp-theme-primary);">0</b> manuais e procedimentos operacionais
+      </div>
+    </div>
+
+    <!-- ABA 7: DOCUMENTOS (REPOSITÓRIO DA EQUIPE) -->
+    <div id="pane-documentos" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📁 Repositório de Documentos da Equipe (__DOCUMENTOS_COUNT__ Arquivos)</h2>
+        <p class="section-desc">Documentos, planilhas históricas, escalas e arquivos da biblioteca corporativa.</p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-inputs">
+          <input type="text" id="search-doc-box" class="search-field" placeholder="🔍 Filtrar documentos...">
+        </div>
+        <div>
+          <a href="https://drive.google.com" target="_blank" class="btn-action btn-action-primary">
+            🌐 Abrir no Google Drive
+          </a>
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center">#</th>
+                <th>Nome do Arquivo / Pasta</th>
+                <th>Tipo</th>
+                <th>Data de Modificação</th>
+                <th class="td-center">Download / Ação</th>
+              </tr>
+            </thead>
+            <tbody id="docs-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 8: DASHBOARD & INDICADORES -->
+    <div id="pane-dashboard" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📊 Dashboard Operacional & Indicadores de Transmissão</h2>
+        <p class="section-desc">Telemetria de ingest de sinais esportivos, uptime de streaming e prontidão de equipe.</p>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-box" style="border-left: 4px solid #10B981;">
+          <div class="kpi-box-label">Disponibilidade Operacional (SLA)</div>
+          <div class="kpi-box-val">99.85%</div>
+          <div class="kpi-box-sub">Meta Corporativa: &gt; 99.50%</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #0078D4;">
+          <div class="kpi-box-label">Eventos Monitorados 2026</div>
+          <div class="kpi-box-val">__EVENTS_COUNT__</div>
+          <div class="kpi-box-sub">CazéTV, Prime, Netflix, TNT, Record</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #D97706;">
+          <div class="kpi-box-label">Conformidade CLT Art. 66</div>
+          <div class="kpi-box-val">100.0%</div>
+          <div class="kpi-box-sub">11h de Descanso entre Jornadas</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #8B5CF6;">
+          <div class="kpi-box-label">Tempo Médio de Reparo (MTTR)</div>
+          <div class="kpi-box-val">2.8 min</div>
+          <div class="kpi-box-sub">Restabelecimento de Transmissão</div>
+        </div>
+      </div>
+
+      <div class="escala-footer-grid">
+        <div class="escala-info-card">
+          <h4>🛰️ Status dos Canais de Ingest</h4>
+          <ul class="sobreaviso-schedule-list">
+            <li>🟢 <b>YouTube Live (CazéTV):</b> 100% Operacional &bull; Latência 1.1s</li>
+            <li>🟢 <b>Amazon Prime Video Sports:</b> 100% Operacional &bull; PVID PV3623</li>
+            <li>🟢 <b>Netflix Live (NFL):</b> 100% Operacional &bull; PVID PV3687</li>
+            <li>🟢 <b>Max / TNT Sports:</b> 100% Operacional &bull; PVID PV3679</li>
+            <li>🟢 <b>Record / PlayPlus:</b> 100% Operacional &bull; Sinais Regionais OK</li>
+          </ul>
+        </div>
+        <div class="escala-info-card">
+          <h4>📡 PVIDs de Hardware TV BOX</h4>
+          <ul class="sobreaviso-schedule-list">
+            <li>📶 <b>PV3623:</b> Central Principal Barra Funda &bull; Primário</li>
+            <li>📶 <b>PV3687:</b> Ingest Secundário Fibra Óptica &bull; Ativo</li>
+            <li>📶 <b>PV3679:</b> Contingência TV BOX Backup &bull; Standby Quente</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 9: METAS -->
+    <div id="pane-metas" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🎯 Metas & OKRs da Equipe de Suporte Captação</h2>
+        <p class="section-desc">Objetivos de desempenho, qualidade técnica e compromissos operacionais para 2026.</p>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-box-label">SLA de Gravação & Cobertura</div>
+          <div class="kpi-box-val">100%</div>
+          <div class="kpi-box-sub">Zero perda de transmissões ao vivo</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #10B981;">
+          <div class="kpi-box-label">Conformidade Legal CLT</div>
+          <div class="kpi-box-val">100%</div>
+          <div class="kpi-box-sub">Intervalo legal de 11h respeitado</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #D97706;">
+          <div class="kpi-box-label">Atualização de Hospedeiros</div>
+          <div class="kpi-box-val">&gt; 95%</div>
+          <div class="kpi-box-sub">Contatos técnicos confirmados semestralmente</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 10: PROJETOS -->
+    <div id="pane-projetos" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🚀 Projetos & Iniciativas Estratégicas</h2>
+        <p class="section-desc">Iniciativas de inovação, automação e melhoria contínua da área de captação.</p>
+      </div>
+
+      <div class="escala-footer-grid">
+        <div class="escala-info-card">
+          <h4>🌐 Portal Autônomo & Descontinuação do SharePoint</h4>
+          <p style="font-size: 13px; color: var(--sp-text-secondary); line-height: 1.6; margin-bottom: 12px;">
+            Migração completa de todas as listas legadas do SharePoint para uma central web autônoma integrada ao Google Workspace, garantindo imunidade à desativação do tenant SharePoint.
+          </p>
+          <span class="badge badge-exibido">100% CONCLUÍDO</span>
+        </div>
+        <div class="escala-info-card">
+          <h4>⚽ Monitor Esportes 2.4 — Auditoria E2E com Grounding</h4>
+          <p style="font-size: 13px; color: var(--sp-text-secondary); line-height: 1.6; margin-bottom: 12px;">
+            Sistema autônomo de auditoria com confirmação oficial de horários da CBF, ge.globo e transmissões CazéTV / Prime Video com geração de relatórios oficiais PDF de 2 páginas.
+          </p>
+          <span class="badge badge-exibido">100% OPERACIONAL</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 11: RECEPTORES & TV BOX -->
+    <div id="pane-receptores" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📡 Receptores & TV BOX (PVIDs de Captura)</h2>
+        <p class="section-desc">Configurações de decodificadores e receptores de satélite nas estações de captação.</p>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-box"><div class="kpi-box-label">PVID PV3623</div><div class="kpi-box-val">Online</div><div class="kpi-box-sub">Cazé TV / YouTube Live</div></div>
+        <div class="kpi-box"><div class="kpi-box-label">PVID PV3687</div><div class="kpi-box-val">Online</div><div class="kpi-box-sub">Amazon Prime Video</div></div>
+        <div class="kpi-box"><div class="kpi-box-label">PVID PV3679</div><div class="kpi-box-val">Online</div><div class="kpi-box-sub">Netflix / NFL Sports</div></div>
+      </div>
+    </div>
+
+    <!-- ABA 12: EQUIPE -->
+    <div id="pane-equipe" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">👥 Equipe de Suporte e Captação</h2>
+        <p class="section-desc">Quadro oficial de liderança, operadores técnicos e especialistas de ingest.</p>
+      </div>
+      <div class="sp-table-wrap">
+        <table class="sp-list-table">
+          <thead>
+            <tr><th>Nome</th><th>Cargo / Função</th><th>E-mail Corporativo</th><th>Perfil de Acesso</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><b>Cleber De Souza Gonçalves</b></td><td>COORD. SUPORTE CAPTAÇÃO</td><td>cleber.goncalves@ibope.com</td><td><span class="badge badge-role-owner">Administrador (Owner)</span></td></tr>
+            <tr><td><b>Luiz De Sa Lemos</b></td><td>DIR. SUPORTE CAPTAÇÃO LATAM</td><td>luiz.lemos@ibope.com</td><td><span class="badge badge-role-owner">Administrador (Owner)</span></td></tr>
+            <tr><td><b>Rodrigo de Almeida Meirelles</b></td><td>Técnico de Suporte Jr (N1)</td><td>rodrigo.meirelles@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Alan Kelvin Chura Carrillo</b></td><td>Técnico de Suporte Jr (N1)</td><td>alan.carrillo@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Bruno Lopes Viana</b></td><td>Técnico de Suporte Jr (N1)</td><td>bruno.viana@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Cassio Esteves de Oliveira</b></td><td>Técnico de Suporte Jr (N1)</td><td>cassio.oliveira@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Marcelo Fialho</b></td><td>Técnico de Suporte Jr (N1)</td><td>marcelo.fialho@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Rômulo Silva</b></td><td>Técnico de Suporte Jr (N1)</td><td>romulo.silva@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Joao Diego Silva Merino</b></td><td>Técnico de Suporte Pl (N2)</td><td>joao.merino@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Marcos Antonio Bezerra da Silva</b></td><td>Técnico de Suporte Sr (N2)</td><td>marcos.bezerra@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Lucieudes Vicente Ferreira</b></td><td>Técnico de Suporte Pl (N2)</td><td>lucieudes.ferreira@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Vinicius Dantas Ferreira da Silva</b></td><td>Técnico de Suporte Pl (N2)</td><td>vinicius.dantas@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Marcelo Pereira Silva</b></td><td>Líder Técnico LATAM (N2)</td><td>marcelo.pereira@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ABA 13: PERMISSÕES & RBAC -->
+    <div id="pane-permissoes" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🔐 Controle de Acessos & Mapeamento RBAC (__PERMS_COUNT__ Registros)</h2>
+        <p class="section-desc">Matriz de permissões migrada do SharePoint para perfis corporativos Google Workspace.</p>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-inputs">
+          <input type="text" id="search-perm-box" class="search-field" placeholder="🔍 Buscar usuário ou grupo...">
+        </div>
+        <div>
+          <button class="btn-action btn-action-primary" onclick="exportPermsCSV()">📥 Exportar Permissões CSV</button>
+        </div>
+      </div>
+      <div class="sp-table-wrap">
+        <table class="sp-list-table">
+          <thead>
+            <tr><th>#</th><th>Nome / Grupo</th><th>Tipo</th><th>E-mail</th><th>Nível SharePoint</th><th>Perfil Google</th><th>Escopo</th></tr>
+          </thead>
+          <tbody id="perms-table-body">
+            <!-- Renderizado via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ABA 14: LINKS EXTERNOS -->
+    <div id="pane-links" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🔗 Diretório de Links & Sistemas Oficiais</h2>
+        <p class="section-desc">Acesso a todos os portais corporativos e ferramentas de telemetria.</p>
+      </div>
+      <div class="waffle-links-grid">
+        <a href="https://mediadna.kantaribopemedia.com/mediadna/Comum/PaginaInicial.aspx" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">🧬</span><span class="waffle-link-title">Site - Media DNA</span></a>
+        <a href="http://10.1.0.39/redmine/login" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">📑</span><span class="waffle-link-title">Redmine</span></a>
+        <a href="https://zbxsrvbr.kantaribopemedia.com/zabbix/zabbix.php?action=dashboard.view&dashboardid=152" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">🖥️</span><span class="waffle-link-title">Zabbix</span></a>
+        <a href="https://rhopen.kantar.com/" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">👥</span><span class="waffle-link-title">RH Open</span></a>
+        <a href="https://kantarit.service-now.com/mykantarservices?id=hr_dashboard_home" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">🎫</span><span class="waffle-link-title">Service Now</span></a>
+        <a href="https://wd3.myworkday.com/wday/authgwy/kantar/login.htmld" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">💼</span><span class="waffle-link-title">Workday</span></a>
+        <a href="https://grafana.kantaribopemedia.com/d/LnH9Oq-Sk/atria-capture?orgId=1" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">📈</span><span class="waffle-link-title">Grafana</span></a>
+        <a href="https://portalbsd.com.br/" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">📡</span><span class="waffle-link-title">Portal BSD</span></a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL DE PROCEDIMENTOS -->
+  <div class="modal-overlay" id="proc-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Procedimento Operacional</h3>
+        <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-content">
+        Carregando...
+      </div>
+    </div>
+  </div>
+
+  <!-- RODAPÉ CORPORATIVO -->
+  <footer class="site-footer">
+    <div class="site-footer-container">
+      <div><b>Kantar IBOPE Media</b> — Central de Operações & Suporte Captação © 2026</div>
+      <div>Portal 100% Autônomo e Integrado com Google Workspace</div>
+    </div>
+  </footer>
+
+  <script>
+    // Datasets completos
+    let allEvents = __EVENTS_JSON__;
+    let allPermissions = __PERMS_JSON__;
+    let allHospedeiros = __HOSPEDEIROS_JSON__;
+    let allOcorrencias = __OCORRENCIAS_JSON__;
+    let allProcedimentos = __PROCEDIMENTOS_JSON__;
+    let allDocumentos = __DOCUMENTOS_JSON__;
+    let allEscalaMonths = __ESCALA_JSON__;
+
+    let currentRole = "admin";
+    let currentMonth = "Novembro";
+
+    function onRoleChange() {
+      const sel = document.getElementById("user-role-select");
+      currentRole = sel.value;
+      const avatar = document.getElementById("top-user-avatar");
+
+      if (currentRole === "admin") {
+        avatar.innerText = "CG";
+        avatar.style.background = "#004578";
+        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "");
+        const permTab = document.getElementById("nav-tab-permissoes");
+        if (permTab) permTab.style.display = "";
+      } else if (currentRole === "operador") {
+        avatar.innerText = "OP";
+        avatar.style.background = "#059669";
+        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "");
+        const permTab = document.getElementById("nav-tab-permissoes");
+        if (permTab) permTab.style.display = "";
+      } else {
+        avatar.innerText = "LE";
+        avatar.style.background = "#64748B";
+        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "none");
+        const permTab = document.getElementById("nav-tab-permissoes");
+        if (permTab) permTab.style.display = "none";
+        const activePane = document.querySelector(".pane-container.active");
+        if (activePane && activePane.id === "pane-permissoes") {
+          showPane("home");
+        }
+      }
+    }
+
+    function showPane(paneId) {
+      document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.pane-container').forEach(pane => pane.classList.remove('active'));
+
+      const targetPane = document.getElementById('pane-' + paneId);
+      if (targetPane) targetPane.classList.add('active');
+
+      document.querySelectorAll('.tab-link').forEach(btn => {
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + paneId + "'")) {
+          btn.classList.add('active');
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      document.getElementById('dark-mode-icon').innerText = isDark ? '☀️' : '🌙';
+    }
+
+    // ==========================================
+    // RENDERIZAÇÃO DA ESCALA DE TRABALHO 2026
+    // ==========================================
+    function initEscalaMonths() {
+      const pillsContainer = document.getElementById("escala-month-pills");
+      if (!pillsContainer) return;
+      pillsContainer.innerHTML = "";
+
+      const monthsList = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro_Prototipo", "Plantao_Fim_Ano"
+      ];
+
+      monthsList.forEach(m => {
+        const btn = document.createElement("button");
+        btn.className = "month-pill-btn" + (m === currentMonth ? " active" : "");
+        const label = m === "Dezembro_Prototipo" ? "Dezembro" : (m === "Plantao_Fim_Ano" ? "🎄 Plantão Fim de Ano" : m);
+        btn.innerText = label;
+        btn.onclick = () => selectEscalaMonth(m);
+        pillsContainer.appendChild(btn);
+      });
+
+      renderEscalaTable();
+    }
+
+    function selectEscalaMonth(monthKey) {
+      currentMonth = monthKey;
+      document.querySelectorAll(".month-pill-btn").forEach(btn => btn.classList.remove("active"));
+      event.target.classList.add("active");
+      renderEscalaTable();
+    }
+
+    function getBadgeClass(val) {
+      const v = String(val || "").toUpperCase().trim();
+      if (v === "T") return "escala-badge escala-badge-t";
+      if (v === "F") return "escala-badge escala-badge-f";
+      if (v.includes("FER") || v.includes("FÉRIAS")) return "escala-badge escala-badge-ferias";
+      if (v === "BH") return "escala-badge escala-badge-bh";
+      if (v === "VF") return "escala-badge escala-badge-vf";
+      if (v === "FJ") return "escala-badge escala-badge-fj";
+      if (v.includes("DAY")) return "escala-badge escala-badge-dayoff";
+      if (v === "TR") return "escala-badge escala-badge-tr";
+      if (v === "AG") return "escala-badge escala-badge-ag";
+      if (v === "SM") return "escala-badge escala-badge-sm";
+      return "escala-badge escala-badge-f";
+    }
+
+    function renderEscalaTable() {
+      const fimAnoWrap = document.getElementById("escala-fim-ano-wrap");
+      const mainTable = document.getElementById("escala-main-table");
+      const ativWrap = document.getElementById("escala-atividades-table").parentElement;
+
+      if (currentMonth === "Plantao_Fim_Ano") {
+        if (mainTable) mainTable.style.display = "none";
+        if (ativWrap) ativWrap.style.display = "none";
+        if (fimAnoWrap) {
+          fimAnoWrap.style.display = "block";
+          renderPlantaoFimAno();
+        }
+        return;
+      }
+
+      if (mainTable) mainTable.style.display = "";
+      if (ativWrap) ativWrap.style.display = "";
+      if (fimAnoWrap) fimAnoWrap.style.display = "none";
+
+      const mData = allEscalaMonths[currentMonth];
+      if (!mData) return;
+
+      const numDays = mData.num_dias || 30;
+      const thead = document.getElementById("escala-table-head");
+      const tbody = document.getElementById("escala-table-body");
+      if (!thead || !tbody) return;
+
+      // Monta Head
+      let hHtml = `<tr>
+        <th class="th-sticky-left" style="min-width: 130px;">Nome Operador</th>
+        <th style="min-width: 80px;">Matrícula</th>
+        <th style="min-width: 100px;">Horário</th>
+        <th style="min-width: 120px;">Equipe</th>`;
+
+      for (let d = 1; d <= numDays; d++) {
+        hHtml += `<th style="min-width: 38px;">${d}</th>`;
+      }
+      hHtml += `</tr>`;
+      thead.innerHTML = hHtml;
+
+      // Filtros
+      const sBox = document.getElementById("escala-search-box");
+      const q = sBox ? sBox.value.toLowerCase().trim() : "";
+      const fEquipe = document.getElementById("escala-filter-equipe")?.value || "";
+      const fTurno = document.getElementById("escala-filter-turno")?.value || "";
+
+      tbody.innerHTML = "";
+      mData.operadores.forEach(op => {
+        if (fEquipe && op.equipe !== fEquipe) return;
+        if (fTurno && !op.horario.includes(fTurno)) return;
+        if (q && !op.nome.toLowerCase().includes(q) && !op.matricula.includes(q)) return;
+
+        let rHtml = `<tr>
+          <td class="td-sticky-left"><b>${op.nome}</b></td>
+          <td style="color: #64748B;">${op.matricula || '-'}</td>
+          <td style="font-size: 11px;">${op.horario}</td>
+          <td><span style="font-size: 11px; color: #0078D4; font-weight: 600;">${op.equipe}</span></td>`;
+
+        for (let d = 1; d <= numDays; d++) {
+          const val = (op.dias && op.dias[d]) ? op.dias[d] : "";
+          if (val) {
+            rHtml += `<td><span class="${getBadgeClass(val)}">${val}</span></td>`;
+          } else {
+            rHtml += `<td style="color: #CBD5E1;">-</td>`;
+          }
+        }
+        rHtml += `</tr>`;
+        tbody.innerHTML += rHtml;
+      });
+
+      // Renderiza Atividades
+      const ativHead = document.getElementById("escala-atividades-head");
+      const ativBody = document.getElementById("escala-atividades-body");
+      if (ativHead && ativBody) {
+        let ahHtml = `<tr><th class="th-sticky-left" style="min-width: 180px;">Atividade Operacional</th>`;
+        for (let d = 1; d <= numDays; d++) {
+          ahHtml += `<th style="min-width: 38px;">${d}</th>`;
+        }
+        ahHtml += `</tr>`;
+        ativHead.innerHTML = ahHtml;
+
+        ativBody.innerHTML = "";
+        (mData.atividades || []).forEach(act => {
+          let aRow = `<tr><td class="td-sticky-left"><b>${act.nome}</b></td>`;
+          for (let d = 1; d <= numDays; d++) {
+            const v = (act.dias && act.dias[d]) ? act.dias[d] : "";
+            aRow += `<td style="font-size: 10px; font-weight: 600; color: #004578;">${v || '-'}</td>`;
+          }
+          aRow += `</tr>`;
+          ativBody.innerHTML += aRow;
+        });
+      }
+    }
+
+    function renderPlantaoFimAno() {
+      const pData = allEscalaMonths["Plantao_Fim_Ano"];
+      const tbody = document.getElementById("escala-fim-ano-body");
+      if (!pData || !tbody) return;
+
+      tbody.innerHTML = "";
+      tbody.innerHTML += `<tr><td colspan="5" style="background: #F1F5F9; font-weight: 700; color: #1E293B;">🎅 Escala de Natal 2026</td></tr>`;
+      pData.natal.forEach(item => {
+        tbody.innerHTML += `<tr>
+          <td><b>${item.dia}</b></td>
+          <td>${item.manha}</td>
+          <td>${item.tarde}</td>
+          <td>${item.madrugada}</td>
+          <td><span class="badge badge-caze">${item.plantao_n2}</span></td>
+        </tr>`;
+      });
+
+      tbody.innerHTML += `<tr><td colspan="5" style="background: #F1F5F9; font-weight: 700; color: #1E293B;">🎆 Escala de Ano Novo 2026 / 2027</td></tr>`;
+      pData.ano_novo.forEach(item => {
+        tbody.innerHTML += `<tr>
+          <td><b>${item.dia}</b></td>
+          <td>${item.manha}</td>
+          <td>${item.tarde}</td>
+          <td>${item.madrugada}</td>
+          <td><span class="badge badge-prime">${item.plantao_n2}</span></td>
+        </tr>`;
+      });
+    }
+
+    // Listeners da escala
+    document.getElementById("escala-search-box")?.addEventListener("input", renderEscalaTable);
+    document.getElementById("escala-filter-equipe")?.addEventListener("change", renderEscalaTable);
+    document.getElementById("escala-filter-turno")?.addEventListener("change", renderEscalaTable);
+
+    // ==========================================
+    // RENDERIZAÇÃO DE HOSPEDEIROS, OCORRÊNCIAS, STREAMING
+    // ==========================================
+    function getChannelBadge(canal) {
+      const c = String(canal || "").toLowerCase();
+      if (c.includes("cazé") || c.includes("caze")) return '<span class="badge badge-caze">' + canal + '</span>';
+      if (c.includes("prime") || c.includes("amazon")) return '<span class="badge badge-prime">' + canal + '</span>';
+      if (c.includes("netflix")) return '<span class="badge badge-netflix">' + canal + '</span>';
+      if (c.includes("tnt") || c.includes("max") || c.includes("hbo")) return '<span class="badge badge-tnt">' + canal + '</span>';
+      if (c.includes("record")) return '<span class="badge badge-record">' + canal + '</span>';
+      if (c.includes("dazn")) return '<span class="badge badge-dazn">' + canal + '</span>';
+      return '<span class="badge badge-default">' + (canal || "-") + '</span>';
+    }
+
+    function getStatusBadge(status) {
+      const s = String(status || "").toLowerCase();
+      if (s.includes("exibido") && !s.includes("não") && !s.includes("nao")) return '<span class="badge badge-exibido">' + status + '</span>';
+      if (s.includes("não") || s.includes("nao") || s.includes("cancelado")) return '<span class="badge badge-nao-exibido">' + status + '</span>';
+      return '<span class="badge badge-pendente">' + (status || "Pendente") + '</span>';
+    }
+
+    function renderTable() {
+      const searchBox = document.getElementById("search-box");
+      const q = searchBox ? searchBox.value.toLowerCase() : "";
+      const canalBox = document.getElementById("filter-canal");
+      const fCanal = canalBox ? canalBox.value.toLowerCase() : "";
+      const statusBox = document.getElementById("filter-status");
+      const fStatus = statusBox ? statusBox.value.toLowerCase() : "";
+
+      const tbody = document.getElementById("table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let count = 0;
+      let caze = 0, prime = 0, netflix = 0, outros = 0;
+
+      allEvents.forEach((ev) => {
+        const cStr = String(ev.canal || "").toLowerCase();
+        if (cStr.includes("cazé") || cStr.includes("caze")) caze++;
+        else if (cStr.includes("prime") || cStr.includes("amazon")) prime++;
+        else if (cStr.includes("netflix")) netflix++;
+        else outros++;
+
+        if (fCanal && !cStr.includes(fCanal)) return;
+        if (fStatus && !String(ev.status_entrega || "").toLowerCase().includes(fStatus)) return;
+
+        if (q) {
+          const fullText = (
+            (ev.partida || '') + " " + (ev.campeonato || '') + " " +
+            (ev.data || '') + " " + (ev.canal || '') + " " + (ev.responsavel || '')
+          ).toLowerCase();
+          if (!fullText.includes(q)) return;
+        }
+
+        count++;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-center" style="color: #64748B; font-weight: 600;">${count}</td>
+          <td class="td-center">${ev.mes || '-'}</td>
+          <td class="td-center" style="font-weight: 600;">${ev.data || '-'}</td>
+          <td class="td-center">${ev.horario || '-'}</td>
+          <td><b>${ev.campeonato || '-'}</b></td>
+          <td><b>${ev.partida || '-'}</b></td>
+          <td>${ev.responsavel || '-'}</td>
+          <td class="td-center">${getChannelBadge(ev.canal)}</td>
+          <td class="td-center"><span class="badge badge-pvid">${ev.pvid || '-'}</span></td>
+          <td class="td-center">${getStatusBadge(ev.status_entrega)}</td>
+          <td class="td-center">${ev.programado || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("kpi-caze").innerText = caze;
+      document.getElementById("kpi-prime").innerText = prime;
+      document.getElementById("kpi-netflix").innerText = netflix;
+      document.getElementById("kpi-outros").innerText = outros;
+      document.getElementById("showing-count").innerText = count;
+    }
+
+    function renderHospedeirosTable() {
+      const sBox = document.getElementById("search-hosp-box");
+      const q = sBox ? sBox.value.toLowerCase() : "";
+      const tbody = document.getElementById("hosp-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let count = 0;
+      allHospedeiros.forEach((h, i) => {
+        if (q) {
+          const t = ((h.Title||'') + " " + (h.Nome1||'') + " " + (h.Especialidade||'') + " " + (h.Telefone_x0020_Comercial||'') + " " + (h.Telefone_x0020_Celular||'')).toLowerCase();
+          if (!t.includes(q)) return;
+        }
+        count++;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-center" style="color: #64748B;">${count}</td>
+          <td><b>${h.Title || '-'}</b></td>
+          <td>${h.Nome1 || '-'}</td>
+          <td><span style="color: #0078D4; font-weight: 600;">${h.Especialidade || '-'}</span></td>
+          <td>📞 ${h.Telefone_x0020_Comercial || '-'}</td>
+          <td>📱 ${h.Telefone_x0020_Celular || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById("showing-hosp-count").innerText = count;
+    }
+
+    function renderOcorrenciasTable() {
+      const sBox = document.getElementById("search-oco-box");
+      const q = sBox ? sBox.value.toLowerCase() : "";
+      const tbody = document.getElementById("oco-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let count = 0;
+      allOcorrencias.forEach((o, i) => {
+        const cs = Array.isArray(o.CS) ? o.CS.join(", ") : (o.CS || '-');
+        const eq = Array.isArray(o.Equipamento) ? o.Equipamento.join(", ") : (o.Equipamento || '-');
+        const prob = o.Problema || o.Problema0 || '-';
+        const acoes = o.A_x00e7__x00f5_esexecutadas || '-';
+
+        if (q) {
+          const t = ((o.Title||'') + " " + cs + " " + eq + " " + prob + " " + acoes).toLowerCase();
+          if (!t.includes(q)) return;
+        }
+        count++;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-center" style="color: #64748B;">${count}</td>
+          <td><b>${o.Title || 'Ocorrência #' + (i+1)}</b></td>
+          <td><span style="font-weight: 600; color: #0078D4;">${cs}</span></td>
+          <td><span class="badge badge-default">${eq}</span></td>
+          <td style="color: #DC2626;">${prob}</td>
+          <td style="color: #166534;">${acoes}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById("showing-oco-count").innerText = count;
+    }
+
+    function renderProcedimentosTable() {
+      const sBox = document.getElementById("search-proc-box");
+      const q = sBox ? sBox.value.toLowerCase() : "";
+      const tbody = document.getElementById("proc-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let count = 0;
+      allProcedimentos.forEach((p, i) => {
+        const name = p.FileLeafRef || p.Title || 'Procedimento #' + (i+1);
+        if (q && !name.toLowerCase().includes(q)) return;
+
+        count++;
+        const ext = name.split('.').pop().toLowerCase();
+        let icon = '📄';
+        if (ext === 'pdf') icon = '📕';
+        else if (ext === 'docx' || ext === 'doc') icon = '📘';
+        else if (ext === 'xlsx' || ext === 'xls') icon = '📗';
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-center" style="color: #64748B;">${count}</td>
+          <td><b>${icon} ${name}</b></td>
+          <td><span class="badge badge-default">${ext.toUpperCase() || 'GUIA'}</span></td>
+          <td style="color: #64748B;">${p.Modified ? p.Modified.substring(0,10) : '2026-11'}</td>
+          <td class="td-center">
+            <button class="btn-action btn-action-secondary" onclick="openProcModal('${name.replace(/'/g, "\'")}')">👁️ Visualizar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById("showing-proc-count").innerText = count;
+    }
+
+    function renderDocumentosTable() {
+      const sBox = document.getElementById("search-doc-box");
+      const q = sBox ? sBox.value.toLowerCase() : "";
+      const tbody = document.getElementById("docs-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let count = 0;
+      allDocumentos.forEach((d, i) => {
+        const name = d.FileLeafRef || d.Title || 'Documento #' + (i+1);
+        if (q && !name.toLowerCase().includes(q)) return;
+
+        count++;
+        const ext = name.split('.').pop().toLowerCase();
+        let icon = '📁';
+        if (ext === 'xlsx') icon = '📊';
+        else if (ext === 'docx') icon = '📄';
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-center" style="color: #64748B;">${count}</td>
+          <td><b>${icon} ${name}</b></td>
+          <td><span class="badge badge-default">${d.ContentType || ext.toUpperCase()}</span></td>
+          <td style="color: #64748B;">${d.Modified ? d.Modified.substring(0,10) : '2026-11'}</td>
+          <td class="td-center">
+            <a href="Escala_de_trabalho_2026.xlsx" download class="btn-action btn-action-secondary" style="text-decoration: none;">📥 Baixar</a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderPermsTable() {
+      const tbody = document.getElementById("perms-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      allPermissions.forEach((p, i) => {
+        let badgeClass = "badge-role-read";
+        if (p.google_role === "Administrador") badgeClass = "badge-role-owner";
+        else if (p.google_role === "Operador") badgeClass = "badge-role-write";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-center" style="color: #64748B;">${i+1}</td>
+          <td><b>${p.name}</b></td>
+          <td><span class="badge badge-default">${p.type}</span></td>
+          <td>${p.email}</td>
+          <td>${p.sp_role}</td>
+          <td><span class="badge ${badgeClass}">${p.google_role}</span></td>
+          <td style="font-size: 11px; color: #64748B;">${p.scope || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Modal
+    function openProcModal(title) {
+      document.getElementById("modal-title").innerText = title;
+      document.getElementById("modal-content").innerHTML = `
+        <div style="background: #F8FAFC; padding: 14px; border-radius: 6px; margin-bottom: 14px; border-left: 4px solid #0078D4;">
+          <b>Guia Oficial de Suporte N1 & Procedimento Operacional</b><br>
+          Este documento foi migrado do repositório corporativo e está disponível offline no novo Portal Web.
+        </div>
+        <p><b>Passo 1:</b> Verificar status de telemetria no Zabbix e confirmar sinal de entrada.</p>
+        <p><b>Passo 2:</b> Em caso de falha no receptor TV BOX, executar reinicialização via comando remoto ou ciclo de energia.</p>
+        <p><b>Passo 3:</b> Registrar o ticket de incidente no Redmine e notificar o plantão da Captação via Teams.</p>
+        <div style="margin-top: 20px; text-align: right;">
+          <button class="btn-action btn-action-primary" onclick="closeModal()">Fechar Procedimento</button>
+        </div>
+      `;
+      document.getElementById("proc-modal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("proc-modal").style.display = "none";
+    }
+
+    // Exportações CSV
+    function exportCSV() {
+      let csv = "Indice,Mes,Data,Horario,Campeonato,Partida,Responsavel,Canal,PVID,Status,Programado\n";
+      allEvents.forEach((ev, i) => {
+        csv += `"${i+1}","${ev.mes||''}","${ev.data||''}","${ev.horario||''}","${ev.campeonato||''}","${ev.partida||''}","${ev.responsavel||''}","${ev.canal||''}","${ev.pvid||''}","${ev.status_entrega||''}","${ev.programado||''}"\n`;
+      });
+      downloadCSV(csv, "programacao_eventos_streaming.csv");
+    }
+
+    function exportHospedeirosCSV() {
+      let csv = "Indice,Cidade,Nome,Especialidade,Telefone_Comercial,Telefone_Celular\n";
+      allHospedeiros.forEach((h, i) => {
+        csv += `"${i+1}","${h.Title||''}","${h.Nome1||''}","${h.Especialidade||''}","${h.Telefone_x0020_Comercial||''}","${h.Telefone_x0020_Celular||''}"\n`;
+      });
+      downloadCSV(csv, "contatos_hospedeiros_completo.csv");
+    }
+
+    function exportOcorrenciasCSV() {
+      let csv = "Indice,Titulo,CS,Equipamento,Problema,Acoes\n";
+      allOcorrencias.forEach((o, i) => {
+        const cs = Array.isArray(o.CS) ? o.CS.join(";") : (o.CS || '');
+        const eq = Array.isArray(o.Equipamento) ? o.Equipamento.join(";") : (o.Equipamento || '');
+        csv += `"${i+1}","${o.Title||''}","${cs}","${eq}","${o.Problema||o.Problema0||''}","${o.A_x00e7__x00f5_esexecutadas||''}"\n`;
+      });
+      downloadCSV(csv, "painel_ocorrencias_historico.csv");
+    }
+
+    function exportPermsCSV() {
+      let csv = "Nome,Tipo,Email,Nivel_SharePoint,Nivel_Google_Sites,Cargo,Escopo\n";
+      allPermissions.forEach((p) => {
+        csv += `"${p.name}","${p.type}","${p.email}","${p.sp_role}","${p.google_role}","${p.cargo||''}","${p.scope||''}"\n`;
+      });
+      downloadCSV(csv, "permissoes_suporte_captacao_google_sites.csv");
+    }
+
+    function downloadCSV(csvContent, filename) {
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+    }
+
+    async function syncLiveAPI() {
+      const btn = event.target;
+      const originalText = btn.innerText;
+      btn.innerText = "⏳ Atualizando...";
+      btn.disabled = true;
+
+      try {
+        const url = "https://script.google.com/macros/s/AKfycbxzWKi1dNiGUiF15Ysl_69Pe2dt2vUpe1UBQ9xadPenmnsH68VOk6W1ZMwhRQkRpkBX/exec?format=json";
+        const resp = await fetch(url);
+        if (resp.ok) {
+          const freshEvents = await resp.json();
+          if (Array.isArray(freshEvents) && freshEvents.length > 0) {
+            allEvents = freshEvents;
+            renderTable();
+            alert("✅ Portal atualizado com sucesso! Total: " + freshEvents.length + " eventos sincronizados.");
+          }
+        } else {
+          alert("⚠️ Não foi possível obter dados remotos (Status " + resp.status + "). Mantendo dados locais.");
+        }
+      } catch (e) {
+        console.warn("Erro ao buscar dados remotos:", e);
+        alert("ℹ️ Base local mantida ativa.");
+      } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    // Listeners
+    document.getElementById("search-box")?.addEventListener("input", renderTable);
+    document.getElementById("filter-canal")?.addEventListener("change", renderTable);
+    document.getElementById("filter-status")?.addEventListener("change", renderTable);
+    document.getElementById("search-hosp-box")?.addEventListener("input", renderHospedeirosTable);
+    document.getElementById("search-oco-box")?.addEventListener("input", renderOcorrenciasTable);
+    document.getElementById("search-proc-box")?.addEventListener("input", renderProcedimentosTable);
+    document.getElementById("search-doc-box")?.addEventListener("input", renderDocumentosTable);
+    document.getElementById("search-perm-box")?.addEventListener("input", renderPermsTable);
+
+    document.getElementById("global-search")?.addEventListener("input", function(e) {
+      const term = e.target.value.trim();
+      if (term.length > 0) {
+        showPane('streaming');
+        const sBox = document.getElementById("search-box");
+        if (sBox) {
+          sBox.value = term;
+          renderTable();
+        }
+      }
+    });
+
+    // Inicialização
+    initEscalaMonths();
+    renderTable();
+    renderHospedeirosTable();
+    renderOcorrenciasTable();
+    renderProcedimentosTable();
+    renderDocumentosTable();
+    renderPermsTable();
+  </script>
+</body>
+</html>"""
+
 
 def generate_portal():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     json_path = os.path.join(base_dir, "config", "sharepoint_clean_migrated_events.json")
     perms_path = os.path.join(base_dir, "config", "sharepoint_extracted_permissions.json")
     migrated_data_path = os.path.join(base_dir, "config", "sharepoint_migrated_standalone_data.json")
+    escala_path = os.path.join(base_dir, "config", "escala_completa_2026.json")
+    raw_escala_excel = os.path.join(base_dir, "config", "Escala de trabalho 2026.xlsx")
+    
     output_dir = os.path.join(base_dir, "portal_web")
     os.makedirs(output_dir, exist_ok=True)
     output_html = os.path.join(output_dir, "index.html")
+
+    docs_dir = os.path.join(base_dir, "docs")
+    os.makedirs(docs_dir, exist_ok=True)
+    docs_html = os.path.join(docs_dir, "index.html")
+
+    # Copia arquivo oficial da escala para download estático
+    if os.path.exists(raw_escala_excel):
+        shutil.copy2(raw_escala_excel, os.path.join(output_dir, "Escala_de_trabalho_2026.xlsx"))
+        shutil.copy2(raw_escala_excel, os.path.join(docs_dir, "Escala_de_trabalho_2026.xlsx"))
 
     # 1. Eventos Streaming (862 jogos)
     events = []
@@ -26,7 +2578,7 @@ def generate_portal():
             events = json.load(f)
     events_json_str = json.dumps(events, ensure_ascii=False)
 
-    # 2. Dados Standalone Migrados (Hospedeiros, Ocorrências, POPs, Escala)
+    # 2. Dados Standalone Migrados (Hospedeiros, Ocorrências, POPs, Documentos)
     standalone_data = {}
     if os.path.exists(migrated_data_path):
         with open(migrated_data_path, "r", encoding="utf-8") as f:
@@ -35,14 +2587,22 @@ def generate_portal():
     hospedeiros = standalone_data.get("contatos_hospedeiros", [])
     ocorrencias = standalone_data.get("painel_ocorrencias", [])
     procedimentos = standalone_data.get("procedimentos", [])
-    escala = standalone_data.get("escala_trabalho", [])
+    documentos_lib = standalone_data.get("escala_trabalho", [])
     antenistas = standalone_data.get("contatos_antenistas", [])
 
     hospedeiros_json_str = json.dumps(hospedeiros, ensure_ascii=False)
     ocorrencias_json_str = json.dumps(ocorrencias, ensure_ascii=False)
     procedimentos_json_str = json.dumps(procedimentos, ensure_ascii=False)
+    documentos_json_str = json.dumps(documentos_lib, ensure_ascii=False)
 
-    # 3. Permissões Extraídas do SharePoint
+    # 3. Escala Completa 2026 (todos os meses, turnos, CLT 66)
+    escala_data = {}
+    if os.path.exists(escala_path):
+        with open(escala_path, "r", encoding="utf-8") as f:
+            escala_data = json.load(f)
+    escala_json_str = json.dumps(escala_data, ensure_ascii=False)
+
+    # 4. Permissões Extraídas do SharePoint
     raw_perms = []
     if os.path.exists(perms_path):
         with open(perms_path, "r", encoding="utf-8") as f:
@@ -125,7 +2685,7 @@ def generate_portal():
 
     perms_json_str = json.dumps(all_permissions, ensure_ascii=False)
 
-    # 4. Exporta CSV oficial
+    # Exporta CSV oficial
     csv_path = os.path.join(base_dir, "config", "permissoes_google_workspace_suportecaptacao.csv")
     with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.writer(f)
@@ -133,2209 +2693,24 @@ def generate_portal():
         for p in all_permissions:
             writer.writerow([p["name"], p["type"], p["email"], p["sp_role"], p["google_role"], p["cargo"], p["scope"]])
 
-    html_content = f"""<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suporte e Captação | Portal Corporativo Autônomo & Streaming Hub</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {{
-      --sp-theme-primary: #0078D4;
-      --sp-theme-dark: #004578;
-      --sp-theme-dark-alt: #106EBE;
-      --sp-theme-light: #DEECF9;
-      --sp-theme-lighter: #EFF6FC;
-      --sp-body-bg: #FAF9F8;
-      --sp-card-bg: #FFFFFF;
-      --sp-text-main: #323130;
-      --sp-text-secondary: #605E5C;
-      --sp-text-muted: #A19F9D;
-      --sp-border: #EDEBE9;
-      --sp-border-hover: #C8C6C4;
-      --sp-nav-bg: #0078D4;
-      --sp-hero-bg: linear-gradient(135deg, #004B50 0%, #0F3854 50%, #164E63 100%);
-
-      /* Badges & Status */
-      --badge-caze-bg: #DCFCE7;
-      --badge-caze-txt: #166534;
-      --badge-prime-bg: #00509E;
-      --badge-prime-txt: #FFFFFF;
-      --badge-netflix-bg: #7F4F24;
-      --badge-netflix-txt: #FFFFFF;
-      --badge-tnt-bg: #6B21A8;
-      --badge-tnt-txt: #FFFFFF;
-      --badge-record-bg: #1E40AF;
-      --badge-record-txt: #FFFFFF;
-      --badge-dazn-bg: #0F172A;
-      --badge-dazn-txt: #F8FAFC;
-      --badge-pvid-bg: #0D5C75;
-      --badge-pvid-txt: #FFFFFF;
-      --badge-pend-bg: #FEF3C7;
-      --badge-pend-txt: #92400E;
-      --badge-exib-bg: #DCFCE7;
-      --badge-exib-txt: #166534;
-      --badge-nao-bg: #FEE2E2;
-      --badge-nao-txt: #991B1B;
-
-      --shadow-card: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
-      --shadow-hover: 0 6.4px 14.4px 0 rgba(0,0,0,0.132), 0 1.2px 3.6px 0 rgba(0,0,0,0.108);
-    }}
-
-    body.dark-mode {{
-      --sp-body-bg: #0B0F19;
-      --sp-card-bg: #1E293B;
-      --sp-text-main: #F8FAFC;
-      --sp-text-secondary: #94A3B8;
-      --sp-text-muted: #64748B;
-      --sp-border: #334155;
-      --sp-border-hover: #475569;
-      --sp-nav-bg: #0F172A;
-      --sp-hero-bg: linear-gradient(135deg, #091E28 0%, #0F2D3E 50%, #153E54 100%);
-      --shadow-card: 0 4px 12px rgba(0,0,0,0.3);
-      --shadow-hover: 0 8px 24px rgba(0,0,0,0.5);
-    }}
-
-    * {{
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-    }}
-
-    html, body {{
-      width: 100%;
-      overflow-x: hidden;
-    }}
-
-    body {{
-      background: var(--sp-body-bg);
-      color: var(--sp-text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: background 0.3s, color 0.3s;
-    }}
-
-    /* Barra Superior Microsoft 365 / Google Workspace */
-    .suite-nav {{
-      background: var(--sp-nav-bg);
-      color: #FFFFFF;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.14);
-    }}
-
-    .suite-nav-left {{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }}
-
-    .waffle-icon {{
-      width: 32px;
-      height: 32px;
-      display: grid;
-      grid-template-columns: repeat(3, 4px);
-      gap: 3px;
-      place-content: center;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background 0.2s;
-    }}
-
-    .waffle-icon:hover {{
-      background: rgba(255,255,255,0.15);
-    }}
-
-    .waffle-dot {{
-      width: 4px;
-      height: 4px;
-      background: #FFFFFF;
-      border-radius: 1px;
-    }}
-
-    .suite-title {{
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }}
-
-    .suite-title span {{
-      font-weight: 400;
-      opacity: 0.9;
-    }}
-
-    .suite-nav-center {{
-      flex: 1;
-      max-width: 480px;
-      margin: 0 20px;
-    }}
-
-    .suite-search-box {{
-      width: 100%;
-      background: rgba(255,255,255,0.2);
-      border: 1px solid transparent;
-      border-radius: 4px;
-      padding: 6px 14px;
-      color: #FFF;
-      font-size: 13px;
-      outline: none;
-      transition: background 0.2s, border 0.2s;
-    }}
-
-    .suite-search-box::placeholder {{
-      color: rgba(255,255,255,0.8);
-    }}
-
-    .suite-search-box:focus {{
-      background: #FFFFFF;
-      color: #323130;
-      border-color: #EDEBE9;
-    }}
-
-    .suite-nav-right {{
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }}
-
-    .role-switcher-select {{
-      background: rgba(255,255,255,0.2);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: #FFFFFF;
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      outline: none;
-      cursor: pointer;
-    }}
-
-    .role-switcher-select option {{
-      background: #004578;
-      color: #FFFFFF;
-    }}
-
-    .nav-pill-btn {{
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: #FFFFFF;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.2s;
-    }}
-
-    .nav-pill-btn:hover {{
-      background: rgba(255,255,255,0.25);
-    }}
-
-    .user-avatar {{
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #004578;
-      border: 2px solid rgba(255,255,255,0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
-      color: #FFFFFF;
-    }}
-
-    /* Menu de Navegação Horizontal do Site */
-    .site-nav-bar {{
-      background: var(--sp-card-bg);
-      border-bottom: 1px solid var(--sp-border);
-      padding: 0 16px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-    }}
-
-    .site-nav-container {{
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      overflow-x: auto;
-      gap: 12px;
-    }}
-
-    .site-brand-row {{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 0;
-      flex-shrink: 0;
-    }}
-
-    .site-brand-icon {{
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
-      background: #0078D4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFFFFF;
-      font-weight: 800;
-      font-size: 16px;
-    }}
-
-    .site-brand-info h2 {{
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--sp-text-main);
-      line-height: 1.2;
-    }}
-
-    .site-brand-info p {{
-      font-size: 11px;
-      color: var(--sp-text-secondary);
-    }}
-
-    .nav-menu-tabs {{
-      display: flex;
-      gap: 2px;
-      align-items: center;
-      overflow-x: auto;
-    }}
-
-    .tab-link {{
-      background: transparent;
-      border: none;
-      color: var(--sp-text-secondary);
-      padding: 12px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      border-bottom: 3px solid transparent;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }}
-
-    .tab-link:hover {{
-      color: var(--sp-theme-primary);
-      background: rgba(0, 120, 212, 0.04);
-    }}
-
-    .tab-link.active {{
-      color: var(--sp-theme-primary);
-      border-bottom-color: var(--sp-theme-primary);
-      font-weight: 700;
-    }}
-
-    .main-body {{
-      width: 100%;
-      padding: 20px 24px;
-      flex: 1;
-    }}
-
-    /* HERO BANNER */
-    .hero-banner {{
-      background: var(--sp-hero-bg);
-      border-radius: 8px;
-      color: #FFFFFF;
-      padding: 32px 36px;
-      margin-bottom: 24px;
-      display: grid;
-      grid-template-columns: 1fr 280px;
-      gap: 28px;
-      align-items: center;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-      position: relative;
-      overflow: hidden;
-    }}
-
-    .hero-banner::after {{
-      content: "";
-      position: absolute;
-      right: -60px;
-      bottom: -60px;
-      width: 240px;
-      height: 240px;
-      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-    }}
-
-    .hero-content h1 {{
-      font-size: 30px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      letter-spacing: -0.02em;
-      color: #FFFFFF;
-    }}
-
-    .hero-content p {{
-      font-size: 14px;
-      line-height: 1.5;
-      color: #E2E8F0;
-      max-width: 820px;
-    }}
-
-    .weather-widget {{
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      padding: 16px 20px;
-      text-align: right;
-    }}
-
-    .weather-location {{
-      font-size: 13px;
-      font-weight: 600;
-      color: #E2E8F0;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 6px;
-    }}
-
-    .weather-temp {{
-      font-size: 30px;
-      font-weight: 700;
-      color: #FFFFFF;
-      margin: 4px 0;
-    }}
-
-    .weather-status {{
-      font-size: 12px;
-      color: #CBD5E1;
-    }}
-
-    /* SEÇÃO 1: LINKS ÚTEIS */
-    .section-title-wrap {{
-      margin-bottom: 16px;
-    }}
-
-    .section-title {{
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--sp-text-main);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }}
-
-    .section-desc {{
-      font-size: 13px;
-      color: var(--sp-text-secondary);
-      margin-top: 4px;
-    }}
-
-    .quick-links-grid {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-      margin-bottom: 28px;
-    }}
-
-    .quick-link-btn {{
-      background: var(--sp-card-bg);
-      border: 1px solid var(--sp-border);
-      border-radius: 6px;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: var(--sp-text-main);
-      box-shadow: var(--shadow-card);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-    }}
-
-    .quick-link-btn:hover {{
-      border-color: var(--sp-theme-primary);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-hover);
-    }}
-
-    .quick-link-icon-box {{
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
-      background: var(--sp-theme-lighter);
-      color: var(--sp-theme-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-    }}
-
-    .quick-link-text {{
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }}
-
-    .quick-link-title {{
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--sp-text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }}
-
-    .quick-link-sub {{
-      font-size: 11px;
-      color: var(--sp-text-muted);
-      margin-top: 2px;
-    }}
-
-    /* SEÇÃO 2: CTAS */
-    .cta-container {{
-      display: grid;
-      grid-template-columns: 2fr 1.2fr;
-      gap: 20px;
-      margin-bottom: 28px;
-    }}
-
-    .cta-banner-card {{
-      background: linear-gradient(135deg, #106EBE 0%, #0078D4 100%);
-      color: #FFFFFF;
-      border-radius: 8px;
-      padding: 24px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: var(--shadow-card);
-      gap: 20px;
-    }}
-
-    .cta-banner-card h3 {{
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }}
-
-    .cta-banner-card p {{
-      font-size: 13px;
-      color: #E2E8F0;
-    }}
-
-    .btn-sp-white {{
-      background: #FFFFFF;
-      color: #0078D4;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 10px 20px;
-      border-radius: 4px;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s, transform 0.15s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }}
-
-    .btn-sp-white:hover {{
-      background: #F3F2F1;
-      transform: translateY(-1px);
-    }}
-
-    .cta-redmine-card {{
-      background: var(--sp-card-bg);
-      border: 1px solid var(--sp-border);
-      border-radius: 8px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      box-shadow: var(--shadow-card);
-    }}
-
-    .cta-redmine-card h4 {{
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--sp-text-main);
-      margin-bottom: 6px;
-    }}
-
-    .cta-redmine-card p {{
-      font-size: 12px;
-      color: var(--sp-text-secondary);
-      margin-bottom: 12px;
-    }}
-
-    .btn-sp-primary {{
-      background: var(--sp-theme-primary);
-      color: #FFFFFF;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 9px 18px;
-      border-radius: 4px;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s;
-    }}
-
-    .btn-sp-primary:hover {{
-      background: var(--sp-theme-dark-alt);
-    }}
-
-    /* SEÇÃO 3: LINKS EXTERNOS */
-    .waffle-links-grid {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
-      gap: 12px;
-      margin-bottom: 28px;
-    }}
-
-    .waffle-link-card {{
-      background: var(--sp-card-bg);
-      border: 1px solid var(--sp-border);
-      border-radius: 6px;
-      padding: 16px 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      text-decoration: none;
-      color: var(--sp-text-main);
-      box-shadow: var(--shadow-card);
-      transition: all 0.2s;
-    }}
-
-    .waffle-link-card:hover {{
-      border-color: var(--sp-theme-primary);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-hover);
-    }}
-
-    .waffle-link-icon {{
-      font-size: 24px;
-      margin-bottom: 8px;
-    }}
-
-    .waffle-link-title {{
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1.3;
-    }}
-
-    /* SEÇÃO 4: EQUIPE */
-    .team-section-card {{
-      background: var(--sp-card-bg);
-      border: 1px solid var(--sp-border);
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 28px;
-      box-shadow: var(--shadow-card);
-    }}
-
-    .team-group {{
-      margin-bottom: 24px;
-    }}
-
-    .team-group:last-child {{
-      margin-bottom: 0;
-    }}
-
-    .team-group-title {{
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--sp-theme-primary);
-      border-bottom: 2px solid var(--sp-theme-light);
-      padding-bottom: 6px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }}
-
-    .team-members-grid {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 12px;
-    }}
-
-    .person-card {{
-      background: var(--sp-body-bg);
-      border: 1px solid var(--sp-border);
-      border-radius: 6px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: border-color 0.2s;
-    }}
-
-    .person-card:hover {{
-      border-color: var(--sp-theme-primary);
-    }}
-
-    .person-avatar {{
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0078D4, #004578);
-      color: #FFFFFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }}
-
-    .person-info {{
-      overflow: hidden;
-      flex: 1;
-    }}
-
-    .person-name {{
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--sp-text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }}
-
-    .person-role {{
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--sp-theme-primary);
-      margin: 1px 0;
-    }}
-
-    .person-dept {{
-      font-size: 10px;
-      color: var(--sp-text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }}
-
-    .person-email-link {{
-      font-size: 11px;
-      color: var(--sp-text-secondary);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 3px;
-    }}
-
-    .person-email-link:hover {{
-      color: var(--sp-theme-primary);
-      text-decoration: underline;
-    }}
-
-    /* SEÇÃO 5: TABELAS & ABAS */
-    .pane-container {{
-      display: none;
-    }}
-
-    .pane-container.active {{
-      display: block;
-      animation: fadeIn 0.2s ease-in;
-    }}
-
-    @keyframes fadeIn {{
-      from {{ opacity: 0; transform: translateY(4px); }}
-      to {{ opacity: 1; transform: translateY(0); }}
-    }}
-
-    .kpi-row {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }}
-
-    .kpi-box {{
-      background: var(--sp-card-bg);
-      border: 1px solid var(--sp-border);
-      border-radius: 6px;
-      padding: 14px 16px;
-      box-shadow: var(--shadow-card);
-    }}
-
-    .kpi-box-label {{
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--sp-text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }}
-
-    .kpi-box-val {{
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--sp-text-main);
-      margin-top: 4px;
-    }}
-
-    .kpi-box-sub {{
-      font-size: 11px;
-      color: var(--sp-text-muted);
-      margin-top: 2px;
-    }}
-
-    .filter-bar {{
-      background: var(--sp-card-bg);
-      border: 1px solid var(--sp-border);
-      border-radius: 6px;
-      padding: 12px 16px;
-      margin-bottom: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: var(--shadow-card);
-    }}
-
-    .filter-inputs {{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      flex: 1;
-    }}
-
-    .search-field {{
-      background: var(--sp-body-bg);
-      border: 1px solid var(--sp-border);
-      color: var(--sp-text-main);
-      padding: 7px 12px;
-      border-radius: 4px;
-      font-size: 13px;
-      min-width: 240px;
-      flex: 1;
-      outline: none;
-    }}
-
-    .search-field:focus {{
-      border-color: var(--sp-theme-primary);
-    }}
-
-    .select-field {{
-      background: var(--sp-body-bg);
-      border: 1px solid var(--sp-border);
-      color: var(--sp-text-main);
-      padding: 7px 12px;
-      border-radius: 4px;
-      font-size: 13px;
-      outline: none;
-      cursor: pointer;
-    }}
-
-    .btn-action {{
-      padding: 7px 14px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: none;
-      transition: all 0.2s;
-    }}
-
-    .btn-action-primary {{
-      background: var(--sp-theme-primary);
-      color: #FFF;
-    }}
-
-    .btn-action-primary:hover {{
-      background: var(--sp-theme-dark-alt);
-    }}
-
-    .btn-action-secondary {{
-      background: var(--sp-body-bg);
-      border: 1px solid var(--sp-border);
-      color: var(--sp-text-main);
-    }}
-
-    .btn-action-secondary:hover {{
-      border-color: var(--sp-theme-primary);
-    }}
-
-    /* Tabelas */
-    .sp-table-wrap {{
-      background: #FFFFFF;
-      border: 1px solid #CBD5E1;
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: var(--shadow-card);
-    }}
-
-    .sp-table-scroll {{
-      max-height: 600px;
-      overflow-y: auto;
-      overflow-x: auto;
-    }}
-
-    table.sp-list-table {{
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 13px;
-      color: #24292F;
-    }}
-
-    table.sp-list-table thead th {{
-      background: #F8FAFC;
-      color: #475569;
-      font-weight: 700;
-      padding: 10px 12px;
-      border-bottom: 2px solid #CBD5E1;
-      border-right: 1px solid #E2E8F0;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      white-space: nowrap;
-    }}
-
-    table.sp-list-table tbody tr {{
-      background: #FFFBEB;
-      border-bottom: 1px solid #E2E8F0;
-      transition: background 0.15s;
-    }}
-
-    table.sp-list-table tbody tr:hover {{
-      background: #FEF3C7;
-    }}
-
-    table.sp-list-table tbody td {{
-      padding: 8px 12px;
-      border-right: 1px solid #E2E8F0;
-      vertical-align: middle;
-      white-space: nowrap;
-    }}
-
-    .td-center {{ text-align: center; }}
-
-    .partida-title {{
-      font-weight: 700;
-      color: #166534;
-      white-space: normal;
-      min-width: 220px;
-    }}
-
-    /* Badges */
-    .badge {{
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      text-align: center;
-    }}
-
-    .badge-caze {{ background: var(--badge-caze-bg); color: var(--badge-caze-txt); }}
-    .badge-prime {{ background: var(--badge-prime-bg); color: var(--badge-prime-txt); }}
-    .badge-netflix {{ background: var(--badge-netflix-bg); color: var(--badge-netflix-txt); }}
-    .badge-tnt {{ background: var(--badge-tnt-bg); color: var(--badge-tnt-txt); }}
-    .badge-record {{ background: var(--badge-record-bg); color: var(--badge-record-txt); }}
-    .badge-dazn {{ background: var(--badge-dazn-bg); color: var(--badge-dazn-txt); }}
-    .badge-default {{ background: #E2E8F0; color: #334155; }}
-
-    .badge-pvid {{
-      background: var(--badge-pvid-bg);
-      color: var(--badge-pvid-txt);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-    }}
-
-    .badge-pendente {{ background: var(--badge-pend-bg); color: var(--badge-pend-txt); }}
-    .badge-exibido {{ background: var(--badge-exib-bg); color: var(--badge-exib-txt); }}
-    .badge-nao-exibido {{ background: var(--badge-nao-bg); color: var(--badge-nao-txt); }}
-
-    .badge-role-owner {{ background: #EDE9FE; color: #6D28D9; border: 1px solid #DDD6FE; }}
-    .badge-role-write {{ background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }}
-    .badge-role-read {{ background: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }}
-
-    .site-footer {{
-      background: var(--sp-card-bg);
-      border-top: 1px solid var(--sp-border);
-      padding: 20px 24px;
-      margin-top: 32px;
-    }}
-
-    .site-footer-container {{
-      width: 100%;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      font-size: 12px;
-      color: var(--sp-text-secondary);
-    }}
-
-    .rbac-matrix-table th, .rbac-matrix-table td {{
-      padding: 10px 14px;
-      border: 1px solid var(--sp-border);
-      font-size: 12px;
-    }}
-    .rbac-matrix-table th {{
-      background: var(--sp-theme-lighter);
-      color: var(--sp-theme-dark);
-      font-weight: 700;
-    }}
-    .check-yes {{ color: #10B981; font-weight: 700; }}
-    .check-no {{ color: #EF4444; font-weight: 700; }}
-
-    @media (max-width: 1150px) {{
-      .suite-nav-center {{ display: none; }}
-      .suite-nav {{ padding: 0 12px; }}
-      .hero-banner {{ grid-template-columns: 1fr; padding: 20px; }}
-      .cta-container {{ grid-template-columns: 1fr; }}
-    }}
-
-    @media (max-width: 768px) {{
-      .quick-links-grid {{ grid-template-columns: 1fr; }}
-      .site-brand-info p {{ display: none; }}
-      .kpi-row {{ grid-template-columns: 1fr 1fr; }}
-    }}
-  </style>
-</head>
-<body>
-
-  <!-- 1. SUITE NAV (MICROSOFT 365 / GOOGLE WORKSPACE TOPBAR) -->
-  <header class="suite-nav">
-    <div class="suite-nav-left">
-      <div class="waffle-icon" title="Menu Corporativo">
-        <div class="waffle-dot"></div><div class="waffle-dot"></div><div class="waffle-dot"></div>
-        <div class="waffle-dot"></div><div class="waffle-dot"></div><div class="waffle-dot"></div>
-        <div class="waffle-dot"></div><div class="waffle-dot"></div><div class="waffle-dot"></div>
-      </div>
-      <div class="suite-title">
-        Google Sites <span>| Suporte e Captação</span>
-      </div>
-    </div>
-
-    <div class="suite-nav-center">
-      <input type="text" class="suite-search-box" id="global-search" placeholder="Pesquisar partidas, contatos, ocorrências, procedimentos...">
-    </div>
-
-    <div class="suite-nav-right">
-      <select id="user-role-select" class="role-switcher-select" onchange="onRoleChange()" title="Simulador de Perfil de Acesso">
-        <option value="admin">👤 Cleber Gonçalves (Gestor/Admin)</option>
-        <option value="operador">🛠️ Operador Suporte N1/N2</option>
-        <option value="leitor">👁️ Visitante (NOC / SAC / Consulta)</option>
-      </select>
-
-      <button class="nav-pill-btn" onclick="toggleDarkMode()" title="Alternar Modo Escuro / Claro">
-        <span id="dark-mode-icon">🌙</span> Modo Operacional
-      </button>
-      <div class="user-avatar" id="top-user-avatar" title="Kantar IBOPE Media — Suporte Captação">CG</div>
-    </div>
-  </header>
-
-  <!-- 2. SITE NAVIGATION & HUB TITLE -->
-  <nav class="site-nav-bar">
-    <div class="site-nav-container">
-      <div class="site-brand-row">
-        <div class="site-brand-icon">SC</div>
-        <div class="site-brand-info">
-          <h2>Suporte e Captação</h2>
-          <p>Kantar IBOPE Media — Central Autônoma de Operações & Ingest</p>
-        </div>
-      </div>
-
-      <div class="nav-menu-tabs">
-        <button class="tab-link active" onclick="showPane('home')">🏠 Início</button>
-        <button class="tab-link" onclick="showPane('streaming')">⚽ Streaming ({len(events)})</button>
-        <button class="tab-link" onclick="showPane('hospedeiros')">📞 Hospedeiros ({len(hospedeiros)})</button>
-        <button class="tab-link" onclick="showPane('ocorrencias')">🚨 Ocorrências ({len(ocorrencias)})</button>
-        <button class="tab-link" onclick="showPane('procedimentos')">📖 Procedimentos N1 ({len(procedimentos)})</button>
-        <button class="tab-link" onclick="showPane('receptores')">📡 Receptores & TV BOX</button>
-        <button class="tab-link" onclick="showPane('equipe')">👥 Equipe</button>
-        <button class="tab-link" id="nav-tab-permissoes" onclick="showPane('permissoes')">🔐 Permissões ({len(all_permissions)})</button>
-        <button class="tab-link" onclick="showPane('links')">🔗 Links</button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- 3. CONTEÚDO PRINCIPAL -->
-  <main class="main-body">
-
-    <!-- ABA 1: HOME PAGE NATIVA -->
-    <div id="pane-home" class="pane-container active">
-
-      <!-- HERO BANNER -->
-      <section class="hero-banner">
-        <div class="hero-content">
-          <h1>Suporte e Captação</h1>
-          <p>
-            Bem vindo(a) à Central Oficial da equipe de Suporte e Captação! Aqui você encontra informações técnicas em tempo real, monitoramento de streaming, contatos de hospedeiros em todas as cidades, controle de ocorrências e procedimentos operacionais padronizados.
-          </p>
-        </div>
-        <div class="weather-widget">
-          <div class="weather-location">📍 São Paulo, Brasil</div>
-          <div class="weather-temp">24°C</div>
-          <div class="weather-status">⛅ Parcialmente nublado • Sensação 25°C</div>
-        </div>
-      </section>
-
-      <!-- SEÇÃO LINKS ÚTEIS (NAVEGAÇÃO 100% NATIVA DENTRO DO NOVO PORTAL) -->
-      <section>
-        <div class="section-title-wrap">
-          <h2 class="section-title">📌 Módulos & Ferramentas Oficiais</h2>
-          <p class="section-desc">Acesso direto a todas as bases de dados e operações da equipe de Suporte Captação.</p>
-        </div>
-
-        <div class="quick-links-grid">
-          <!-- 1. Hospedeiros (Nativo) -->
-          <div onclick="showPane('hospedeiros')" class="quick-link-btn" style="border-left: 4px solid #0078D4;">
-            <div class="quick-link-icon-box">📞</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Contatos Hospedeiros</span>
-              <span class="quick-link-sub" style="color: #0078D4; font-weight: 600;">{len(hospedeiros)} Cidades & Técnicos ↗</span>
-            </div>
-          </div>
-
-          <!-- 2. Streaming (Nativo) -->
-          <div onclick="showPane('streaming')" class="quick-link-btn" style="border-left: 4px solid #10B981;">
-            <div class="quick-link-icon-box" style="background: #DCFCE7; color: #166534;">⚽</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Programação de Eventos Streaming</span>
-              <span class="quick-link-sub" style="color: #166534; font-weight: 600;">{len(events)} Jogos Sincronizados ↗</span>
-            </div>
-          </div>
-
-          <!-- 3. Ocorrências (Nativo) -->
-          <div onclick="showPane('ocorrencias')" class="quick-link-btn" style="border-left: 4px solid #EF4444;">
-            <div class="quick-link-icon-box" style="background: #FEE2E2; color: #991B1B;">🚨</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Painel de Ocorrências</span>
-              <span class="quick-link-sub" style="color: #991B1B; font-weight: 600;">{len(ocorrencias)} Registros de Falhas ↗</span>
-            </div>
-          </div>
-
-          <!-- 4. Procedimentos (Nativo) -->
-          <div onclick="showPane('procedimentos')" class="quick-link-btn" style="border-left: 4px solid #8B5CF6;">
-            <div class="quick-link-icon-box" style="background: #EDE9FE; color: #6D28D9;">📖</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Procedimentos N1 & POPs</span>
-              <span class="quick-link-sub" style="color: #6D28D9; font-weight: 600;">{len(procedimentos)} Guias e Manuais ↗</span>
-            </div>
-          </div>
-
-          <!-- 5. Receptores (Nativo) -->
-          <div onclick="showPane('receptores')" class="quick-link-btn">
-            <div class="quick-link-icon-box">📡</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Receptores & TV BOX</span>
-              <span class="quick-link-sub">PVIDs PV3623, PV3687, PV3679</span>
-            </div>
-          </div>
-
-          <!-- 6. Equipe (Nativo) -->
-          <div onclick="showPane('equipe')" class="quick-link-btn">
-            <div class="quick-link-icon-box">👥</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Equipe & Escala de Plantão</span>
-              <span class="quick-link-sub">Contatos, plantões e liderança</span>
-            </div>
-          </div>
-
-          <!-- 7. Permissões RBAC (Nativo) -->
-          <div onclick="showPane('permissoes')" class="quick-link-btn">
-            <div class="quick-link-icon-box">🔐</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Controle de Acessos & RBAC</span>
-              <span class="quick-link-sub">{len(all_permissions)} Grupos & Usuários</span>
-            </div>
-          </div>
-
-          <!-- 8. Documentos & Drive (Google Workspace) -->
-          <a href="https://drive.google.com" target="_blank" class="quick-link-btn">
-            <div class="quick-link-icon-box">📁</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Repositório Google Drive</span>
-              <span class="quick-link-sub">Documentos oficiais na nuvem ↗</span>
-            </div>
-          </a>
-
-          <!-- 9. Metas & Indicadores (Nativo) -->
-          <div onclick="showPane('streaming')" class="quick-link-btn">
-            <div class="quick-link-icon-box">🎯</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Metas & Indicadores</span>
-              <span class="quick-link-sub">SLA & Cobertura de Transmissões</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- SEÇÃO CHAMADA PARA AÇÃO -->
-      <section class="cta-container">
-        <div class="cta-banner-card">
-          <div>
-            <h3>Entre em contato com a nossa equipe</h3>
-            <p>Precisa de suporte imediato ou alinhamento técnico com o plantão da Captação? Chame diretamente no Teams.</p>
-          </div>
-          <a href="https://teams.microsoft.com/l/team/19:DbmEit-Jw5Egnzv9KJysAxgT20jeLg_9HvF-OtRncrE1@thread.tacv2/conversations?groupId=b85ee2f2-68d9-461a-8ba8-d4eecbf19d94&tenantId=1e355c04-e0a4-42ed-8e2d-7351591f0ef1" target="_blank" class="btn-sp-white">
-            💬 Enviar uma mensagem
-          </a>
-        </div>
-
-        <div class="cta-redmine-card">
-          <h4>Sugestões e Demandas</h4>
-          <p>Sugestões e Melhorias para o Portal e Sistemas de Captação.</p>
-          <a href="http://10.1.0.39/redmine/projects/suporte-captacao-demandas-sharepoint/issues?set_filter=1&tracker_id=3" target="_blank" class="btn-sp-primary">
-            📝 Abrir no Redmine
-          </a>
-        </div>
-      </section>
-
-      <!-- SEÇÃO LINKS EXTERNOS -->
-      <section>
-        <div class="section-title-wrap">
-          <h2 class="section-title">🌐 Links Externos & Ferramentas</h2>
-          <p class="section-desc">Acesso rápido aos sistemas corporativos, telemetria e ferramentas de trabalho diário.</p>
-        </div>
-
-        <div class="waffle-links-grid">
-          <a href="https://mediadna.kantaribopemedia.com/mediadna/Comum/PaginaInicial.aspx" target="_blank" class="waffle-link-card">
-            <span class="waffle-link-icon">🧬</span>
-            <span class="waffle-link-title">Site - Media DNA</span>
-          </a>
-          <a href="http://10.1.0.39/redmine/login" target="_blank" class="waffle-link-card">
-            <span class="waffle-link-icon">📑</span>
-            <span class="waffle-link-title">Redmine</span>
-          </a>
-          <a href="https://zbxsrvbr.kantaribopemedia.com/zabbix/zabbix.php?action=dashboard.view&dashboardid=152" target="_blank" class="waffle-link-card">
-            <span class="waffle-link-icon">🖥️</span>
-            <span class="waffle-link-title">Zabbix</span>
-          </a>
-          <a href="https://rhopen.kantar.com/" target="_blank" class="waffle-link-card">
-            <span class="waffle-link-icon">👥</span>
-            <span class="waffle-link-title">RH Open</span>
-          </a>
-          <a href="https://kantarit.service-now.com/mykantarservices?id=hr_dashboard_home" target="_blank" class="waffle-link-card">
-            <span class="waffle-link-icon">🎫</span>
-            <span class="waffle-link-title">Service Now</span>
-          </a>
-          <a href="https://wd3.myworkday.com/wday/authgwy/kantar/login.htmld" target="_blank" class="waffle-link-card">
-            <span class="waffle-link-icon">💼</span>
-            <span class="waffle-link-title">Workday</span>
-          </a>
-          <a href="https://grafana.kantaribopemedia.com/d/LnH9Oq-Sk/atria-capture?orgId=1" target="_blank" class="waffle-link-card">
-            <span class="waffle-link-icon">📈</span>
-            <span class="waffle-link-title">Grafana</span>
-          </a>
-          <a href="https://portalbsd.com.br/" target="_blank" class="waffle-link-card">
-            <span class="waffle-link-icon">📡</span>
-            <span class="waffle-link-title">Portal BSD</span>
-          </a>
-        </div>
-      </section>
-
-    </div>
-
-    <!-- ABA 2: PROGRAMAÇÃO STREAMING COMPLETA (862 JOGOS) -->
-    <div id="pane-streaming" class="pane-container">
-      <div class="kpi-row">
-        <div class="kpi-box">
-          <div class="kpi-box-label">Total de Confrontos</div>
-          <div class="kpi-box-val" id="kpi-total">{len(events)}</div>
-          <div class="kpi-box-sub">Base Oficial Sincronizada</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #10B981;">
-          <div class="kpi-box-label">Cazé TV</div>
-          <div class="kpi-box-val" id="kpi-caze">0</div>
-          <div class="kpi-box-sub">YouTube Live & PPV</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #00509E;">
-          <div class="kpi-box-label">Amazon Prime</div>
-          <div class="kpi-box-val" id="kpi-prime">0</div>
-          <div class="kpi-box-sub">Prime Video Sports</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #7F4F24;">
-          <div class="kpi-box-label">Netflix</div>
-          <div class="kpi-box-val" id="kpi-netflix">0</div>
-          <div class="kpi-box-sub">NFL & Eventos Especiais</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #8B5CF6;">
-          <div class="kpi-box-label">TNT / Max / Record</div>
-          <div class="kpi-box-val" id="kpi-outros">0</div>
-          <div class="kpi-box-sub">Paulistão & Carioca</div>
-        </div>
-      </div>
-
-      <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-box" class="search-field" placeholder="🔍 Buscar partida, campeonato, responsável ou data...">
-          <select id="filter-canal" class="select-field">
-            <option value="">Todos os Canais</option>
-            <option value="cazé">Cazé TV</option>
-            <option value="prime">Amazon Prime Video</option>
-            <option value="netflix">Netflix</option>
-            <option value="tnt">TNT / Max</option>
-            <option value="record">Record</option>
-            <option value="dazn">DAZN</option>
-          </select>
-          <select id="filter-status" class="select-field">
-            <option value="">Todos os Status</option>
-            <option value="pendente">Pendente</option>
-            <option value="exibido">Exibido</option>
-            <option value="não exibido">Não Exibido</option>
-          </select>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn-action btn-action-secondary action-admin-only" onclick="syncLiveAPI()">🔄 Sincronizar em Tempo Real</button>
-          <button class="btn-action btn-action-primary" onclick="exportCSV()">📥 Exportar CSV</button>
-        </div>
-      </div>
-
-      <div class="sp-table-wrap">
-        <div class="sp-table-scroll">
-          <table class="sp-list-table">
-            <thead>
-              <tr>
-                <th class="td-center">#</th>
-                <th class="td-center">Mês</th>
-                <th class="td-center">Data</th>
-                <th class="td-center">Horário</th>
-                <th>Campeonato</th>
-                <th>Partida</th>
-                <th>Responsável Gravação</th>
-                <th class="td-center">Canal de Transmissão</th>
-                <th class="td-center">PVID TV BOX</th>
-                <th class="td-center">Status de Entrega</th>
-                <th class="td-center">Programado</th>
-              </tr>
-            </thead>
-            <tbody id="table-body">
-              <!-- Renderizado via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary); display: flex; justify-content: space-between;">
-        <div>Mostrando <b id="showing-count" style="color: var(--sp-theme-primary);">0</b> eventos filtrados</div>
-        <div>Padrão Oficial Google Workspace & SharePoint Modern</div>
-      </div>
-    </div>
-
-    <!-- ABA 3: CONTATOS HOSPEDEIROS (500 REGISTROS NATIVOS) -->
-    <div id="pane-hospedeiros" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">📞 Contatos Técnicos de Hospedeiros & Antenistas</h2>
-        <p class="section-desc">Base oficial e completa com {len(hospedeiros)} cidades, centrais e técnicos de campo.</p>
-      </div>
-
-      <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-hosp-box" class="search-field" placeholder="🔍 Buscar por cidade, nome do técnico, especialidade ou telefone...">
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn-action btn-action-primary" onclick="exportHospedeirosCSV()">📥 Exportar Hospedeiros (CSV)</button>
-        </div>
-      </div>
-
-      <div class="sp-table-wrap">
-        <div class="sp-table-scroll">
-          <table class="sp-list-table">
-            <thead>
-              <tr>
-                <th class="td-center">#</th>
-                <th>Cidade / Região</th>
-                <th>Nome do Técnico / Contato</th>
-                <th>Especialidade</th>
-                <th>Telefone Comercial</th>
-                <th>Telefone Celular</th>
-              </tr>
-            </thead>
-            <tbody id="hosp-table-body">
-              <!-- Renderizado via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
-        Mostrando <b id="showing-hosp-count" style="color: var(--sp-theme-primary);">0</b> contatos de hospedeiros
-      </div>
-    </div>
-
-    <!-- ABA 4: PAINEL DE OCORRÊNCIAS (500 REGISTROS NATIVOS) -->
-    <div id="pane-ocorrencias" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🚨 Painel de Ocorrências & Histórico de Incidentes</h2>
-        <p class="section-desc">Registro operacional com {len(ocorrencias)} tratativas de falhas de captação e sinal.</p>
-      </div>
-
-      <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-oco-box" class="search-field" placeholder="🔍 Buscar por CS, equipamento, problema ou ações executadas...">
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn-action btn-action-primary" onclick="exportOcorrenciasCSV()">📥 Exportar Ocorrências (CSV)</button>
-        </div>
-      </div>
-
-      <div class="sp-table-wrap">
-        <div class="sp-table-scroll">
-          <table class="sp-list-table">
-            <thead>
-              <tr>
-                <th class="td-center">#</th>
-                <th>Título / Incidente</th>
-                <th class="td-center">CS</th>
-                <th>Equipamento</th>
-                <th>Problema Reportado</th>
-                <th>Ações Executadas</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="oco-table-body">
-              <!-- Renderizado via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
-        Mostrando <b id="showing-oco-count" style="color: var(--sp-theme-primary);">0</b> ocorrências registradas
-      </div>
-    </div>
-
-    <!-- ABA 5: PROCEDIMENTOS N1 & POPS -->
-    <div id="pane-procedimentos" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">📖 Procedimentos N1, Manuais & POPs Operacionais</h2>
-        <p class="section-desc">Repositório nativo com {len(procedimentos)} pastas, roteiros técnicos e orientações de rotina.</p>
-      </div>
-
-      <div class="quick-links-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-        <!-- Renderizado dinamicamente via JS com base nos POPs reais -->
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-            <span style="font-size: 24px;">📁</span>
-            <span style="font-weight: 700; font-size: 14px;">Procedimentos Suporte N1</span>
-          </div>
-          <p style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.5;">Rotinas de verificação diária, monitoração de CS, checklist de abertura e fechamento de plantão.</p>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-            <span style="font-size: 24px;">📁</span>
-            <span style="font-weight: 700; font-size: 14px;">Tratamento de Chamados</span>
-          </div>
-          <p style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.5;">Fluxo de escalonamento para N2, registro no Redmine e comunicação com gestores.</p>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-            <span style="font-size: 24px;">📁</span>
-            <span style="font-weight: 700; font-size: 14px;">Monitoração Preventiva</span>
-          </div>
-          <p style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.5;">Validação periódica de sinais Tomate, WADT, decodificadores e telemetria Zabbix.</p>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-            <span style="font-size: 24px;">📁</span>
-            <span style="font-weight: 700; font-size: 14px;">Estrutura CPD 6º Andar</span>
-          </div>
-          <p style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.5;">Mapeamento de racks, switches, cabeamento de rede e contingência elétrica.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ABA 6: RECEPTORES & TV BOX -->
-    <div id="pane-receptores" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">📡 Mapa de Receptores & Dispositivos de Captura (PVID TV BOX)</h2>
-        <p class="section-desc">Configurações de sinal, hardware de captura e redundância dos decodificadores.</p>
-      </div>
-
-      <div class="quick-links-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">CAZETV - PV3623</span>
-            <span class="badge badge-caze">ATIVO</span>
-          </div>
-          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
-            <div><b>Plataforma:</b> YouTube Live & CazéTV PPV</div>
-            <div><b>PVID Oficial:</b> PV3623</div>
-            <div><b>Resolução / Taxa:</b> 1080p @ 60fps</div>
-            <div><b>Responsável Backup:</b> Cleber / Marcelo</div>
-          </div>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">Prime Video - PV3687</span>
-            <span class="badge badge-prime">ATIVO</span>
-          </div>
-          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
-            <div><b>Plataforma:</b> Amazon Prime Video Sports</div>
-            <div><b>PVID Oficial:</b> PV3687</div>
-            <div><b>Resolução / Taxa:</b> 1080p @ 60fps</div>
-            <div><b>Responsável Backup:</b> Lucieudes / Cleber</div>
-          </div>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">Netflix - PV3679</span>
-            <span class="badge badge-netflix">ATIVO</span>
-          </div>
-          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
-            <div><b>Plataforma:</b> Netflix Live Events (NFL)</div>
-            <div><b>PVID Oficial:</b> PV3679</div>
-            <div><b>Resolução / Taxa:</b> 4K UHD / 1080p</div>
-            <div><b>Responsável Backup:</b> Cleber BL01</div>
-          </div>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">TNT - PV316</span>
-            <span class="badge badge-tnt">ATIVO</span>
-          </div>
-          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
-            <div><b>Plataforma:</b> TNT Sports / Max (Paulistão)</div>
-            <div><b>PVID Oficial:</b> PV316</div>
-            <div><b>Resolução / Taxa:</b> 1080i HD</div>
-            <div><b>Responsável Backup:</b> Lucieudes BL01</div>
-          </div>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">Record - PV58</span>
-            <span class="badge badge-record">ATIVO</span>
-          </div>
-          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
-            <div><b>Plataforma:</b> Record TV / PlayPlus</div>
-            <div><b>PVID Oficial:</b> PV58</div>
-            <div><b>Resolução / Taxa:</b> 1080i ISDB-T</div>
-            <div><b>Responsável Backup:</b> Marcelo BL01</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ABA 7: EQUIPE -->
-    <div id="pane-equipe" class="pane-container">
-      <div class="team-section-card">
-        <div class="section-title-wrap" style="margin-bottom: 20px;">
-          <h2 class="section-title">👥 Equipe & Escala de Plantão</h2>
-          <p class="section-desc">Estrutura organizacional da equipe de Suporte e Captação da Kantar IBOPE Media.</p>
-        </div>
-
-        <!-- Grupo: Administração -->
-        <div class="team-group">
-          <div class="team-group-title">🏢 Administração</div>
-          <div class="team-members-grid">
-            <div class="person-card">
-              <div class="person-avatar">AU</div>
-              <div class="person-info">
-                <div class="person-name">Andre Toshio Uiete Uehara</div>
-                <div class="person-role">Assistente Administrativo</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:andre.uehara@ibope.com" class="person-email-link">✉️ andre.uehara@ibope.com</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Grupo: Gestores -->
-        <div class="team-group">
-          <div class="team-group-title">👔 Gestores</div>
-          <div class="team-members-grid">
-            <div class="person-card">
-              <div class="person-avatar" style="background: linear-gradient(135deg, #10B981, #047857);">CG</div>
-              <div class="person-info">
-                <div class="person-name">Cleber De Souza Goncalves</div>
-                <div class="person-role">COORD. SUPORTE CAPTAÇÃO</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:cleber.goncalves@ibope.com" class="person-email-link">✉️ cleber.goncalves@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar" style="background: linear-gradient(135deg, #10B981, #047857);">LL</div>
-              <div class="person-info">
-                <div class="person-name">Luiz De Sa Lemos</div>
-                <div class="person-role">DIR. SUPORTE CAPTAÇÃO LATAM</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:luiz.lemos@ibope.com" class="person-email-link">✉️ luiz.lemos@ibope.com</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Grupo: Análise de Dados -->
-        <div class="team-group">
-          <div class="team-group-title">📊 Análise de Dados</div>
-          <div class="team-members-grid">
-            <div class="person-card">
-              <div class="person-avatar" style="background: linear-gradient(135deg, #8B5CF6, #6D28D9);">MM</div>
-              <div class="person-info">
-                <div class="person-name">Maria Simone De Santana Matos</div>
-                <div class="person-role">Analista de dados Jr.</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:maria.matos@ibope.com" class="person-email-link">✉️ maria.matos@ibope.com</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Grupo: Suporte N1 -->
-        <div class="team-group">
-          <div class="team-group-title">🛠️ Suporte N1</div>
-          <div class="team-members-grid">
-            <div class="person-card">
-              <div class="person-avatar">AC</div>
-              <div class="person-info">
-                <div class="person-name">ALAN KELVIN CHURA CARRILLO</div>
-                <div class="person-role">TEC. SUPORTE JR</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:alan.carrillo@ibope.com" class="person-email-link">✉️ alan.carrillo@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar">BV</div>
-              <div class="person-info">
-                <div class="person-name">Bruno Lopes Viana</div>
-                <div class="person-role">TEC. SUPORTE JR</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:bruno.viana@ibope.com" class="person-email-link">✉️ bruno.viana@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar">CG</div>
-              <div class="person-info">
-                <div class="person-name">Cleber Rodrigo Gomes</div>
-                <div class="person-role">TEC. SUPORTE JR</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:cleber.gomes@ibope.com" class="person-email-link">✉️ cleber.gomes@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar">CO</div>
-              <div class="person-info">
-                <div class="person-name">Cassio Esteves De Oliveira</div>
-                <div class="person-role">TEC. SUPORTE JR</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:cassio.oliveira@ibope.com" class="person-email-link">✉️ cassio.oliveira@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar">RM</div>
-              <div class="person-info">
-                <div class="person-name">RODRIGO DE ALMEIDA MEIRELLES</div>
-                <div class="person-role">TEC. SUPORTE JR</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:rodrigo.meirelles@ibope.com" class="person-email-link">✉️ rodrigo.meirelles@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar">RS</div>
-              <div class="person-info">
-                <div class="person-name">Rômulo Silva</div>
-                <div class="person-role">Tecnico De Suporte Jr</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:romulo.silva@ibope.com" class="person-email-link">✉️ romulo.silva@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar">MF</div>
-              <div class="person-info">
-                <div class="person-name">Marcelo Fialho</div>
-                <div class="person-role">Tecnico De Suporte Jr</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:marcelo.fialho@ibope.com" class="person-email-link">✉️ marcelo.fialho@ibope.com</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Grupo: Suporte N2 -->
-        <div class="team-group">
-          <div class="team-group-title">⚡ Suporte N2</div>
-          <div class="team-members-grid">
-            <div class="person-card">
-              <div class="person-avatar" style="background: linear-gradient(135deg, #00509E, #002855);">JM</div>
-              <div class="person-info">
-                <div class="person-name">Joao Diego Silva Merino</div>
-                <div class="person-role">TEC. SUPORTE PL</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:joao.merino@ibope.com" class="person-email-link">✉️ joao.merino@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar" style="background: linear-gradient(135deg, #00509E, #002855);">LF</div>
-              <div class="person-info">
-                <div class="person-name">Lucieudes Vicente Ferreira</div>
-                <div class="person-role">TEC. SUPORTE PL</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:lucieudes.ferreira@ibope.com" class="person-email-link">✉️ lucieudes.ferreira@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar" style="background: linear-gradient(135deg, #00509E, #002855);">MP</div>
-              <div class="person-info">
-                <div class="person-name">Marcelo Pereira Silva</div>
-                <div class="person-role">LIDER TECNICO LATAM</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:marcelo.pereira@ibope.com" class="person-email-link">✉️ marcelo.pereira@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar" style="background: linear-gradient(135deg, #00509E, #002855);">MB</div>
-              <div class="person-info">
-                <div class="person-name">Marcos Antonio Bezerra Da Silva</div>
-                <div class="person-role">TEC. SUPORTE SR</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:marcos.bezerra@ibope.com" class="person-email-link">✉️ marcos.bezerra@ibope.com</a>
-              </div>
-            </div>
-            <div class="person-card">
-              <div class="person-avatar" style="background: linear-gradient(135deg, #00509E, #002855);">VD</div>
-              <div class="person-info">
-                <div class="person-name">Vinicius Dantas Ferreira Da Silva</div>
-                <div class="person-role">Tec. Suporte Pl</div>
-                <div class="person-dept">Operations Hub, LATAM Advertising Intelligence</div>
-                <a href="mailto:vinicius.dantas@ibope.com" class="person-email-link">✉️ vinicius.dantas@ibope.com</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ABA 8: PERMISSÕES & CONTROLE DE ACESSO (RBAC) -->
-    <div id="pane-permissoes" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🔐 Permissões & Controle de Acesso (RBAC)</h2>
-        <p class="section-desc">Mapeamento oficial de grupos de segurança e usuários sincronizados para Google Workspace.</p>
-      </div>
-
-      <div class="kpi-row">
-        <div class="kpi-box">
-          <div class="kpi-box-label">Total de Entidades</div>
-          <div class="kpi-box-val" id="kpi-perm-total">{len(all_permissions)}</div>
-          <div class="kpi-box-sub">Grupos & Usuários Mapeados</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #8B5CF6;">
-          <div class="kpi-box-label">Proprietários / Admin</div>
-          <div class="kpi-box-val" id="kpi-perm-owners" style="color: #8B5CF6;">0</div>
-          <div class="kpi-box-sub">Controle Total do Portal</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #10B981;">
-          <div class="kpi-box-label">Operadores / Edição</div>
-          <div class="kpi-box-val" id="kpi-perm-writers" style="color: #10B981;">0</div>
-          <div class="kpi-box-sub">Edição de Grade & Sinais</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #0078D4;">
-          <div class="kpi-box-label">Visitantes / Leitura</div>
-          <div class="kpi-box-val" id="kpi-perm-readers" style="color: #0078D4;">0</div>
-          <div class="kpi-box-sub">Consulta de Eventos & POPs</div>
-        </div>
-      </div>
-
-      <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-perm-box" class="search-field" placeholder="🔍 Buscar usuário, grupo corporativo ou e-mail...">
-          <select id="filter-perm-type" class="select-field">
-            <option value="">Todos os Tipos (Grupos & Usuários)</option>
-            <option value="Grupo de Segurança">Grupos de Segurança</option>
-            <option value="Usuário">Usuários Individuais</option>
-          </select>
-          <select id="filter-perm-role" class="select-field">
-            <option value="">Todos os Níveis de Acesso</option>
-            <option value="Administrador">Administrador / Owner</option>
-            <option value="Operador">Operador / Write</option>
-            <option value="Leitor">Leitor / Read</option>
-          </select>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn-action btn-action-primary" onclick="exportPermsCSV()">📥 Exportar Lista Google Sites (CSV)</button>
-        </div>
-      </div>
-
-      <div class="sp-table-wrap">
-        <div class="sp-table-scroll">
-          <table class="sp-list-table">
-            <thead>
-              <tr>
-                <th class="td-center">#</th>
-                <th>Nome / Grupo</th>
-                <th class="td-center">Tipo</th>
-                <th>E-mail Corporativo</th>
-                <th class="td-center">Nível SharePoint</th>
-                <th class="td-center">Nível Google Sites</th>
-                <th>Escopo de Acesso</th>
-              </tr>
-            </thead>
-            <tbody id="perms-table-body">
-              <!-- Renderizado via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
-        Mostrando <b id="showing-perms-count" style="color: var(--sp-theme-primary);">0</b> registros de acesso
-      </div>
-    </div>
-
-    <!-- ABA 9: LINKS EXTERNOS -->
-    <div id="pane-links" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🔗 Diretório de Links & Sistemas Oficiais</h2>
-        <p class="section-desc">Acesso a todos os portais corporativos e ferramentas de telemetria.</p>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- RODAPÉ CORPORATIVO -->
-  <footer class="site-footer">
-    <div class="site-footer-container">
-      <div><b>Kantar IBOPE Media</b> — Central de Operações & Suporte Captação © 2026</div>
-      <div>Portal 100% Autônomo e Integrado com Google Workspace</div>
-    </div>
-  </footer>
-
-  <script>
-    // Datasets completos
-    let allEvents = {events_json_str};
-    let allPermissions = {perms_json_str};
-    let allHospedeiros = {hospedeiros_json_str};
-    let allOcorrencias = {ocorrencias_json_str};
-
-    let currentRole = "admin";
-
-    function onRoleChange() {{
-      const sel = document.getElementById("user-role-select");
-      currentRole = sel.value;
-      const avatar = document.getElementById("top-user-avatar");
-
-      if (currentRole === "admin") {{
-        avatar.innerText = "CG";
-        avatar.style.background = "#004578";
-        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "");
-        const permTab = document.getElementById("nav-tab-permissoes");
-        if (permTab) permTab.style.display = "";
-      }} else if (currentRole === "operador") {{
-        avatar.innerText = "OP";
-        avatar.style.background = "#059669";
-        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "");
-        const permTab = document.getElementById("nav-tab-permissoes");
-        if (permTab) permTab.style.display = "";
-      }} else {{
-        avatar.innerText = "LE";
-        avatar.style.background = "#64748B";
-        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "none");
-        const permTab = document.getElementById("nav-tab-permissoes");
-        if (permTab) permTab.style.display = "none";
-        const activePane = document.querySelector(".pane-container.active");
-        if (activePane && activePane.id === "pane-permissoes") {{
-          showPane("home");
-        }}
-      }}
-    }}
-
-    function showPane(paneId) {{
-      document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.pane-container').forEach(pane => pane.classList.remove('active'));
-
-      const targetPane = document.getElementById('pane-' + paneId);
-      if (targetPane) targetPane.classList.add('active');
-
-      document.querySelectorAll('.tab-link').forEach(btn => {{
-        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(paneId)) {{
-          btn.classList.add('active');
-        }}
-      }});
-
-      window.scrollTo({{ top: 0, behavior: 'smooth' }});
-    }}
-
-    function toggleDarkMode() {{
-      document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
-      document.getElementById('dark-mode-icon').innerText = isDark ? '☀️' : '🌙';
-    }}
-
-    // Badges
-    function getChannelBadge(canal) {{
-      const c = String(canal || "").toLowerCase();
-      if (c.includes("cazé") || c.includes("caze")) return '<span class="badge badge-caze">' + canal + '</span>';
-      if (c.includes("prime") || c.includes("amazon")) return '<span class="badge badge-prime">' + canal + '</span>';
-      if (c.includes("netflix")) return '<span class="badge badge-netflix">' + canal + '</span>';
-      if (c.includes("tnt") || c.includes("max") || c.includes("hbo")) return '<span class="badge badge-tnt">' + canal + '</span>';
-      if (c.includes("record")) return '<span class="badge badge-record">' + canal + '</span>';
-      if (c.includes("dazn")) return '<span class="badge badge-dazn">' + canal + '</span>';
-      return '<span class="badge badge-default">' + (canal || "-") + '</span>';
-    }}
-
-    function getStatusBadge(status) {{
-      const s = String(status || "").toLowerCase();
-      if (s.includes("exibido") && !s.includes("não") && !s.includes("nao")) return '<span class="badge badge-exibido">' + status + '</span>';
-      if (s.includes("não") || s.includes("nao") || s.includes("cancelado")) return '<span class="badge badge-nao-exibido">' + status + '</span>';
-      return '<span class="badge badge-pendente">' + (status || "Pendente") + '</span>';
-    }}
-
-    // 1. Renderizar Tabela de Eventos Streaming
-    function renderTable() {{
-      const searchBox = document.getElementById("search-box");
-      const q = searchBox ? searchBox.value.toLowerCase() : "";
-      const canalBox = document.getElementById("filter-canal");
-      const fCanal = canalBox ? canalBox.value.toLowerCase() : "";
-      const statusBox = document.getElementById("filter-status");
-      const fStatus = statusBox ? statusBox.value.toLowerCase() : "";
-
-      const tbody = document.getElementById("table-body");
-      if (!tbody) return;
-      tbody.innerHTML = "";
-
-      let count = 0;
-      let caze = 0, prime = 0, netflix = 0, outros = 0;
-
-      allEvents.forEach((ev) => {{
-        const cStr = String(ev.canal || "").toLowerCase();
-        if (cStr.includes("cazé") || cStr.includes("caze")) caze++;
-        else if (cStr.includes("prime") || cStr.includes("amazon")) prime++;
-        else if (cStr.includes("netflix")) netflix++;
-        else outros++;
-
-        if (fCanal && !cStr.includes(fCanal)) return;
-        if (fStatus && !String(ev.status_entrega || "").toLowerCase().includes(fStatus)) return;
-
-        if (q) {{
-          const fullText = (
-            (ev.partida || '') + " " + (ev.campeonato || '') + " " +
-            (ev.data || '') + " " + (ev.canal || '') + " " + (ev.responsavel || '')
-          ).toLowerCase();
-          if (!fullText.includes(q)) return;
-        }}
-
-        count++;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="td-center" style="color: #64748B; font-weight: 600;">${{count}}</td>
-          <td class="td-center">${{ev.mes || '-'}}</td>
-          <td class="td-center" style="font-weight: 600;">${{ev.data || '-'}}</td>
-          <td class="td-center">${{ev.horario || '-'}}</td>
-          <td>${{ev.campeonato || '-'}}</td>
-          <td class="partida-title">${{ev.partida || '-'}}</td>
-          <td>${{ev.responsavel || '-'}}</td>
-          <td class="td-center">${{getChannelBadge(ev.canal)}}</td>
-          <td class="td-center"><span class="badge badge-pvid">${{ev.pvid || '-'}}</span></td>
-          <td class="td-center">${{getStatusBadge(ev.status_entrega)}}</td>
-          <td class="td-center" style="font-weight: 600;">${{ev.programado || 'NÃO'}}</td>
-        `;
-        tbody.appendChild(tr);
-      }});
-
-      const elTotal = document.getElementById("kpi-total");
-      if (elTotal) elTotal.innerText = allEvents.length;
-      const elCaze = document.getElementById("kpi-caze");
-      if (elCaze) elCaze.innerText = caze;
-      const elPrime = document.getElementById("kpi-prime");
-      if (elPrime) elPrime.innerText = prime;
-      const elNetflix = document.getElementById("kpi-netflix");
-      if (elNetflix) elNetflix.innerText = netflix;
-      const elOutros = document.getElementById("kpi-outros");
-      if (elOutros) elOutros.innerText = outros;
-      const elShowing = document.getElementById("showing-count");
-      if (elShowing) elShowing.innerText = count;
-    }}
-
-    // 2. Renderizar Tabela de Hospedeiros
-    function renderHospedeirosTable() {{
-      const searchBox = document.getElementById("search-hosp-box");
-      const q = searchBox ? searchBox.value.toLowerCase() : "";
-      const tbody = document.getElementById("hosp-table-body");
-      if (!tbody) return;
-      tbody.innerHTML = "";
-
-      let count = 0;
-      allHospedeiros.forEach((h) => {{
-        if (q) {{
-          const fullText = (
-            (h.Title || '') + " " + (h.Nome1 || '') + " " +
-            (h.Especialidade || '') + " " + (h.Telefone_x0020_Comercial || '') + " " +
-            (h.Telefone_x0020_Celular || '')
-          ).toLowerCase();
-          if (!fullText.includes(q)) return;
-        }}
-
-        count++;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="td-center" style="color: #64748B; font-weight: 600;">${{count}}</td>
-          <td><b>${{h.Title || '-'}}</b></td>
-          <td>${{h.Nome1 || '-'}}</td>
-          <td><span class="badge" style="background:#E2E8F0; color:#1E293B;">${{h.Especialidade || 'Técnico'}}</span></td>
-          <td>${{h.Telefone_x0020_Comercial ? `📞 <a href="tel:${{h.Telefone_x0020_Comercial}}" style="text-decoration:none; color:var(--sp-theme-primary); font-weight:600;">${{h.Telefone_x0020_Comercial}}</a>` : '-'}}</td>
-          <td>${{h.Telefone_x0020_Celular ? `📱 <a href="tel:${{h.Telefone_x0020_Celular}}" style="text-decoration:none; color:#10B981; font-weight:600;">${{h.Telefone_x0020_Celular}}</a>` : '-'}}</td>
-        `;
-        tbody.appendChild(tr);
-      }});
-
-      const elShowing = document.getElementById("showing-hosp-count");
-      if (elShowing) elShowing.innerText = count;
-    }}
-
-    // 3. Renderizar Tabela de Ocorrências
-    function renderOcorrenciasTable() {{
-      const searchBox = document.getElementById("search-oco-box");
-      const q = searchBox ? searchBox.value.toLowerCase() : "";
-      const tbody = document.getElementById("oco-table-body");
-      if (!tbody) return;
-      tbody.innerHTML = "";
-
-      let count = 0;
-      allOcorrencias.forEach((o) => {{
-        const csStr = Array.isArray(o.CS) ? o.CS.join(", ") : (o.CS || "-");
-        const equipStr = Array.isArray(o.Equipamento) ? o.Equipamento.join(", ") : (o.Equipamento || "-");
-        const probStr = o.Problema || o.Problema0 || "-";
-        const acoesStr = o.A_x00e7__x00f5_esexecutadas || "-";
-
-        if (q) {{
-          const fullText = (
-            (o.Title || '') + " " + csStr + " " + equipStr + " " + probStr + " " + acoesStr
-          ).toLowerCase();
-          if (!fullText.includes(q)) return;
-        }}
-
-        count++;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="td-center" style="color: #64748B; font-weight: 600;">${{count}}</td>
-          <td><b>${{o.Title || 'Incidente'}}</b></td>
-          <td class="td-center"><span class="badge" style="background:#EFF6FC; color:#0078D4; font-weight:700;">CS ${{csStr}}</span></td>
-          <td>${{equipStr}}</td>
-          <td style="color:#B91C1C; font-weight:600;">${{probStr}}</td>
-          <td style="font-size:12px; color:var(--sp-text-secondary); max-width:280px; white-space:normal;">${{acoesStr}}</td>
-          <td class="td-center"><span class="badge badge-exibido">Registrado</span></td>
-        `;
-        tbody.appendChild(tr);
-      }});
-
-      const elShowing = document.getElementById("showing-oco-count");
-      if (elShowing) elShowing.innerText = count;
-    }}
-
-    // 4. Renderizar Tabela de Permissões
-    function renderPermsTable() {{
-      const searchBox = document.getElementById("search-perm-box");
-      const q = searchBox ? searchBox.value.toLowerCase() : "";
-      const typeBox = document.getElementById("filter-perm-type");
-      const fType = typeBox ? typeBox.value.toLowerCase() : "";
-      const roleBox = document.getElementById("filter-perm-role");
-      const fRole = roleBox ? roleBox.value.toLowerCase() : "";
-
-      const tbody = document.getElementById("perms-table-body");
-      if (!tbody) return;
-      tbody.innerHTML = "";
-
-      let count = 0;
-      let owners = 0, writers = 0, readers = 0;
-
-      allPermissions.forEach((p) => {{
-        const gRole = p.google_role || "Leitor";
-        if (gRole === "Administrador") owners++;
-        else if (gRole === "Operador") writers++;
-        else readers++;
-
-        if (fType && !String(p.type || "").toLowerCase().includes(fType)) return;
-        if (fRole && !gRole.toLowerCase().includes(fRole)) return;
-
-        if (q) {{
-          const fullText = (
-            (p.name || '') + " " + (p.email || '') + " " + (p.sp_role || '') + " " + (p.cargo || '')
-          ).toLowerCase();
-          if (!fullText.includes(q)) return;
-        }}
-
-        count++;
-        let roleBadgeClass = "badge-role-read";
-        if (gRole === "Administrador") roleBadgeClass = "badge-role-owner";
-        else if (gRole === "Operador") roleBadgeClass = "badge-role-write";
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="td-center" style="color: #64748B; font-weight: 600;">${{count}}</td>
-          <td><b>${{p.name}}</b> <span style="font-size: 11px; color: var(--sp-text-muted);">(${{p.cargo || '-'}})</span></td>
-          <td class="td-center"><span class="badge" style="background:#F1F5F9; color:#475569;">${{p.type}}</span></td>
-          <td>${{p.email && p.email !== '-' ? `<a href="mailto:${{p.email}}" style="color: var(--sp-theme-primary); text-decoration:none;">✉️ ${{p.email}}</a>` : '<span style="color:#94A3B8;">(Grupo de Segurança)</span>'}}</td>
-          <td class="td-center"><span style="font-size: 11px; font-weight:600;">${{p.sp_role}}</span></td>
-          <td class="td-center"><span class="badge ${{roleBadgeClass}}">${{p.google_role}}</span></td>
-          <td style="font-size: 12px; color: var(--sp-text-secondary);">${{p.scope}}</td>
-        `;
-        tbody.appendChild(tr);
-      }});
-
-      const elTotal = document.getElementById("kpi-perm-total");
-      if (elTotal) elTotal.innerText = allPermissions.length;
-      const elOwners = document.getElementById("kpi-perm-owners");
-      if (elOwners) elOwners.innerText = owners;
-      const elWriters = document.getElementById("kpi-perm-writers");
-      if (elWriters) elWriters.innerText = writers;
-      const elReaders = document.getElementById("kpi-perm-readers");
-      if (elReaders) elReaders.innerText = readers;
-      const elShowing = document.getElementById("showing-perms-count");
-      if (elShowing) elShowing.innerText = count;
-    }}
-
-    // Listeners
-    const sBox = document.getElementById("search-box");
-    if (sBox) sBox.addEventListener("input", renderTable);
-    const fCanalEl = document.getElementById("filter-canal");
-    if (fCanalEl) fCanalEl.addEventListener("change", renderTable);
-    const fStatusEl = document.getElementById("filter-status");
-    if (fStatusEl) fStatusEl.addEventListener("change", renderTable);
-
-    const sHosp = document.getElementById("search-hosp-box");
-    if (sHosp) sHosp.addEventListener("input", renderHospedeirosTable);
-
-    const sOco = document.getElementById("search-oco-box");
-    if (sOco) sOco.addEventListener("input", renderOcorrenciasTable);
-
-    const sPermBox = document.getElementById("search-perm-box");
-    if (sPermBox) sPermBox.addEventListener("input", renderPermsTable);
-    const fPermType = document.getElementById("filter-perm-type");
-    if (fPermType) fPermType.addEventListener("change", renderPermsTable);
-    const fPermRole = document.getElementById("filter-perm-role");
-    if (fPermRole) fPermRole.addEventListener("change", renderPermsTable);
-
-    // Global Search
-    const gSearch = document.getElementById("global-search");
-    if (gSearch) {{
-      gSearch.addEventListener("input", function(e) {{
-        const term = e.target.value.trim();
-        if (term.length > 0) {{
-          showPane('streaming');
-          if (sBox) {{
-            sBox.value = term;
-            renderTable();
-          }}
-        }}
-      }});
-    }}
-
-    // Sincronização em tempo real (Google Sheets)
-    async function syncLiveAPI() {{
-      const btn = event.target;
-      const originalText = btn.innerText;
-      btn.innerText = "⏳ Atualizando...";
-      btn.disabled = true;
-
-      try {{
-        const url = "https://script.google.com/macros/s/AKfycbxzWKi1dNiGUiF15Ysl_69Pe2dt2vUpe1UBQ9xadPenmnsH68VOk6W1ZMwhRQkRpkBX/exec?format=json";
-        const resp = await fetch(url);
-        if (resp.ok) {{
-          const freshEvents = await resp.json();
-          if (Array.isArray(freshEvents) && freshEvents.length > 0) {{
-            allEvents = freshEvents;
-            renderTable();
-            alert("✅ Portal atualizado com sucesso! Total: " + freshEvents.length + " eventos sincronizados.");
-          }}
-        }} else {{
-          alert("⚠️ Não foi possível obter dados remotos frescos (Status " + resp.status + "). Mantendo dados locais.");
-        }}
-      }} catch (e) {{
-        console.warn("Erro ao buscar dados remotos:", e);
-        alert("ℹ️ Base sincronizada localmente mantida ativa.");
-      }} finally {{
-        btn.innerText = originalText;
-        btn.disabled = false;
-      }}
-    }}
-
-    // Exportações CSV
-    function exportCSV() {{
-      let csv = "Indice,Mes,Data,Horario,Campeonato,Partida,Responsavel,Canal,PVID,Status,Programado\\n";
-      allEvents.forEach((ev, i) => {{
-        csv += `"${{i+1}}","${{ev.mes||''}}","${{ev.data||''}}","${{ev.horario||''}}","${{ev.campeonato||''}}","${{ev.partida||''}}","${{ev.responsavel||''}}","${{ev.canal||''}}","${{ev.pvid||''}}","${{ev.status_entrega||''}}","${{ev.programado||''}}"\\n`;
-      }});
-      downloadCSV(csv, "programacao_eventos_streaming.csv");
-    }}
-
-    function exportHospedeirosCSV() {{
-      let csv = "Indice,Cidade,Nome,Especialidade,Telefone_Comercial,Telefone_Celular\\n";
-      allHospedeiros.forEach((h, i) => {{
-        csv += `"${{i+1}}","${{h.Title||''}}","${{h.Nome1||''}}","${{h.Especialidade||''}}","${{h.Telefone_x0020_Comercial||''}}","${{h.Telefone_x0020_Celular||''}}"\\n`;
-      }});
-      downloadCSV(csv, "contatos_hospedeiros_completo.csv");
-    }}
-
-    function exportOcorrenciasCSV() {{
-      let csv = "Indice,Titulo,CS,Equipamento,Problema,Acoes\\n";
-      allOcorrencias.forEach((o, i) => {{
-        const cs = Array.isArray(o.CS) ? o.CS.join(";") : (o.CS || '');
-        const eq = Array.isArray(o.Equipamento) ? o.Equipamento.join(";") : (o.Equipamento || '');
-        csv += `"${{i+1}}","${{o.Title||''}}","${{cs}}","${{eq}}","${{o.Problema||o.Problema0||''}}","${{o.A_x00e7__x00f5_esexecutadas||''}}"\\n`;
-      }});
-      downloadCSV(csv, "painel_ocorrencias_historico.csv");
-    }}
-
-    function exportPermsCSV() {{
-      let csv = "Nome,Tipo,Email,Nivel_SharePoint,Nivel_Google_Sites,Cargo,Escopo\\n";
-      allPermissions.forEach((p) => {{
-        csv += `"${{p.name}}","${{p.type}}","${{p.email}}","${{p.sp_role}}","${{p.google_role}}","${{p.cargo||''}}","${{p.scope||''}}"\\n`;
-      }});
-      downloadCSV(csv, "permissoes_suporte_captacao_google_sites.csv");
-    }}
-
-    function downloadCSV(csvContent, filename) {{
-      const blob = new Blob([csvContent], {{ type: 'text/csv;charset=utf-8;' }});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-    }}
-
-    // Render Inicial Completo
-    renderTable();
-    renderHospedeirosTable();
-    renderOcorrenciasTable();
-    renderPermsTable();
-  </script>
-</body>
-</html>"""
+    html_content = HTML_TEMPLATE
+    html_content = html_content.replace("__EVENTS_JSON__", events_json_str)
+    html_content = html_content.replace("__HOSPEDEIROS_JSON__", hospedeiros_json_str)
+    html_content = html_content.replace("__OCORRENCIAS_JSON__", ocorrencias_json_str)
+    html_content = html_content.replace("__PROCEDIMENTOS_JSON__", procedimentos_json_str)
+    html_content = html_content.replace("__DOCUMENTOS_JSON__", documentos_json_str)
+    html_content = html_content.replace("__ESCALA_JSON__", escala_json_str)
+    html_content = html_content.replace("__PERMS_JSON__", perms_json_str)
+    html_content = html_content.replace("__EVENTS_COUNT__", str(len(events)))
+    html_content = html_content.replace("__HOSPEDEIROS_COUNT__", str(len(hospedeiros)))
+    html_content = html_content.replace("__OCORRENCIAS_COUNT__", str(len(ocorrencias)))
+    html_content = html_content.replace("__PROCEDIMENTOS_COUNT__", str(len(procedimentos)))
+    html_content = html_content.replace("__DOCUMENTOS_COUNT__", str(len(documentos_lib)))
+    html_content = html_content.replace("__PERMS_COUNT__", str(len(all_permissions)))
 
     with open(output_html, "w", encoding="utf-8") as f:
         f.write(html_content)
 
-    docs_dir = os.path.join(base_dir, "docs")
-    os.makedirs(docs_dir, exist_ok=True)
-    docs_html = os.path.join(docs_dir, "index.html")
     with open(docs_html, "w", encoding="utf-8") as f:
         f.write(html_content)
 

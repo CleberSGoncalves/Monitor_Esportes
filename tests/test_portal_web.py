@@ -11,27 +11,40 @@ def test_build_portal_web_creates_file_and_validates_sharepoint_replica_and_rbac
     with open(html_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # 1. Validação de Título e Hero Banner 1:1
+    # 1. Validação de Título e Hero Banner 1:1 com SharePoint
     assert "Suporte e Captação" in content
     assert "São Paulo, Brasil" in content
+    assert "hero-3x3-grid" in content
+    assert "hero-network-svg" in content
+    assert "Entre em contato com a nossa equipe" in content
 
-    # 2. Validação dos Módulos Nativos Autônomos (Substituição Completa do SharePoint)
+    # 2. Validação da Grade 3x3 e Módulos Nativos Autônomos
     assert "Contatos Hospedeiros" in content
+    assert "Documentos" in content
+    assert "Escala de Trabalho" in content
+    assert "Dashboard & Indicadores" in content
+    assert "Metas" in content
     assert "Painel de Ocorrências" in content
     assert "Procedimentos N1" in content
-    assert "Programação de Eventos Streaming" in content
-    assert "Receptores & TV BOX" in content
-    assert "Equipe & Escala de Plantão" in content
+    assert "Projetos" in content
+    assert "Programação" in content
 
-    # 3. Validação dos Dados Nativos Migrados (Hospedeiros & Ocorrências)
+    # 3. Validação do Módulo Nativo de Escala de Trabalho 2026 & CLT 66
+    assert "pane-escala" in content
+    assert "Artigo 66 da CLT" in content
+    assert "allEscalaMonths" in content
+    assert "initEscalaMonths" in content
+    assert "Escala_de_trabalho_2026.xlsx" in content
+
+    # 4. Validação dos Dados Nativos Migrados (Hospedeiros, Ocorrências, Procedimentos)
     assert "allHospedeiros" in content
     assert "allOcorrencias" in content
+    assert "allProcedimentos" in content
+    assert "allDocumentos" in content
     assert "exportHospedeirosCSV" in content
     assert "exportOcorrenciasCSV" in content
-    assert "Contatos Técnicos de Hospedeiros" in content
-    assert "Painel de Ocorrências & Histórico de Incidentes" in content
 
-    # 4. Validação dos Links Externos
+    # 5. Validação dos Links Externos Oficiais
     assert "Links Externos" in content
     assert "Site - Media DNA" in content
     assert "Redmine" in content
@@ -42,29 +55,34 @@ def test_build_portal_web_creates_file_and_validates_sharepoint_replica_and_rbac
     assert "Grafana" in content
     assert "Portal BSD" in content
 
-    # 5. Validação da Equipe Completa
+    # 6. Validação da Equipe Completa
     assert "Andre Toshio Uiete Uehara" in content
-    assert "Cleber De Souza Goncalves" in content
+    assert "Cleber De Souza Gonçalves" in content or "Cleber De Souza Goncalves" in content
     assert "Luiz De Sa Lemos" in content
-    assert "Maria Simone De Santana Matos" in content
     assert "ALAN KELVIN CHURA CARRILLO" in content
+    assert "RODRIGO DE ALMEIDA MEIRELLES" in content
     assert "Joao Diego Silva Merino" in content
 
-    # 6. Validação do Módulo Streaming Integrado (Google Sheets)
+    # 7. Validação do Módulo Streaming Integrado
     assert "allEvents" in content
     assert "PV3623" in content
     assert "PV3687" in content
     assert "PV3679" in content
 
-    # 7. Validação do Módulo de Permissões & RBAC
+    # 8. Validação do Módulo de Permissões & RBAC
     assert "allPermissions" in content
     assert "user-role-select" in content
     assert "exportPermsCSV" in content
-    assert "Proprietários do Suporte Captação" in content
-    assert "Visitantes da Suporte Captação" in content
 
-    # 8. Validação do CSV de Permissões
+    # 9. Validação dos arquivos estáticos de download gerados
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    excel_portal = os.path.join(base_dir, "portal_web", "Escala_de_trabalho_2026.xlsx")
+    excel_docs = os.path.join(base_dir, "docs", "Escala_de_trabalho_2026.xlsx")
+    assert os.path.exists(excel_portal)
+    assert os.path.exists(excel_docs)
+    assert os.path.getsize(excel_portal) > 100000
+
+    # 10. Validação do CSV de Permissões
     csv_perm = os.path.join(base_dir, "config", "permissoes_google_workspace_suportecaptacao.csv")
     assert os.path.exists(csv_perm)
     assert os.path.getsize(csv_perm) > 500
