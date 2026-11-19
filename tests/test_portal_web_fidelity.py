@@ -163,15 +163,15 @@ try:
     search_box.clear()
     driver.execute_script("document.getElementById('search-perm-box').value = ''; renderPermsTable();")
 
-    print("\n=== TEST 12: ESCALA DE TRABALHO (DRIVE & EXCEL ONLINE) ===")
+    print("\n=== TEST 12: ESCALA DE TRABALHO (DESVINCULAÇÃO SHAREPOINT & GOVERNANÇA) ===")
     driver.execute_script("showPane('escala');")
     time.sleep(0.2)
     pane = driver.find_element(By.CSS_SELECTOR, '.pane-container.active').get_attribute('id')
     assert pane == 'pane-escala'
     escala_html = driver.find_element(By.ID, 'pane-escala').get_attribute('outerHTML')
-    assert 'Editar no Excel Online' in escala_html
-    assert 'Doc.aspx?sourcedoc=' in escala_html
-    assert 'Biblioteca da Escala' in escala_html
+    assert 'adgbl.sharepoint.com' not in escala_html, "Nenhum link para o SharePoint legado pode existir na escala"
+    assert 'Editar no Excel Online' not in escala_html, "Link antigo Editar no Excel Online deve estar removido"
+    assert 'escala-perm-badge' in escala_html, "Badge de governança de permissão da escala deve estar presente"
 
     # Open drive_escala
     driver.execute_script("showPane('drive_escala');")
@@ -180,7 +180,7 @@ try:
     assert pane == 'pane-drive-viewer'
     escala_drive_text = driver.find_element(By.ID, 'drive-viewer-tbody').text
     assert 'Escala de trabalho 2026.xlsx' in escala_drive_text
-    print("Escala de Trabalho Drive & Excel Online link verified with 100% success!")
+    print("Escala de Trabalho desvinculação e governança verificadas com 100% de sucesso!")
 
     print("\n=== TEST 13: PÁGINA INICIAL (MONITOR 8092, ORGANOGRAMA, GOOGLE CHAT) ===")
     driver.execute_script("showPane('home');")

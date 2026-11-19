@@ -1713,6 +1713,29 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
+
+    /* ORDENAÇÃO E CABEÇALHOS INTERATIVOS ESTILO SHAREPOINT */
+    .th-sortable {
+      cursor: pointer !important;
+      user-select: none;
+      transition: background 0.15s ease, color 0.15s ease;
+      white-space: nowrap;
+    }
+    .th-sortable:hover {
+      background: rgba(0, 120, 212, 0.08) !important;
+      color: #0078D4 !important;
+    }
+    .sort-icon {
+      font-size: 11px;
+      margin-left: 4px;
+      color: #94A3B8;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .th-sortable.sorted-asc .sort-icon, .th-sortable.sorted-desc .sort-icon {
+      color: #0078D4;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
@@ -1735,12 +1758,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <div class="suite-nav-right">
-      <select id="user-role-select" class="role-switcher-select" onchange="onRoleChange()" title="Simulador de Perfil de Acesso">
-        <option value="admin">👤 Cleber Gonçalves (Gestor/Admin)</option>
+      <select id="user-role-select" class="role-switcher-select" onchange="onRoleChange()" title="Simulador de Perfil de Acesso & Permissões">
+        <option value="admin">👤 Cleber Gonçalves (Gestor/Proprietário)</option>
         <option value="admin_cassio">👤 Cássio Esteves (Administrador)</option>
         <option value="admin_vinicius">👤 Vinícius Dantas (Administrador)</option>
-        <option value="operador">🛠️ Operador Suporte N1/N2</option>
-        <option value="leitor">👁️ Visitante (NOC / SAC / Consulta)</option>
+        <option value="admin_luiz">👤 Luiz De Sa Lemos (Gestão / Diretoria)</option>
+        <option value="operador">🛠️ Operador Suporte N1/N2 (Escrita Operacional)</option>
+        <option value="leitor">👁️ Visitante (NOC / SAC / Consulta — Somente Leitura)</option>
       </select>
 
       <button class="nav-pill-btn" onclick="toggleDarkMode()" title="Alternar Modo Escuro / Claro">
@@ -1771,8 +1795,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="sp-menu-item">
           <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">Documentos <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('escala', '💼 Escala de Trabalho 2026', event)">💼 Escala de Trabalho 2026</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('drive_escala', '📁 Arquivos da Escala (Drive)', event)">📁 Arquivos da Escala (Drive)</a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('procedimentos', '📖 Procedimentos N1', event)">📖 Procedimentos N1 <span class="item-count-badge">__PROCEDIMENTOS_COUNT__</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('documentos', '📁 Documentos Compartilhados', event)">📁 Documentos Compartilhados <span class="item-count-badge">__DOCUMENTOS_COUNT__</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('capacitacao', '📋 Ficha de Capacitação', event)">📋 Ficha de Capacitação</a>
@@ -1785,6 +1807,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="sp-menu-item">
           <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">Administração <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('escala', '💼 Escala de Trabalho 2026', event)">💼 Escala de Trabalho 2026</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('drive_escala', '📁 Arquivos da Escala (Drive)', event)">📁 Arquivos da Escala (Drive)</a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('metas', '🎯 Metas & OKRs da Equipe', event)">🎯 Metas & OKRs da Equipe <span class="item-count-badge">8</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('contratos', '📝 Controle de Contratos Parceiros', event)">📝 Controle de Contratos Parceiros <span class="item-count-badge">114</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('fornecedores', '🏢 Avaliação Técnica de Fornecedores', event)">🏢 Avaliação Técnica de Fornecedores <span class="item-count-badge">13</span></a>
@@ -2160,9 +2184,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           </select>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-          <a href="https://adgbl.sharepoint.com/sites/suportecaptacao/_layouts/15/Doc.aspx?sourcedoc=%7BA29DD1D1-CE71-41BD-BA20-8D79237CC8D1%7D&file=Escala%20de%20trabalho%202026.xlsx&action=default&mobileredirect=true" target="_blank" class="btn-action" style="background: #107C41; color: #fff; text-decoration: none; font-weight: 600;" title="Abrir planilha oficial no Excel Online com permissões de edição">
-            ✏️ Editar no Excel Online ↗
-          </a>
+          <span id="escala-perm-badge" class="badge" style="background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; font-size: 11.5px; padding: 4px 10px;">
+            🔒 Gestão Restrita à Administração
+          </span>
           <a href="javascript:void(0)" onclick="handleMenuClick('drive_escala', '📁 Arquivos da Escala (Drive)', event)" class="btn-action btn-action-secondary" title="Ver arquivos e pastas da biblioteca Escala de Trabalho">
             📁 Biblioteca da Escala
           </a>
@@ -2286,9 +2310,27 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
 
       <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-box" class="search-field" placeholder="🔍 Buscar partida, campeonato, responsável ou data...">
-          <select id="filter-canal" class="select-field">
+        <div class="filter-inputs" style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+          <input type="text" id="search-box" class="search-field" style="min-width: 240px; flex: 1;" placeholder="🔍 Buscar partida, campeonato, responsável ou data...">
+          <select id="filter-mes" class="select-field" onchange="renderTable()">
+            <option value="">Todos os Meses</option>
+            <option value="Janeiro">Janeiro</option>
+            <option value="Fevereiro">Fevereiro</option>
+            <option value="Março">Março</option>
+            <option value="Abril">Abril</option>
+            <option value="Maio">Maio</option>
+            <option value="Junho">Junho</option>
+            <option value="Julho">Julho</option>
+            <option value="Agosto">Agosto</option>
+            <option value="Setembro">Setembro</option>
+            <option value="Outubro">Outubro</option>
+            <option value="Novembro">Novembro</option>
+            <option value="Dezembro">Dezembro</option>
+          </select>
+          <select id="filter-campeonato" class="select-field" onchange="renderTable()">
+            <option value="">Todos os Campeonatos</option>
+          </select>
+          <select id="filter-canal" class="select-field" onchange="renderTable()">
             <option value="">Todos os Canais</option>
             <option value="cazé">Cazé TV</option>
             <option value="prime">Amazon Prime Video</option>
@@ -2297,14 +2339,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <option value="record">Record</option>
             <option value="dazn">DAZN</option>
           </select>
-          <select id="filter-status" class="select-field">
+          <select id="filter-status" class="select-field" onchange="renderTable()">
             <option value="">Todos os Status</option>
             <option value="pendente">Pendente</option>
             <option value="exibido">Exibido</option>
             <option value="não exibido">Não Exibido</option>
           </select>
+          <button type="button" id="btn-clear-stream-filters" class="btn-action btn-action-secondary" onclick="clearStreamFilters()" title="Limpar todos os filtros">Limpar ✕</button>
         </div>
-        <div style="display: flex; gap: 8px;">
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
           <button class="btn-action btn-action-secondary action-admin-only" onclick="syncLiveAPI(this)">🔄 Sincronizar em Tempo Real</button>
           <button class="btn-action btn-action-primary" onclick="exportCSV()">📥 Exportar CSV</button>
         </div>
@@ -2315,17 +2358,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <table class="sp-list-table">
             <thead>
               <tr>
-                <th class="td-center">#</th>
-                <th class="td-center">Mês</th>
-                <th class="td-center">Data</th>
-                <th class="td-center">Horário</th>
-                <th>Campeonato</th>
-                <th>Partida</th>
-                <th>Responsável Gravação</th>
-                <th class="td-center">Canal de Transmissão</th>
-                <th class="td-center">PVID TV BOX</th>
-                <th class="td-center">Status de Entrega</th>
-                <th class="td-center">Programado</th>
+                <th class="td-center" style="width: 45px;">#</th>
+                <th class="td-center th-sortable" onclick="sortStreamBy('mes')" title="Ordenar por Mês">Mês <span id="sort-st-mes" class="sort-icon">↕</span></th>
+                <th class="td-center th-sortable" onclick="sortStreamBy('data')" title="Ordenar por Data">Data <span id="sort-st-data" class="sort-icon">↕</span></th>
+                <th class="td-center th-sortable" onclick="sortStreamBy('horario')" title="Ordenar por Horário">Horário <span id="sort-st-horario" class="sort-icon">↕</span></th>
+                <th class="th-sortable" onclick="sortStreamBy('campeonato')" title="Ordenar por Campeonato">Campeonato <span id="sort-st-campeonato" class="sort-icon">↕</span></th>
+                <th class="th-sortable" onclick="sortStreamBy('partida')" title="Ordenar por Partida">Partida <span id="sort-st-partida" class="sort-icon">↕</span></th>
+                <th class="th-sortable" onclick="sortStreamBy('responsavel')" title="Ordenar por Responsável">Responsável Gravação <span id="sort-st-responsavel" class="sort-icon">↕</span></th>
+                <th class="td-center th-sortable" onclick="sortStreamBy('canal')" title="Ordenar por Canal">Canal de Transmissão <span id="sort-st-canal" class="sort-icon">↕</span></th>
+                <th class="td-center th-sortable" onclick="sortStreamBy('pvid')" title="Ordenar por PVID">PVID TV BOX <span id="sort-st-pvid" class="sort-icon">↕</span></th>
+                <th class="td-center th-sortable" onclick="sortStreamBy('status_entrega')" title="Ordenar por Status">Status de Entrega <span id="sort-st-status_entrega" class="sort-icon">↕</span></th>
+                <th class="td-center th-sortable" onclick="sortStreamBy('programado')" title="Ordenar por Programado">Programado <span id="sort-st-programado" class="sort-icon">↕</span></th>
               </tr>
             </thead>
             <tbody id="table-body">
@@ -2362,10 +2405,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <table class="sp-list-table">
             <thead>
               <tr>
-                <th class="td-center">#</th>
-                <th>Cidade / Praça</th>
-                <th>Nome do Técnico / Central</th>
-                <th>Especialidade</th>
+                <th class="td-center" style="width: 45px;">#</th>
+                <th class="th-sortable" onclick="sortHospBy('Title')" title="Ordenar por Cidade / Praça">Cidade / Praça <span id="sort-hosp-Title" class="sort-icon">↕</span></th>
+                <th class="th-sortable" onclick="sortHospBy('Nome1')" title="Ordenar por Nome">Nome do Técnico / Central <span id="sort-hosp-Nome1" class="sort-icon">↕</span></th>
+                <th class="th-sortable" onclick="sortHospBy('Especialidade')" title="Ordenar por Especialidade">Especialidade <span id="sort-hosp-Especialidade" class="sort-icon">↕</span></th>
                 <th>Telefone Comercial</th>
                 <th>Telefone Celular</th>
               </tr>
@@ -2454,19 +2497,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <table class="sp-list-table">
             <thead>
               <tr>
-                <th style="min-width: 120px;">Status</th>
-                <th style="min-width: 130px; cursor: pointer;" onclick="toggleOcoSort()">Criado ↓</th>
-                <th style="min-width: 190px;">Host</th>
-                <th style="min-width: 70px;">CS</th>
-                <th style="min-width: 110px;">Veículo</th>
-                <th style="min-width: 140px;">Equipamento</th>
-                <th style="min-width: 140px;">Tipo do Problema</th>
-                <th style="min-width: 110px;" class="td-center">Em recuperação</th>
-                <th style="min-width: 120px;" class="td-center">GravaçãoStreaming</th>
-                <th style="min-width: 120px;" class="td-center">Informar Operação</th>
-                <th style="min-width: 250px;">Ações executadas</th>
-                <th style="min-width: 130px;">Area/Responsável</th>
-                <th style="min-width: 80px;" class="td-center">Redmine</th>
+                <th class="th-sortable" style="min-width: 120px;" onclick="sortOcoBy('Status')" title="Ordenar por Status">Status <span id="sort-oco-Status" class="sort-icon">↕</span></th>
+                <th class="th-sortable" style="min-width: 130px;" onclick="sortOcoBy('Criado')" title="Ordenar por Data de Criação">Criado <span id="sort-oco-Criado" class="sort-icon">▼</span></th>
+                <th class="th-sortable" style="min-width: 190px;" onclick="sortOcoBy('HostName')" title="Ordenar por Host">Host <span id="sort-oco-HostName" class="sort-icon">↕</span></th>
+                <th class="th-sortable" style="min-width: 70px;" onclick="sortOcoBy('CS')" title="Ordenar por CS">CS <span id="sort-oco-CS" class="sort-icon">↕</span></th>
+                <th class="th-sortable" style="min-width: 110px;" onclick="sortOcoBy('Veiculo')" title="Ordenar por Veículo">Veículo <span id="sort-oco-Veiculo" class="sort-icon">↕</span></th>
+                <th class="th-sortable" style="min-width: 140px;" onclick="sortOcoBy('Equipamento')" title="Ordenar por Equipamento">Equipamento <span id="sort-oco-Equipamento" class="sort-icon">↕</span></th>
+                <th class="th-sortable" style="min-width: 140px;" onclick="sortOcoBy('TipoProblema')" title="Ordenar por Tipo do Problema">Tipo do Problema <span id="sort-oco-TipoProblema" class="sort-icon">↕</span></th>
+                <th class="td-center th-sortable" style="min-width: 110px;" onclick="sortOcoBy('EmRecuperacao')" title="Ordenar por Em Recuperação">Em recuperação <span id="sort-oco-EmRecuperacao" class="sort-icon">↕</span></th>
+                <th class="td-center th-sortable" style="min-width: 120px;" onclick="sortOcoBy('GravacaoStreaming')" title="Ordenar por Gravação Streaming">GravaçãoStreaming <span id="sort-oco-GravacaoStreaming" class="sort-icon">↕</span></th>
+                <th class="td-center th-sortable" style="min-width: 120px;" onclick="sortOcoBy('InformarOperacao')" title="Ordenar por Informar Operação">Informar Operação <span id="sort-oco-InformarOperacao" class="sort-icon">↕</span></th>
+                <th class="th-sortable" style="min-width: 250px;" onclick="sortOcoBy('AcoesExecutadas')" title="Ordenar por Ações Executadas">Ações executadas <span id="sort-oco-AcoesExecutadas" class="sort-icon">↕</span></th>
+                <th class="th-sortable" style="min-width: 130px;" onclick="sortOcoBy('AreaResponsavel')" title="Ordenar por Área / Responsável">Area/Responsável <span id="sort-oco-AreaResponsavel" class="sort-icon">↕</span></th>
+                <th class="td-center th-sortable" style="min-width: 80px;" onclick="sortOcoBy('Redmine')" title="Ordenar por Redmine">Redmine <span id="sort-oco-Redmine" class="sort-icon">↕</span></th>
               </tr>
             </thead>
             <tbody id="oco-table-body">
@@ -3179,27 +3222,69 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const sel = document.getElementById("user-role-select");
       currentRole = sel.value;
       const avatar = document.getElementById("top-user-avatar");
+      const escalaBadge = document.getElementById("escala-perm-badge");
 
-      if (currentRole.startsWith("admin")) {
+      const isAdmin = currentRole.startsWith("admin");
+      const isOperador = (currentRole === "operador");
+      const isReadOnly = currentRole.startsWith("leitor");
+
+      if (isAdmin) {
         if (currentRole === "admin_cassio") avatar.innerText = "CE";
         else if (currentRole === "admin_vinicius") avatar.innerText = "VD";
+        else if (currentRole === "admin_luiz") avatar.innerText = "LL";
         else avatar.innerText = "CG";
         avatar.style.background = "#004578";
+
         document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "");
         const permTab = document.getElementById("nav-tab-permissoes");
         if (permTab) permTab.style.display = "";
-      } else if (currentRole === "operador") {
+
+        // Botões de criação e edição ativos
+        document.querySelectorAll(".sp-btn-new, #btn-grid-oco, #btn-grid-generic").forEach(el => el.style.display = "");
+
+        if (escalaBadge) {
+          escalaBadge.innerText = "✏️ Permissão de Edição (Administrador)";
+          escalaBadge.style.background = "#D1FAE5";
+          escalaBadge.style.color = "#065F46";
+          escalaBadge.style.borderColor = "#A7F3D0";
+        }
+      } else if (isOperador) {
         avatar.innerText = "OP";
         avatar.style.background = "#059669";
-        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "");
-        const permTab = document.getElementById("nav-tab-permissoes");
-        if (permTab) permTab.style.display = "";
-      } else {
-        avatar.innerText = "LE";
-        avatar.style.background = "#64748B";
+
+        // Operador não tem acesso à gestão de permissões ou configurações restritas
         document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "none");
         const permTab = document.getElementById("nav-tab-permissoes");
         if (permTab) permTab.style.display = "none";
+
+        // Operador tem permissão de inclusão e edição em ocorrências e listas operacionais
+        document.querySelectorAll(".sp-btn-new, #btn-grid-oco, #btn-grid-generic").forEach(el => el.style.display = "");
+
+        if (escalaBadge) {
+          escalaBadge.innerText = "🔒 Somente Leitura (Gestão da Escala Restrita à Administração)";
+          escalaBadge.style.background = "#FEF3C7";
+          escalaBadge.style.color = "#92400E";
+          escalaBadge.style.borderColor = "#FDE68A";
+        }
+      } else {
+        // Visitante / Consulta (NOC, SAC, Leitura Geral)
+        avatar.innerText = "LE";
+        avatar.style.background = "#64748B";
+
+        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "none");
+        const permTab = document.getElementById("nav-tab-permissoes");
+        if (permTab) permTab.style.display = "none";
+
+        // Modo estritamente somente leitura: sem botões de criação ou modo grade
+        document.querySelectorAll(".sp-btn-new, #btn-grid-oco, #btn-grid-generic").forEach(el => el.style.display = "none");
+
+        if (escalaBadge) {
+          escalaBadge.innerText = "🔒 Somente Leitura (Visitante / Consulta)";
+          escalaBadge.style.background = "#F1F5F9";
+          escalaBadge.style.color = "#475569";
+          escalaBadge.style.borderColor = "#E2E8F0";
+        }
+
         const activePane = document.querySelector(".pane-container.active");
         if (activePane && activePane.id === "pane-permissoes") {
           showPane("home");
@@ -3581,11 +3666,35 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     let currentRealListName = null;
     let currentRealListTitle = '';
     let isGenericListGridEditMode = false;
+    let genericSortCol = null;
+    let genericSortAsc = true;
+
+    function sortGenericList(colName) {
+      if (genericSortCol === colName) {
+        genericSortAsc = !genericSortAsc;
+      } else {
+        genericSortCol = colName;
+        genericSortAsc = true;
+      }
+      document.querySelectorAll('#list-viewer-thead .th-sortable').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        const icon = th.querySelector('.sort-icon');
+        if (icon) icon.innerText = '↕';
+      });
+      const curIcon = document.getElementById('sort-gen-' + colName);
+      if (curIcon && curIcon.parentElement) {
+        curIcon.parentElement.classList.add(genericSortAsc ? 'sorted-asc' : 'sorted-desc');
+        curIcon.innerText = genericSortAsc ? '▲' : '▼';
+      }
+      filterRealListTable();
+    }
 
     function openRealList(listName, title) {
       currentRealListName = listName;
       currentRealListTitle = title || listName;
       isGenericListGridEditMode = false;
+      genericSortCol = null;
+      genericSortAsc = true;
 
       const btn = document.getElementById("btn-grid-generic");
       const icon = document.getElementById("btn-grid-generic-icon");
@@ -3626,7 +3735,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         if (!listData || !listData.columns || listData.columns.length === 0) {
           thead.innerHTML = '<tr><th>Registro</th></tr>';
         } else {
-          thead.innerHTML = '<tr><th class="td-center" style="width: 45px;">#</th>' + listData.columns.map(col => `<th>${col.displayName || col.name}</th>`).join('') + '</tr>';
+          thead.innerHTML = '<tr><th class="td-center" style="width: 45px;">#</th>' + listData.columns.map(col =>
+            `<th class="th-sortable" onclick="sortGenericList('${col.name}')" title="Clique para ordenar por ${col.displayName || col.name}">${col.displayName || col.name} <span id="sort-gen-${col.name}" class="sort-icon">↕</span></th>`
+          ).join('') + '</tr>';
         }
       }
 
@@ -3644,10 +3755,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const cols = listData.columns || [];
 
       const items = listData.items || [];
-      const filtered = items.filter(it => {
+      let filtered = items.filter(it => {
         if (!q) return true;
         return Object.values(it).some(val => String(val || '').toLowerCase().includes(q));
       });
+
+      if (genericSortCol) {
+        filtered.sort((a, b) => {
+          let va = a[genericSortCol] !== undefined ? a[genericSortCol] : '';
+          let vb = b[genericSortCol] !== undefined ? b[genericSortCol] : '';
+          const cmp = String(va).localeCompare(String(vb), undefined, { numeric: true, sensitivity: 'base' });
+          return genericSortAsc ? cmp : -cmp;
+        });
+      }
 
       if (tbody) {
         if (filtered.length === 0) {
@@ -4130,13 +4250,70 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       return '<span class="badge badge-pendente">' + (status || "Pendente") + '</span>';
     }
 
+    let streamSortCol = null;
+    let streamSortAsc = true;
+
+    function initStreamingFilters() {
+      const campSelect = document.getElementById("filter-campeonato");
+      if (campSelect && campSelect.options.length <= 1) {
+        const camps = [...new Set(allEvents.map(e => e.campeonato).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+        camps.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.innerText = c;
+          campSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function sortStreamBy(col) {
+      if (streamSortCol === col) {
+        streamSortAsc = !streamSortAsc;
+      } else {
+        streamSortCol = col;
+        streamSortAsc = true;
+      }
+      document.querySelectorAll('#pane-streaming .th-sortable').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        const icon = th.querySelector('.sort-icon');
+        if (icon) icon.innerText = '↕';
+      });
+      const curIcon = document.getElementById('sort-st-' + col) || document.getElementById('sort-stream-' + col);
+      if (curIcon && curIcon.parentElement) {
+        curIcon.parentElement.classList.add(streamSortAsc ? 'sorted-asc' : 'sorted-desc');
+        curIcon.innerText = streamSortAsc ? '▲' : '▼';
+      }
+      renderTable();
+    }
+
+    function clearStreamFilters() {
+      const sb = document.getElementById("search-box"); if (sb) sb.value = "";
+      const fm = document.getElementById("filter-mes"); if (fm) fm.value = "";
+      const fc = document.getElementById("filter-campeonato"); if (fc) fc.value = "";
+      const fcn = document.getElementById("filter-canal"); if (fcn) fcn.value = "";
+      const fs = document.getElementById("filter-status"); if (fs) fs.value = "";
+      streamSortCol = null;
+      streamSortAsc = true;
+      document.querySelectorAll('#pane-streaming .th-sortable').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        const icon = th.querySelector('.sort-icon');
+        if (icon) icon.innerText = '↕';
+      });
+      renderTable();
+    }
+
     function renderTable() {
+      initStreamingFilters();
       const searchBox = document.getElementById("search-box");
-      const q = searchBox ? searchBox.value.toLowerCase() : "";
+      const q = searchBox ? searchBox.value.toLowerCase().trim() : "";
+      const mesBox = document.getElementById("filter-mes");
+      const fMes = mesBox ? mesBox.value.toLowerCase().trim() : "";
+      const campBox = document.getElementById("filter-campeonato");
+      const fCamp = campBox ? campBox.value.toLowerCase().trim() : "";
       const canalBox = document.getElementById("filter-canal");
-      const fCanal = canalBox ? canalBox.value.toLowerCase() : "";
+      const fCanal = canalBox ? canalBox.value.toLowerCase().trim() : "";
       const statusBox = document.getElementById("filter-status");
-      const fStatus = statusBox ? statusBox.value.toLowerCase() : "";
+      const fStatus = statusBox ? statusBox.value.toLowerCase().trim() : "";
 
       const tbody = document.getElementById("table-body");
       if (!tbody) return;
@@ -4145,24 +4322,48 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       let count = 0;
       let caze = 0, prime = 0, netflix = 0, outros = 0;
 
-      allEvents.forEach((ev) => {
+      let filtered = allEvents.filter((ev) => {
         const cStr = String(ev.canal || "").toLowerCase();
         if (cStr.includes("cazé") || cStr.includes("caze")) caze++;
         else if (cStr.includes("prime") || cStr.includes("amazon")) prime++;
         else if (cStr.includes("netflix")) netflix++;
         else outros++;
 
-        if (fCanal && !cStr.includes(fCanal)) return;
-        if (fStatus && !String(ev.status_entrega || "").toLowerCase().includes(fStatus)) return;
+        if (fMes && !String(ev.mes || "").toLowerCase().includes(fMes)) return false;
+        if (fCamp && !String(ev.campeonato || "").toLowerCase().includes(fCamp)) return false;
+        if (fCanal && !cStr.includes(fCanal)) return false;
+        if (fStatus && !String(ev.status_entrega || "").toLowerCase().includes(fStatus)) return false;
 
         if (q) {
           const fullText = (
             (ev.partida || '') + " " + (ev.campeonato || '') + " " +
             (ev.data || '') + " " + (ev.canal || '') + " " + (ev.responsavel || '')
           ).toLowerCase();
-          if (!fullText.includes(q)) return;
+          if (!fullText.includes(q)) return false;
         }
+        return true;
+      });
 
+      if (streamSortCol) {
+        filtered.sort((a, b) => {
+          let va = a[streamSortCol] || '';
+          let vb = b[streamSortCol] || '';
+          if (streamSortCol === 'data') {
+            const parseDate = s => {
+              const parts = String(s).split('/');
+              if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+              return 0;
+            };
+            const da = parseDate(va);
+            const db = parseDate(vb);
+            return streamSortAsc ? (da - db) : (db - da);
+          }
+          const cmp = String(va).localeCompare(String(vb), undefined, { numeric: true, sensitivity: 'base' });
+          return streamSortAsc ? cmp : -cmp;
+        });
+      }
+
+      filtered.forEach((ev) => {
         count++;
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -4188,19 +4389,53 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       document.getElementById("showing-count").innerText = count;
     }
 
+    let hospSortCol = null;
+    let hospSortAsc = true;
+
+    function sortHospBy(col) {
+      if (hospSortCol === col) {
+        hospSortAsc = !hospSortAsc;
+      } else {
+        hospSortCol = col;
+        hospSortAsc = true;
+      }
+      document.querySelectorAll('#pane-hospedeiros .th-sortable').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        const icon = th.querySelector('.sort-icon');
+        if (icon) icon.innerText = '↕';
+      });
+      const curIcon = document.getElementById('sort-hosp-' + col);
+      if (curIcon && curIcon.parentElement) {
+        curIcon.parentElement.classList.add(hospSortAsc ? 'sorted-asc' : 'sorted-desc');
+        curIcon.innerText = hospSortAsc ? '▲' : '▼';
+      }
+      renderHospedeirosTable();
+    }
+
     function renderHospedeirosTable() {
       const sBox = document.getElementById("search-hosp-box");
-      const q = sBox ? sBox.value.toLowerCase() : "";
+      const q = sBox ? sBox.value.toLowerCase().trim() : "";
       const tbody = document.getElementById("hosp-table-body");
       if (!tbody) return;
       tbody.innerHTML = "";
 
+      let list = allHospedeiros.filter((h) => {
+        if (!q) return true;
+        const t = ((h.Title||'') + " " + (h.Nome1||'') + " " + (h.Especialidade||'') + " " + (h.Telefone_x0020_Comercial||'') + " " + (h.Telefone_x0020_Celular||'')).toLowerCase();
+        return t.includes(q);
+      });
+
+      if (hospSortCol) {
+        list.sort((a, b) => {
+          let va = a[hospSortCol] || '';
+          let vb = b[hospSortCol] || '';
+          const cmp = String(va).localeCompare(String(vb), undefined, { numeric: true, sensitivity: 'base' });
+          return hospSortAsc ? cmp : -cmp;
+        });
+      }
+
       let count = 0;
-      allHospedeiros.forEach((h, i) => {
-        if (q) {
-          const t = ((h.Title||'') + " " + (h.Nome1||'') + " " + (h.Especialidade||'') + " " + (h.Telefone_x0020_Comercial||'') + " " + (h.Telefone_x0020_Celular||'')).toLowerCase();
-          if (!t.includes(q)) return;
-        }
+      list.forEach((h) => {
         count++;
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -4218,6 +4453,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     let currentOcoView = "emandamento";
     let activeStatusFilters = ["Em andamento", "Feedback"];
+    let ocoSortCol = "Criado";
     let ocoSortAsc = false;
 
     function switchOcoView(viewName) {
@@ -4268,9 +4504,28 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       switchOcoView("todos");
     }
 
-    function toggleOcoSort() {
-      ocoSortAsc = !ocoSortAsc;
+    function sortOcoBy(col) {
+      if (ocoSortCol === col) {
+        ocoSortAsc = !ocoSortAsc;
+      } else {
+        ocoSortCol = col;
+        ocoSortAsc = (col === "Criado" ? false : true);
+      }
+      document.querySelectorAll('#pane-ocorrencias .th-sortable').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        const icon = th.querySelector('.sort-icon');
+        if (icon) icon.innerText = '↕';
+      });
+      const curIcon = document.getElementById('sort-oco-' + col);
+      if (curIcon && curIcon.parentElement) {
+        curIcon.parentElement.classList.add(ocoSortAsc ? 'sorted-asc' : 'sorted-desc');
+        curIcon.innerText = ocoSortAsc ? '▲' : '▼';
+      }
       renderOcorrenciasTable();
+    }
+
+    function toggleOcoSort() {
+      sortOcoBy("Criado");
     }
 
     function formatSPDate(isoStr) {
@@ -4427,11 +4682,23 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         });
       }
 
-      // 3. Ordenação
+      // 3. Ordenação por Coluna
       list.sort((a, b) => {
-        const da = new Date(a.Criado || 0).getTime();
-        const db = new Date(b.Criado || 0).getTime();
-        return ocoSortAsc ? (da - db) : (db - da);
+        if (ocoSortCol === "Criado") {
+          const da = new Date(a.Criado || 0).getTime();
+          const db = new Date(b.Criado || 0).getTime();
+          return ocoSortAsc ? (da - db) : (db - da);
+        }
+        let va = a[ocoSortCol];
+        let vb = b[ocoSortCol];
+        if (Array.isArray(va)) va = va.join(", ");
+        if (Array.isArray(vb)) vb = vb.join(", ");
+        if (typeof va === 'boolean') va = va ? '1' : '0';
+        if (typeof vb === 'boolean') vb = vb ? '1' : '0';
+        va = String(va || '');
+        vb = String(vb || '');
+        const cmp = va.localeCompare(vb, undefined, { numeric: true, sensitivity: 'base' });
+        return ocoSortAsc ? cmp : -cmp;
       });
 
       let count = 0;
@@ -5030,6 +5297,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     // Listeners
     document.getElementById("search-box")?.addEventListener("input", renderTable);
+    document.getElementById("filter-mes")?.addEventListener("change", renderTable);
+    document.getElementById("filter-campeonato")?.addEventListener("change", renderTable);
     document.getElementById("filter-canal")?.addEventListener("change", renderTable);
     document.getElementById("filter-status")?.addEventListener("change", renderTable);
     document.getElementById("search-hosp-box")?.addEventListener("input", renderHospedeirosTable);
@@ -5055,6 +5324,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     window.selectEscalaMonth = selectEscalaMonth;
     window.toggleDarkMode = toggleDarkMode;
     window.onRoleChange = onRoleChange;
+    window.sortStreamBy = sortStreamBy;
+    window.clearStreamFilters = clearStreamFilters;
+    window.sortHospBy = sortHospBy;
+    window.sortOcoBy = sortOcoBy;
+    window.sortGenericList = sortGenericList;
     window.exportCSV = exportCSV;
     window.exportHospedeirosCSV = exportHospedeirosCSV;
     window.exportOcorrenciasCSV = exportOcorrenciasCSV;
