@@ -422,6 +422,60 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       margin: 4px 0;
     }
 
+    /* BREADCRUMBS & NAVEGAÇÃO DE DIRETÓRIOS SHAREPOINT */
+    .sp-breadcrumbs {
+      font-size: 13px;
+      color: #64748B;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .sp-crumb {
+      color: #0078D4;
+      cursor: pointer;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
+    .sp-crumb:hover {
+      color: #106EBE;
+    }
+
+    .sp-crumb-current {
+      font-weight: 700;
+      color: #1E293B;
+    }
+
+    .sp-folder-row:hover {
+      background: #F1F5F9 !important;
+    }
+
+    .sp-tab-pill {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #CBD5E1;
+      background: #FFFFFF;
+      color: #475569;
+      transition: all 0.15s ease;
+    }
+
+    .sp-tab-pill:hover {
+      background: #F1F5F9;
+      color: #0078D4;
+    }
+
+    .sp-tab-pill.active {
+      background: #0078D4;
+      color: #FFFFFF;
+      border-color: #0078D4;
+    }
+
     /* PAINEL DE OCORRÊNCIAS ESTILO SHAREPOINT LIST (1:1 COM IMAGEM DO USUÁRIO) */
     .sp-list-header-row {
       display: flex;
@@ -1599,8 +1653,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="sp-menu-item">
           <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">Administração <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('metas', '🎯 Metas & OKRs da Equipe', event)">🎯 Metas & OKRs da Equipe</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('contratos', '📝 Controle de Contratos Parceiros', event)">📝 Controle de Contratos Parceiros</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('metas', '🎯 Metas & OKRs da Equipe', event)">🎯 Metas & OKRs da Equipe <span class="item-count-badge">8</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('contratos', '📝 Controle de Contratos Parceiros', event)">📝 Controle de Contratos Parceiros <span class="item-count-badge">114</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('fornecedores', '🏢 Avaliação Técnica de Fornecedores', event)">🏢 Avaliação Técnica de Fornecedores</a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('solicitacoes', '🔑 Solicitações de Acesso', event)">🔑 Solicitações de Acesso</a>
           </div>
@@ -1633,10 +1687,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="sp-menu-item">
           <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">DEV <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('automacoes', '🤖 Repositório de Automações', event)">🤖 Repositório de Automações</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redmine', '🐞 Redmine (Demandas)', event)">🐞 Redmine (Demandas)</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('automacoes', '🤖 Repositório de Automações', event)">🤖 Repositório de Automações <span class="item-count-badge">82</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redmine', '🐞 Redmine (Demandas)', event)">🐞 Redmine (Demandas) <span class="item-count-badge">300</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('hosts', '📡 Cadastro de Hosts', event)">📡 Cadastro de Hosts <span class="item-count-badge">__HOSTS_COUNT__</span></a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('cidades', '🏙️ Mapeamento de Cidades e Emissoras', event)">🏙️ Mapeamento de Cidades e Emissoras</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('cidades', '🏙️ Mapeamento de Cidades e Emissoras', event)">🏙️ Mapeamento de Cidades e Emissoras <span class="item-count-badge">229</span></a>
           </div>
         </div>
 
@@ -1646,18 +1700,18 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <div class="sp-dropdown-menu">
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('ocorrencias', '🚨 Painel de Ocorrências', event)">🚨 Painel de Ocorrências <span class="item-count-badge">__OCORRENCIAS_COUNT__</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('streaming', '⚽ Programação Streaming', event)">⚽ Programação Streaming <span class="item-count-badge">__EVENTS_COUNT__</span></a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('gestaoservicos', '⚙️ Painel de Gestão de Serviços dos CS', event)">⚙️ Painel de Gestão de Serviços dos CS</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('monitoramentocanais', '📺 Monitoramento de Canais CS', event)">📺 Monitoramento de Canais CS</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redescs', '🌐 Configurações de Rede do CS', event)">🌐 Configurações de Rede do CS</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redepcd', '🖥️ Mapeamento de Rede do CPD', event)">🖥️ Mapeamento de Rede do CPD</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('remoto', '🎮 Acesso Remoto & América Central', event)">🎮 Acesso Remoto & América Central</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('relatoriosjogos', '🏀 Relatórios de Jogos (YouTube & NBA)', event)">🏀 Relatórios de Jogos (YouTube & NBA)</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('gestaoservicos', '⚙️ Painel de Gestão de Serviços dos CS', event)">⚙️ Painel de Gestão de Serviços dos CS <span class="item-count-badge">300</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('monitoramentocanais', '📺 Monitoramento de Canais CS', event)">📺 Monitoramento de Canais CS <span class="item-count-badge">300</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redescs', '🌐 Configurações de Rede do CS', event)">🌐 Configurações de Rede do CS <span class="item-count-badge">137</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redepcd', '🖥️ Mapeamento de Rede do CPD', event)">🖥️ Mapeamento de Rede do CPD <span class="item-count-badge">46</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('remoto', '🎮 Acesso Remoto & América Central', event)">🎮 Acesso Remoto & América Central <span class="item-count-badge">19</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('relatoriosjogos', '🏀 Relatórios de Jogos (YouTube & NBA)', event)">🏀 Relatórios de Jogos (YouTube & NBA) <span class="item-count-badge">260</span></a>
           </div>
         </div>
 
         <!-- Links de Internet dos Parceiros -->
         <div class="sp-menu-item">
-          <button type="button" class="sp-menu-btn tab-link" onclick="handleMenuClick('links', 'Links de Internet dos Parceiros', event)">Links de Internet dos Parceiros</button>
+          <button type="button" class="sp-menu-btn tab-link" onclick="handleMenuClick('links', 'Links de Internet dos Parceiros', event)">Links de Internet dos Parceiros <span class="item-count-badge">126</span></button>
         </div>
 
         <!-- Permissões (RBAC) -->
@@ -2255,12 +2309,138 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
     </div>
 
-    <!-- SUBMENU GENÉRICO: VISUALIZADOR DE LISTAS NATIVAS DO SHAREPOINT (ESTILO 1:1) -->
+    <!-- SUBMENU 1: VISUALIZADOR UNIFICADO DE BIBLIOTECAS DE DOCUMENTOS (SHAREPOINT DRIVES 1:1) -->
+    <div id="pane-drive-viewer" class="pane-container">
+      <div class="sp-command-bar">
+        <div class="sp-command-left">
+          <button class="sp-btn-new action-admin-only" onclick="alert('Inclusão de arquivos restrita a administradores no SharePoint Online')"><span>+</span> Novo</button>
+          <button class="sp-btn-cmd" onclick="alert('Modo de exibição de grade do SharePoint ativado')"><span>田</span> Modo Grade</button>
+          <button class="sp-btn-cmd" onclick="exportCurrentDriveCSV()"><span>📥</span> Exportar CSV</button>
+          <button class="sp-btn-cmd" onclick="handleMenuClick('home', 'Página Inicial')"><span>🏠</span> Voltar ao Início</button>
+        </div>
+      </div>
+
+      <div class="sp-list-header-row">
+        <div>
+          <div class="sp-breadcrumbs" id="drive-breadcrumbs">
+            <!-- Breadcrumbs dinâmicos -->
+          </div>
+          <h2 class="sp-list-main-title" id="drive-viewer-title">Biblioteca de Documentos <span class="star-icon">☆</span></h2>
+        </div>
+        <div class="sp-views-bar">
+          <span class="sp-view-tab active">Todos os Documentos</span>
+        </div>
+      </div>
+
+      <p id="drive-viewer-desc" style="color: #64748B; font-size: 13px; margin: 4px 0 14px 0; line-height: 1.5;">
+        Biblioteca oficial sincronizada 1:1 com o Microsoft SharePoint Online da Central de Suporte e Captação.
+      </p>
+
+      <div class="filter-bar">
+        <div class="filter-inputs" style="width: 100%;">
+          <input type="text" id="drive-viewer-search" class="search-field" oninput="filterDriveTable()" placeholder="🔍 Buscar por nome do arquivo, pasta ou responsável...">
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center" style="width: 45px;">#</th>
+                <th>Nome do Arquivo / Pasta</th>
+                <th>Tipo</th>
+                <th>Tamanho</th>
+                <th>Modificado em</th>
+                <th>Modificado por</th>
+                <th class="td-center" style="width: 120px;">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="drive-viewer-tbody">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);" id="drive-viewer-footer">
+        Sincronizado com Microsoft SharePoint Online
+      </div>
+    </div>
+
+    <!-- SUBMENU 2: RELATÓRIOS OFICIAIS DE AUDITORIA DE JOGOS (NBA, YOUTUBE & FUTEBOL - 260 CASOS) -->
+    <div id="pane-relatoriosjogos" class="pane-container">
+      <div class="sp-command-bar">
+        <div class="sp-command-left">
+          <button class="sp-btn-cmd" onclick="exportRelatoriosCSV()"><span>📥</span> Exportar CSV</button>
+          <button class="sp-btn-cmd" onclick="handleMenuClick('home', 'Página Inicial')"><span>🏠</span> Voltar ao Início</button>
+        </div>
+      </div>
+
+      <div class="sp-list-header-row">
+        <div>
+          <div style="font-size: 12px; color: #64748B; margin-bottom: 4px;">Suporte Captação &rsaquo; Relatórios de Auditoria</div>
+          <h2 class="sp-list-main-title">Relatórios de Jogos & Auditoria de Transmissão <span class="star-icon">☆</span></h2>
+        </div>
+        <div class="sp-views-bar">
+          <span class="sp-view-tab active">260 Relatórios Oficiais</span>
+        </div>
+      </div>
+
+      <p style="color: #64748B; font-size: 13px; margin: 4px 0 14px 0; line-height: 1.5;">
+        Repositório oficial de relatórios de auditoria com parecer técnico e comprovação de horários CBF, CazéTV e NBA. Todos os 260 relatórios oficiais do SharePoint disponíveis para download direto.
+      </p>
+
+      <!-- Pílulas de Seleção de Categoria (Tabs) -->
+      <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+        <button class="sp-tab-pill active" id="pill-relatorios-nba" onclick="switchRelatoriosTab('nba')">
+          🏀 NBA (<span id="count-rel-nba">168</span> Relatórios)
+        </button>
+        <button class="sp-tab-pill" id="pill-relatorios-yt" onclick="switchRelatoriosTab('yt')">
+          📺 YouTube & CazéTV (<span id="count-rel-yt">51</span> Relatórios)
+        </button>
+        <button class="sp-tab-pill" id="pill-relatorios-fut" onclick="switchRelatoriosTab('fut')">
+          ⚽ Auditoria Futebol (<span id="count-rel-fut">41</span> Relatórios)
+        </button>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-inputs" style="width: 100%;">
+          <input type="text" id="search-relatorios-box" class="search-field" oninput="filterRelatoriosTable()" placeholder="🔍 Buscar relatório por partida, time, data ou responsável...">
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center" style="width: 45px;">#</th>
+                <th>Nome do Relatório / Partida</th>
+                <th>Tipo / Formato</th>
+                <th>Tamanho</th>
+                <th>Data de Auditoria</th>
+                <th>Auditor Responsável</th>
+                <th class="td-center" style="width: 140px;">Relatório PDF</th>
+              </tr>
+            </thead>
+            <tbody id="relatorios-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);" id="relatorios-footer-count">
+        Mostrando relatórios sincronizados com SharePoint Online
+      </div>
+    </div>
+
+    <!-- SUBMENU 3: VISUALIZADOR DINÂMICO DE LISTAS NATIVAS DO SHAREPOINT (46 LISTAS REAIS) -->
     <div id="pane-list-viewer" class="pane-container">
       <div class="sp-command-bar">
         <div class="sp-command-left">
           <button class="sp-btn-new action-admin-only" onclick="alert('Formulário de inclusão conectado ao SharePoint Online')"><span>+</span> Novo</button>
-          <button class="sp-btn-cmd" onclick="alert('Modo de exibição de grade ativado')"><span>田</span> Editar no modo de exibição de grade</button>
+          <button class="sp-btn-cmd" onclick="alert('Modo de exibição de grade do SharePoint ativado')"><span>田</span> Editar no modo de exibição de grade</button>
           <button class="sp-btn-cmd" onclick="exportGenericListCSV()"><span>📥</span> Exportar CSV</button>
           <button class="sp-btn-cmd" onclick="handleMenuClick('home', 'Página Inicial')"><span>🏠</span> Voltar ao Início</button>
         </div>
@@ -2277,12 +2457,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
 
       <p id="list-viewer-desc" style="color: #64748B; font-size: 13px; margin: 4px 0 14px 0; line-height: 1.5;">
-        Esta lista está sincronizada com a esteira oficial do SharePoint Online da Central de Suporte e Captação.
+        Esta lista está sincronizada 1:1 com a esteira oficial do SharePoint Online da Central de Suporte e Captação.
       </p>
 
       <div class="filter-bar">
         <div class="filter-inputs" style="width: 100%;">
-          <input type="text" id="list-viewer-search" class="search-field" oninput="filterListViewerTable()" placeholder="🔍 Buscar registros nesta lista...">
+          <input type="text" id="list-viewer-search" class="search-field" oninput="filterRealListTable()" placeholder="🔍 Buscar registros nesta lista...">
         </div>
       </div>
 
@@ -2299,83 +2479,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
       </div>
       <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);" id="list-viewer-footer">
-        Sincronizado com a Central de Suporte e Captação
+        Sincronizado com Microsoft SharePoint Online
       </div>
     </div>
 
-    <!-- ABA 6: PROCEDIMENTOS N1 (68 POPS NATIVOS) -->
-    <div id="pane-procedimentos" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">📖 Procedimentos Operacionais Padrão (POPs N1) (__PROCEDIMENTOS_COUNT__ Itens)</h2>
-        <p class="section-desc">Manuais de atendimento rápido, guias de reset de TV BOX, contingência e configurações técnicas.</p>
-      </div>
-
-      <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-proc-box" class="search-field" placeholder="🔍 Buscar procedimento por nome ou palavra-chave...">
-        </div>
-      </div>
-
-      <div class="sp-table-wrap">
-        <div class="sp-table-scroll">
-          <table class="sp-list-table">
-            <thead>
-              <tr>
-                <th class="td-center">#</th>
-                <th>Nome do Procedimento / Manual</th>
-                <th>Tipo de Arquivo</th>
-                <th>Data de Atualização</th>
-                <th class="td-center">Ações</th>
-              </tr>
-            </thead>
-            <tbody id="proc-table-body">
-              <!-- Renderizado via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
-        Mostrando <b id="showing-proc-count" style="color: var(--sp-theme-primary);">0</b> manuais e procedimentos operacionais
-      </div>
-    </div>
-
-    <!-- ABA 7: DOCUMENTOS (REPOSITÓRIO DA EQUIPE) -->
-    <div id="pane-documentos" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">📁 Repositório de Documentos da Equipe (__DOCUMENTOS_COUNT__ Arquivos)</h2>
-        <p class="section-desc">Documentos, planilhas históricas, escalas e arquivos da biblioteca corporativa.</p>
-      </div>
-
-      <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-doc-box" class="search-field" placeholder="🔍 Filtrar documentos...">
-        </div>
-        <div>
-          <a href="https://drive.google.com" target="_blank" class="btn-action btn-action-primary">
-            🌐 Abrir no Google Drive
-          </a>
-        </div>
-      </div>
-
-      <div class="sp-table-wrap">
-        <div class="sp-table-scroll">
-          <table class="sp-list-table">
-            <thead>
-              <tr>
-                <th class="td-center">#</th>
-                <th>Nome do Arquivo / Pasta</th>
-                <th>Tipo</th>
-                <th>Data de Modificação</th>
-                <th class="td-center">Download / Ação</th>
-              </tr>
-            </thead>
-            <tbody id="docs-table-body">
-              <!-- Renderizado via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
 
     <!-- ABA 8: DASHBOARD & INDICADORES -->
     <div id="pane-dashboard" class="pane-container">
@@ -2425,32 +2532,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <li>📶 <b>PV3687:</b> Ingest Secundário Fibra Óptica &bull; Ativo</li>
             <li>📶 <b>PV3679:</b> Contingência TV BOX Backup &bull; Standby Quente</li>
           </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ABA 9: METAS -->
-    <div id="pane-metas" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🎯 Metas & OKRs da Equipe de Suporte Captação</h2>
-        <p class="section-desc">Objetivos de desempenho, qualidade técnica e compromissos operacionais para 2026.</p>
-      </div>
-
-      <div class="kpi-row">
-        <div class="kpi-box">
-          <div class="kpi-box-label">SLA de Gravação & Cobertura</div>
-          <div class="kpi-box-val">100%</div>
-          <div class="kpi-box-sub">Zero perda de transmissões ao vivo</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #10B981;">
-          <div class="kpi-box-label">Conformidade Legal CLT</div>
-          <div class="kpi-box-val">100%</div>
-          <div class="kpi-box-sub">Intervalo legal de 11h respeitado</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #D97706;">
-          <div class="kpi-box-label">Atualização de Hospedeiros</div>
-          <div class="kpi-box-val">&gt; 95%</div>
-          <div class="kpi-box-sub">Contatos técnicos confirmados semestralmente</div>
         </div>
       </div>
     </div>
@@ -2601,6 +2682,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     let allEscalaMonths = __ESCALA_JSON__;
     let allAntenistas = __ANTENISTAS_JSON__;
     let allHosts = __HOSTS_JSON__;
+    let SP_MASTER_DATA = __SP_MASTER_DATA__;
 
     let currentRole = "admin";
     let currentMonth = "Novembro";
@@ -2638,303 +2720,508 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     }
 
     // ==========================================
-    // CATÁLOGO DE SUBMENUS & LISTAS NATIVAS DO SHAREPOINT
     // ==========================================
-    const SP_LISTS_CATALOG = {
-      capacitacao: {
-        title: "Ficha de Capacitação",
-        desc: "Registro oficial de capacitações, treinamentos técnicos e certificações operacionais da equipe de Captação.",
-        columns: ["#", "Colaborador", "Treinamento / Certificação", "Data", "Instrutor / Responsável", "Status"],
-        rows: [
-          ["1", "Rodrigo Meirelles", "Operação Receptores ATRIA e Decoders TDT", "15/01/2026", "Cleber Gonçalves", "<span class='badge badge-exibido'>Concluído</span>"],
-          ["2", "Alan Kelvin", "Diagnóstico de Enlace e Roteadores de Praça", "22/01/2026", "Vinicius Dantas", "<span class='badge badge-exibido'>Concluído</span>"],
-          ["3", "Bruno Viana", "Procedimentos de Gravação Streaming CazéTV", "05/02/2026", "Marcelo Pereira", "<span class='badge badge-exibido'>Concluído</span>"],
-          ["4", "Marcelo Fialho", "Conformidade CLT Art. 66 & Gestão de Plantões", "12/02/2026", "Luiz Lemos", "<span class='badge badge-exibido'>Concluído</span>"],
-          ["5", "Rômulo Silva", "Mapeamento e Reset Remoto de TV BOX", "18/02/2026", "Marcos Bezerra", "<span class='badge badge-exibido'>Concluído</span>"]
-        ]
-      },
-      tratativa: {
-        title: "Tratativa de Problemas de Captação",
-        desc: "Fluxos de contingência, escalonamento N1/N2/N3 e resolução de indisponibilidade de sinal em praças críticas.",
-        columns: ["#", "Praça / Cidade", "Incidente", "Classificação", "Ação Imediata", "Responsável", "Status"],
-        rows: [
-          ["1", "Montes Claros / MG", "Queda de sinal digital SBT", "Crítico", "Acionamento de hospedeiro local para reboot de receptor", "N1 Plantão", "<span class='badge badge-exibido'>Resolvido</span>"],
-          ["2", "Vilhena / RO", "Falha de link de fibra óptica", "Grave", "Ativação de link secundário 4G de contingência", "N2 Engenharia", "<span class='badge badge-exibido'>Resolvido</span>"],
-          ["3", "Resende / RJ", "Perda de sincronismo Band Barra Mansa", "Médio", "Reajuste de sintonia remota via ATRIA", "N1 Plantão", "<span class='badge badge-exibido'>Resolvido</span>"],
-          ["4", "Taubaté / SP", "Travamento de decoder TV BOX", "Crítico", "Ciclo de energia inteligente via PDU remota", "N1 Plantão", "<span class='badge badge-exibido'>Resolvido</span>"]
-        ]
-      },
-      doctecnicos: {
-        title: "Documentos Técnicos (PayTV)",
-        desc: "Manuais técnicos de decodificadores PayTV, especificações de satélite e parâmetros de modulação DVB-S2.",
-        columns: ["#", "Documento", "Plataforma / Operadora", "Versão", "Última Atualização", "Tipo", "Ações"],
-        rows: [
-          ["1", "Manual de Configuração TV BOX OTT Android", "Streaming & OTT", "v3.2", "10/01/2026", "PDF", "<a href='#' class='btn-doc-download'>Visualizar</a>"],
-          ["2", "Tabela de Frequências e Transponders StarOne D2", "Satélite PayTV", "v2026.1", "15/01/2026", "XLSX", "<a href='#' class='btn-doc-download'>Visualizar</a>"],
-          ["3", "Guia de Troubleshooting Receptores ATRIA", "PayTV / Ingest", "v4.0", "01/02/2026", "PDF", "<a href='#' class='btn-doc-download'>Visualizar</a>"]
-        ]
-      },
-      contratos: {
-        title: "Controle de Contratos Parceiros",
-        desc: "Acompanhamento de vigência, reajustes e acordos de nível de serviço com hospedeiros de recepção.",
-        columns: ["#", "Parceiro / Hospedeiro", "Praça", "Contrato Nº", "Vigência", "SLA Acordado", "Status"],
-        rows: [
-          ["1", "Central de Recepção Montes Claros", "Montes Claros / MG", "CT-2024-089", "Dez/2026", "99.8%", "<span class='badge badge-exibido'>Vigente</span>"],
-          ["2", "Recepção e Antenas Vilhena", "Vilhena / RO", "CT-2023-044", "Nov/2026", "99.5%", "<span class='badge badge-exibido'>Vigente</span>"],
-          ["3", "Telecomunicações Resende", "Resende / RJ", "CT-2024-112", "Jan/2027", "99.9%", "<span class='badge badge-exibido'>Vigente</span>"]
-        ]
-      },
-      fornecedores: {
-        title: "Avaliação Técnica de Fornecedores",
-        desc: "Critérios de qualidade, pontualidade no envio de mídias e prontidão técnica de parceiros credenciados.",
-        columns: ["#", "Fornecedor", "Escopo", "Índice de Qualidade", "Tempo Médio Reparo", "Classificação", "Status"],
-        rows: [
-          ["1", "ATRIA Broadcast Solutions", "Receptores & Ingest", "9.8 / 10", "< 2 horas", "Classe A", "<span class='badge badge-exibido'>Homologado</span>"],
-          ["2", "SatCom Brasil", "Manutenção de Antenas", "9.5 / 10", "< 4 horas", "Classe A", "<span class='badge badge-exibido'>Homologado</span>"],
-          ["3", "FiberLink Telecom", "Conectividade Praças", "9.2 / 10", "< 3 horas", "Classe B", "<span class='badge badge-exibido'>Homologado</span>"]
-        ]
-      },
-      solicitacoes: {
-        title: "Solicitações de Acesso",
-        desc: "Controle de pedidos de novos acessos, permissões no portal e credenciamento de técnicos e auditores.",
-        columns: ["#", "Solicitante", "Área", "Perfil Solicitado", "Data Solicitação", "Aprovador", "Status"],
-        rows: [
-          ["1", "Cassio Esteves de Oliveira", "Suporte Captação", "Administrador (Owner)", "18/11/2026", "Cleber Gonçalves", "<span class='badge badge-exibido'>Aprovado</span>"],
-          ["2", "Vinicius Dantas Ferreira", "Suporte Captação", "Administrador (Owner)", "18/11/2026", "Cleber Gonçalves", "<span class='badge badge-exibido'>Aprovado</span>"],
-          ["3", "Auditoria Externa", "Qualidade & Compliance", "Leitura (Viewer)", "10/11/2026", "Luiz Lemos", "<span class='badge badge-exibido'>Aprovado</span>"]
-        ]
-      },
-      sla: {
-        title: "SLA de Atendimento",
-        desc: "Métricas de tempo de resposta para incidentes de captação e transmissão ao vivo.",
-        columns: ["#", "Severidade", "Tempo Máximo Resposta", "Tempo Máximo Solução", "Meta Cumprimento", "Atingido 2026", "Status"],
-        rows: [
-          ["1", "Gravíssima (Sinal fora do ar)", "10 minutos", "45 minutos", "99.0%", "99.7%", "<span class='badge badge-exibido'>Conforme</span>"],
-          ["2", "Alta (Degradação de áudio/vídeo)", "20 minutos", "2 horas", "98.0%", "98.9%", "<span class='badge badge-exibido'>Conforme</span>"],
-          ["3", "Média (Alerta de telemetria)", "45 minutos", "6 horas", "95.0%", "97.4%", "<span class='badge badge-exibido'>Conforme</span>"]
-        ]
-      },
-      notificacoes: {
-        title: "Análise de Notificações",
-        desc: "Histórico de alertas disparados pelos sensores de monitoramento de fluxo de gravação.",
-        columns: ["#", "Estação / Praça", "Origem Alerta", "Tipo de Notificação", "Data / Hora", "Ação", "Status"],
-        rows: [
-          ["1", "BRMG-MCL-TDT (Montes Claros)", "Sensor ATRIA", "Oscilação de Bitrate", "18/11/2026 19:08", "Reconexão automática", "<span class='badge badge-exibido'>Resolvido</span>"],
-          ["2", "BRRO-VHA (Vilhena)", "Ping Watchdog", "Perda de Pacotes", "18/11/2026 19:05", "Alerta enviado N1", "<span class='badge badge-exibido'>Resolvido</span>"]
-        ]
-      },
-      backup: {
-        title: "Validação de Backup",
-        desc: "Auditoria diária de retenção de gravações brutas e logs de telemetria de todas as praças.",
-        columns: ["#", "Storage / Unidade", "Volume de Dados", "Última Sincronização", "Checksum SHA-256", "Status"],
-        rows: [
-          ["1", "Storage Ingest São Paulo", "42.8 TB", "18/11/2026 23:50", "OK (Validado)", "<span class='badge badge-exibido'>100% Íntegro</span>"],
-          ["2", "Storage Nuvem AWS / S3", "18.4 TB", "18/11/2026 23:45", "OK (Validado)", "<span class='badge badge-exibido'>100% Íntegro</span>"]
-        ]
-      },
-      analisedados: {
-        title: "Análise de Dados",
-        desc: "Relatórios de consolidação volumétrica de transmissões captadas e disponibilidade de praças.",
-        columns: ["#", "Métrica Analisada", "Período", "Total Eventos", "Taxa de Sucesso", "Tendência"],
-        rows: [
-          ["1", "Disponibilidade Global de Sinais", "Novembro/2026", "862 Jogos", "99.85%", "Estável ↗"],
-          ["2", "Tempo Médio de Atendimento N1", "Novembro/2026", "1.000 Ocorrências", "14 minutos", "Melhoria ↗"]
-        ]
-      },
-      falhas: {
-        title: "Confirmação de Falhas",
-        desc: "Registro de confirmação técnica de falhas de transmissão por motivo de força maior ou emissora local.",
-        columns: ["#", "Praça", "Emissora", "Motivo Confirmado", "Comprovação Oficial", "Status"],
-        rows: [
-          ["1", "Itumbiara / GO", "BAND", "Interrupção na geradora local da emissora", "Ofício da emissora anexado", "<span class='badge badge-exibido'>Confirmado</span>"],
-          ["2", "Resende / RJ", "Band Barra Mansa", "Manutenção na torre de transmissão", "E-mail de aviso do engenheiro", "<span class='badge badge-exibido'>Confirmado</span>"]
-        ]
-      },
-      automacoes: {
-        title: "Repositório de Automações",
-        desc: "Scripts autônomos, bots de ingest, rotinas de auditoria de esportes e sincronização com Google Sheets.",
-        columns: ["#", "Script / Bot", "Função", "Linguagem", "Execução", "Status"],
-        rows: [
-          ["1", "Monitor_Esportes.exe", "Auditoria autônoma YouTube Live & CazéTV com Grounding Oficial", "Python 3.12", "Serviço Contínuo", "<span class='badge badge-exibido'>Ativo</span>"],
-          ["2", "google_sheets_sync.py", "Sincronização bidirecional do Portal com Google Workspace", "Python 3.12", "Automático", "<span class='badge badge-exibido'>Ativo</span>"],
-          ["3", "audit_nba_autonomous.py", "Auditoria automatizada de transmissões NBA no Prime Video", "Python 3.12", "Noturno", "<span class='badge badge-exibido'>Ativo</span>"]
-        ]
-      },
-      redmine: {
-        title: "Redmine (Demandas e Melhorias)",
-        desc: "Acompanhamento de chamados e solicitações de melhoria do portal e infraestrutura de captação.",
-        columns: ["#", "ID Ticket", "Assunto / Demanda", "Autor", "Prioridade", "Situação"],
-        rows: [
-          ["1", "#9860", "Ajuste na rotina de detecção automática de TV BOX", "Vinicius Dantas", "Alta", "<span class='badge badge-exibido'>Resolvido</span>"],
-          ["2", "#9857", "Sincronização da escala 2026 com regras do Artigo 66 CLT", "Cleber Gonçalves", "Urgente", "<span class='badge badge-exibido'>Concluído</span>"],
-          ["3", "#9105", "Reconfiguração de receptores na praça Itumbiara", "Lucieudes Ferreira", "Normal", "<span class='badge badge-exibido'>Concluído</span>"]
-        ]
-      },
-      cidades: {
-        title: "Mapeamento de Cidades e Emissoras",
-        desc: "Catálogo completo de capitais, praças do interior e canais de TV monitorados no território nacional.",
-        columns: ["#", "Cidade / Praça", "UF", "Região", "Canais Monitorados", "Status da Captação"],
-        rows: [
-          ["1", "São Paulo", "SP", "Sudeste", "Globo, Record, SBT, Band, Cultura, Gazeta, RedeTV", "<span class='badge badge-exibido'>Operacional</span>"],
-          ["2", "Rio de Janeiro", "RJ", "Sudeste", "Globo RJ, Record RJ, SBT RJ, Band RJ", "<span class='badge badge-exibido'>Operacional</span>"],
-          ["3", "Montes Claros", "MG", "Sudeste", "InterTV Grande Minas, Record Minas, SBT", "<span class='badge badge-exibido'>Operacional</span>"],
-          ["4", "Vilhena", "RO", "Norte", "Rede Amazônica, TV Allamanda, SIC TV", "<span class='badge badge-exibido'>Operacional</span>"]
-        ]
-      },
-      gestaoservicos: {
-        title: "Painel de Gestão de Serviços dos CS",
-        desc: "Monitoramento de integridade e serviços das centrais de suporte e recepção distribuídas.",
-        columns: ["#", "Central (CS)", "Host", "Serviço Ingest", "Uptime", "Carga CPU", "Status"],
-        rows: [
-          ["1", "CS São Paulo 01", "BRSP-SAO-CPD01", "Daemon Ingest CazéTV", "99.98%", "18%", "<span class='badge badge-exibido'>Online</span>"],
-          ["2", "CS São Paulo 02", "BRSP-SAO-CPD02", "Daemon Ingest Prime Video", "99.95%", "22%", "<span class='badge badge-exibido'>Online</span>"],
-          ["3", "CS Rio de Janeiro", "BRRJ-RIO-CPD01", "Daemon Ingest Transmissões RJ", "99.90%", "15%", "<span class='badge badge-exibido'>Online</span>"]
-        ]
-      },
-      monitoramentocanais: {
-        title: "Monitoramento de Canais CS",
-        desc: "Supervisão em tempo real de feed de vídeo, áudio e status de gravação de cada canal ativo.",
-        columns: ["#", "Canal / Sinal", "Praça", "PVID", "Resolução", "Áudio", "Status Ingest"],
-        rows: [
-          ["1", "Cazé TV YouTube Live", "São Paulo / Nacional", "PV3623", "1080p60", "AAC Stereo", "<span class='badge badge-exibido'>Gravando</span>"],
-          ["2", "Amazon Prime Sports", "São Paulo / Nacional", "PV3687", "1080p60", "5.1 Surround", "<span class='badge badge-exibido'>Gravando</span>"],
-          ["3", "Globo SP HD", "São Paulo", "PV1001", "1080i", "Dolby Digital", "<span class='badge badge-exibido'>Gravando</span>"]
-        ]
-      },
-      redescs: {
-        title: "Configurações de Rede do CS",
-        desc: "Topologia de rede, faixas de IP e rotas dedicadas para ingest de dados das centrais.",
-        columns: ["#", "Central", "Interface", "IP / CIDR", "Gateway", "DNS Primário", "Status"],
-        rows: [
-          ["1", "CS Matriz São Paulo", "eth0 (Fibra 10G)", "10.1.0.10/24", "10.1.0.1", "10.1.0.2", "<span class='badge badge-exibido'>Ativo</span>"],
-          ["2", "CS Contingência Alphaville", "eth0 (Fibra 1G)", "10.2.0.10/24", "10.2.0.1", "10.1.0.2", "<span class='badge badge-exibido'>Ativo</span>"]
-        ]
-      },
-      redepcd: {
-        title: "Mapeamento de Rede do CPD",
-        desc: "Mapeamento físico e lógico de switches, servidores e PDUs nos racks do datacenter de captação.",
-        columns: ["#", "Equipamento", "Rack", "Unidade (U)", "IP de Gerência", "VLAN", "Status"],
-        rows: [
-          ["1", "Switch Core Cisco Nexus", "Rack A1", "U42-U44", "10.1.254.1", "VLAN 100", "<span class='badge badge-exibido'>Ativo</span>"],
-          ["2", "Servidor Ingest 01 (Dell R740)", "Rack A1", "U20-U22", "10.1.254.11", "VLAN 200", "<span class='badge badge-exibido'>Ativo</span>"],
-          ["3", "Servidor Ingest 02 (Dell R740)", "Rack A1", "U23-U25", "10.1.254.12", "VLAN 200", "<span class='badge badge-exibido'>Ativo</span>"]
-        ]
-      },
-      remoto: {
-        title: "Acesso Remoto & América Central",
-        desc: "Credenciamento de túneis seguros e acesso remoto às centrais de transmissão internacionais.",
-        columns: ["#", "País / Região", "Central", "Método de Conexão", "Autenticação", "Status"],
-        rows: [
-          ["1", "Costa Rica", "CS San José", "VPN IPsec WireGuard", "MFA Duo", "<span class='badge badge-exibido'>Conectado</span>"],
-          ["2", "Guatemala", "CS Cidade da Guatemala", "VPN IPsec WireGuard", "MFA Duo", "<span class='badge badge-exibido'>Conectado</span>"],
-          ["3", "Panamá", "CS Cidade do Panamá", "VPN IPsec WireGuard", "MFA Duo", "<span class='badge badge-exibido'>Conectado</span>"]
-        ]
-      },
-      relatoriosjogos: {
-        title: "Relatórios de Jogos (YouTube & NBA)",
-        desc: "Repositório oficial de relatórios de auditoria com parecer técnico e comprovação de horários CBF.",
-        columns: ["#", "Partida / Evento", "Transmissão", "Data do Jogo", "Horário Oficial", "Auditoria", "Relatório PDF"],
-        rows: [
-          ["1", "Flamengo x Vasco da Gama", "Cazé TV (YouTube)", "15/11/2026", "16:00 - 18:05", "100% Conforme", "<a href='#' class='btn-doc-download'>Baixar PDF (2 Páginas)</a>"],
-          ["2", "Palmeiras x Corinthians", "Cazé TV (YouTube)", "16/11/2026", "20:00 - 22:08", "100% Conforme", "<a href='#' class='btn-doc-download'>Baixar PDF (2 Páginas)</a>"],
-          ["3", "Boston Celtics x LA Lakers", "Amazon Prime (NBA)", "17/11/2026", "21:30 - 00:05", "100% Conforme", "<a href='#' class='btn-doc-download'>Baixar PDF (2 Páginas)</a>"]
-        ]
-      }
+    // RECURSOS UNIFICADOS DO SHAREPOINT (DRIVES & LISTAS REAIS)
+    // ==========================================
+    const SP_RESOURCE_MAP = {
+      // Drives (Bibliotecas de Documentos com Pastas e Arquivos Reais)
+      'procedimentos': { type: 'drive', name: 'Procedimentos', title: 'Procedimentos Operacionais Padrão (POPs N1)' },
+      'documentos': { type: 'drive', name: 'Documentos', title: 'Documentos Compartilhados da Equipe' },
+      'capacitacao': { type: 'drive', name: 'Ficha de Capacitação', title: 'Ficha de Capacitação' },
+      'tratativa': { type: 'drive', name: 'Tratativa de Problemas de captação', title: 'Tratativa de Problemas de Captação' },
+      'doctecnicos': { type: 'drive', name: 'Documentos Técnicos', title: 'Documentos Técnicos (PayTV)' },
+      'metas': { type: 'drive', name: 'Metas', title: 'Metas & Acompanhamento da Equipe' },
+      'contratos': { type: 'drive', name: 'Controle de contratos parceiros', title: 'Controle de Contratos Parceiros' },
+      'automacoes': { type: 'drive', name: 'Repositorio_Automacoes', title: 'Repositório de Automações' },
+
+      // Relatórios Dedicados (NBA, YouTube & Futebol - 260 Casos)
+      'relatoriosjogos': { type: 'relatorios', title: 'Relatórios de Jogos (YouTube & NBA)' },
+
+      // Listas Oficiais do SharePoint
+      'fornecedores': { type: 'list', name: 'Avaliação Técnica de Fornecedores', title: 'Avaliação Técnica de Fornecedores' },
+      'solicitacoes': { type: 'list', name: 'Solicitações de Acesso', title: 'Solicitações de Acesso' },
+      'sla': { type: 'list', name: 'SLA', title: 'SLA de Atendimento' },
+      'notificacoes': { type: 'list', name: 'Análise de Notificações', title: 'Análise de Notificações' },
+      'backup': { type: 'list', name: 'Validação de Backup', title: 'Validação de Backup' },
+      'analisedados': { type: 'list', name: 'Analise de Dados', title: 'Análise de Dados' },
+      'falhas': { type: 'list', name: 'Confirmação de Falhas Suporte Captação', title: 'Confirmação de Falhas' },
+      'antenistas': { type: 'list', name: 'Contatos de Antenistas', title: 'Contatos de Antenistas' },
+      'redmine': { type: 'list', name: 'Redmine', title: 'Redmine (Demandas & Chamados)' },
+      'hosts': { type: 'list', name: 'Cadastro - Hosts', title: 'Cadastro de Hosts' },
+      'cidades': { type: 'list', name: 'Cidades', title: 'Mapeamento de Cidades e Emissoras' },
+      'gestaoservicos': { type: 'list', name: 'Painel de gestão de serviços dos CS', title: 'Painel de Gestão de Serviços dos CS' },
+      'monitoramentocanais': { type: 'list', name: 'Monitoramento de Canais CS', title: 'Monitoramento de Canais CS' },
+      'redescs': { type: 'list', name: 'Configurações de Rede do CS', title: 'Configurações de Rede do CS' },
+      'redepcd': { type: 'list', name: 'Mapeamento de Rede do CPD', title: 'Mapeamento de Rede do CPD' },
+      'remoto': { type: 'list', name: 'Acesso Remote Control - America Central', title: 'Acesso Remoto & América Central' },
+      'links': { type: 'list', name: 'Links de Internet dos Parceiros', title: 'Links de Internet dos Parceiros' },
+      'projetos': { type: 'list', name: 'Projetos', title: 'Projetos & Iniciativas' }
     };
 
-    let currentGenericListKey = null;
-
-    function renderGenericList(listKey) {
-      currentGenericListKey = listKey;
-      const data = SP_LISTS_CATALOG[listKey];
-      if (!data) return;
-
-      const tEl = document.getElementById('list-viewer-title');
-      const dEl = document.getElementById('list-viewer-desc');
-      const thead = document.getElementById('list-viewer-thead');
-      const searchBox = document.getElementById('list-viewer-search');
-
-      if (tEl) tEl.innerHTML = data.title + ' <span class="star-icon">☆</span>';
-      if (dEl) dEl.innerText = data.desc;
-      if (searchBox) searchBox.value = '';
-
-      if (thead) {
-        thead.innerHTML = '<tr>' + data.columns.map((col, idx) => `<th class="${idx === 0 ? 'td-center' : ''}">${col}</th>`).join('') + '</tr>';
-      }
-
-      filterListViewerTable();
+    // --- Utilitários de Formatação ---
+    function formatFileSize(bytes) {
+      if (bytes === undefined || bytes === null || isNaN(bytes)) return '-';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
 
-    function filterListViewerTable() {
-      if (!currentGenericListKey) return;
-      const data = SP_LISTS_CATALOG[currentGenericListKey];
-      if (!data) return;
+    function formatDate(isoStr) {
+      if (!isoStr) return '-';
+      try {
+        const d = new Date(isoStr);
+        if (isNaN(d.getTime())) return String(isoStr);
+        const day = String(d.getDate()).padStart(2, '0');
+        const mon = String(d.getMonth() + 1).padStart(2, '0');
+        const yr = d.getFullYear();
+        const hr = String(d.getHours()).padStart(2, '0');
+        const min = String(d.getMinutes()).padStart(2, '0');
+        return `${day}/${mon}/${yr} ${hr}:${min}`;
+      } catch (e) {
+        return String(isoStr);
+      }
+    }
 
-      const q = (document.getElementById('list-viewer-search')?.value || '').toLowerCase().trim();
-      const tbody = document.getElementById('list-viewer-tbody');
-      const footer = document.getElementById('list-viewer-footer');
+    function getSpFileIcon(item) {
+      if (item.type === 'folder') return '📁';
+      const ext = (item.extension || item.name.split('.').pop() || '').toLowerCase();
+      if (ext === 'pdf') return '📕';
+      if (['xlsx', 'xls', 'csv'].includes(ext)) return '📊';
+      if (['docx', 'doc', 'txt'].includes(ext)) return '📝';
+      if (['vsdx', 'vsd'].includes(ext)) return '📐';
+      if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(ext)) return '🖼️';
+      if (['zip', 'rar', '7z'].includes(ext)) return '📦';
+      if (['json', 'xml', 'py', 'js'].includes(ext)) return '⚙️';
+      return '📄';
+    }
 
-      const filtered = data.rows.filter(row => {
-        if (!q) return true;
-        return row.some(cell => String(cell).toLowerCase().includes(q));
+    function formatCellContent(val, colName) {
+      if (val === null || val === undefined || val === '') return '-';
+      if (typeof val === 'object') {
+        if (val.Url) return `<a href="${val.Url}" target="_blank" class="sp-table-link">${val.Description || val.Url} ↗</a>`;
+        return JSON.stringify(val);
+      }
+      const s = String(val).trim();
+      if (s.startsWith("{'") && s.includes("'Url':")) {
+        const urlM = s.match(/'Url':\s*'([^']+)'/);
+        const descM = s.match(/'Description':\s*'([^']+)'/);
+        if (urlM) {
+          const u = urlM[1];
+          const d = descM ? descM[1] : u;
+          return `<a href="${u}" target="_blank" class="sp-table-link">${d} ↗</a>`;
+        }
+      }
+      if (s.startsWith("[{'LookupValue':")) {
+        const vals = [];
+        const re = /'LookupValue':\s*'([^']+)'/g;
+        let m;
+        while ((m = re.exec(s)) !== null) vals.push(m[1]);
+        if (vals.length) return vals.join(', ');
+      }
+      if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s)) {
+        return formatDate(s);
+      }
+      if (['Ativo', 'Online', 'Concluído', 'Resolvido', 'Vigente', 'Operacional', 'Sim'].includes(s)) {
+        return `<span class="badge badge-exibido">${s}</span>`;
+      }
+      if (s.includes('SLA Estourado')) {
+        return `<span class="badge" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">${s}</span>`;
+      }
+      if (s.includes('Gravando')) {
+        return `<span class="badge badge-exibido">${s}</span>`;
+      }
+      return s;
+    }
+
+    // ==========================================
+    // 1. CONTROLADOR DE BIBLIOTECA DE DOCUMENTOS (DRIVES)
+    // ==========================================
+    let currentDriveKey = null;
+    let currentDriveTitle = '';
+    let driveBreadcrumbs = []; // [ { name, items } ]
+
+    function openDrive(driveName, title) {
+      currentDriveKey = driveName;
+      currentDriveTitle = title || driveName;
+      const drive = SP_MASTER_DATA.drives && SP_MASTER_DATA.drives[driveName];
+      const items = drive ? (drive.items || []) : [];
+      driveBreadcrumbs = [{ name: currentDriveTitle, items: items }];
+      
+      const tEl = document.getElementById('drive-viewer-title');
+      const dEl = document.getElementById('drive-viewer-desc');
+      const sBox = document.getElementById('drive-viewer-search');
+      if (tEl) tEl.innerHTML = currentDriveTitle + ' <span class="star-icon">☆</span>';
+      if (dEl) dEl.innerText = `Biblioteca oficial sincronizada 1:1 com o Microsoft SharePoint Online (${drive ? drive.items_count : 0} itens mapeados).`;
+      if (sBox) sBox.value = '';
+      
+      renderCurrentDriveLevel();
+    }
+
+    function renderCurrentDriveLevel() {
+      const currentLevel = driveBreadcrumbs[driveBreadcrumbs.length - 1];
+      const items = currentLevel ? currentLevel.items : [];
+      
+      // Renderizar breadcrumbs
+      const bEl = document.getElementById('drive-breadcrumbs');
+      if (bEl) {
+        bEl.innerHTML = driveBreadcrumbs.map((crumb, idx) => {
+          if (idx === driveBreadcrumbs.length - 1) {
+            return `<span class="sp-crumb-current">${crumb.name}</span>`;
+          }
+          return `<span class="sp-crumb" onclick="navigateDriveBreadcrumb(${idx})">${crumb.name}</span> &rsaquo; `;
+        }).join('');
+      }
+
+      filterDriveTable();
+    }
+
+    function openDriveFolder(folderId) {
+      const currentLevel = driveBreadcrumbs[driveBreadcrumbs.length - 1];
+      if (!currentLevel) return;
+      const folder = currentLevel.items.find(it => String(it.id) === String(folderId));
+      if (!folder) return;
+
+      driveBreadcrumbs.push({
+        name: folder.name,
+        items: folder.children || []
+      });
+      const sBox = document.getElementById('drive-viewer-search');
+      if (sBox) sBox.value = '';
+      renderCurrentDriveLevel();
+    }
+
+    function navigateDriveBreadcrumb(index) {
+      if (index >= 0 && index < driveBreadcrumbs.length) {
+        driveBreadcrumbs = driveBreadcrumbs.slice(0, index + 1);
+        const sBox = document.getElementById('drive-viewer-search');
+        if (sBox) sBox.value = '';
+        renderCurrentDriveLevel();
+      }
+    }
+
+    function filterDriveTable() {
+      const currentLevel = driveBreadcrumbs[driveBreadcrumbs.length - 1];
+      if (!currentLevel) return;
+      const rawItems = currentLevel.items || [];
+      const q = (document.getElementById('drive-viewer-search')?.value || '').toLowerCase().trim();
+
+      // Ordenar: pastas primeiro, depois arquivos alfabeticamente
+      const sorted = [...rawItems].sort((a, b) => {
+        if (a.type === 'folder' && b.type !== 'folder') return -1;
+        if (a.type !== 'folder' && b.type === 'folder') return 1;
+        return a.name.localeCompare(b.name);
       });
 
-      if (tbody) {
-        if (filtered.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="${data.columns.length}" style="text-align:center; padding: 24px; color: #94A3B8;">Nenhum registro encontrado para esta busca.</td></tr>`;
-        } else {
-          tbody.innerHTML = filtered.map(row => {
-            return '<tr>' + row.map((cell, idx) => `<td class="${idx === 0 ? 'td-center' : ''}">${cell}</td>`).join('') + '</tr>';
-          }).join('');
-        }
+      const filtered = sorted.filter(it => {
+        if (!q) return true;
+        return it.name.toLowerCase().includes(q) || (it.lastModifiedBy && it.lastModifiedBy.toLowerCase().includes(q));
+      });
+
+      const tbody = document.getElementById('drive-viewer-tbody');
+      const footer = document.getElementById('drive-viewer-footer');
+      if (!tbody) return;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 30px; color: #94A3B8;">${q ? 'Nenhum item encontrado para esta busca.' : 'Esta pasta está vazia no SharePoint.'}</td></tr>`;
+      } else {
+        tbody.innerHTML = filtered.map((it, idx) => {
+          const isFolder = it.type === 'folder';
+          const icon = getSpFileIcon(it);
+          const typeStr = isFolder ? 'Pasta de Arquivos' : (it.extension ? it.extension.toUpperCase() : 'Arquivo');
+          const sizeStr = isFolder ? `${it.childCount !== undefined ? it.childCount : (it.children ? it.children.length : 0)} itens` : formatFileSize(it.size);
+          const modStr = formatDate(it.lastModifiedDateTime);
+          const authorStr = it.lastModifiedBy || 'Equipe Captação';
+          
+          let nameHtml = '';
+          let actionHtml = '';
+          if (isFolder) {
+            nameHtml = `<span style="cursor:pointer; font-weight:600; color:#0078D4;" onclick="openDriveFolder('${it.id}')">${icon} ${it.name}</span>`;
+            actionHtml = `<button class="sp-btn-cmd" style="padding: 3px 8px; font-size: 11px;" onclick="openDriveFolder('${it.id}')">Abrir Pasta</button>`;
+          } else {
+            const link = it.webUrl || '#';
+            nameHtml = `<span>${icon} ${it.name}</span>`;
+            actionHtml = `<a href="${link}" target="_blank" class="btn-doc-download">Abrir ↗</a>`;
+          }
+
+          return `
+            <tr class="${isFolder ? 'sp-folder-row' : ''}">
+              <td class="td-center" style="color: #64748B;">${idx + 1}</td>
+              <td>${nameHtml}</td>
+              <td><span class="badge ${isFolder ? 'badge-exibido' : 'badge-default'}">${typeStr}</span></td>
+              <td style="color: #475569;">${sizeStr}</td>
+              <td style="color: #64748B;">${modStr}</td>
+              <td style="color: #475569;">${authorStr}</td>
+              <td class="td-center">${actionHtml}</td>
+            </tr>
+          `;
+        }).join('');
       }
 
       if (footer) {
-        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${data.rows.length}</b> registros &bull; Sincronizado com a esteira do SharePoint Online`;
+        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${rawItems.length}</b> itens nesta pasta &bull; Sincronizado com Microsoft SharePoint Online`;
       }
     }
 
-    function exportGenericListCSV() {
-      if (!currentGenericListKey) return;
-      const data = SP_LISTS_CATALOG[currentGenericListKey];
-      if (!data) return;
-
-      let csv = data.columns.join(';') + '\\n';
-      data.rows.forEach(row => {
-        const cleanRow = row.map(c => `"${String(c).replace(/<[^>]+>/g, '').replace(/"/g, '""')}"`);
-        csv += cleanRow.join(';') + '\\n';
+    function exportCurrentDriveCSV() {
+      const currentLevel = driveBreadcrumbs[driveBreadcrumbs.length - 1];
+      if (!currentLevel || !currentLevel.items) return;
+      const items = currentLevel.items;
+      let csv = "ID,Nome,Tipo,Extensao,Tamanho_Bytes,Modificado_Em,Modificado_Por,WebUrl" + String.fromCharCode(10);
+      items.forEach(it => {
+        csv += `"${it.id || ''}","${(it.name || '').replace(/"/g, '""')}","${it.type || ''}","${it.extension || ''}","${it.size || 0}","${it.lastModifiedDateTime || ''}","${it.lastModifiedBy || ''}","${it.webUrl || ''}"` + String.fromCharCode(10);
       });
-
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `sharepoint_${currentGenericListKey}.csv`;
+      a.download = `sharepoint_${currentDriveKey}_${currentLevel.name}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
 
+    // ==========================================
+    // 2. CONTROLADOR DE RELATÓRIOS DE JOGOS (260 RELATÓRIOS OFICIAIS)
+    // ==========================================
+    let currentRelatoriosTab = 'nba';
+
+    function initRelatoriosJogos() {
+      const nbaItems = (SP_MASTER_DATA.drives && SP_MASTER_DATA.drives['Relatorios_de_Jogos_NBA'] && SP_MASTER_DATA.drives['Relatorios_de_Jogos_NBA'].items) || [];
+      const ytItems = (SP_MASTER_DATA.drives && SP_MASTER_DATA.drives['Relatorio Jogos Youtube'] && SP_MASTER_DATA.drives['Relatorio Jogos Youtube'].items) || [];
+      const futItems = (SP_MASTER_DATA.drives && SP_MASTER_DATA.drives['Relatorios_de_Jogos'] && SP_MASTER_DATA.drives['Relatorios_de_Jogos'].items) || [];
+
+      const cNba = document.getElementById('count-rel-nba');
+      const cYt = document.getElementById('count-rel-yt');
+      const cFut = document.getElementById('count-rel-fut');
+      if (cNba) cNba.innerText = nbaItems.length;
+      if (cYt) cYt.innerText = ytItems.length;
+      if (cFut) cFut.innerText = futItems.length;
+
+      switchRelatoriosTab(currentRelatoriosTab);
+    }
+
+    function switchRelatoriosTab(tab) {
+      currentRelatoriosTab = tab;
+      document.querySelectorAll('#pane-relatoriosjogos .sp-tab-pill').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById('pill-relatorios-' + tab);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const sBox = document.getElementById('search-relatorios-box');
+      if (sBox) sBox.value = '';
+
+      filterRelatoriosTable();
+    }
+
+    function getActiveRelatoriosList() {
+      if (!SP_MASTER_DATA.drives) return [];
+      if (currentRelatoriosTab === 'nba') return SP_MASTER_DATA.drives['Relatorios_de_Jogos_NBA']?.items || [];
+      if (currentRelatoriosTab === 'yt') return SP_MASTER_DATA.drives['Relatorio Jogos Youtube']?.items || [];
+      if (currentRelatoriosTab === 'fut') return SP_MASTER_DATA.drives['Relatorios_de_Jogos']?.items || [];
+      return [];
+    }
+
+    function filterRelatoriosTable() {
+      const raw = getActiveRelatoriosList();
+      const q = (document.getElementById('search-relatorios-box')?.value || '').toLowerCase().trim();
+      const tbody = document.getElementById('relatorios-table-body');
+      const footer = document.getElementById('relatorios-footer-count');
+      if (!tbody) return;
+
+      const filtered = raw.filter(it => {
+        if (!q) return true;
+        return it.name.toLowerCase().includes(q) || (it.lastModifiedBy && it.lastModifiedBy.toLowerCase().includes(q));
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 26px; color: #94A3B8;">Nenhum relatório encontrado para os critérios de busca.</td></tr>`;
+      } else {
+        tbody.innerHTML = filtered.map((it, idx) => {
+          const sizeStr = formatFileSize(it.size);
+          const modStr = formatDate(it.lastModifiedDateTime);
+          const authorStr = it.lastModifiedBy || 'Equipe Captação';
+          const link = it.webUrl || '#';
+
+          return `
+            <tr>
+              <td class="td-center" style="color: #64748B;">${idx + 1}</td>
+              <td><b>📕 ${it.name}</b></td>
+              <td><span class="badge badge-exibido">PDF AUDITORIA OFICIAL (2 PÁG)</span></td>
+              <td style="color: #475569;">${sizeStr}</td>
+              <td style="color: #64748B;">${modStr}</td>
+              <td style="color: #475569;">${authorStr}</td>
+              <td class="td-center">
+                <a href="${link}" target="_blank" class="btn-doc-download">Baixar PDF ↗</a>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (footer) {
+        const catName = currentRelatoriosTab === 'nba' ? 'NBA' : (currentRelatoriosTab === 'yt' ? 'YouTube & CazéTV' : 'Auditoria Futebol');
+        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${raw.length}</b> relatórios oficiais de ${catName} &bull; Sincronizado com SharePoint Online (Total Geral: 260 relatórios)`;
+      }
+    }
+
+    function exportRelatoriosCSV() {
+      const items = getActiveRelatoriosList();
+      let csv = "ID,Nome_Relatorio,Tamanho_Bytes,Data_Modificacao,Autor,WebUrl" + String.fromCharCode(10);
+      items.forEach(it => {
+        csv += `"${it.id || ''}","${(it.name || '').replace(/"/g, '""')}","${it.size || 0}","${it.lastModifiedDateTime || ''}","${it.lastModifiedBy || ''}","${it.webUrl || ''}"` + String.fromCharCode(10);
+      });
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `relatorios_auditoria_${currentRelatoriosTab}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ==========================================
+    // 3. CONTROLADOR DE LISTAS NATIVAS REAIS DO SHAREPOINT (46 LISTAS)
+    // ==========================================
+    let currentRealListName = null;
+    let currentRealListTitle = '';
+
+    function openRealList(listName, title) {
+      currentRealListName = listName;
+      currentRealListTitle = title || listName;
+      const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[listName];
+
+      const tEl = document.getElementById('list-viewer-title');
+      const dEl = document.getElementById('list-viewer-desc');
+      const thead = document.getElementById('list-viewer-thead');
+      const searchBox = document.getElementById('list-viewer-search');
+
+      if (tEl) tEl.innerHTML = currentRealListTitle + ' <span class="star-icon">☆</span>';
+      if (dEl) dEl.innerText = `Lista oficial sincronizada 1:1 com o Microsoft SharePoint Online (${listData ? listData.items.length : 0} registros ativos).`;
+      if (searchBox) searchBox.value = '';
+
+      if (thead) {
+        if (!listData || !listData.columns || listData.columns.length === 0) {
+          thead.innerHTML = '<tr><th>Registro</th></tr>';
+        } else {
+          thead.innerHTML = '<tr><th class="td-center" style="width: 45px;">#</th>' + listData.columns.map(col => `<th>${col.displayName || col.name}</th>`).join('') + '</tr>';
+        }
+      }
+
+      filterRealListTable();
+    }
+
+    function filterRealListTable() {
+      if (!currentRealListName) return;
+      const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[currentRealListName];
+      if (!listData) return;
+
+      const q = (document.getElementById('list-viewer-search')?.value || '').toLowerCase().trim();
+      const tbody = document.getElementById('list-viewer-tbody');
+      const footer = document.getElementById('list-viewer-footer');
+      const cols = listData.columns || [];
+
+      const items = listData.items || [];
+      const filtered = items.filter(it => {
+        if (!q) return true;
+        return Object.values(it).some(val => String(val || '').toLowerCase().includes(q));
+      });
+
+      if (tbody) {
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="${cols.length + 1}" style="text-align:center; padding: 26px; color: #94A3B8;">Nenhum registro encontrado nesta lista.</td></tr>`;
+        } else {
+          tbody.innerHTML = filtered.map((it, idx) => {
+            const cells = cols.map(c => {
+              const val = it[c.name] !== undefined ? it[c.name] : (it[c.displayName] !== undefined ? it[c.displayName] : '');
+              return `<td>${formatCellContent(val, c.name)}</td>`;
+            }).join('');
+            return `<tr><td class="td-center" style="color: #64748B;">${idx + 1}</td>${cells}</tr>`;
+          }).join('');
+        }
+      }
+
+      if (footer) {
+        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${items.length}</b> registros &bull; Sincronizado com Microsoft SharePoint Online`;
+      }
+    }
+
+    function exportGenericListCSV() {
+      if (!currentRealListName) return;
+      const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[currentRealListName];
+      if (!listData || !listData.items) return;
+
+      const cols = listData.columns || [];
+      let csv = cols.map(c => `"${(c.displayName || c.name).replace(/"/g, '""')}"`).join(',') + String.fromCharCode(10);
+      listData.items.forEach(it => {
+        const row = cols.map(c => {
+          const val = it[c.name] !== undefined ? it[c.name] : (it[c.displayName] !== undefined ? it[c.displayName] : '');
+          return `"${String(val || '').replace(/"/g, '""')}"`;
+        });
+        csv += row.join(',') + String.fromCharCode(10);
+      });
+
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sharepoint_lista_${currentRealListName}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ==========================================
+    // 4. ROTEAMENTO DINÂMICO DE ABAS (SHOW PANE)
+    // ==========================================
     function showPane(paneId, title, desc) {
       document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.pane-container').forEach(pane => pane.classList.remove('active'));
 
-      let targetPane = document.getElementById('pane-' + paneId);
-      if (!targetPane) {
-        // Se for uma das listas do catálogo SharePoint, renderiza no list-viewer
+      const res = SP_RESOURCE_MAP[paneId];
+      let targetPane = null;
+
+      if (paneId === 'relatoriosjogos' || (res && res.type === 'relatorios')) {
+        targetPane = document.getElementById('pane-relatoriosjogos');
+        if (targetPane) {
+          targetPane.classList.add('active');
+          initRelatoriosJogos();
+        }
+      } else if (res && res.type === 'drive') {
+        targetPane = document.getElementById('pane-drive-viewer');
+        if (targetPane) {
+          targetPane.classList.add('active');
+          openDrive(res.name, res.title || title);
+        }
+      } else if (res && res.type === 'list') {
         targetPane = document.getElementById('pane-list-viewer');
-        if (SP_LISTS_CATALOG[paneId]) {
-          renderGenericList(paneId);
-        } else if (targetPane) {
-          const tEl = document.getElementById('list-viewer-title');
-          const dEl = document.getElementById('list-viewer-desc');
-          if (tEl) tEl.innerHTML = (title || 'Lista: ' + paneId) + ' <span class="star-icon">☆</span>';
-          if (dEl) dEl.innerText = desc || 'Esta lista do SharePoint Online está sincronizada com a Central de Suporte e Captação.';
+        if (targetPane) {
+          targetPane.classList.add('active');
+          openRealList(res.name, res.title || title);
+        }
+      } else {
+        targetPane = document.getElementById('pane-' + paneId);
+        if (!targetPane) {
+          // Fallback para list-viewer se for uma lista por nome direto
+          if (SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[paneId]) {
+            targetPane = document.getElementById('pane-list-viewer');
+            if (targetPane) {
+              targetPane.classList.add('active');
+              openRealList(paneId, title);
+            }
+          } else if (SP_MASTER_DATA.drives && SP_MASTER_DATA.drives[paneId]) {
+            targetPane = document.getElementById('pane-drive-viewer');
+            if (targetPane) {
+              targetPane.classList.add('active');
+              openDrive(paneId, title);
+            }
+          }
+        } else {
+          targetPane.classList.add('active');
         }
       }
-
-      if (targetPane) targetPane.classList.add('active');
 
       document.querySelectorAll('.tab-link').forEach(btn => {
         if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + paneId + "'")) {
@@ -3820,8 +4107,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     renderOcorrenciasTable();
     renderAntenistasTable();
     renderHostsTable();
-    renderProcedimentosTable();
-    renderDocumentosTable();
     renderPermsTable();
   </script>
 </body>
@@ -3980,6 +4265,14 @@ def generate_portal():
         })
 
     perms_json_str = json.dumps(all_permissions, ensure_ascii=False)
+    # 5. Master Data do SharePoint (21 Drives com 260 Relatórios e 46 Listas Reais)
+    master_data_path = os.path.join(base_dir, "config", "sharepoint_portal_master_data.json")
+    master_data = {"drives": {}, "lists": {}}
+    if os.path.exists(master_data_path):
+        with open(master_data_path, "r", encoding="utf-8") as f:
+            master_data = json.load(f)
+    master_data_json_str = json.dumps(master_data, ensure_ascii=False)
+
 
     # Exporta CSV oficial
     csv_path = os.path.join(base_dir, "config", "permissoes_google_workspace_suportecaptacao.csv")
@@ -3999,6 +4292,7 @@ def generate_portal():
     html_content = html_content.replace("__DOCUMENTOS_JSON__", documentos_json_str)
     html_content = html_content.replace("__ESCALA_JSON__", escala_json_str)
     html_content = html_content.replace("__PERMS_JSON__", perms_json_str)
+    html_content = html_content.replace("__SP_MASTER_DATA__", master_data_json_str)
     html_content = html_content.replace("__EVENTS_COUNT__", str(len(events)))
     html_content = html_content.replace("__HOSPEDEIROS_COUNT__", str(len(hospedeiros)))
     html_content = html_content.replace("__OCORRENCIAS_COUNT__", str(len(ocorrencias)))
