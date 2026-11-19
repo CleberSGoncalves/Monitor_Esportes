@@ -79,7 +79,8 @@ def test_montagem_payload_google_chat_cards_v2():
     
     card_obj = payload["cardsV2"][0]["card"]
     assert card_obj["header"]["title"] == "Agenda de Transmissões"
-    assert "hoje e amanhã" in card_obj["header"]["subtitle"].lower()
+    assert "hoje" in card_obj["header"]["subtitle"].lower()
+    assert "amanhã" in card_obj["header"]["subtitle"].lower()
     
     sections = card_obj["sections"]
     assert len(sections) == 2
@@ -99,6 +100,31 @@ def test_montagem_payload_google_chat_cards_v2():
     w_amanha = sec_amanha["widgets"][0]["decoratedText"]
     assert "16:00" in w_amanha["topLabel"]
     assert "PV3687" in w_amanha["bottomLabel"]
+
+def test_cenario_sem_eventos_hoje_e_amanha():
+    """Garante que dias sem jogos geram aviso explícito de grade livre."""
+    hoje_str = "01/01/2030"
+    amanha_str = "02/01/2030"
+    
+    payload = montar_payload_google_chat(hoje_str, [], amanha_str, [])
+    
+    assert "cardsV2" in payload
+    card_obj = payload["cardsV2"][0]["card"]
+    assert "Grade Livre" in card_obj["header"]["subtitle"]
+    
+    # Valida seção Hoje
+    sec_hoje = card_obj["sections"][0]
+    assert "Grade Livre" in sec_hoje["header"]
+    assert "Nenhuma transmissão programada para hoje" in sec_hoje["widgets"][0]["decoratedText"]["text"]
+    
+    # Valida seção Amanhã
+    sec_amanha = card_obj["sections"][1]
+    assert "Grade Livre" in sec_amanha["header"]
+    assert "Nenhuma transmissão programada para amanhã" in sec_amanha["widgets"][0]["decoratedText"]["text"]
+    
+    # Valida fallback texto
+    assert "Nenhuma transmissão programada para hoje" in payload["text"]
+    assert "Nenhuma transmissão programada para amanhã" in payload["text"]
 
 def test_powershell_enviar_agenda_script():
     """Valida a execução do script PowerShell em modo simulação."""

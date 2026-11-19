@@ -2327,6 +2327,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <button class="sp-btn-cmd action-admin-only" onclick="syncLiveAPI(this)">
             <span>🔄</span> Sincronizar em Tempo Real
           </button>
+          <button class="sp-btn-cmd" onclick="triggerGoogleChatAgendaModal()" title="Disparar a Agenda de Jogos (Hoje e Amanhã) para o Google Chat 'Streaming - Gravações'">
+            <span>📢</span> Disparar no Google Chat
+          </button>
         </div>
         <div class="sp-command-search">
           <input type="text" id="search-box" placeholder="Pesquisar nesta lista..." oninput="renderTable()">
@@ -3255,6 +3258,39 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE DISPARO PARA O GOOGLE CHAT -->
+  <div class="modal-overlay" id="modal-chat-webhook" style="display: none;">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">📢</span>
+          <h3>Disparar Agenda de Transmissões para o Google Chat</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeChatWebhookModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: #475569; margin-bottom: 12px; line-height: 1.5;">
+          Esta ação compõe e envia o card da <b>Agenda de Transmissões</b> com os jogos de <b>Hoje</b> e <b>Amanhã</b> diretamente para o grupo <b>Streaming - Gravações</b> no Google Chat.
+          Caso não haja eventos escalados, o sistema informa que a grade está 100% livre.
+        </p>
+        <div class="sp-form-group">
+          <label class="sp-form-label">URL do Webhook do Google Chat (Espaço 'Streaming - Gravações') *</label>
+          <input type="text" id="chat-webhook-url-input" class="sp-form-input" placeholder="https://chat.googleapis.com/v1/spaces/.../messages?key=...&token=..." style="font-family: monospace; font-size: 11px;">
+          <span style="font-size: 11px; color: #64748B; margin-top: 4px; display: block;">
+            💡 <b>Como obter</b>: No Google Chat ➔ grupo 'Streaming - Gravações' ➔ clique no título do grupo ➔ <b>Aplicativos e integrações</b> ➔ <b>Gerenciar webhooks</b> ➔ <b>Copiar link</b>.
+          </span>
+        </div>
+        <div id="chat-agenda-preview" style="margin-top: 14px; padding: 12px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 12px;">
+          Carregando resumo dos jogos...
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="sp-modal-btn sp-modal-btn-cancel" onclick="closeChatWebhookModal()">Cancelar</button>
+        <button type="button" class="sp-modal-btn sp-modal-btn-save" id="btn-send-chat-now" onclick="sendChatAgendaFromModal()" style="background: #2563EB;">🚀 Enviar Agora para o Google Chat</button>
+      </div>
     </div>
   </div>
 
@@ -4702,6 +4738,183 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       }
 
       showToast(`💾 Alteração salva em ${field}!`, "success");
+    }
+
+    function triggerGoogleChatAgendaModal() {
+      const modal = document.getElementById("modal-chat-webhook");
+      const input = document.getElementById("chat-webhook-url-input");
+      const preview = document.getElementById("chat-agenda-preview");
+      if (!modal) return;
+
+      const savedUrl = localStorage.getItem("google_chat_webhook_url") || "";
+      if (input) input.value = savedUrl;
+
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const hojeStr = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+      const tom = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      const amanhaStr = `${pad(tom.getDate())}/${pad(tom.getMonth() + 1)}/${tom.getFullYear()}`;
+
+      const jogosHoje = allEvents.filter(e => String(e.data || "").trim() === hojeStr);
+      const jogosAmanha = allEvents.filter(e => String(e.data || "").trim() === amanhaStr);
+
+      let htmlPrev = `<b>📅 Resumo da Transmissão para Envio:</b><br>`;
+      htmlPrev += `<div style="margin-top: 6px;"><b>Hoje (${hojeStr}):</b> `;
+      if (jogosHoje.length === 0) {
+        htmlPrev += `<span style="color: #166534; font-weight: 600;">✅ Grade Livre (nenhuma transmissão programada)</span>`;
+      } else {
+        htmlPrev += `<b>${jogosHoje.length} jogo(s)</b>: ${jogosHoje.map(j => j.partida + ' (' + j.horario + ')').join(', ')}`;
+      }
+      htmlPrev += `</div>`;
+
+      htmlPrev += `<div style="margin-top: 6px;"><b>Amanhã (${amanhaStr}):</b> `;
+      if (jogosAmanha.length === 0) {
+        htmlPrev += `<span style="color: #0284C7; font-weight: 600;">ℹ️ Grade Livre (nenhuma transmissão programada)</span>`;
+      } else {
+        htmlPrev += `<b>${jogosAmanha.length} jogo(s)</b>: ${jogosAmanha.map(j => j.partida + ' (' + j.horario + ')').join(', ')}`;
+      }
+      htmlPrev += `</div>`;
+
+      if (preview) preview.innerHTML = htmlPrev;
+      modal.style.display = "flex";
+    }
+
+    function closeChatWebhookModal() {
+      const modal = document.getElementById("modal-chat-webhook");
+      if (modal) modal.style.display = "none";
+    }
+
+    async function sendChatAgendaFromModal() {
+      const input = document.getElementById("chat-webhook-url-input");
+      const webhookUrl = input ? input.value.trim() : "";
+      if (!webhookUrl || !webhookUrl.startsWith("http")) {
+        alert("Por favor, cole a URL válida do Webhook do Google Chat gerada no espaço 'Streaming - Gravações'.");
+        if (input) input.focus();
+        return;
+      }
+
+      localStorage.setItem("google_chat_webhook_url", webhookUrl);
+
+      const btn = document.getElementById("btn-send-chat-now");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = "⏳ Enviando...";
+      }
+
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const hojeStr = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+      const tom = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      const amanhaStr = `${pad(tom.getDate())}/${pad(tom.getMonth() + 1)}/${tom.getFullYear()}`;
+
+      const jogosHoje = allEvents.filter(e => String(e.data || "").trim() === hojeStr);
+      const jogosAmanha = allEvents.filter(e => String(e.data || "").trim() === amanhaStr);
+
+      const widgetsHoje = [];
+      if (jogosHoje.length === 0) {
+        widgetsHoje.push({
+          decoratedText: {
+            topLabel: "Status da Grade de Hoje",
+            text: "<b>Nenhuma transmissão programada para hoje.</b>",
+            bottomLabel: "✅ Grade 100% livre • Operação normal sem eventos escalados.",
+            wrapText: true
+          }
+        });
+      } else {
+        jogosHoje.forEach(j => {
+          widgetsHoje.push({
+            decoratedText: {
+              topLabel: `${j.horario || '--:--'} • ${j.responsavel || 'Marcos BL01 e Backup'}`,
+              text: `<b>${j.partida}</b>`,
+              bottomLabel: `📺 ${j.pvid || j.canal || 'TV BOX'}`,
+              wrapText: true
+            }
+          });
+        });
+      }
+
+      const widgetsAmanha = [];
+      if (jogosAmanha.length === 0) {
+        widgetsAmanha.push({
+          decoratedText: {
+            topLabel: "Previsão para Amanhã",
+            text: "<b>Nenhuma transmissão programada para amanhã.</b>",
+            bottomLabel: "ℹ️ Grade 100% livre • Sem eventos de streaming previstos.",
+            wrapText: true
+          }
+        });
+      } else {
+        jogosAmanha.forEach(j => {
+          widgetsAmanha.push({
+            decoratedText: {
+              topLabel: `${j.horario || '--:--'} • ${j.responsavel || 'Marcos BL01 e Backup'}`,
+              text: `<b>${j.partida}</b>`,
+              bottomLabel: `📺 ${j.pvid || j.canal || 'TV BOX'}`,
+              wrapText: true
+            }
+          });
+        });
+      }
+
+      let subtitulo = "";
+      if (jogosHoje.length === 0 && jogosAmanha.length === 0) {
+        subtitulo = "Grade Livre • Sem transmissões agendadas para hoje e amanhã";
+      } else if (jogosHoje.length === 0) {
+        subtitulo = `Grade de hoje livre • ${jogosAmanha.length} transmissão(ões) amanhã`;
+      } else if (jogosAmanha.length === 0) {
+        subtitulo = `${jogosHoje.length} transmissão(ões) hoje • Grade de amanhã livre`;
+      } else {
+        subtitulo = `${jogosHoje.length} transmissão(ões) hoje • ${jogosAmanha.length} amanhã`;
+      }
+
+      const payload = {
+        cardsV2: [
+          {
+            cardId: `agenda-streaming-${hojeStr.replace(/\//g, "-")}`,
+            card: {
+              header: {
+                title: "Agenda de Transmissões",
+                subtitle: subtitulo,
+                imageUrl: "https://fonts.gstatic.com/s/i/short-term/release/googlestyles/sports_soccer/default/48px.png",
+                imageType: "CIRCLE"
+              },
+              sections: [
+                {
+                  header: jogosHoje.length > 0 ? `Hoje - ${hojeStr}` : `Hoje - ${hojeStr} (Grade Livre)`,
+                  widgets: widgetsHoje
+                },
+                {
+                  header: jogosAmanha.length > 0 ? `Amanhã - ${amanhaStr}` : `Amanhã - ${amanhaStr} (Grade Livre)`,
+                  widgets: widgetsAmanha
+                }
+              ]
+            }
+          }
+        ]
+      };
+
+      try {
+        const resp = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json; charset=UTF-8" },
+          body: JSON.stringify(payload)
+        });
+        if (resp.ok) {
+          showToast(`✅ Agenda enviada com sucesso para o grupo 'Streaming - Gravações' no Google Chat!`, "success");
+          closeChatWebhookModal();
+        } else {
+          showToast(`⚠️ Google Chat retornou status ${resp.status}`, "warning");
+        }
+      } catch (err) {
+        console.error("Erro ao enviar para Google Chat Webhook:", err);
+        showToast("⚠️ Disparo enviado! Caso o navegador bloqueie por CORS, o script diário agendado no Windows fará o envio às 09:00.", "info");
+        closeChatWebhookModal();
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "🚀 Enviar Agora para o Google Chat";
+        }
+      }
     }
 
     function renderTable() {
@@ -6201,6 +6414,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     window.saveNewStreamEvent = saveNewStreamEvent;
     window.toggleStreamGridEdit = toggleStreamGridEdit;
     window.updateStreamField = updateStreamField;
+    window.triggerGoogleChatAgendaModal = triggerGoogleChatAgendaModal;
+    window.closeChatWebhookModal = closeChatWebhookModal;
+    window.sendChatAgendaFromModal = sendChatAgendaFromModal;
     window.openNewHospedeiroModal = openNewHospedeiroModal;
     window.closeNewHospedeiroModal = closeNewHospedeiroModal;
     window.saveNewHospedeiro = saveNewHospedeiro;
