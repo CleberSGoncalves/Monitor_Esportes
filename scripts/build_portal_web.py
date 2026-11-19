@@ -1550,7 +1550,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           </select>
         </div>
         <div style="display: flex; gap: 8px;">
-          <button class="btn-action btn-action-secondary action-admin-only" onclick="syncLiveAPI()">🔄 Sincronizar em Tempo Real</button>
+          <button class="btn-action btn-action-secondary action-admin-only" onclick="syncLiveAPI(this)">🔄 Sincronizar em Tempo Real</button>
           <button class="btn-action btn-action-primary" onclick="exportCSV()">📥 Exportar CSV</button>
         </div>
       </div>
@@ -2038,17 +2038,25 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         btn.className = "month-pill-btn" + (m === currentMonth ? " active" : "");
         const label = m === "Dezembro_Prototipo" ? "Dezembro" : (m === "Plantao_Fim_Ano" ? "🎄 Plantão Fim de Ano" : m);
         btn.innerText = label;
-        btn.onclick = () => selectEscalaMonth(m);
+        btn.onclick = function() { selectEscalaMonth(m, this); };
         pillsContainer.appendChild(btn);
       });
 
       renderEscalaTable();
     }
 
-    function selectEscalaMonth(monthKey) {
+    function selectEscalaMonth(monthKey, btnElement) {
       currentMonth = monthKey;
       document.querySelectorAll(".month-pill-btn").forEach(btn => btn.classList.remove("active"));
-      event.target.classList.add("active");
+      if (btnElement) {
+        btnElement.classList.add("active");
+      } else {
+        document.querySelectorAll(".month-pill-btn").forEach(btn => {
+          if (btn.innerText.includes(monthKey) || (monthKey === "Dezembro_Prototipo" && btn.innerText === "Dezembro") || (monthKey === "Plantao_Fim_Ano" && btn.innerText.includes("Fim de Ano"))) {
+            btn.classList.add("active");
+          }
+        });
+      }
       renderEscalaTable();
     }
 
@@ -2361,7 +2369,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <td><span class="badge badge-default">${ext.toUpperCase() || 'GUIA'}</span></td>
           <td style="color: #64748B;">${p.Modified ? p.Modified.substring(0,10) : '2026-11'}</td>
           <td class="td-center">
-            <button class="btn-action btn-action-secondary" onclick="openProcModal('${name.replace(/'/g, "\'")}')">👁️ Visualizar</button>
+            <button class="btn-action btn-action-secondary" data-name="${encodeURIComponent(name)}" onclick="openProcModal(decodeURIComponent(this.getAttribute('data-name')))">👁️ Visualizar</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -2449,36 +2457,40 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     // Exportações CSV
     function exportCSV() {
-      let csv = "Indice,Mes,Data,Horario,Campeonato,Partida,Responsavel,Canal,PVID,Status,Programado\n";
+      const rows = [["Indice","Mes","Data","Horario","Campeonato","Partida","Responsavel","Canal","PVID","Status","Programado"]];
       allEvents.forEach((ev, i) => {
-        csv += `"${i+1}","${ev.mes||''}","${ev.data||''}","${ev.horario||''}","${ev.campeonato||''}","${ev.partida||''}","${ev.responsavel||''}","${ev.canal||''}","${ev.pvid||''}","${ev.status_entrega||''}","${ev.programado||''}"\n`;
+        rows.push([i+1, ev.mes||'', ev.data||'', ev.horario||'', ev.campeonato||'', ev.partida||'', ev.responsavel||'', ev.canal||'', ev.pvid||'', ev.status_entrega||'', ev.programado||'']);
       });
+      const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join(String.fromCharCode(13, 10));
       downloadCSV(csv, "programacao_eventos_streaming.csv");
     }
 
     function exportHospedeirosCSV() {
-      let csv = "Indice,Cidade,Nome,Especialidade,Telefone_Comercial,Telefone_Celular\n";
+      const rows = [["Indice","Cidade","Nome","Especialidade","Telefone_Comercial","Telefone_Celular"]];
       allHospedeiros.forEach((h, i) => {
-        csv += `"${i+1}","${h.Title||''}","${h.Nome1||''}","${h.Especialidade||''}","${h.Telefone_x0020_Comercial||''}","${h.Telefone_x0020_Celular||''}"\n`;
+        rows.push([i+1, h.Title||'', h.Nome1||'', h.Especialidade||'', h.Telefone_x0020_Comercial||'', h.Telefone_x0020_Celular||'']);
       });
+      const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join(String.fromCharCode(13, 10));
       downloadCSV(csv, "contatos_hospedeiros_completo.csv");
     }
 
     function exportOcorrenciasCSV() {
-      let csv = "Indice,Titulo,CS,Equipamento,Problema,Acoes\n";
+      const rows = [["Indice","Titulo","CS","Equipamento","Problema","Acoes"]];
       allOcorrencias.forEach((o, i) => {
         const cs = Array.isArray(o.CS) ? o.CS.join(";") : (o.CS || '');
         const eq = Array.isArray(o.Equipamento) ? o.Equipamento.join(";") : (o.Equipamento || '');
-        csv += `"${i+1}","${o.Title||''}","${cs}","${eq}","${o.Problema||o.Problema0||''}","${o.A_x00e7__x00f5_esexecutadas||''}"\n`;
+        rows.push([i+1, o.Title||'', cs, eq, o.Problema||o.Problema0||'', o.A_x00e7__x00f5_esexecutadas||'']);
       });
+      const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join(String.fromCharCode(13, 10));
       downloadCSV(csv, "painel_ocorrencias_historico.csv");
     }
 
     function exportPermsCSV() {
-      let csv = "Nome,Tipo,Email,Nivel_SharePoint,Nivel_Google_Sites,Cargo,Escopo\n";
+      const rows = [["Nome","Tipo","Email","Nivel_SharePoint","Nivel_Google_Sites","Cargo","Escopo"]];
       allPermissions.forEach((p) => {
-        csv += `"${p.name}","${p.type}","${p.email}","${p.sp_role}","${p.google_role}","${p.cargo||''}","${p.scope||''}"\n`;
+        rows.push([p.name, p.type, p.email, p.sp_role, p.google_role, p.cargo||'', p.scope||'']);
       });
+      const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join(String.fromCharCode(13, 10));
       downloadCSV(csv, "permissoes_suporte_captacao_google_sites.csv");
     }
 
@@ -2491,11 +2503,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       a.click();
     }
 
-    async function syncLiveAPI() {
-      const btn = event.target;
-      const originalText = btn.innerText;
-      btn.innerText = "⏳ Atualizando...";
-      btn.disabled = true;
+    async function syncLiveAPI(btnElement) {
+      const btn = btnElement || (typeof event !== 'undefined' ? event.target : null);
+      const originalText = btn ? btn.innerText : "";
+      if (btn) {
+        btn.innerText = "⏳ Atualizando...";
+        btn.disabled = true;
+      }
 
       try {
         const url = "https://script.google.com/macros/s/AKfycbxzWKi1dNiGUiF15Ysl_69Pe2dt2vUpe1UBQ9xadPenmnsH68VOk6W1ZMwhRQkRpkBX/exec?format=json";
@@ -2540,6 +2554,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
       }
     });
+
+    // Exposição global explícita no window
+    window.showPane = showPane;
+    window.selectEscalaMonth = selectEscalaMonth;
+    window.openProcModal = openProcModal;
+    window.closeModal = closeModal;
+    window.toggleDarkMode = toggleDarkMode;
+    window.onRoleChange = onRoleChange;
+    window.exportCSV = exportCSV;
+    window.exportHospedeirosCSV = exportHospedeirosCSV;
+    window.exportOcorrenciasCSV = exportOcorrenciasCSV;
+    window.exportPermsCSV = exportPermsCSV;
+    window.syncLiveAPI = syncLiveAPI;
 
     // Inicialização
     initEscalaMonths();

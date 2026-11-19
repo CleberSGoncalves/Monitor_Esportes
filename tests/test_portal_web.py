@@ -86,3 +86,35 @@ def test_build_portal_web_creates_file_and_validates_sharepoint_replica_and_rbac
     csv_perm = os.path.join(base_dir, "config", "permissoes_google_workspace_suportecaptacao.csv")
     assert os.path.exists(csv_perm)
     assert os.path.getsize(csv_perm) > 500
+
+    # 11. Validação de Sintaxe JavaScript Rigorosa (node -c) e Exposição de Funções de Navegação
+    import re
+    import subprocess
+    import tempfile
+
+    scripts = re.findall(r'<script>(.*?)</script>', content, re.DOTALL)
+    assert len(scripts) >= 1
+    for i, s in enumerate(scripts):
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False, encoding="utf-8") as tf:
+            tf.write(s)
+            tf_path = tf.name
+        try:
+            res = subprocess.run(["node", "-c", tf_path], capture_output=True, text=True)
+            assert res.returncode == 0, f"Erro de sintaxe no script {i}: {res.stderr}"
+        finally:
+            if os.path.exists(tf_path):
+                os.remove(tf_path)
+
+    # 12. Validação dos Contêineres de Abas e Funções Globais
+    required_panes = [
+        "pane-home", "pane-escala", "pane-streaming", "pane-hospedeiros",
+        "pane-ocorrencias", "pane-procedimentos", "pane-documentos",
+        "pane-dashboard", "pane-metas", "pane-projetos", "pane-receptores",
+        "pane-equipe", "pane-permissoes", "pane-links"
+    ]
+    for pane in required_panes:
+        assert f'id="{pane}"' in content, f"Aba obrigatória {pane} não encontrada no HTML"
+
+    assert "window.showPane = showPane;" in content
+    assert "window.selectEscalaMonth = selectEscalaMonth;" in content
+
