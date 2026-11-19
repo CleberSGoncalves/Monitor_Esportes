@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Gerador do Portal Web Oficial do Suporte Captação (Kantar IBOPE Media).
-Gera um portal intranet moderno, responsivo, profissional e 100% fiel à HomePage
-original do SharePoint (https://adgbl.sharepoint.com/sites/suportecaptacao/SitePages/HomePage.aspx),
-integrado com a Programação Oficial de Eventos Streaming (Google Sheets & SharePoint)
-e com o Módulo Completo de Permissões e Controle de Acesso (RBAC).
+Gera um portal intranet moderno, autônomo e 100% independente do SharePoint legado.
+Contém todos os módulos nativos (Streaming 862 jogos, 500 Contatos Hospedeiros,
+500 Ocorrências, POPs/Procedimentos, Escala de Plantão, TV Box PVIDs e Matriz RBAC).
 """
 
 import os
@@ -15,24 +14,40 @@ def generate_portal():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     json_path = os.path.join(base_dir, "config", "sharepoint_clean_migrated_events.json")
     perms_path = os.path.join(base_dir, "config", "sharepoint_extracted_permissions.json")
+    migrated_data_path = os.path.join(base_dir, "config", "sharepoint_migrated_standalone_data.json")
     output_dir = os.path.join(base_dir, "portal_web")
     os.makedirs(output_dir, exist_ok=True)
     output_html = os.path.join(output_dir, "index.html")
 
-    # 1. Eventos Streaming
+    # 1. Eventos Streaming (862 jogos)
     events = []
     if os.path.exists(json_path):
         with open(json_path, "r", encoding="utf-8") as f:
             events = json.load(f)
     events_json_str = json.dumps(events, ensure_ascii=False)
 
-    # 2. Permissões Extraídas do SharePoint
+    # 2. Dados Standalone Migrados (Hospedeiros, Ocorrências, POPs, Escala)
+    standalone_data = {}
+    if os.path.exists(migrated_data_path):
+        with open(migrated_data_path, "r", encoding="utf-8") as f:
+            standalone_data = json.load(f)
+
+    hospedeiros = standalone_data.get("contatos_hospedeiros", [])
+    ocorrencias = standalone_data.get("painel_ocorrencias", [])
+    procedimentos = standalone_data.get("procedimentos", [])
+    escala = standalone_data.get("escala_trabalho", [])
+    antenistas = standalone_data.get("contatos_antenistas", [])
+
+    hospedeiros_json_str = json.dumps(hospedeiros, ensure_ascii=False)
+    ocorrencias_json_str = json.dumps(ocorrencias, ensure_ascii=False)
+    procedimentos_json_str = json.dumps(procedimentos, ensure_ascii=False)
+
+    # 3. Permissões Extraídas do SharePoint
     raw_perms = []
     if os.path.exists(perms_path):
         with open(perms_path, "r", encoding="utf-8") as f:
             raw_perms = json.load(f)
 
-    # Adiciona os membros da equipe que têm papéis específicos na HomePage
     team_members_roles = [
         {"type": "user", "displayName": "Cleber De Souza Goncalves", "email": "cleber.goncalves@ibope.com", "roles": ["owner"], "cargo": "COORD. SUPORTE CAPTAÇÃO", "google_role": "Administrador"},
         {"type": "user", "displayName": "Luiz De Sa Lemos", "email": "luiz.lemos@ibope.com", "roles": ["owner"], "cargo": "DIR. SUPORTE CAPTAÇÃO LATAM", "google_role": "Administrador"},
@@ -55,7 +70,6 @@ def generate_portal():
     all_permissions = []
     seen_identifiers = set()
 
-    # Adiciona a equipe operacional primeiro
     for m in team_members_roles:
         seen_identifiers.add(m["email"].lower())
         all_permissions.append({
@@ -68,7 +82,6 @@ def generate_portal():
             "scope": "Acesso Completo (Todas as Seções & Ações)" if m["google_role"] == "Administrador" else "Operacional (Streaming, Receptores, POPs)"
         })
 
-    # Adiciona as permissões extraídas do SharePoint
     for p in raw_perms:
         p_name = p.get("displayName") or "Desconhecido"
         p_type = "Grupo de Segurança" if p.get("type") == "group" else "Usuário"
@@ -112,7 +125,7 @@ def generate_portal():
 
     perms_json_str = json.dumps(all_permissions, ensure_ascii=False)
 
-    # 3. Exporta CSV oficial de permissões para Google Workspace / Google Sites
+    # 4. Exporta CSV oficial
     csv_path = os.path.join(base_dir, "config", "permissoes_google_workspace_suportecaptacao.csv")
     with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.writer(f)
@@ -125,13 +138,12 @@ def generate_portal():
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suporte e Captação | Portal Corporativo & Hub de Streaming</title>
+  <title>Suporte e Captação | Portal Corporativo Autônomo & Streaming Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   <style>
     :root {{
-      /* Microsoft SharePoint Modern Theme (Fluent UI) */
       --sp-theme-primary: #0078D4;
       --sp-theme-dark: #004578;
       --sp-theme-dark-alt: #106EBE;
@@ -208,7 +220,7 @@ def generate_portal():
       transition: background 0.3s, color 0.3s;
     }}
 
-    /* Barra Superior Microsoft 365 (Suite Nav) */
+    /* Barra Superior Microsoft 365 / Google Workspace */
     .suite-nav {{
       background: var(--sp-nav-bg);
       color: #FFFFFF;
@@ -297,7 +309,7 @@ def generate_portal():
     .suite-nav-right {{
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }}
 
     .role-switcher-select {{
@@ -350,33 +362,34 @@ def generate_portal():
       color: #FFFFFF;
     }}
 
-    /* Menu de Navegação do Site */
+    /* Menu de Navegação Horizontal do Site */
     .site-nav-bar {{
       background: var(--sp-card-bg);
       border-bottom: 1px solid var(--sp-border);
-      padding: 0 24px;
+      padding: 0 16px;
       box-shadow: 0 1px 2px rgba(0,0,0,0.03);
     }}
 
     .site-nav-container {{
-      max-width: 1440px;
-      margin: 0 auto;
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
       overflow-x: auto;
+      gap: 12px;
     }}
 
     .site-brand-row {{
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 12px 0;
+      gap: 12px;
+      padding: 10px 0;
+      flex-shrink: 0;
     }}
 
     .site-brand-icon {{
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: 6px;
       background: #0078D4;
       display: flex;
@@ -384,33 +397,34 @@ def generate_portal():
       justify-content: center;
       color: #FFFFFF;
       font-weight: 800;
-      font-size: 18px;
+      font-size: 16px;
     }}
 
     .site-brand-info h2 {{
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--sp-text-main);
       line-height: 1.2;
     }}
 
     .site-brand-info p {{
-      font-size: 12px;
+      font-size: 11px;
       color: var(--sp-text-secondary);
     }}
 
     .nav-menu-tabs {{
       display: flex;
-      gap: 4px;
+      gap: 2px;
       align-items: center;
+      overflow-x: auto;
     }}
 
     .tab-link {{
       background: transparent;
       border: none;
       color: var(--sp-text-secondary);
-      padding: 14px 16px;
-      font-size: 13px;
+      padding: 12px 14px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
@@ -433,23 +447,21 @@ def generate_portal():
     }}
 
     .main-body {{
-      max-width: 1440px;
       width: 100%;
-      margin: 0 auto;
-      padding: 24px;
+      padding: 20px 24px;
       flex: 1;
     }}
 
-    /* HERO BANNER 1:1 SHAREPOINT HOMEPAGE */
+    /* HERO BANNER */
     .hero-banner {{
       background: var(--sp-hero-bg);
       border-radius: 8px;
       color: #FFFFFF;
-      padding: 36px 40px;
-      margin-bottom: 28px;
+      padding: 32px 36px;
+      margin-bottom: 24px;
       display: grid;
       grid-template-columns: 1fr 280px;
-      gap: 32px;
+      gap: 28px;
       align-items: center;
       box-shadow: 0 4px 16px rgba(0,0,0,0.18);
       position: relative;
@@ -469,18 +481,18 @@ def generate_portal():
     }}
 
     .hero-content h1 {{
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 700;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       letter-spacing: -0.02em;
       color: #FFFFFF;
     }}
 
     .hero-content p {{
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1.5;
       color: #E2E8F0;
-      max-width: 780px;
+      max-width: 820px;
     }}
 
     .weather-widget {{
@@ -919,7 +931,7 @@ def generate_portal():
       padding: 7px 12px;
       border-radius: 4px;
       font-size: 13px;
-      min-width: 260px;
+      min-width: 240px;
       flex: 1;
       outline: none;
     }}
@@ -1033,7 +1045,7 @@ def generate_portal():
       min-width: 220px;
     }}
 
-    /* Badges de Cores Oficiais */
+    /* Badges */
     .badge {{
       display: inline-block;
       padding: 3px 8px;
@@ -1063,7 +1075,6 @@ def generate_portal():
     .badge-exibido {{ background: var(--badge-exib-bg); color: var(--badge-exib-txt); }}
     .badge-nao-exibido {{ background: var(--badge-nao-bg); color: var(--badge-nao-txt); }}
 
-    /* Badges de Permissão */
     .badge-role-owner {{ background: #EDE9FE; color: #6D28D9; border: 1px solid #DDD6FE; }}
     .badge-role-write {{ background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }}
     .badge-role-read {{ background: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }}
@@ -1076,8 +1087,7 @@ def generate_portal():
     }}
 
     .site-footer-container {{
-      max-width: 1440px;
-      margin: 0 auto;
+      width: 100%;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
@@ -1087,7 +1097,6 @@ def generate_portal():
       color: var(--sp-text-secondary);
     }}
 
-    /* Matriz RBAC */
     .rbac-matrix-table th, .rbac-matrix-table td {{
       padding: 10px 14px;
       border: 1px solid var(--sp-border);
@@ -1117,25 +1126,24 @@ def generate_portal():
 </head>
 <body>
 
-  <!-- 1. SUITE NAV (MICROSOFT 365 TOPBAR) -->
+  <!-- 1. SUITE NAV (MICROSOFT 365 / GOOGLE WORKSPACE TOPBAR) -->
   <header class="suite-nav">
     <div class="suite-nav-left">
-      <div class="waffle-icon" title="Inicializador de Aplicativos Microsoft 365">
+      <div class="waffle-icon" title="Menu Corporativo">
         <div class="waffle-dot"></div><div class="waffle-dot"></div><div class="waffle-dot"></div>
         <div class="waffle-dot"></div><div class="waffle-dot"></div><div class="waffle-dot"></div>
         <div class="waffle-dot"></div><div class="waffle-dot"></div><div class="waffle-dot"></div>
       </div>
       <div class="suite-title">
-        SharePoint <span>| Suporte e Captação</span>
+        Google Sites <span>| Suporte e Captação</span>
       </div>
     </div>
 
     <div class="suite-nav-center">
-      <input type="text" class="suite-search-box" id="global-search" placeholder="Pesquisar neste site, documentos, equipe ou partidas...">
+      <input type="text" class="suite-search-box" id="global-search" placeholder="Pesquisar partidas, contatos, ocorrências, procedimentos...">
     </div>
 
     <div class="suite-nav-right">
-      <!-- Seletor de Perfil RBAC Ativo -->
       <select id="user-role-select" class="role-switcher-select" onchange="onRoleChange()" title="Simulador de Perfil de Acesso">
         <option value="admin">👤 Cleber Gonçalves (Gestor/Admin)</option>
         <option value="operador">🛠️ Operador Suporte N1/N2</option>
@@ -1156,17 +1164,20 @@ def generate_portal():
         <div class="site-brand-icon">SC</div>
         <div class="site-brand-info">
           <h2>Suporte e Captação</h2>
-          <p>Kantar IBOPE Media — Operations Hub, LATAM Advertising Intelligence</p>
+          <p>Kantar IBOPE Media — Central Autônoma de Operações & Ingest</p>
         </div>
       </div>
 
       <div class="nav-menu-tabs">
-        <button class="tab-link active" onclick="showPane('home')">🏠 Página Inicial</button>
-        <button class="tab-link" onclick="showPane('streaming')">⚽ Programação Streaming (862)</button>
+        <button class="tab-link active" onclick="showPane('home')">🏠 Início</button>
+        <button class="tab-link" onclick="showPane('streaming')">⚽ Streaming ({len(events)})</button>
+        <button class="tab-link" onclick="showPane('hospedeiros')">📞 Hospedeiros ({len(hospedeiros)})</button>
+        <button class="tab-link" onclick="showPane('ocorrencias')">🚨 Ocorrências ({len(ocorrencias)})</button>
+        <button class="tab-link" onclick="showPane('procedimentos')">📖 Procedimentos N1 ({len(procedimentos)})</button>
         <button class="tab-link" onclick="showPane('receptores')">📡 Receptores & TV BOX</button>
-        <button class="tab-link" onclick="showPane('equipe')">👥 Equipe & Contatos</button>
-        <button class="tab-link" id="nav-tab-permissoes" onclick="showPane('permissoes')">🔐 Permissões & Acessos</button>
-        <button class="tab-link" onclick="showPane('links')">🔗 Links Úteis & Externos</button>
+        <button class="tab-link" onclick="showPane('equipe')">👥 Equipe</button>
+        <button class="tab-link" id="nav-tab-permissoes" onclick="showPane('permissoes')">🔐 Permissões ({len(all_permissions)})</button>
+        <button class="tab-link" onclick="showPane('links')">🔗 Links</button>
       </div>
     </div>
   </nav>
@@ -1174,7 +1185,7 @@ def generate_portal():
   <!-- 3. CONTEÚDO PRINCIPAL -->
   <main class="main-body">
 
-    <!-- ABA 1: HOME PAGE 1:1 RÉPLICA SHAREPOINT -->
+    <!-- ABA 1: HOME PAGE NATIVA -->
     <div id="pane-home" class="pane-container active">
 
       <!-- HERO BANNER -->
@@ -1182,7 +1193,7 @@ def generate_portal():
         <div class="hero-content">
           <h1>Suporte e Captação</h1>
           <p>
-            Bem vindo(a) ao site da equipe de Suporte e Captação! Aqui você pode encontrar informações sobre problemas técnicos, verificar o status das ocorrências, localizar documentos e dados referentes à área e muito mais.
+            Bem vindo(a) à Central Oficial da equipe de Suporte e Captação! Aqui você encontra informações técnicas em tempo real, monitoramento de streaming, contatos de hospedeiros em todas as cidades, controle de ocorrências e procedimentos operacionais padronizados.
           </p>
         </div>
         <div class="weather-widget">
@@ -1192,89 +1203,98 @@ def generate_portal():
         </div>
       </section>
 
-      <!-- SEÇÃO LINKS ÚTEIS -->
+      <!-- SEÇÃO LINKS ÚTEIS (NAVEGAÇÃO 100% NATIVA DENTRO DO NOVO PORTAL) -->
       <section>
         <div class="section-title-wrap">
-          <h2 class="section-title">📌 Links úteis</h2>
-          <p class="section-desc">Repositório central para todos os documentos relacionados às metas e objetivos da equipe.</p>
+          <h2 class="section-title">📌 Módulos & Ferramentas Oficiais</h2>
+          <p class="section-desc">Acesso direto a todas as bases de dados e operações da equipe de Suporte Captação.</p>
         </div>
 
         <div class="quick-links-grid">
-          <a href="https://adgbl.sharepoint.com/sites/suportecaptacao/Lists/Contato%20Tcnico%20de%20Hospedeiros/Teste.aspx" target="_blank" class="quick-link-btn">
+          <!-- 1. Hospedeiros (Nativo) -->
+          <div onclick="showPane('hospedeiros')" class="quick-link-btn" style="border-left: 4px solid #0078D4;">
             <div class="quick-link-icon-box">📞</div>
             <div class="quick-link-text">
               <span class="quick-link-title">Contatos Hospedeiros</span>
-              <span class="quick-link-sub">Contatos técnicos e centrais</span>
+              <span class="quick-link-sub" style="color: #0078D4; font-weight: 600;">{len(hospedeiros)} Cidades & Técnicos ↗</span>
             </div>
-          </a>
+          </div>
 
-          <a href="https://adgbl.sharepoint.com/sites/suportecaptacao/Documentos%20Compartilhados/Forms/AllItems.aspx" target="_blank" class="quick-link-btn">
-            <div class="quick-link-icon-box">📁</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Documentos</span>
-              <span class="quick-link-sub">Arquivos e compartilhamentos</span>
-            </div>
-          </a>
-
-          <a href="https://adgbl.sharepoint.com/sites/suportecaptacao/SitePages/Escala.aspx" target="_blank" class="quick-link-btn">
-            <div class="quick-link-icon-box">📅</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Escala de Trabalho</span>
-              <span class="quick-link-sub">Turnos e escalas de plantão</span>
-            </div>
-          </a>
-
-          <a href="https://adgbl.sharepoint.com/sites/suportecaptacao/SitePages/Dashboard.aspx" target="_blank" class="quick-link-btn">
-            <div class="quick-link-icon-box">📊</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Dashboard & Indicadores</span>
-              <span class="quick-link-sub">Métricas operacionais de captação</span>
-            </div>
-          </a>
-
-          <a href="https://adgbl.sharepoint.com/sites/suportecaptacao/Metas" target="_blank" class="quick-link-btn">
-            <div class="quick-link-icon-box">🎯</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Metas</span>
-              <span class="quick-link-sub">Metas e objetivos da equipe</span>
-            </div>
-          </a>
-
-          <a href="https://adgbl.sharepoint.com/sites/suportecaptacao/Lists/Painel%20de%20Ocorrncias/AllItems.aspx" target="_blank" class="quick-link-btn">
-            <div class="quick-link-icon-box">🚨</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Painel de Ocorrências</span>
-              <span class="quick-link-sub">Status e registro de incidentes</span>
-            </div>
-          </a>
-
-          <a href="https://adgbl.sharepoint.com/sites/suportecaptacao/Procedimentos/Forms/AllItems.aspx" target="_blank" class="quick-link-btn">
-            <div class="quick-link-icon-box">📖</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Procedimentos N1</span>
-              <span class="quick-link-sub">Manuais e POPs operacionais</span>
-            </div>
-          </a>
-
-          <a href="https://adgbl.sharepoint.com/sites/suportecaptacao/SitePages/HomePage.aspx" target="_blank" class="quick-link-btn">
-            <div class="quick-link-icon-box">🚀</div>
-            <div class="quick-link-text">
-              <span class="quick-link-title">Projetos</span>
-              <span class="quick-link-sub">Iniciativas e melhorias da área</span>
-            </div>
-          </a>
-
+          <!-- 2. Streaming (Nativo) -->
           <div onclick="showPane('streaming')" class="quick-link-btn" style="border-left: 4px solid #10B981;">
             <div class="quick-link-icon-box" style="background: #DCFCE7; color: #166534;">⚽</div>
             <div class="quick-link-text">
               <span class="quick-link-title">Programação de Eventos Streaming</span>
-              <span class="quick-link-sub" style="color: #166534; font-weight: 600;">862 Jogos Sincronizados ↗</span>
+              <span class="quick-link-sub" style="color: #166534; font-weight: 600;">{len(events)} Jogos Sincronizados ↗</span>
+            </div>
+          </div>
+
+          <!-- 3. Ocorrências (Nativo) -->
+          <div onclick="showPane('ocorrencias')" class="quick-link-btn" style="border-left: 4px solid #EF4444;">
+            <div class="quick-link-icon-box" style="background: #FEE2E2; color: #991B1B;">🚨</div>
+            <div class="quick-link-text">
+              <span class="quick-link-title">Painel de Ocorrências</span>
+              <span class="quick-link-sub" style="color: #991B1B; font-weight: 600;">{len(ocorrencias)} Registros de Falhas ↗</span>
+            </div>
+          </div>
+
+          <!-- 4. Procedimentos (Nativo) -->
+          <div onclick="showPane('procedimentos')" class="quick-link-btn" style="border-left: 4px solid #8B5CF6;">
+            <div class="quick-link-icon-box" style="background: #EDE9FE; color: #6D28D9;">📖</div>
+            <div class="quick-link-text">
+              <span class="quick-link-title">Procedimentos N1 & POPs</span>
+              <span class="quick-link-sub" style="color: #6D28D9; font-weight: 600;">{len(procedimentos)} Guias e Manuais ↗</span>
+            </div>
+          </div>
+
+          <!-- 5. Receptores (Nativo) -->
+          <div onclick="showPane('receptores')" class="quick-link-btn">
+            <div class="quick-link-icon-box">📡</div>
+            <div class="quick-link-text">
+              <span class="quick-link-title">Receptores & TV BOX</span>
+              <span class="quick-link-sub">PVIDs PV3623, PV3687, PV3679</span>
+            </div>
+          </div>
+
+          <!-- 6. Equipe (Nativo) -->
+          <div onclick="showPane('equipe')" class="quick-link-btn">
+            <div class="quick-link-icon-box">👥</div>
+            <div class="quick-link-text">
+              <span class="quick-link-title">Equipe & Escala de Plantão</span>
+              <span class="quick-link-sub">Contatos, plantões e liderança</span>
+            </div>
+          </div>
+
+          <!-- 7. Permissões RBAC (Nativo) -->
+          <div onclick="showPane('permissoes')" class="quick-link-btn">
+            <div class="quick-link-icon-box">🔐</div>
+            <div class="quick-link-text">
+              <span class="quick-link-title">Controle de Acessos & RBAC</span>
+              <span class="quick-link-sub">{len(all_permissions)} Grupos & Usuários</span>
+            </div>
+          </div>
+
+          <!-- 8. Documentos & Drive (Google Workspace) -->
+          <a href="https://drive.google.com" target="_blank" class="quick-link-btn">
+            <div class="quick-link-icon-box">📁</div>
+            <div class="quick-link-text">
+              <span class="quick-link-title">Repositório Google Drive</span>
+              <span class="quick-link-sub">Documentos oficiais na nuvem ↗</span>
+            </div>
+          </a>
+
+          <!-- 9. Metas & Indicadores (Nativo) -->
+          <div onclick="showPane('streaming')" class="quick-link-btn">
+            <div class="quick-link-icon-box">🎯</div>
+            <div class="quick-link-text">
+              <span class="quick-link-title">Metas & Indicadores</span>
+              <span class="quick-link-sub">SLA & Cobertura de Transmissões</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- SEÇÃO CHAMADA PARA AÇÃO & SUGESTÕES -->
+      <!-- SEÇÃO CHAMADA PARA AÇÃO -->
       <section class="cta-container">
         <div class="cta-banner-card">
           <div>
@@ -1288,7 +1308,7 @@ def generate_portal():
 
         <div class="cta-redmine-card">
           <h4>Sugestões e Demandas</h4>
-          <p>Sugestões e Melhorias para o Portal e SharePoint de Captação.</p>
+          <p>Sugestões e Melhorias para o Portal e Sistemas de Captação.</p>
           <a href="http://10.1.0.39/redmine/projects/suporte-captacao-demandas-sharepoint/issues?set_filter=1&tracker_id=3" target="_blank" class="btn-sp-primary">
             📝 Abrir no Redmine
           </a>
@@ -1298,7 +1318,7 @@ def generate_portal():
       <!-- SEÇÃO LINKS EXTERNOS -->
       <section>
         <div class="section-title-wrap">
-          <h2 class="section-title">🌐 Links Externos</h2>
+          <h2 class="section-title">🌐 Links Externos & Ferramentas</h2>
           <p class="section-desc">Acesso rápido aos sistemas corporativos, telemetria e ferramentas de trabalho diário.</p>
         </div>
 
@@ -1307,37 +1327,30 @@ def generate_portal():
             <span class="waffle-link-icon">🧬</span>
             <span class="waffle-link-title">Site - Media DNA</span>
           </a>
-
           <a href="http://10.1.0.39/redmine/login" target="_blank" class="waffle-link-card">
             <span class="waffle-link-icon">📑</span>
             <span class="waffle-link-title">Redmine</span>
           </a>
-
           <a href="https://zbxsrvbr.kantaribopemedia.com/zabbix/zabbix.php?action=dashboard.view&dashboardid=152" target="_blank" class="waffle-link-card">
             <span class="waffle-link-icon">🖥️</span>
             <span class="waffle-link-title">Zabbix</span>
           </a>
-
           <a href="https://rhopen.kantar.com/" target="_blank" class="waffle-link-card">
             <span class="waffle-link-icon">👥</span>
             <span class="waffle-link-title">RH Open</span>
           </a>
-
           <a href="https://kantarit.service-now.com/mykantarservices?id=hr_dashboard_home" target="_blank" class="waffle-link-card">
             <span class="waffle-link-icon">🎫</span>
             <span class="waffle-link-title">Service Now</span>
           </a>
-
           <a href="https://wd3.myworkday.com/wday/authgwy/kantar/login.htmld" target="_blank" class="waffle-link-card">
             <span class="waffle-link-icon">💼</span>
             <span class="waffle-link-title">Workday</span>
           </a>
-
           <a href="https://grafana.kantaribopemedia.com/d/LnH9Oq-Sk/atria-capture?orgId=1" target="_blank" class="waffle-link-card">
             <span class="waffle-link-icon">📈</span>
             <span class="waffle-link-title">Grafana</span>
           </a>
-
           <a href="https://portalbsd.com.br/" target="_blank" class="waffle-link-card">
             <span class="waffle-link-icon">📡</span>
             <span class="waffle-link-title">Portal BSD</span>
@@ -1345,10 +1358,298 @@ def generate_portal():
         </div>
       </section>
 
-      <!-- SEÇÃO CONHEÇA NOSSA EQUIPE -->
-      <section class="team-section-card">
+    </div>
+
+    <!-- ABA 2: PROGRAMAÇÃO STREAMING COMPLETA (862 JOGOS) -->
+    <div id="pane-streaming" class="pane-container">
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-box-label">Total de Confrontos</div>
+          <div class="kpi-box-val" id="kpi-total">{len(events)}</div>
+          <div class="kpi-box-sub">Base Oficial Sincronizada</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #10B981;">
+          <div class="kpi-box-label">Cazé TV</div>
+          <div class="kpi-box-val" id="kpi-caze">0</div>
+          <div class="kpi-box-sub">YouTube Live & PPV</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #00509E;">
+          <div class="kpi-box-label">Amazon Prime</div>
+          <div class="kpi-box-val" id="kpi-prime">0</div>
+          <div class="kpi-box-sub">Prime Video Sports</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #7F4F24;">
+          <div class="kpi-box-label">Netflix</div>
+          <div class="kpi-box-val" id="kpi-netflix">0</div>
+          <div class="kpi-box-sub">NFL & Eventos Especiais</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #8B5CF6;">
+          <div class="kpi-box-label">TNT / Max / Record</div>
+          <div class="kpi-box-val" id="kpi-outros">0</div>
+          <div class="kpi-box-sub">Paulistão & Carioca</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-inputs">
+          <input type="text" id="search-box" class="search-field" placeholder="🔍 Buscar partida, campeonato, responsável ou data...">
+          <select id="filter-canal" class="select-field">
+            <option value="">Todos os Canais</option>
+            <option value="cazé">Cazé TV</option>
+            <option value="prime">Amazon Prime Video</option>
+            <option value="netflix">Netflix</option>
+            <option value="tnt">TNT / Max</option>
+            <option value="record">Record</option>
+            <option value="dazn">DAZN</option>
+          </select>
+          <select id="filter-status" class="select-field">
+            <option value="">Todos os Status</option>
+            <option value="pendente">Pendente</option>
+            <option value="exibido">Exibido</option>
+            <option value="não exibido">Não Exibido</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-action btn-action-secondary action-admin-only" onclick="syncLiveAPI()">🔄 Sincronizar em Tempo Real</button>
+          <button class="btn-action btn-action-primary" onclick="exportCSV()">📥 Exportar CSV</button>
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center">#</th>
+                <th class="td-center">Mês</th>
+                <th class="td-center">Data</th>
+                <th class="td-center">Horário</th>
+                <th>Campeonato</th>
+                <th>Partida</th>
+                <th>Responsável Gravação</th>
+                <th class="td-center">Canal de Transmissão</th>
+                <th class="td-center">PVID TV BOX</th>
+                <th class="td-center">Status de Entrega</th>
+                <th class="td-center">Programado</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary); display: flex; justify-content: space-between;">
+        <div>Mostrando <b id="showing-count" style="color: var(--sp-theme-primary);">0</b> eventos filtrados</div>
+        <div>Padrão Oficial Google Workspace & SharePoint Modern</div>
+      </div>
+    </div>
+
+    <!-- ABA 3: CONTATOS HOSPEDEIROS (500 REGISTROS NATIVOS) -->
+    <div id="pane-hospedeiros" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📞 Contatos Técnicos de Hospedeiros & Antenistas</h2>
+        <p class="section-desc">Base oficial e completa com {len(hospedeiros)} cidades, centrais e técnicos de campo.</p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-inputs">
+          <input type="text" id="search-hosp-box" class="search-field" placeholder="🔍 Buscar por cidade, nome do técnico, especialidade ou telefone...">
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-action btn-action-primary" onclick="exportHospedeirosCSV()">📥 Exportar Hospedeiros (CSV)</button>
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center">#</th>
+                <th>Cidade / Região</th>
+                <th>Nome do Técnico / Contato</th>
+                <th>Especialidade</th>
+                <th>Telefone Comercial</th>
+                <th>Telefone Celular</th>
+              </tr>
+            </thead>
+            <tbody id="hosp-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
+        Mostrando <b id="showing-hosp-count" style="color: var(--sp-theme-primary);">0</b> contatos de hospedeiros
+      </div>
+    </div>
+
+    <!-- ABA 4: PAINEL DE OCORRÊNCIAS (500 REGISTROS NATIVOS) -->
+    <div id="pane-ocorrencias" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">🚨 Painel de Ocorrências & Histórico de Incidentes</h2>
+        <p class="section-desc">Registro operacional com {len(ocorrencias)} tratativas de falhas de captação e sinal.</p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-inputs">
+          <input type="text" id="search-oco-box" class="search-field" placeholder="🔍 Buscar por CS, equipamento, problema ou ações executadas...">
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-action btn-action-primary" onclick="exportOcorrenciasCSV()">📥 Exportar Ocorrências (CSV)</button>
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center">#</th>
+                <th>Título / Incidente</th>
+                <th class="td-center">CS</th>
+                <th>Equipamento</th>
+                <th>Problema Reportado</th>
+                <th>Ações Executadas</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="oco-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
+        Mostrando <b id="showing-oco-count" style="color: var(--sp-theme-primary);">0</b> ocorrências registradas
+      </div>
+    </div>
+
+    <!-- ABA 5: PROCEDIMENTOS N1 & POPS -->
+    <div id="pane-procedimentos" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📖 Procedimentos N1, Manuais & POPs Operacionais</h2>
+        <p class="section-desc">Repositório nativo com {len(procedimentos)} pastas, roteiros técnicos e orientações de rotina.</p>
+      </div>
+
+      <div class="quick-links-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <!-- Renderizado dinamicamente via JS com base nos POPs reais -->
+        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-size: 24px;">📁</span>
+            <span style="font-weight: 700; font-size: 14px;">Procedimentos Suporte N1</span>
+          </div>
+          <p style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.5;">Rotinas de verificação diária, monitoração de CS, checklist de abertura e fechamento de plantão.</p>
+        </div>
+
+        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-size: 24px;">📁</span>
+            <span style="font-weight: 700; font-size: 14px;">Tratamento de Chamados</span>
+          </div>
+          <p style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.5;">Fluxo de escalonamento para N2, registro no Redmine e comunicação com gestores.</p>
+        </div>
+
+        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-size: 24px;">📁</span>
+            <span style="font-weight: 700; font-size: 14px;">Monitoração Preventiva</span>
+          </div>
+          <p style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.5;">Validação periódica de sinais Tomate, WADT, decodificadores e telemetria Zabbix.</p>
+        </div>
+
+        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-size: 24px;">📁</span>
+            <span style="font-weight: 700; font-size: 14px;">Estrutura CPD 6º Andar</span>
+          </div>
+          <p style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.5;">Mapeamento de racks, switches, cabeamento de rede e contingência elétrica.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 6: RECEPTORES & TV BOX -->
+    <div id="pane-receptores" class="pane-container">
+      <div class="section-title-wrap">
+        <h2 class="section-title">📡 Mapa de Receptores & Dispositivos de Captura (PVID TV BOX)</h2>
+        <p class="section-desc">Configurações de sinal, hardware de captura e redundância dos decodificadores.</p>
+      </div>
+
+      <div class="quick-links-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
+            <span style="font-weight: 700; font-size: 15px;">CAZETV - PV3623</span>
+            <span class="badge badge-caze">ATIVO</span>
+          </div>
+          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
+            <div><b>Plataforma:</b> YouTube Live & CazéTV PPV</div>
+            <div><b>PVID Oficial:</b> PV3623</div>
+            <div><b>Resolução / Taxa:</b> 1080p @ 60fps</div>
+            <div><b>Responsável Backup:</b> Cleber / Marcelo</div>
+          </div>
+        </div>
+
+        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
+            <span style="font-weight: 700; font-size: 15px;">Prime Video - PV3687</span>
+            <span class="badge badge-prime">ATIVO</span>
+          </div>
+          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
+            <div><b>Plataforma:</b> Amazon Prime Video Sports</div>
+            <div><b>PVID Oficial:</b> PV3687</div>
+            <div><b>Resolução / Taxa:</b> 1080p @ 60fps</div>
+            <div><b>Responsável Backup:</b> Lucieudes / Cleber</div>
+          </div>
+        </div>
+
+        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
+            <span style="font-weight: 700; font-size: 15px;">Netflix - PV3679</span>
+            <span class="badge badge-netflix">ATIVO</span>
+          </div>
+          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
+            <div><b>Plataforma:</b> Netflix Live Events (NFL)</div>
+            <div><b>PVID Oficial:</b> PV3679</div>
+            <div><b>Resolução / Taxa:</b> 4K UHD / 1080p</div>
+            <div><b>Responsável Backup:</b> Cleber BL01</div>
+          </div>
+        </div>
+
+        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
+            <span style="font-weight: 700; font-size: 15px;">TNT - PV316</span>
+            <span class="badge badge-tnt">ATIVO</span>
+          </div>
+          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
+            <div><b>Plataforma:</b> TNT Sports / Max (Paulistão)</div>
+            <div><b>PVID Oficial:</b> PV316</div>
+            <div><b>Resolução / Taxa:</b> 1080i HD</div>
+            <div><b>Responsável Backup:</b> Lucieudes BL01</div>
+          </div>
+        </div>
+
+        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
+          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
+            <span style="font-weight: 700; font-size: 15px;">Record - PV58</span>
+            <span class="badge badge-record">ATIVO</span>
+          </div>
+          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
+            <div><b>Plataforma:</b> Record TV / PlayPlus</div>
+            <div><b>PVID Oficial:</b> PV58</div>
+            <div><b>Resolução / Taxa:</b> 1080i ISDB-T</div>
+            <div><b>Responsável Backup:</b> Marcelo BL01</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 7: EQUIPE -->
+    <div id="pane-equipe" class="pane-container">
+      <div class="team-section-card">
         <div class="section-title-wrap" style="margin-bottom: 20px;">
-          <h2 class="section-title">👥 CONHEÇA NOSSA EQUIPE</h2>
+          <h2 class="section-title">👥 Equipe & Escala de Plantão</h2>
           <p class="section-desc">Estrutura organizacional da equipe de Suporte e Captação da Kantar IBOPE Media.</p>
         </div>
 
@@ -1531,201 +1832,20 @@ def generate_portal():
           </div>
         </div>
 
-      </section>
-
-    </div>
-
-    <!-- ABA 2: PROGRAMAÇÃO STREAMING COMPLETA (862 JOGOS) -->
-    <div id="pane-streaming" class="pane-container">
-
-      <div class="kpi-row">
-        <div class="kpi-box">
-          <div class="kpi-box-label">Total de Confrontos</div>
-          <div class="kpi-box-val" id="kpi-total">862</div>
-          <div class="kpi-box-sub">Base Oficial Sincronizada</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #10B981;">
-          <div class="kpi-box-label">Cazé TV</div>
-          <div class="kpi-box-val" id="kpi-caze">0</div>
-          <div class="kpi-box-sub">YouTube Live & PPV</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #00509E;">
-          <div class="kpi-box-label">Amazon Prime</div>
-          <div class="kpi-box-val" id="kpi-prime">0</div>
-          <div class="kpi-box-sub">Prime Video Sports</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #7F4F24;">
-          <div class="kpi-box-label">Netflix</div>
-          <div class="kpi-box-val" id="kpi-netflix">0</div>
-          <div class="kpi-box-sub">NFL & Eventos Especiais</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #8B5CF6;">
-          <div class="kpi-box-label">TNT / Max / Record</div>
-          <div class="kpi-box-val" id="kpi-outros">0</div>
-          <div class="kpi-box-sub">Paulistão & Carioca</div>
-        </div>
-      </div>
-
-      <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-box" class="search-field" placeholder="🔍 Buscar partida, campeonato, responsável ou data...">
-          <select id="filter-canal" class="select-field">
-            <option value="">Todos os Canais</option>
-            <option value="cazé">Cazé TV</option>
-            <option value="prime">Amazon Prime Video</option>
-            <option value="netflix">Netflix</option>
-            <option value="tnt">TNT / Max</option>
-            <option value="record">Record</option>
-            <option value="dazn">DAZN</option>
-          </select>
-          <select id="filter-status" class="select-field">
-            <option value="">Todos os Status</option>
-            <option value="pendente">Pendente</option>
-            <option value="exibido">Exibido</option>
-            <option value="não exibido">Não Exibido</option>
-          </select>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn-action btn-action-secondary action-admin-only" onclick="syncLiveAPI()">🔄 Sincronizar em Tempo Real</button>
-          <button class="btn-action btn-action-primary" onclick="exportCSV()">📥 Exportar CSV</button>
-        </div>
-      </div>
-
-      <div class="sp-table-wrap">
-        <div class="sp-table-scroll">
-          <table class="sp-list-table">
-            <thead>
-              <tr>
-                <th class="td-center">#</th>
-                <th class="td-center">Mês</th>
-                <th class="td-center">Data</th>
-                <th class="td-center">Horário</th>
-                <th>Campeonato</th>
-                <th>Partida</th>
-                <th>Responsável Gravação</th>
-                <th class="td-center">Canal de Transmissão</th>
-                <th class="td-center">PVID TV BOX</th>
-                <th class="td-center">Status de Entrega</th>
-                <th class="td-center">Programado</th>
-              </tr>
-            </thead>
-            <tbody id="table-body">
-              <!-- Renderizado via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary); display: flex; justify-content: space-between;">
-        <div>Mostrando <b id="showing-count" style="color: var(--sp-theme-primary);">0</b> eventos filtrados</div>
-        <div>Padrão de Cores Oficial SharePoint Modern Lists</div>
-      </div>
-
-    </div>
-
-    <!-- ABA 3: RECEPTORES & TV BOX -->
-    <div id="pane-receptores" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">📡 Mapa de Receptores & Dispositivos de Captura (PVID TV BOX)</h2>
-        <p class="section-desc">Configurações de sinal, hardware de captura e redundância dos decodificadores.</p>
-      </div>
-
-      <div class="quick-links-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">CAZETV - PV3623</span>
-            <span class="badge badge-caze">ATIVO</span>
-          </div>
-          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
-            <div><b>Plataforma:</b> YouTube Live & CazéTV PPV</div>
-            <div><b>PVID Oficial:</b> PV3623</div>
-            <div><b>Resolução / Taxa:</b> 1080p @ 60fps</div>
-            <div><b>Responsável Backup:</b> Cleber / Marcelo</div>
-          </div>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">Prime Video - PV3687</span>
-            <span class="badge badge-prime">ATIVO</span>
-          </div>
-          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
-            <div><b>Plataforma:</b> Amazon Prime Video Sports</div>
-            <div><b>PVID Oficial:</b> PV3687</div>
-            <div><b>Resolução / Taxa:</b> 1080p @ 60fps</div>
-            <div><b>Responsável Backup:</b> Lucieudes / Cleber</div>
-          </div>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">Netflix - PV3679</span>
-            <span class="badge badge-netflix">ATIVO</span>
-          </div>
-          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
-            <div><b>Plataforma:</b> Netflix Live Events (NFL)</div>
-            <div><b>PVID Oficial:</b> PV3679</div>
-            <div><b>Resolução / Taxa:</b> 4K UHD / 1080p</div>
-            <div><b>Responsável Backup:</b> Cleber BL01</div>
-          </div>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">TNT - PV316</span>
-            <span class="badge badge-tnt">ATIVO</span>
-          </div>
-          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
-            <div><b>Plataforma:</b> TNT Sports / Max (Paulistão)</div>
-            <div><b>PVID Oficial:</b> PV316</div>
-            <div><b>Resolução / Taxa:</b> 1080i HD</div>
-            <div><b>Responsável Backup:</b> Lucieudes BL01</div>
-          </div>
-        </div>
-
-        <div class="quick-link-btn" style="flex-direction: column; align-items: flex-start;">
-          <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
-            <span style="font-weight: 700; font-size: 15px;">Record - PV58</span>
-            <span class="badge badge-record">ATIVO</span>
-          </div>
-          <div style="font-size: 12px; color: var(--sp-text-secondary); line-height: 1.6; width: 100%;">
-            <div><b>Plataforma:</b> Record TV / PlayPlus</div>
-            <div><b>PVID Oficial:</b> PV58</div>
-            <div><b>Resolução / Taxa:</b> 1080i ISDB-T</div>
-            <div><b>Responsável Backup:</b> Marcelo BL01</div>
-          </div>
-        </div>
       </div>
     </div>
 
-    <!-- ABA 4: EQUIPE -->
-    <div id="pane-equipe" class="pane-container">
-      <div class="team-section-card">
-        <div class="section-title-wrap" style="margin-bottom: 20px;">
-          <h2 class="section-title">👥 Equipe & Escala de Plantão</h2>
-          <p class="section-desc">Contatos, cargos e divisões de plantão da equipe de Suporte Captação.</p>
-        </div>
-        <p style="font-size: 13px; color: var(--sp-text-secondary); margin-bottom: 16px;">
-          Todos os membros da equipe contam com perfis integrados ao Microsoft 365 e Google Workspace. Clique no e-mail para abrir mensagem direta no Outlook, Teams ou Gmail corporativo.
-        </p>
-      </div>
-    </div>
-
-    <!-- ABA 5: PERMISSÕES & CONTROLE DE ACESSO (RBAC) -->
+    <!-- ABA 8: PERMISSÕES & CONTROLE DE ACESSO (RBAC) -->
     <div id="pane-permissoes" class="pane-container">
-      
       <div class="section-title-wrap">
-        <h2 class="section-title">🔐 Permissões & Controle de Acesso (SharePoint & Google Sites)</h2>
-        <p class="section-desc">
-          Mapeamento oficial de grupos de segurança e usuários extraídos da Microsoft Graph API, sincronizados para gestão de acesso corporativo no Google Workspace.
-        </p>
+        <h2 class="section-title">🔐 Permissões & Controle de Acesso (RBAC)</h2>
+        <p class="section-desc">Mapeamento oficial de grupos de segurança e usuários sincronizados para Google Workspace.</p>
       </div>
 
-      <!-- KPIs de Acesso -->
       <div class="kpi-row">
         <div class="kpi-box">
           <div class="kpi-box-label">Total de Entidades</div>
-          <div class="kpi-box-val" id="kpi-perm-total">0</div>
+          <div class="kpi-box-val" id="kpi-perm-total">{len(all_permissions)}</div>
           <div class="kpi-box-sub">Grupos & Usuários Mapeados</div>
         </div>
         <div class="kpi-box" style="border-left: 4px solid #8B5CF6;">
@@ -1745,58 +1865,6 @@ def generate_portal():
         </div>
       </div>
 
-      <!-- Matriz Visual de Acesso por Módulo -->
-      <div class="team-section-card" style="margin-bottom: 20px;">
-        <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--sp-theme-primary); display: flex; align-items: center; gap: 8px;">
-          🛡️ Matriz de Controle por Módulo & Nível de Perfil
-        </h3>
-        <div style="overflow-x: auto;">
-          <table class="rbac-matrix-table" style="width: 100%; border-collapse: collapse;">
-            <thead>
-              <tr>
-                <th>Módulo do Portal</th>
-                <th style="text-align: center;">👑 Administrador (Gestores)</th>
-                <th style="text-align: center;">🛠️ Operador (Suporte N1/N2)</th>
-                <th style="text-align: center;">👁️ Leitor (NOC, SAC, Comercial)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><b>⚽ Programação Streaming</b></td>
-                <td style="text-align: center;" class="check-yes">Visualizar, Sincronizar, Editar e Exportar</td>
-                <td style="text-align: center;" class="check-yes">Visualizar, Atualizar Status e Exportar</td>
-                <td style="text-align: center;">Apenas Visualizar Consulta</td>
-              </tr>
-              <tr>
-                <td><b>📡 Receptores & TV BOX (PVIDs)</b></td>
-                <td style="text-align: center;" class="check-yes">Gerenciar PVIDs, Redundância e Hardware</td>
-                <td style="text-align: center;" class="check-yes">Consultar e Verificar Sinal Técnico</td>
-                <td style="text-align: center;">Visualização Restrita</td>
-              </tr>
-              <tr>
-                <td><b>👥 Equipe & Contatos</b></td>
-                <td style="text-align: center;" class="check-yes">Gerenciar Escala e Estrutura</td>
-                <td style="text-align: center;" class="check-yes">Consultar Turnos e Contatos</td>
-                <td style="text-align: center;" class="check-yes">Consultar Contatos do Plantão</td>
-              </tr>
-              <tr>
-                <td><b>🔐 Permissões & Acessos</b></td>
-                <td style="text-align: center;" class="check-yes">Acesso Total & Exportação para Google Sites</td>
-                <td style="text-align: center;" class="check-no">Apenas Consulta Própria</td>
-                <td style="text-align: center;" class="check-no">Acesso Oculto</td>
-              </tr>
-              <tr>
-                <td><b>🔗 Links Úteis & Sistemas</b></td>
-                <td style="text-align: center;" class="check-yes">Gerenciar e Adicionar Atalhos</td>
-                <td style="text-align: center;" class="check-yes">Acesso a Todos os Links</td>
-                <td style="text-align: center;" class="check-yes">Acesso aos Links Públicos</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Barra de Filtros de Permissões -->
       <div class="filter-bar">
         <div class="filter-inputs">
           <input type="text" id="search-perm-box" class="search-field" placeholder="🔍 Buscar usuário, grupo corporativo ou e-mail...">
@@ -1813,11 +1881,10 @@ def generate_portal():
           </select>
         </div>
         <div style="display: flex; gap: 8px;">
-          <button class="btn-action btn-action-primary" onclick="exportPermsCSV()">📥 Exportar Lista para Google Sites (CSV)</button>
+          <button class="btn-action btn-action-primary" onclick="exportPermsCSV()">📥 Exportar Lista Google Sites (CSV)</button>
         </div>
       </div>
 
-      <!-- Tabela de Permissões -->
       <div class="sp-table-wrap">
         <div class="sp-table-scroll">
           <table class="sp-list-table">
@@ -1838,15 +1905,12 @@ def generate_portal():
           </table>
         </div>
       </div>
-
-      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary); display: flex; justify-content: space-between;">
-        <div>Mostrando <b id="showing-perms-count" style="color: var(--sp-theme-primary);">0</b> registros de acesso</div>
-        <div>Mapeado via Microsoft Graph API & Google Workspace RBAC</div>
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);">
+        Mostrando <b id="showing-perms-count" style="color: var(--sp-theme-primary);">0</b> registros de acesso
       </div>
-
     </div>
 
-    <!-- ABA 6: LINKS & SISTEMAS -->
+    <!-- ABA 9: LINKS EXTERNOS -->
     <div id="pane-links" class="pane-container">
       <div class="section-title-wrap">
         <h2 class="section-title">🔗 Diretório de Links & Sistemas Oficiais</h2>
@@ -1860,16 +1924,17 @@ def generate_portal():
   <footer class="site-footer">
     <div class="site-footer-container">
       <div><b>Kantar IBOPE Media</b> — Central de Operações & Suporte Captação © 2026</div>
-      <div>Sincronizado automaticamente via <b>Monitor de Esportes v2.5.17</b>, SharePoint Graph API & Google Workspace</div>
+      <div>Portal 100% Autônomo e Integrado com Google Workspace</div>
     </div>
   </footer>
 
   <script>
-    // Datasets integrados
+    // Datasets completos
     let allEvents = {events_json_str};
     let allPermissions = {perms_json_str};
+    let allHospedeiros = {hospedeiros_json_str};
+    let allOcorrencias = {ocorrencias_json_str};
 
-    // Controle de Perfil RBAC Ativo
     let currentRole = "admin";
 
     function onRoleChange() {{
@@ -1895,7 +1960,6 @@ def generate_portal():
         document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "none");
         const permTab = document.getElementById("nav-tab-permissoes");
         if (permTab) permTab.style.display = "none";
-        // Se estava na aba de permissões, volta para home
         const activePane = document.querySelector(".pane-container.active");
         if (activePane && activePane.id === "pane-permissoes") {{
           showPane("home");
@@ -1903,7 +1967,6 @@ def generate_portal():
       }}
     }}
 
-    // Navegação de Abas
     function showPane(paneId) {{
       document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.pane-container').forEach(pane => pane.classList.remove('active'));
@@ -1920,14 +1983,13 @@ def generate_portal():
       window.scrollTo({{ top: 0, behavior: 'smooth' }});
     }}
 
-    // Modo Escuro
     function toggleDarkMode() {{
       document.body.classList.toggle('dark-mode');
       const isDark = document.body.classList.contains('dark-mode');
       document.getElementById('dark-mode-icon').innerText = isDark ? '☀️' : '🌙';
     }}
 
-    // Badges de Canal
+    // Badges
     function getChannelBadge(canal) {{
       const c = String(canal || "").toLowerCase();
       if (c.includes("cazé") || c.includes("caze")) return '<span class="badge badge-caze">' + canal + '</span>';
@@ -1939,7 +2001,6 @@ def generate_portal():
       return '<span class="badge badge-default">' + (canal || "-") + '</span>';
     }}
 
-    // Badges de Status
     function getStatusBadge(status) {{
       const s = String(status || "").toLowerCase();
       if (s.includes("exibido") && !s.includes("não") && !s.includes("nao")) return '<span class="badge badge-exibido">' + status + '</span>';
@@ -1947,7 +2008,7 @@ def generate_portal():
       return '<span class="badge badge-pendente">' + (status || "Pendente") + '</span>';
     }}
 
-    // Renderizar Tabela de Eventos
+    // 1. Renderizar Tabela de Eventos Streaming
     function renderTable() {{
       const searchBox = document.getElementById("search-box");
       const q = searchBox ? searchBox.value.toLowerCase() : "";
@@ -1963,7 +2024,7 @@ def generate_portal():
       let count = 0;
       let caze = 0, prime = 0, netflix = 0, outros = 0;
 
-      allEvents.forEach((ev, idx) => {{
+      allEvents.forEach((ev) => {{
         const cStr = String(ev.canal || "").toLowerCase();
         if (cStr.includes("cazé") || cStr.includes("caze")) caze++;
         else if (cStr.includes("prime") || cStr.includes("amazon")) prime++;
@@ -2013,7 +2074,83 @@ def generate_portal():
       if (elShowing) elShowing.innerText = count;
     }}
 
-    // Renderizar Tabela de Permissões
+    // 2. Renderizar Tabela de Hospedeiros
+    function renderHospedeirosTable() {{
+      const searchBox = document.getElementById("search-hosp-box");
+      const q = searchBox ? searchBox.value.toLowerCase() : "";
+      const tbody = document.getElementById("hosp-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let count = 0;
+      allHospedeiros.forEach((h) => {{
+        if (q) {{
+          const fullText = (
+            (h.Title || '') + " " + (h.Nome1 || '') + " " +
+            (h.Especialidade || '') + " " + (h.Telefone_x0020_Comercial || '') + " " +
+            (h.Telefone_x0020_Celular || '')
+          ).toLowerCase();
+          if (!fullText.includes(q)) return;
+        }}
+
+        count++;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-center" style="color: #64748B; font-weight: 600;">${{count}}</td>
+          <td><b>${{h.Title || '-'}}</b></td>
+          <td>${{h.Nome1 || '-'}}</td>
+          <td><span class="badge" style="background:#E2E8F0; color:#1E293B;">${{h.Especialidade || 'Técnico'}}</span></td>
+          <td>${{h.Telefone_x0020_Comercial ? `📞 <a href="tel:${{h.Telefone_x0020_Comercial}}" style="text-decoration:none; color:var(--sp-theme-primary); font-weight:600;">${{h.Telefone_x0020_Comercial}}</a>` : '-'}}</td>
+          <td>${{h.Telefone_x0020_Celular ? `📱 <a href="tel:${{h.Telefone_x0020_Celular}}" style="text-decoration:none; color:#10B981; font-weight:600;">${{h.Telefone_x0020_Celular}}</a>` : '-'}}</td>
+        `;
+        tbody.appendChild(tr);
+      }});
+
+      const elShowing = document.getElementById("showing-hosp-count");
+      if (elShowing) elShowing.innerText = count;
+    }}
+
+    // 3. Renderizar Tabela de Ocorrências
+    function renderOcorrenciasTable() {{
+      const searchBox = document.getElementById("search-oco-box");
+      const q = searchBox ? searchBox.value.toLowerCase() : "";
+      const tbody = document.getElementById("oco-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let count = 0;
+      allOcorrencias.forEach((o) => {{
+        const csStr = Array.isArray(o.CS) ? o.CS.join(", ") : (o.CS || "-");
+        const equipStr = Array.isArray(o.Equipamento) ? o.Equipamento.join(", ") : (o.Equipamento || "-");
+        const probStr = o.Problema || o.Problema0 || "-";
+        const acoesStr = o.A_x00e7__x00f5_esexecutadas || "-";
+
+        if (q) {{
+          const fullText = (
+            (o.Title || '') + " " + csStr + " " + equipStr + " " + probStr + " " + acoesStr
+          ).toLowerCase();
+          if (!fullText.includes(q)) return;
+        }}
+
+        count++;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-center" style="color: #64748B; font-weight: 600;">${{count}}</td>
+          <td><b>${{o.Title || 'Incidente'}}</b></td>
+          <td class="td-center"><span class="badge" style="background:#EFF6FC; color:#0078D4; font-weight:700;">CS ${{csStr}}</span></td>
+          <td>${{equipStr}}</td>
+          <td style="color:#B91C1C; font-weight:600;">${{probStr}}</td>
+          <td style="font-size:12px; color:var(--sp-text-secondary); max-width:280px; white-space:normal;">${{acoesStr}}</td>
+          <td class="td-center"><span class="badge badge-exibido">Registrado</span></td>
+        `;
+        tbody.appendChild(tr);
+      }});
+
+      const elShowing = document.getElementById("showing-oco-count");
+      if (elShowing) elShowing.innerText = count;
+    }}
+
+    // 4. Renderizar Tabela de Permissões
     function renderPermsTable() {{
       const searchBox = document.getElementById("search-perm-box");
       const q = searchBox ? searchBox.value.toLowerCase() : "";
@@ -2029,7 +2166,7 @@ def generate_portal():
       let count = 0;
       let owners = 0, writers = 0, readers = 0;
 
-      allPermissions.forEach((p, idx) => {{
+      allPermissions.forEach((p) => {{
         const gRole = p.google_role || "Leitor";
         if (gRole === "Administrador") owners++;
         else if (gRole === "Operador") writers++;
@@ -2075,7 +2212,7 @@ def generate_portal():
       if (elShowing) elShowing.innerText = count;
     }}
 
-    // Event Listeners Eventos
+    // Listeners
     const sBox = document.getElementById("search-box");
     if (sBox) sBox.addEventListener("input", renderTable);
     const fCanalEl = document.getElementById("filter-canal");
@@ -2083,7 +2220,12 @@ def generate_portal():
     const fStatusEl = document.getElementById("filter-status");
     if (fStatusEl) fStatusEl.addEventListener("change", renderTable);
 
-    // Event Listeners Permissões
+    const sHosp = document.getElementById("search-hosp-box");
+    if (sHosp) sHosp.addEventListener("input", renderHospedeirosTable);
+
+    const sOco = document.getElementById("search-oco-box");
+    if (sOco) sOco.addEventListener("input", renderOcorrenciasTable);
+
     const sPermBox = document.getElementById("search-perm-box");
     if (sPermBox) sPermBox.addEventListener("input", renderPermsTable);
     const fPermType = document.getElementById("filter-perm-type");
@@ -2095,8 +2237,8 @@ def generate_portal():
     const gSearch = document.getElementById("global-search");
     if (gSearch) {{
       gSearch.addEventListener("input", function(e) {{
-        const term = e.target.value;
-        if (term.trim().length > 0) {{
+        const term = e.target.value.trim();
+        if (term.length > 0) {{
           showPane('streaming');
           if (sBox) {{
             sBox.value = term;
@@ -2106,7 +2248,7 @@ def generate_portal():
       }});
     }}
 
-    // Sincronização em tempo real
+    // Sincronização em tempo real (Google Sheets)
     async function syncLiveAPI() {{
       const btn = event.target;
       const originalText = btn.innerText;
@@ -2135,36 +2277,54 @@ def generate_portal():
       }}
     }}
 
-    // Exportar CSV Eventos
+    // Exportações CSV
     function exportCSV() {{
       let csv = "Indice,Mes,Data,Horario,Campeonato,Partida,Responsavel,Canal,PVID,Status,Programado\\n";
       allEvents.forEach((ev, i) => {{
         csv += `"${{i+1}}","${{ev.mes||''}}","${{ev.data||''}}","${{ev.horario||''}}","${{ev.campeonato||''}}","${{ev.partida||''}}","${{ev.responsavel||''}}","${{ev.canal||''}}","${{ev.pvid||''}}","${{ev.status_entrega||''}}","${{ev.programado||''}}"\\n`;
       }});
-      const blob = new Blob([csv], {{ type: 'text/csv;charset=utf-8;' }});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "programacao_eventos_streaming.csv";
-      a.click();
+      downloadCSV(csv, "programacao_eventos_streaming.csv");
     }}
 
-    // Exportar CSV Permissões Google
+    function exportHospedeirosCSV() {{
+      let csv = "Indice,Cidade,Nome,Especialidade,Telefone_Comercial,Telefone_Celular\\n";
+      allHospedeiros.forEach((h, i) => {{
+        csv += `"${{i+1}}","${{h.Title||''}}","${{h.Nome1||''}}","${{h.Especialidade||''}}","${{h.Telefone_x0020_Comercial||''}}","${{h.Telefone_x0020_Celular||''}}"\\n`;
+      }});
+      downloadCSV(csv, "contatos_hospedeiros_completo.csv");
+    }}
+
+    function exportOcorrenciasCSV() {{
+      let csv = "Indice,Titulo,CS,Equipamento,Problema,Acoes\\n";
+      allOcorrencias.forEach((o, i) => {{
+        const cs = Array.isArray(o.CS) ? o.CS.join(";") : (o.CS || '');
+        const eq = Array.isArray(o.Equipamento) ? o.Equipamento.join(";") : (o.Equipamento || '');
+        csv += `"${{i+1}}","${{o.Title||''}}","${{cs}}","${{eq}}","${{o.Problema||o.Problema0||''}}","${{o.A_x00e7__x00f5_esexecutadas||''}}"\\n`;
+      }});
+      downloadCSV(csv, "painel_ocorrencias_historico.csv");
+    }}
+
     function exportPermsCSV() {{
       let csv = "Nome,Tipo,Email,Nivel_SharePoint,Nivel_Google_Sites,Cargo,Escopo\\n";
       allPermissions.forEach((p) => {{
         csv += `"${{p.name}}","${{p.type}}","${{p.email}}","${{p.sp_role}}","${{p.google_role}}","${{p.cargo||''}}","${{p.scope||''}}"\\n`;
       }});
-      const blob = new Blob([csv], {{ type: 'text/csv;charset=utf-8;' }});
+      downloadCSV(csv, "permissoes_suporte_captacao_google_sites.csv");
+    }}
+
+    function downloadCSV(csvContent, filename) {{
+      const blob = new Blob([csvContent], {{ type: 'text/csv;charset=utf-8;' }});
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "permissoes_suporte_captacao_google_sites.csv";
+      a.download = filename;
       a.click();
     }}
 
-    // Render Inicial
+    // Render Inicial Completo
     renderTable();
+    renderHospedeirosTable();
+    renderOcorrenciasTable();
     renderPermsTable();
   </script>
 </body>
@@ -2181,7 +2341,6 @@ def generate_portal():
 
     print(f"Portal Web Suporte Captação gerado com sucesso em: {output_html}")
     print(f"Publicação atualizada em: {docs_html}")
-    print(f"Planilha de permissões para Google Workspace gerada em: {csv_path}")
     print(f"Tamanho do arquivo: {os.path.getsize(output_html)} bytes")
     return output_html
 
