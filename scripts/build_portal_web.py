@@ -1655,8 +1655,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <div class="sp-dropdown-menu">
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('metas', '🎯 Metas & OKRs da Equipe', event)">🎯 Metas & OKRs da Equipe <span class="item-count-badge">8</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('contratos', '📝 Controle de Contratos Parceiros', event)">📝 Controle de Contratos Parceiros <span class="item-count-badge">114</span></a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('fornecedores', '🏢 Avaliação Técnica de Fornecedores', event)">🏢 Avaliação Técnica de Fornecedores</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('solicitacoes', '🔑 Solicitações de Acesso', event)">🔑 Solicitações de Acesso</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('fornecedores', '🏢 Avaliação Técnica de Fornecedores', event)">🏢 Avaliação Técnica de Fornecedores <span class="item-count-badge">13</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('solicitacoes', '🔑 Solicitações de Acesso', event)">🔑 Solicitações de Acesso <span class="item-count-badge">45</span></a>
           </div>
         </div>
 
@@ -1664,12 +1664,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="sp-menu-item">
           <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">Qualidade <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('sla', '⏱️ SLA de Atendimento', event)">⏱️ SLA de Atendimento</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('sla', '⏱️ SLA de Atendimento', event)">⏱️ SLA de Atendimento <span class="item-count-badge">9</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('dashboard', '📊 Dashboard & Indicadores', event)">📊 Dashboard & Indicadores</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('notificacoes', '🔔 Análise de Notificações', event)">🔔 Análise de Notificações</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('backup', '💾 Validação de Backup', event)">💾 Validação de Backup</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('analisedados', '📈 Análise de Dados', event)">📈 Análise de Dados</a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('falhas', '⚠️ Confirmação de Falhas', event)">⚠️ Confirmação de Falhas</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('notificacoes', '🔔 Análise de Notificações', event)">🔔 Análise de Notificações <span class="item-count-badge">12</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('backup', '💾 Validação de Backup', event)">💾 Validação de Backup <span class="item-count-badge">300</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('analisedados', '📈 Análise de Dados', event)">📈 Análise de Dados <span class="item-count-badge">1</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('falhas', '⚠️ Confirmação de Falhas', event)">⚠️ Confirmação de Falhas <span class="item-count-badge">156</span></a>
           </div>
         </div>
 
@@ -1704,8 +1704,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('monitoramentocanais', '📺 Monitoramento de Canais CS', event)">📺 Monitoramento de Canais CS <span class="item-count-badge">300</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redescs', '🌐 Configurações de Rede do CS', event)">🌐 Configurações de Rede do CS <span class="item-count-badge">137</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redepcd', '🖥️ Mapeamento de Rede do CPD', event)">🖥️ Mapeamento de Rede do CPD <span class="item-count-badge">46</span></a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('remoto', '🎮 Acesso Remoto & América Central', event)">🎮 Acesso Remoto & América Central <span class="item-count-badge">19</span></a>
-            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('relatoriosjogos', '🏀 Relatórios de Jogos (YouTube & NBA)', event)">🏀 Relatórios de Jogos (YouTube & NBA) <span class="item-count-badge">260</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('remoto', '🎮 Acesso Remoto & América Central', event)">🎮 Acesso Remoto & América Central <span class="item-count-badge">18</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('relatorios_futebol', '⚽ Relatórios de Jogos', event)">⚽ Relatórios de Jogos <span class="item-count-badge">41</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('relatorios_youtube', '📺 Relatório Jogos Youtube', event)">📺 Relatório Jogos Youtube <span class="item-count-badge">51</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('relatorios_nba', '🏀 Relatórios de Jogos NBA', event)">🏀 Relatórios de Jogos NBA <span class="item-count-badge">168</span></a>
           </div>
         </div>
 
@@ -2367,74 +2369,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
     </div>
 
-    <!-- SUBMENU 2: RELATÓRIOS OFICIAIS DE AUDITORIA DE JOGOS (NBA, YOUTUBE & FUTEBOL - 260 CASOS) -->
-    <div id="pane-relatoriosjogos" class="pane-container">
-      <div class="sp-command-bar">
-        <div class="sp-command-left">
-          <button class="sp-btn-cmd" onclick="exportRelatoriosCSV()"><span>📥</span> Exportar CSV</button>
-          <button class="sp-btn-cmd" onclick="handleMenuClick('home', 'Página Inicial')"><span>🏠</span> Voltar ao Início</button>
-        </div>
-      </div>
-
-      <div class="sp-list-header-row">
-        <div>
-          <div style="font-size: 12px; color: #64748B; margin-bottom: 4px;">Suporte Captação &rsaquo; Relatórios de Auditoria</div>
-          <h2 class="sp-list-main-title">Relatórios de Jogos & Auditoria de Transmissão <span class="star-icon">☆</span></h2>
-        </div>
-        <div class="sp-views-bar">
-          <span class="sp-view-tab active">260 Relatórios Oficiais</span>
-        </div>
-      </div>
-
-      <p style="color: #64748B; font-size: 13px; margin: 4px 0 14px 0; line-height: 1.5;">
-        Repositório oficial de relatórios de auditoria com parecer técnico e comprovação de horários CBF, CazéTV e NBA. Todos os 260 relatórios oficiais do SharePoint disponíveis para download direto.
-      </p>
-
-      <!-- Pílulas de Seleção de Categoria (Tabs) -->
-      <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
-        <button class="sp-tab-pill active" id="pill-relatorios-nba" onclick="switchRelatoriosTab('nba')">
-          🏀 NBA (<span id="count-rel-nba">168</span> Relatórios)
-        </button>
-        <button class="sp-tab-pill" id="pill-relatorios-yt" onclick="switchRelatoriosTab('yt')">
-          📺 YouTube & CazéTV (<span id="count-rel-yt">51</span> Relatórios)
-        </button>
-        <button class="sp-tab-pill" id="pill-relatorios-fut" onclick="switchRelatoriosTab('fut')">
-          ⚽ Auditoria Futebol (<span id="count-rel-fut">41</span> Relatórios)
-        </button>
-      </div>
-
-      <div class="filter-bar">
-        <div class="filter-inputs" style="width: 100%;">
-          <input type="text" id="search-relatorios-box" class="search-field" oninput="filterRelatoriosTable()" placeholder="🔍 Buscar relatório por partida, time, data ou responsável...">
-        </div>
-      </div>
-
-      <div class="sp-table-wrap">
-        <div class="sp-table-scroll">
-          <table class="sp-list-table">
-            <thead>
-              <tr>
-                <th class="td-center" style="width: 45px;">#</th>
-                <th>Nome do Relatório / Partida</th>
-                <th>Tipo / Formato</th>
-                <th>Tamanho</th>
-                <th>Data de Auditoria</th>
-                <th>Auditor Responsável</th>
-                <th class="td-center" style="width: 140px;">Relatório PDF</th>
-              </tr>
-            </thead>
-            <tbody id="relatorios-table-body">
-              <!-- Renderizado via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);" id="relatorios-footer-count">
-        Mostrando relatórios sincronizados com SharePoint Online
-      </div>
-    </div>
-
     <!-- SUBMENU 3: VISUALIZADOR DINÂMICO DE LISTAS NATIVAS DO SHAREPOINT (46 LISTAS REAIS) -->
     <div id="pane-list-viewer" class="pane-container">
       <div class="sp-command-bar">
@@ -2484,54 +2418,42 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
 
-    <!-- ABA 8: DASHBOARD & INDICADORES -->
+    <!-- ABA 8: DASHBOARD & INDICADORES (CONTEÚDO OFICIAL 1:1 DE DASHBOARD.ASPX DO SHAREPOINT) -->
     <div id="pane-dashboard" class="pane-container">
       <div class="section-title-wrap">
-        <h2 class="section-title">📊 Dashboard Operacional & Indicadores de Transmissão</h2>
-        <p class="section-desc">Telemetria de ingest de sinais esportivos, uptime de streaming e prontidão de equipe.</p>
+        <h2 class="section-title">📊 Dashboard & Indicadores</h2>
+        <p class="section-desc">Acesse nossos painéis e acompanhe os principais indicadores de desempenho do Suporte Captação.</p>
       </div>
 
-      <div class="kpi-row">
-        <div class="kpi-box" style="border-left: 4px solid #10B981;">
-          <div class="kpi-box-label">Disponibilidade Operacional (SLA)</div>
-          <div class="kpi-box-val">99.85%</div>
-          <div class="kpi-box-sub">Meta Corporativa: &gt; 99.50%</div>
+      <div class="escala-footer-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-top: 15px;">
+        <div class="escala-info-card" style="border-left: 4px solid #0078D4;">
+          <h3 style="font-size: 16px; font-weight: 700; color: #1E293B; margin-bottom: 8px;">📊 Suporte N2 (Redmine)</h3>
+          <p style="font-size: 13px; color: #64748B; line-height: 1.5; margin-bottom: 14px;">
+            Este painel acompanha a saúde das entregas, a volumetria de demandas e o cumprimento dos prazos estabelecidos para a equipe de Suporte N2.
+          </p>
+          <a href="https://app.powerbi.com/groups/me/reports/5e99d789-4b3d-443e-980f-6c9aaad7cfeb/bebe49dc7b5a50ffe75d/share?experience=power-bi" target="_blank" class="btn-action btn-action-primary" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+            📊 Abrir Relatório Power BI N2 ↗
+          </a>
         </div>
-        <div class="kpi-box" style="border-left: 4px solid #0078D4;">
-          <div class="kpi-box-label">Eventos Monitorados 2026</div>
-          <div class="kpi-box-val">__EVENTS_COUNT__</div>
-          <div class="kpi-box-sub">CazéTV, Prime, Netflix, TNT, Record</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #D97706;">
-          <div class="kpi-box-label">Conformidade CLT Art. 66</div>
-          <div class="kpi-box-val">100.0%</div>
-          <div class="kpi-box-sub">11h de Descanso entre Jornadas</div>
-        </div>
-        <div class="kpi-box" style="border-left: 4px solid #8B5CF6;">
-          <div class="kpi-box-label">Tempo Médio de Reparo (MTTR)</div>
-          <div class="kpi-box-val">2.8 min</div>
-          <div class="kpi-box-sub">Restabelecimento de Transmissão</div>
-        </div>
-      </div>
 
-      <div class="escala-footer-grid">
-        <div class="escala-info-card">
-          <h4>🛰️ Status dos Canais de Ingest</h4>
-          <ul class="sobreaviso-schedule-list">
-            <li>🟢 <b>YouTube Live (CazéTV):</b> 100% Operacional &bull; Latência 1.1s</li>
-            <li>🟢 <b>Amazon Prime Video Sports:</b> 100% Operacional &bull; PVID PV3623</li>
-            <li>🟢 <b>Netflix Live (NFL):</b> 100% Operacional &bull; PVID PV3687</li>
-            <li>🟢 <b>Max / TNT Sports:</b> 100% Operacional &bull; PVID PV3679</li>
-            <li>🟢 <b>Record / PlayPlus:</b> 100% Operacional &bull; Sinais Regionais OK</li>
-          </ul>
+        <div class="escala-info-card" style="border-left: 4px solid #10B981;">
+          <h3 style="font-size: 16px; font-weight: 700; color: #1E293B; margin-bottom: 8px;">📊 Suporte N1 (Recuperação e Monitor de Incidentes)</h3>
+          <p style="font-size: 13px; color: #64748B; line-height: 1.5; margin-bottom: 14px;">
+            Este painel acompanha o desempenho operacional, a volumetria de atendimentos e o uso do site MediaDNA pela Equipe N1, com foco nas frentes de Recuperação e Monitor de Incidentes.
+          </p>
+          <a href="https://app.powerbi.com/groups/me/reports/5e99d789-4b3d-443e-980f-6c9aaad7cfeb/bebe49dc7b5a50ffe75d/share?experience=power-bi" target="_blank" class="btn-action btn-action-primary" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+            📊 Abrir Relatório Power BI N1 ↗
+          </a>
         </div>
-        <div class="escala-info-card">
-          <h4>📡 PVIDs de Hardware TV BOX</h4>
-          <ul class="sobreaviso-schedule-list">
-            <li>📶 <b>PV3623:</b> Central Principal Barra Funda &bull; Primário</li>
-            <li>📶 <b>PV3687:</b> Ingest Secundário Fibra Óptica &bull; Ativo</li>
-            <li>📶 <b>PV3679:</b> Contingência TV BOX Backup &bull; Standby Quente</li>
-          </ul>
+
+        <div class="escala-info-card" style="border-left: 4px solid #D97706;">
+          <h3 style="font-size: 16px; font-weight: 700; color: #1E293B; margin-bottom: 8px;">📈 Dashboard de Estatísticas (IMA)</h3>
+          <p style="font-size: 13px; color: #64748B; line-height: 1.5; margin-bottom: 14px;">
+            Painel corporativo de telemetria e estatísticas operacionais do ecossistema de ingest de sinais.
+          </p>
+          <a href="http://ecossistema-ima.grupoibope.corp:3000/dashboard.html" target="_blank" class="btn-action btn-action-secondary" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+            📈 Acessar Servidor IMA :3000 ↗
+          </a>
         </div>
       </div>
     </div>
@@ -2732,18 +2654,25 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       'doctecnicos': { type: 'drive', name: 'Documentos Técnicos', title: 'Documentos Técnicos (PayTV)' },
       'metas': { type: 'drive', name: 'Metas', title: 'Metas & Acompanhamento da Equipe' },
       'contratos': { type: 'drive', name: 'Controle de contratos parceiros', title: 'Controle de Contratos Parceiros' },
+      'fornecedores': { type: 'drive', name: 'Avaliação Técnica de Fornecedores', title: 'Avaliação Técnica de Fornecedores' },
+      'sla': { type: 'drive', name: 'SLA', title: 'SLA de Atendimento' },
+      'notificacoes': { type: 'drive', name: 'Análise de Notificações', title: 'Análise de Notificações' },
+      'analisedados': { type: 'drive', name: 'Analise de Dados', title: 'Análise de Dados' },
+      'remoto': { type: 'drive', name: 'Acesso Remoto', title: 'Acesso Remoto & América Central' },
       'automacoes': { type: 'drive', name: 'Repositorio_Automacoes', title: 'Repositório de Automações' },
+      'projetos': { type: 'drive', name: 'Projetos', title: 'Projetos' },
 
-      // Relatórios Dedicados (NBA, YouTube & Futebol - 260 Casos)
-      'relatoriosjogos': { type: 'relatorios', title: 'Relatórios de Jogos (YouTube & NBA)' },
+      // Os 3 Relatórios de Jogos Separados (Drives Oficiais do SharePoint)
+      'relatorios_futebol': { type: 'drive', name: 'Relatorios_de_Jogos', title: 'Relatórios de Jogos' },
+      'relatoriosjogos': { type: 'drive', name: 'Relatorios_de_Jogos', title: 'Relatórios de Jogos' },
+      'relatorios_youtube': { type: 'drive', name: 'Relatorio Jogos Youtube', title: 'Relatório Jogos Youtube' },
+      'relatoriosyoutube': { type: 'drive', name: 'Relatorio Jogos Youtube', title: 'Relatório Jogos Youtube' },
+      'relatorios_nba': { type: 'drive', name: 'Relatorios_de_Jogos_NBA', title: 'Relatórios de Jogos NBA' },
+      'relatoriosnba': { type: 'drive', name: 'Relatorios_de_Jogos_NBA', title: 'Relatórios de Jogos NBA' },
 
       // Listas Oficiais do SharePoint
-      'fornecedores': { type: 'list', name: 'Avaliação Técnica de Fornecedores', title: 'Avaliação Técnica de Fornecedores' },
       'solicitacoes': { type: 'list', name: 'Solicitações de Acesso', title: 'Solicitações de Acesso' },
-      'sla': { type: 'list', name: 'SLA', title: 'SLA de Atendimento' },
-      'notificacoes': { type: 'list', name: 'Análise de Notificações', title: 'Análise de Notificações' },
       'backup': { type: 'list', name: 'Validação de Backup', title: 'Validação de Backup' },
-      'analisedados': { type: 'list', name: 'Analise de Dados', title: 'Análise de Dados' },
       'falhas': { type: 'list', name: 'Confirmação de Falhas Suporte Captação', title: 'Confirmação de Falhas' },
       'antenistas': { type: 'list', name: 'Contatos de Antenistas', title: 'Contatos de Antenistas' },
       'redmine': { type: 'list', name: 'Redmine', title: 'Redmine (Demandas & Chamados)' },
@@ -2753,9 +2682,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       'monitoramentocanais': { type: 'list', name: 'Monitoramento de Canais CS', title: 'Monitoramento de Canais CS' },
       'redescs': { type: 'list', name: 'Configurações de Rede do CS', title: 'Configurações de Rede do CS' },
       'redepcd': { type: 'list', name: 'Mapeamento de Rede do CPD', title: 'Mapeamento de Rede do CPD' },
-      'remoto': { type: 'list', name: 'Acesso Remote Control - America Central', title: 'Acesso Remoto & América Central' },
-      'links': { type: 'list', name: 'Links de Internet dos Parceiros', title: 'Links de Internet dos Parceiros' },
-      'projetos': { type: 'list', name: 'Projetos', title: 'Projetos & Iniciativas' }
+      'links': { type: 'list', name: 'Links de Internet dos Parceiros', title: 'Links de Internet dos Parceiros' }
     };
 
     // --- Utilitários de Formatação ---
@@ -3183,13 +3110,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const res = SP_RESOURCE_MAP[paneId];
       let targetPane = null;
 
-      if (paneId === 'relatoriosjogos' || (res && res.type === 'relatorios')) {
-        targetPane = document.getElementById('pane-relatoriosjogos');
-        if (targetPane) {
-          targetPane.classList.add('active');
-          initRelatoriosJogos();
-        }
-      } else if (res && res.type === 'drive') {
+      if (res && res.type === 'drive') {
         targetPane = document.getElementById('pane-drive-viewer');
         if (targetPane) {
           targetPane.classList.add('active');
@@ -3204,18 +3125,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       } else {
         targetPane = document.getElementById('pane-' + paneId);
         if (!targetPane) {
-          // Fallback para list-viewer se for uma lista por nome direto
-          if (SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[paneId]) {
-            targetPane = document.getElementById('pane-list-viewer');
-            if (targetPane) {
-              targetPane.classList.add('active');
-              openRealList(paneId, title);
-            }
-          } else if (SP_MASTER_DATA.drives && SP_MASTER_DATA.drives[paneId]) {
+          if (SP_MASTER_DATA.drives && SP_MASTER_DATA.drives[paneId]) {
             targetPane = document.getElementById('pane-drive-viewer');
             if (targetPane) {
               targetPane.classList.add('active');
               openDrive(paneId, title);
+            }
+          } else if (SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[paneId]) {
+            targetPane = document.getElementById('pane-list-viewer');
+            if (targetPane) {
+              targetPane.classList.add('active');
+              openRealList(paneId, title);
             }
           }
         } else {
@@ -4078,8 +3998,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     // Exposição global explícita no window
     window.showPane = showPane;
     window.selectEscalaMonth = selectEscalaMonth;
-    window.openProcModal = openProcModal;
-    window.closeModal = closeModal;
     window.toggleDarkMode = toggleDarkMode;
     window.onRoleChange = onRoleChange;
     window.exportCSV = exportCSV;
@@ -4094,11 +4012,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     window.searchHostInOco = searchHostInOco;
     window.toggleDropdown = toggleDropdown;
     window.handleMenuClick = handleMenuClick;
-    window.filterListViewerTable = filterListViewerTable;
+    window.openDrive = openDrive;
+    window.openDriveFolder = openDriveFolder;
+    window.navigateDriveBreadcrumb = navigateDriveBreadcrumb;
+    window.filterDriveTable = filterDriveTable;
+    window.exportCurrentDriveCSV = exportCurrentDriveCSV;
+    window.openRealList = openRealList;
+    window.filterRealListTable = filterRealListTable;
     window.exportGenericListCSV = exportGenericListCSV;
-    window.renderGenericList = renderGenericList;
+    window.renderGenericList = openRealList;
+    window.filterListViewerTable = filterRealListTable;
     window.renderAntenistasTable = renderAntenistasTable;
     window.renderHostsTable = renderHostsTable;
+    window.renderTable = renderTable;
+    window.renderHospedeirosTable = renderHospedeirosTable;
+    window.renderOcorrenciasTable = renderOcorrenciasTable;
+    window.renderPermsTable = renderPermsTable;
 
     // Inicialização
     initEscalaMonths();
