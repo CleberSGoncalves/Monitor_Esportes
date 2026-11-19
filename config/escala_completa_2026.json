@@ -3,10 +3,10 @@
     "num_dias": 31,
     "operadores": [
       {
-        "nome": "Rodrigo",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Rodrigo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -42,10 +42,10 @@
         }
       },
       {
-        "nome": "Cleber. R",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Cleber. R",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -67,24 +67,14 @@
           "18": "T",
           "19": "T",
           "20": "F",
-          "21": "FÉRIAS",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "21": "FÉRIAS"
         }
       },
       {
-        "nome": "Vinicius",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Monitoração",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Vinicius",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -120,10 +110,10 @@
         }
       },
       {
-        "nome": "Alan",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Alan",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -159,14 +149,12 @@
         }
       },
       {
-        "nome": "Joel",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Joel",
+        "equipe": "FÉRIAS",
         "dias": {
           "1": "FÉRIAS",
-          "2": "",
-          "3": "",
           "4": "F",
           "5": "T",
           "6": "T",
@@ -175,72 +163,27 @@
           "9": "T",
           "10": "F",
           "11": "F",
-          "12": "Desligado",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "12": "DESLIGADO"
         }
       },
       {
-        "nome": "Bruno",
-        "matricula": "",
-        "horario": "23:00 - 06:00",
-        "equipe": "Monitoração",
+        "nome": "23:00 - 06:00",
+        "matricula": "23:00 - 06:00",
+        "horario": "Bruno",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
           "3": "F",
           "4": "F",
-          "5": "FÉRIAS",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "5": "FÉRIAS"
         }
       },
       {
-        "nome": "Cassio",
-        "matricula": "",
-        "horario": "23:00 - 06:00",
-        "equipe": "Monitoração",
+        "nome": "23:00 - 06:00",
+        "matricula": "23:00 - 06:00",
+        "horario": "Cassio",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -276,10 +219,45 @@
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Rodrigo/Joel",
+        "dias": {
+          "1": "RODRIGO/JOEL",
+          "5": "CLEBER/ALAN",
+          "12": "RODRIGO/VINI",
+          "19": "CLEBER/ALAN",
+          "26": "RODRIGO/VINI"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Cleber/Alan",
+        "dias": {
+          "1": "CLEBER/ALAN",
+          "5": "RODRIGO/JOEL",
+          "12": "CLEBER/ALAN",
+          "19": "RODRIGO/VINI",
+          "26": "CLEBER/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Vinicius",
+        "dias": {
+          "1": "VINICIUS"
+        }
+      },
+      {
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Cleber",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -315,10 +293,10 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Marcelo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -354,10 +332,10 @@
         }
       },
       {
-        "nome": "Marcos",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Marcos",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -393,10 +371,10 @@
         }
       },
       {
-        "nome": "Luis",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Luis",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -432,10 +410,10 @@
         }
       },
       {
-        "nome": "Lucieudes",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Lucieudes",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -471,10 +449,10 @@
         }
       },
       {
-        "nome": "Joao",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Joao",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -510,10 +488,10 @@
         }
       },
       {
-        "nome": "Simone",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Simone",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -549,10 +527,10 @@
         }
       },
       {
-        "nome": "Andre",
-        "matricula": "",
-        "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:23",
+        "matricula": "08:00 - 17:23",
+        "horario": "Andre",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -585,164 +563,48 @@
           "29": "T",
           "30": "T",
           "31": "F"
-        }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Rodrigo/Joel",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "Cleber/Alan",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "Rodrigo/Vini",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "Cleber/Alan",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "Rodrigo/Vini",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Cleber/Alan",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "Rodrigo/Joel",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "Cleber/Alan",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "Rodrigo/Vini",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "Cleber/Alan",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Vinicius",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
         }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Luis",
         "dias": {
-          "1": "Luis",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "Lucieudes",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "Marcos",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "Cleber",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "Marcelo",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "1": "LUIS",
+          "5": "LUCIEUDES",
+          "12": "MARCOS",
+          "19": "CLEBER",
+          "26": "MARCELO"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "PESSOAL,",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Fevereiro": {
     "num_dias": 28,
     "operadores": [
       {
-        "nome": "Rodrigo",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Rodrigo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -775,20 +637,12 @@
         }
       },
       {
-        "nome": "Cleber. R",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Cleber. R",
+        "equipe": "FÉRIAS",
         "dias": {
           "1": "FÉRIAS",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
           "10": "FJ",
           "11": "FJ",
           "12": "F",
@@ -811,10 +665,10 @@
         }
       },
       {
-        "nome": "Vinicius",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Vinicius",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -847,10 +701,10 @@
         }
       },
       {
-        "nome": "Alan",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Alan",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "FJ",
@@ -883,14 +737,12 @@
         }
       },
       {
-        "nome": "Bruno",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Bruno",
+        "equipe": "FÉRIAS",
         "dias": {
           "1": "FÉRIAS",
-          "2": "",
-          "3": "",
           "4": "T",
           "5": "T",
           "6": "F",
@@ -919,10 +771,10 @@
         }
       },
       {
-        "nome": "Cassio",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Cassio",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -955,27 +807,48 @@
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Rodrigo/Vini",
+        "dias": {
+          "1": "RODRIGO/VINI",
+          "2": "CLEBER/ALAN",
+          "9": "RODRIGO/VINI",
+          "16": "CLEBER/ALAN",
+          "23": "RODRIGO/VINI"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Cleber/Alan",
+        "dias": {
+          "1": "CLEBER/ALAN",
+          "2": "RODRIGO/VINI",
+          "9": "CLEBER/ALAN",
+          "16": "RODRIGO/VINI",
+          "23": "CLEBER/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Vinicius",
+        "dias": {
+          "1": "VINICIUS"
+        }
+      },
+      {
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Cleber",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "FÉRIAS",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
           "17": "F",
           "18": "DAY OFF",
           "19": "T",
@@ -991,10 +864,10 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Marcelo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1027,10 +900,10 @@
         }
       },
       {
-        "nome": "Marcos",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Marcos",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1063,10 +936,10 @@
         }
       },
       {
-        "nome": "Luis",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Luis",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1099,10 +972,10 @@
         }
       },
       {
-        "nome": "Lucieudes",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Lucieudes",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1127,18 +1000,14 @@
           "21": "F",
           "22": "F",
           "23": "FÉRIAS",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
           "28": "F"
         }
       },
       {
-        "nome": "Joao",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Joao",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -1171,10 +1040,10 @@
         }
       },
       {
-        "nome": "Simone",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Simone",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1207,10 +1076,10 @@
         }
       },
       {
-        "nome": "Andre",
-        "matricula": "",
-        "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:23",
+        "matricula": "08:00 - 17:23",
+        "horario": "Andre",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1240,152 +1109,55 @@
           "26": "T",
           "27": "T",
           "28": "F"
-        }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Rodrigo/Vini",
-          "2": "Cleber/Alan",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "Rodrigo/Vini",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "Cleber/Alan",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "Rodrigo/Vini",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": ""
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Cleber/Alan",
-          "2": "Rodrigo/Vini",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "Cleber/Alan",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "Rodrigo/Vini",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "Cleber/Alan",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": ""
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Vinicius",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": ""
         }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Marcelo",
         "dias": {
-          "1": "Marcelo",
-          "2": "Luis",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "Lucieudes",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "Marcelo",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "Cleber",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": ""
+          "1": "MARCELO",
+          "2": "LUIS",
+          "9": "LUCIEUDES",
+          "16": "MARCELO",
+          "23": "CLEBER"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "PESSOAL,",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Março": {
     "num_dias": 31,
     "operadores": [
       {
-        "nome": "Rodrigo",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Rodrigo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1421,10 +1193,10 @@
         }
       },
       {
-        "nome": "Cleber. R",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Cleber. R",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -1460,10 +1232,10 @@
         }
       },
       {
-        "nome": "Vinicius",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Monitoração",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Vinicius",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1499,10 +1271,10 @@
         }
       },
       {
-        "nome": "Alan",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Alan",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -1538,10 +1310,10 @@
         }
       },
       {
-        "nome": "Bruno",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Bruno",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1577,10 +1349,10 @@
         }
       },
       {
-        "nome": "Cassio",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Cassio",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -1616,10 +1388,47 @@
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Rodrigo/Vini",
+        "dias": {
+          "1": "RODRIGO/VINI",
+          "2": "CLEBER/ALAN",
+          "9": "RODRIGO/VINI",
+          "16": "CLEBER/ALAN",
+          "23": "RODRIGO/VINI",
+          "30": "CLEBER/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Cleber/Alan",
+        "dias": {
+          "1": "CLEBER/ALAN",
+          "2": "RODRIGO/VINI",
+          "9": "CLEBER/ALAN",
+          "16": "RODRIGO/VINI",
+          "23": "CLEBER/ALAN",
+          "30": "RODRIGO/VINI"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Vinicius",
+        "dias": {
+          "1": "VINICIUS"
+        }
+      },
+      {
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Cleber",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1655,10 +1464,10 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Marcelo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1694,10 +1503,10 @@
         }
       },
       {
-        "nome": "Marcos",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Marcos",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "FJ",
@@ -1733,10 +1542,10 @@
         }
       },
       {
-        "nome": "Luis",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Luis",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1772,10 +1581,10 @@
         }
       },
       {
-        "nome": "Lucieudes",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Lucieudes",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1811,10 +1620,10 @@
         }
       },
       {
-        "nome": "Joao",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Joao",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1850,10 +1659,10 @@
         }
       },
       {
-        "nome": "Simone",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Simone",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1871,28 +1680,14 @@
           "14": "F",
           "15": "F",
           "16": "FÉRIAS",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
           "31": "T"
         }
       },
       {
-        "nome": "Andre",
-        "matricula": "",
-        "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:23",
+        "matricula": "08:00 - 17:23",
+        "horario": "Andre",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -1926,163 +1721,62 @@
           "30": "T",
           "31": "T"
         }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Rodrigo/Vini",
-          "2": "Cleber/Alan",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "Rodrigo/Vini",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "Cleber/Alan",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "Rodrigo/Vini",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "Cleber/Alan",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Cleber/Alan",
-          "2": "Rodrigo/Vini",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "Cleber/Alan",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "Rodrigo/Vini",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "Cleber/Alan",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "Rodrigo/Vini",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Vinicius",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Cleber",
         "dias": {
-          "1": "Cleber",
-          "2": "Marcelo",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "Luis",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "Lucieudes",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "Marcos",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "Cleber",
-          "31": ""
+          "1": "CLEBER",
+          "2": "MARCELO",
+          "9": "LUIS",
+          "16": "LUCIEUDES",
+          "23": "MARCOS",
+          "30": "CLEBER"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "PESSOAL,",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "LIC",
+        "matricula": "Licença",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Abril": {
     "num_dias": 30,
     "operadores": [
       {
-        "nome": "Rodrigo",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Rodrigo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2117,10 +1811,10 @@
         }
       },
       {
-        "nome": "Cleber. R",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Cleber. R",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -2155,10 +1849,10 @@
         }
       },
       {
-        "nome": "Vinicius",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Monitoração",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Vinicius",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "F",
@@ -2193,10 +1887,10 @@
         }
       },
       {
-        "nome": "Alan",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Alan",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2231,48 +1925,48 @@
         }
       },
       {
-        "nome": "Marcelo. F",
-        "matricula": "",
-        "horario": "09:00 - 18:00",
-        "equipe": "Monitoração",
+        "nome": "09:00 - 18:00",
+        "matricula": "09:00 - 18:00",
+        "horario": "Marcelo. F",
+        "equipe": "Tr",
         "dias": {
-          "1": "Tr",
-          "2": "Tr",
+          "1": "TR",
+          "2": "TR",
           "3": "F",
           "4": "F",
           "5": "F",
-          "6": "Tr",
-          "7": "Tr",
-          "8": "Tr",
-          "9": "Tr",
-          "10": "Tr",
+          "6": "TR",
+          "7": "TR",
+          "8": "TR",
+          "9": "TR",
+          "10": "TR",
           "11": "F",
           "12": "F",
-          "13": "Tr",
-          "14": "Tr",
-          "15": "Tr",
-          "16": "Tr",
-          "17": "Tr",
+          "13": "TR",
+          "14": "TR",
+          "15": "TR",
+          "16": "TR",
+          "17": "TR",
           "18": "F",
           "19": "F",
-          "20": "Tr",
+          "20": "TR",
           "21": "F",
-          "22": "Tr",
-          "23": "Tr",
-          "24": "Tr",
+          "22": "TR",
+          "23": "TR",
+          "24": "TR",
           "25": "F",
           "26": "F",
-          "27": "Tr",
-          "28": "Tr",
-          "29": "Tr",
-          "30": "Tr"
+          "27": "TR",
+          "28": "TR",
+          "29": "TR",
+          "30": "TR"
         }
       },
       {
-        "nome": "Bruno",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Bruno",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2307,10 +2001,10 @@
         }
       },
       {
-        "nome": "Cassio",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Cassio",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2345,10 +2039,45 @@
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Cleber/Alan",
+        "dias": {
+          "1": "CLEBER/ALAN",
+          "6": "RODRIGO/VINI",
+          "13": "CLEBER/ALAN",
+          "20": "RODRIGO/VINI",
+          "27": "CLEBER/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Rodrigo/Vini",
+        "dias": {
+          "1": "RODRIGO/VINI",
+          "6": "CLEBER/ALAN",
+          "13": "RODRIGO/VINI",
+          "20": "CLEBER/ALAN",
+          "27": "RODRIGO/VINI"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Vinicius",
+        "dias": {
+          "1": "VINICIUS"
+        }
+      },
+      {
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Cleber",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2383,10 +2112,10 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Marcelo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2421,10 +2150,10 @@
         }
       },
       {
-        "nome": "Marcos",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Marcos",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2459,10 +2188,10 @@
         }
       },
       {
-        "nome": "Luis",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Luis",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2497,10 +2226,10 @@
         }
       },
       {
-        "nome": "Lucieudes",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Lucieudes",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2535,10 +2264,10 @@
         }
       },
       {
-        "nome": "Joao",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Joao",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2546,25 +2275,6 @@
           "4": "F",
           "5": "F",
           "6": "FÉRIAS",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
           "26": "F",
           "27": "T",
           "28": "T",
@@ -2573,10 +2283,10 @@
         }
       },
       {
-        "nome": "Simone",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Simone",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2611,10 +2321,10 @@
         }
       },
       {
-        "nome": "Andre",
-        "matricula": "",
-        "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:23",
+        "matricula": "08:00 - 17:23",
+        "horario": "Andre",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2646,160 +2356,55 @@
           "28": "T",
           "29": "T",
           "30": "T"
-        }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Cleber/Alan",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "Rodrigo/Vini",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "Cleber/Alan",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "Rodrigo/Vini",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "Cleber/Alan",
-          "28": "",
-          "29": "",
-          "30": ""
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Rodrigo/Vini",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "Cleber/Alan",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "Rodrigo/Vini",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "Cleber/Alan",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "Rodrigo/Vini",
-          "28": "",
-          "29": "",
-          "30": ""
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Vinicius",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": ""
         }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Cleber",
         "dias": {
-          "1": "Cleber",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "Marcelo",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "Luis",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "Lucieudes",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "Marcos",
-          "28": "",
-          "29": "",
-          "30": ""
+          "1": "CLEBER",
+          "6": "MARCELO",
+          "13": "LUIS",
+          "20": "LUCIEUDES",
+          "27": "MARCOS"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "PESSOAL,",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Maio": {
     "num_dias": 31,
     "operadores": [
       {
-        "nome": "Rodrigo",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Rodrigo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -2835,10 +2440,10 @@
         }
       },
       {
-        "nome": "Cleber. R",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Cleber. R",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -2874,29 +2479,15 @@
         }
       },
       {
-        "nome": "Vinicius",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Monitoração",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Vinicius",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
           "3": "T",
           "4": "FÉRIAS",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
           "19": "T",
           "20": "T",
           "21": "T",
@@ -2913,10 +2504,10 @@
         }
       },
       {
-        "nome": "Alan",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Alan",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "F",
@@ -2952,25 +2543,25 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Marcelo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
           "3": "F",
-          "4": "Tr",
-          "5": "Tr",
-          "6": "Tr",
+          "4": "TR",
+          "5": "TR",
+          "6": "TR",
           "7": "T",
-          "8": "Tr",
+          "8": "TR",
           "9": "F",
           "10": "F",
-          "11": "Tr",
+          "11": "TR",
           "12": "T",
-          "13": "Tr",
-          "14": "Tr",
+          "13": "TR",
+          "14": "TR",
           "15": "T",
           "16": "F",
           "17": "F",
@@ -2991,10 +2582,10 @@
         }
       },
       {
-        "nome": "Bruno",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Bruno",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -3030,10 +2621,10 @@
         }
       },
       {
-        "nome": "Cassio",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Cassio",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "F",
@@ -3069,10 +2660,45 @@
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Cleber/Alan",
+        "dias": {
+          "1": "CLEBER/ALAN",
+          "4": "RODRIGO/VINI",
+          "11": "CLEBER/ALAN",
+          "18": "RODRIGO/MARCELO",
+          "25": "CLEBER/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Rodrigo/Vini",
+        "dias": {
+          "1": "RODRIGO/VINI",
+          "4": "CLEBER/ALAN",
+          "11": "RODRIGO/VINI",
+          "18": "CLEBER/ALAN",
+          "25": "RODRIGO/MARCELO"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Vinicius",
+        "dias": {
+          "1": "VINICIUS"
+        }
+      },
+      {
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Cleber",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -3108,10 +2734,10 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Marcelo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -3147,10 +2773,10 @@
         }
       },
       {
-        "nome": "Marcos",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Marcos",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -3186,10 +2812,10 @@
         }
       },
       {
-        "nome": "Lucieudes",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Lucieudes",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -3225,10 +2851,10 @@
         }
       },
       {
-        "nome": "Joao",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Joao",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "F",
@@ -3264,10 +2890,10 @@
         }
       },
       {
-        "nome": "Simone",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Simone",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -3303,10 +2929,10 @@
         }
       },
       {
-        "nome": "Andre",
-        "matricula": "",
-        "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:23",
+        "matricula": "08:00 - 17:23",
+        "horario": "Andre",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -3339,164 +2965,62 @@
           "29": "T",
           "30": "F",
           "31": "F"
-        }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Cleber/Alan",
-          "2": "",
-          "3": "",
-          "4": "Rodrigo/Vini",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "Cleber/Alan",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "Rodrigo/Marcelo",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "Cleber/Alan",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Rodrigo/Vini",
-          "2": "",
-          "3": "",
-          "4": "Cleber/Alan",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "Rodrigo/Vini",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "Cleber/Alan",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "Rodrigo/Marcelo",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Vinicius",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
         }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Marcos",
         "dias": {
-          "1": "Marcos",
-          "2": "",
-          "3": "",
-          "4": "Cleber",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "Marcelo",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "Lucieudes",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "Marcos",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "1": "MARCOS",
+          "4": "CLEBER",
+          "11": "MARCELO",
+          "18": "LUCIEUDES",
+          "25": "MARCOS"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "PESSOAL,",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "LIC",
+        "matricula": "Licença",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Junho": {
     "num_dias": 30,
     "operadores": [
       {
-        "nome": "Rodrigo",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Rodrigo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3531,10 +3055,10 @@
         }
       },
       {
-        "nome": "Cleber. R",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Cleber. R",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3569,10 +3093,10 @@
         }
       },
       {
-        "nome": "Alan",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Alan",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3607,10 +3131,10 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Marcelo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "F",
@@ -3645,10 +3169,10 @@
         }
       },
       {
-        "nome": "Bruno",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Bruno",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3683,10 +3207,10 @@
         }
       },
       {
-        "nome": "Cassio",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Cassio",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3721,10 +3245,45 @@
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Cleber/Alan",
+        "dias": {
+          "1": "CLEBER/ALAN",
+          "8": "RODRIGO/MARCELO",
+          "15": "CLEBER/ALAN",
+          "22": "RODRIGO/MARCELO",
+          "29": "CLEBER/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Rodrigo/Marcelo",
+        "dias": {
+          "1": "RODRIGO/MARCELO",
+          "8": "CLEBER/ALAN",
+          "15": "RODRIGO/MARCELO",
+          "22": "CLEBER/ALAN",
+          "29": "RODRIGO/MARCELO"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Joao",
+        "dias": {
+          "1": "JOAO"
+        }
+      },
+      {
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Cleber",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3759,10 +3318,10 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Marcelo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3797,10 +3356,10 @@
         }
       },
       {
-        "nome": "Marcos",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Marcos",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3835,10 +3394,10 @@
         }
       },
       {
-        "nome": "Lucieudes",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Lucieudes",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3873,10 +3432,10 @@
         }
       },
       {
-        "nome": "Vinicius",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Vinicius",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3911,10 +3470,10 @@
         }
       },
       {
-        "nome": "Joao",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Joao",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3949,10 +3508,10 @@
         }
       },
       {
-        "nome": "Simone",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Simone",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -3987,10 +3546,10 @@
         }
       },
       {
-        "nome": "Andre",
-        "matricula": "",
-        "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:23",
+        "matricula": "08:00 - 17:23",
+        "horario": "Andre",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4022,160 +3581,62 @@
           "28": "F",
           "29": "T",
           "30": "T"
-        }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Cleber/Alan",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "Rodrigo/Marcelo",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "Cleber/Alan",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "Rodrigo/Marcelo",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "Cleber/Alan",
-          "30": ""
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Rodrigo/Marcelo",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "Cleber/Alan",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "Rodrigo/Marcelo",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "Cleber/Alan",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "Rodrigo/Marcelo",
-          "30": ""
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Joao",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": ""
         }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Cleber",
         "dias": {
-          "1": "Cleber",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "Marcelo",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "Lucieudes",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "Marcos",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "Vinicius",
-          "30": ""
+          "1": "CLEBER",
+          "8": "MARCELO",
+          "15": "LUCIEUDES",
+          "22": "MARCOS",
+          "29": "VINICIUS"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "PESSOAL,",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "LIC",
+        "matricula": "Licença",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Julho": {
     "num_dias": 31,
     "operadores": [
       {
-        "nome": "Rodrigo",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Rodrigo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "F",
@@ -4211,10 +3672,10 @@
         }
       },
       {
-        "nome": "Cleber. R",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Cleber. R",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4250,10 +3711,10 @@
         }
       },
       {
-        "nome": "Alan",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Alan",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4281,18 +3742,14 @@
           "24": "T",
           "25": "F",
           "26": "F",
-          "27": "FÉRIAS",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "27": "FÉRIAS"
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Marcelo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4328,10 +3785,10 @@
         }
       },
       {
-        "nome": "Bruno",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Bruno",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4367,10 +3824,10 @@
         }
       },
       {
-        "nome": "Cassio",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Cassio",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4398,18 +3855,49 @@
           "24": "T",
           "25": "F",
           "26": "F",
-          "27": "LICENÇA PARTERNIDADE",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "27": "LICENÇA PARTERNIDADE"
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Cleber/Alan",
+        "dias": {
+          "1": "CLEBER/ALAN",
+          "6": "RODRIGO/MARCELO",
+          "13": "CLEBER/ALAN",
+          "20": "RODRIGO/MARCELO",
+          "27": "CLEBER/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Rodrigo/Marcelo",
+        "dias": {
+          "1": "RODRIGO/MARCELO",
+          "6": "CLEBER/ALAN",
+          "13": "RODRIGO/MARCELO",
+          "20": "CLEBER/ALAN",
+          "27": "RODRIGO/MARCELO"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "JOAO",
+        "dias": {
+          "1": "JOAO"
+        }
+      },
+      {
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Cleber",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4445,10 +3933,10 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Marcelo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4484,10 +3972,10 @@
         }
       },
       {
-        "nome": "Marcos",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Marcos",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4523,10 +4011,10 @@
         }
       },
       {
-        "nome": "Lucieudes",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Lucieudes",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4547,25 +4035,14 @@
           "17": "T",
           "18": "F",
           "19": "F",
-          "20": "FÉRIAS",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "20": "FÉRIAS"
         }
       },
       {
-        "nome": "Vinicius",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Vinicius",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4601,10 +4078,10 @@
         }
       },
       {
-        "nome": "Joao",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Joao",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4640,10 +4117,10 @@
         }
       },
       {
-        "nome": "Simone",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Simone",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4679,10 +4156,10 @@
         }
       },
       {
-        "nome": "Andre",
-        "matricula": "",
-        "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:23",
+        "matricula": "08:00 - 17:23",
+        "horario": "Andre",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4715,164 +4192,62 @@
           "29": "T",
           "30": "T",
           "31": "T"
-        }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Cleber/Alan",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "Rodrigo/Marcelo",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "Cleber/Alan",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "Rodrigo/Marcelo",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "Cleber/Alan",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Rodrigo/Marcelo",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "Cleber/Alan",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "Rodrigo/Marcelo",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "Cleber/Alan",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "Rodrigo/Marcelo",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "JOAO",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
         }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Vinicius",
         "dias": {
-          "1": "Vinicius",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "Cleber",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "Marcelo",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "Vincius",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "Marcos",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "1": "VINICIUS",
+          "6": "CLEBER",
+          "13": "MARCELO",
+          "20": "VINCIUS",
+          "27": "MARCOS"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "PESSOAL,",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "LIC",
+        "matricula": "Licença",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Agosto": {
     "num_dias": 31,
     "operadores": [
       {
-        "nome": "Rodrigo",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Rodrigo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -4908,10 +4283,10 @@
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Cleber",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -4947,26 +4322,12 @@
         }
       },
       {
-        "nome": "Alan",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Alan",
+        "equipe": "FÉRIAS",
         "dias": {
           "1": "FÉRIAS",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
           "16": "T",
           "17": "T",
           "18": "T",
@@ -4986,10 +4347,10 @@
         }
       },
       {
-        "nome": "Marcelo F",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Marcelo F",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -5025,49 +4386,49 @@
         }
       },
       {
-        "nome": "Romulo",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Romulo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
-          "3": "Tr",
-          "4": "Tr",
-          "5": "Tr",
-          "6": "Tr",
-          "7": "Tr",
+          "3": "TR",
+          "4": "TR",
+          "5": "TR",
+          "6": "TR",
+          "7": "TR",
           "8": "F",
           "9": "F",
-          "10": "Tr",
-          "11": "Tr",
-          "12": "Tr",
-          "13": "Tr",
+          "10": "TR",
+          "11": "TR",
+          "12": "TR",
+          "13": "TR",
           "14": "T",
           "15": "F",
           "16": "F",
-          "17": "Tr",
-          "18": "Tr",
-          "19": "Tr",
-          "20": "Tr",
+          "17": "TR",
+          "18": "TR",
+          "19": "TR",
+          "20": "TR",
           "21": "DAY OFF",
           "22": "F",
           "23": "F",
-          "24": "Tr",
-          "25": "Tr",
-          "26": "Tr",
-          "27": "Tr",
-          "28": "Tr",
+          "24": "TR",
+          "25": "TR",
+          "26": "TR",
+          "27": "TR",
+          "28": "TR",
           "29": "F",
           "30": "F",
-          "31": "Tr"
+          "31": "TR"
         }
       },
       {
-        "nome": "Bruno",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Bruno",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -5103,34 +4464,12 @@
         }
       },
       {
-        "nome": "Cassio",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Cassio",
+        "equipe": "LICENÇA PARTERNIDADE",
         "dias": {
           "1": "LICENÇA PARTERNIDADE",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
           "24": "DAY OFF",
           "25": "T",
           "26": "T",
@@ -5142,10 +4481,47 @@
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Cleber/Alan",
+        "dias": {
+          "1": "CLEBER/ALAN",
+          "3": "RODRIGO/MARCELO",
+          "10": "CLEBER/ALAN",
+          "17": "RODRIGO/MARCELO",
+          "24": "CLEBER/ALAN",
+          "31": "RODRIGO/MARCELO"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Rodrigo/Marcelo",
+        "dias": {
+          "1": "RODRIGO/MARCELO",
+          "3": "CLEBER/ALAN",
+          "10": "RODRIGO/MARCELO",
+          "17": "CLEBER/ALAN",
+          "24": "RODRIGO/MARCELO",
+          "31": "CLEBER/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Joao",
+        "dias": {
+          "1": "JOAO"
+        }
+      },
+      {
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Cleber",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -5181,10 +4557,10 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Marcelo",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -5220,10 +4596,10 @@
         }
       },
       {
-        "nome": "Marcos",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Marcos",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -5259,14 +4635,12 @@
         }
       },
       {
-        "nome": "Lucieudes",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Lucieudes",
+        "equipe": "FÉRIAS",
         "dias": {
           "1": "FÉRIAS",
-          "2": "",
-          "3": "",
           "4": "T",
           "5": "T",
           "6": "T",
@@ -5298,10 +4672,10 @@
         }
       },
       {
-        "nome": "Vinicius",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Vinicius",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -5337,10 +4711,10 @@
         }
       },
       {
-        "nome": "Joao",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Joao",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -5376,18 +4750,14 @@
         }
       },
       {
-        "nome": "Simone",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Simone",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
           "3": "FÉRIAS",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
           "8": "F",
           "9": "F",
           "10": "DAY OFF",
@@ -5415,10 +4785,10 @@
         }
       },
       {
-        "nome": "Andre",
-        "matricula": "",
-        "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:23",
+        "matricula": "08:00 - 17:23",
+        "horario": "Andre",
+        "equipe": "F",
         "dias": {
           "1": "F",
           "2": "F",
@@ -5452,163 +4822,55 @@
           "30": "F",
           "31": "T"
         }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Cleber/Alan",
-          "2": "",
-          "3": "Rodrigo/Marcelo",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "Cleber/Alan",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "Rodrigo/Marcelo",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "Cleber/Alan",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": "Rodrigo/Marcelo"
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Rodrigo/Marcelo",
-          "2": "",
-          "3": "Cleber/Alan",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "Rodrigo/Marcelo",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "Cleber/Alan",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "Rodrigo/Marcelo",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": "Cleber/Alan"
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Joao",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Marcos",
         "dias": {
-          "1": "Marcos",
-          "2": "",
-          "3": "Cleber",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "Marcelo",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "Lucieudes",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "Vinicius",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": "Marcos"
+          "1": "MARCOS",
+          "3": "CLEBER",
+          "10": "MARCELO",
+          "17": "LUCIEUDES",
+          "24": "VINICIUS",
+          "31": "MARCOS"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "PESSOAL,",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Setembro": {
     "num_dias": 30,
     "operadores": [
       {
-        "nome": "Rodrigo",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Rodrigo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -5623,30 +4885,14 @@
           "11": "F",
           "12": "T",
           "13": "T",
-          "14": "FÉRIAS",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": ""
+          "14": "FÉRIAS"
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "nome": "06:00 - 15:00",
+        "matricula": "06:00 - 15:00",
+        "horario": "Cleber",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -5681,10 +4927,10 @@
         }
       },
       {
-        "nome": "Alan",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Alan",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -5719,10 +4965,10 @@
         }
       },
       {
-        "nome": "Marcelo F",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Marcelo F",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -5757,22 +5003,22 @@
         }
       },
       {
-        "nome": "Romulo",
-        "matricula": "",
-        "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "nome": "14:00 - 23:00",
+        "matricula": "14:00 - 23:00",
+        "horario": "Romulo",
+        "equipe": "Tr",
         "dias": {
-          "1": "Tr",
-          "2": "Tr",
-          "3": "Tr",
-          "4": "Tr",
+          "1": "TR",
+          "2": "TR",
+          "3": "TR",
+          "4": "TR",
           "5": "F",
           "6": "F",
           "7": "F",
-          "8": "Tr",
-          "9": "Tr",
-          "10": "Tr",
-          "11": "Tr",
+          "8": "TR",
+          "9": "TR",
+          "10": "TR",
+          "11": "TR",
           "12": "F",
           "13": "F",
           "14": "T",
@@ -5795,10 +5041,10 @@
         }
       },
       {
-        "nome": "Bruno",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Bruno",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -5833,16 +5079,12 @@
         }
       },
       {
-        "nome": "Cassio",
-        "matricula": "",
-        "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "nome": "22:50 - 06:10",
+        "matricula": "22:50 - 06:10",
+        "horario": "Cassio",
+        "equipe": "FÉRIAS",
         "dias": {
           "1": "FÉRIAS",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
           "6": "F",
           "7": "T",
           "8": "T",
@@ -5871,10 +5113,45 @@
         }
       },
       {
-        "nome": "Cleber",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Rodrigo/Marcelo",
+        "dias": {
+          "1": "RODRIGO/MARCELO",
+          "7": "CLEBER/ALAN",
+          "14": "RODRIGO/MARCELO",
+          "21": "ROMULO/ALAN",
+          "28": "RODRIGO/MARCELO"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Cleber/Alan",
+        "dias": {
+          "1": "CLEBER/ALAN",
+          "7": "RODRIGO/MARCELO",
+          "14": "ROMULO/ALAN",
+          "21": "RODRIGO/MARCELO",
+          "28": "ROMULO/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Joao",
+        "dias": {
+          "1": "JOAO"
+        }
+      },
+      {
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Cleber",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -5909,10 +5186,10 @@
         }
       },
       {
-        "nome": "Marcelo",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Marcelo",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -5947,10 +5224,10 @@
         }
       },
       {
-        "nome": "Marcos",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Marcos",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -5960,35 +5237,16 @@
           "6": "F",
           "7": "F",
           "8": "FÉRIAS",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
           "28": "T",
           "29": "T",
           "30": "T"
         }
       },
       {
-        "nome": "Lucieudes",
-        "matricula": "",
-        "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "nome": "10:00 - 19:00",
+        "matricula": "10:00 - 19:00",
+        "horario": "Lucieudes",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6023,10 +5281,10 @@
         }
       },
       {
-        "nome": "Vinicius",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Vinicius",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6061,10 +5319,10 @@
         }
       },
       {
-        "nome": "Joao",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Joao",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6099,10 +5357,10 @@
         }
       },
       {
-        "nome": "Simone",
-        "matricula": "",
-        "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:00",
+        "matricula": "08:00 - 17:00",
+        "horario": "Simone",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6137,10 +5395,10 @@
         }
       },
       {
-        "nome": "Andre",
-        "matricula": "",
-        "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "nome": "08:00 - 17:23",
+        "matricula": "08:00 - 17:23",
+        "horario": "Andre",
+        "equipe": "T",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6162,184 +5420,67 @@
           "18": "T",
           "19": "F",
           "20": "F",
-          "21": "FÉRIAS",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": ""
-        }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Rodrigo/Marcelo",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "Cleber/Alan",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "Rodrigo/Marcelo",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "Romulo/Alan",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "Rodrigo/Marcelo",
-          "29": "",
-          "30": ""
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Cleber/Alan",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "Rodrigo/Marcelo",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "Romulo/Alan",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "Rodrigo/Marcelo",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "Romulo/Alan",
-          "29": "",
-          "30": ""
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Joao",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": ""
+          "21": "FÉRIAS"
         }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Marcos",
         "dias": {
-          "1": "Marcos",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "Cleber",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "Marcelo",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "Lucieudes",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "Vinicius",
-          "29": "",
-          "30": ""
+          "1": "MARCOS",
+          "7": "CLEBER",
+          "14": "MARCELO",
+          "21": "LUCIEUDES",
+          "28": "VINICIUS"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "PESSOAL,",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Outubro": {
     "num_dias": 31,
     "operadores": [
       {
-        "nome": "Rodrigo",
+        "nome": "Matricula",
+        "matricula": "Matricula",
+        "horario": "Horário",
+        "equipe": "Nome",
+        "dias": {
+          "1": "SUPORTE TÉCNICO - MONITORAÇÃO"
+        }
+      },
+      {
+        "nome": "1015103",
         "matricula": "1015103",
         "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "equipe": "Rodrigo",
         "dias": {
           "1": "FÉRIAS",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
           "14": "T",
           "15": "T",
           "16": "T",
@@ -6361,10 +5502,10 @@
         }
       },
       {
-        "nome": "Alan",
+        "nome": "1014892",
         "matricula": "1014892",
         "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "equipe": "Alan",
         "dias": {
           "1": "T",
           "2": "F",
@@ -6400,10 +5541,10 @@
         }
       },
       {
-        "nome": "Cleber",
+        "nome": "1013022",
         "matricula": "1013022",
         "horario": "10:00 - 19:00",
-        "equipe": "Monitoração",
+        "equipe": "Cleber",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6439,10 +5580,10 @@
         }
       },
       {
-        "nome": "Marcelo F",
+        "nome": "1015466",
         "matricula": "1015466",
         "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "equipe": "Marcelo F",
         "dias": {
           "1": "F",
           "2": "T",
@@ -6478,10 +5619,10 @@
         }
       },
       {
-        "nome": "Romulo",
+        "nome": "1015615",
         "matricula": "1015615",
         "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "equipe": "Romulo",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6517,10 +5658,10 @@
         }
       },
       {
-        "nome": "Bruno",
+        "nome": "1008331",
         "matricula": "1008331",
         "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "equipe": "Bruno",
         "dias": {
           "1": "T",
           "2": "F",
@@ -6556,10 +5697,10 @@
         }
       },
       {
-        "nome": "Cassio",
+        "nome": "1009573",
         "matricula": "1009573",
         "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "equipe": "Cassio",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6595,10 +5736,54 @@
         }
       },
       {
-        "nome": "Cleber",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "RODRIGO/MARCELO",
+          "5": "ROMULO/ALAN",
+          "12": "RODRIGO/MARCELO",
+          "19": "ROMULO/ALAN",
+          "26": "RODRIGO/MARCELO"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "ROMULO/ALAN",
+          "5": "RODRIGO/MARCELO",
+          "12": "ROMULO/ALAN",
+          "19": "RODRIGO/MARCELO",
+          "26": "ROMULO/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "CLEBER"
+        }
+      },
+      {
+        "nome": "Matricula",
+        "matricula": "Matricula",
+        "horario": "Horário",
+        "equipe": "Nome",
+        "dias": {
+          "1": "SUPORTE TÉCNICO - CAPTAÇÃO"
+        }
+      },
+      {
+        "nome": "1000461",
         "matricula": "1000461",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Cleber",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6634,49 +5819,25 @@
         }
       },
       {
-        "nome": "Marcelo",
+        "nome": "1000489",
         "matricula": "1000489",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Marcelo",
         "dias": {
           "1": "T",
           "2": "T",
           "3": "F",
           "4": "F",
           "5": "FÉRIAS",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
           "30": "DAY OFF",
           "31": "F"
         }
       },
       {
-        "nome": "Marcos",
+        "nome": "1000304",
         "matricula": "1000304",
         "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "equipe": "Marcos",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6712,10 +5873,10 @@
         }
       },
       {
-        "nome": "Lucieudes",
+        "nome": "1003832",
         "matricula": "1003832",
         "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "equipe": "Lucieudes",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6751,10 +5912,10 @@
         }
       },
       {
-        "nome": "Vinicius",
+        "nome": "1011369",
         "matricula": "1011369",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Vinicius",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6790,10 +5951,10 @@
         }
       },
       {
-        "nome": "Joao",
+        "nome": "1009828",
         "matricula": "1009828",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Joao",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6829,10 +5990,10 @@
         }
       },
       {
-        "nome": "Simone",
+        "nome": "1000358",
         "matricula": "1000358",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Simone",
         "dias": {
           "1": "T",
           "2": "T",
@@ -6868,16 +6029,12 @@
         }
       },
       {
-        "nome": "Andre",
+        "nome": "1011372",
         "matricula": "1011372",
         "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "equipe": "Andre",
         "dias": {
           "1": "FÉRIAS",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
           "6": "T",
           "7": "T",
           "8": "T",
@@ -6905,163 +6062,63 @@
           "30": "SM",
           "31": "F"
         }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Rodrigo/Marcelo",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "Romulo/Alan",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "Rodrigo/Marcelo",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "Romulo/Alan",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "Rodrigo/Marcelo",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Romulo/Alan",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "Rodrigo/Marcelo",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "Romulo/Alan",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "Rodrigo/Marcelo",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "Romulo/Alan",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Cleber",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Captação",
         "dias": {
-          "1": "Vinicius",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "Marcos",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "Cleber",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "Lucieudes",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "Vinicius",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "1": "VINICIUS",
+          "5": "MARCOS",
+          "12": "CLEBER",
+          "19": "LUCIEUDES",
+          "26": "VINICIUS"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Novembro": {
     "num_dias": 30,
     "operadores": [
       {
-        "nome": "Rodrigo",
+        "nome": "Matricula",
+        "matricula": "Matricula",
+        "horario": "Horário",
+        "equipe": "Nome",
+        "dias": {
+          "1": "SUPORTE TÉCNICO - MONITORAÇÃO"
+        }
+      },
+      {
+        "nome": "1015103",
         "matricula": "1015103",
         "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "equipe": "Rodrigo",
         "dias": {
           "1": "F",
           "2": "T",
@@ -7096,10 +6153,10 @@
         }
       },
       {
-        "nome": "Alan",
+        "nome": "1014892",
         "matricula": "1014892",
         "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "equipe": "Alan",
         "dias": {
           "1": "T",
           "2": "F",
@@ -7134,10 +6191,10 @@
         }
       },
       {
-        "nome": "Cleber",
+        "nome": "1013022",
         "matricula": "1013022",
         "horario": "10:00 - 19:00",
-        "equipe": "Monitoração",
+        "equipe": "Cleber",
         "dias": {
           "1": "F",
           "2": "F",
@@ -7172,10 +6229,10 @@
         }
       },
       {
-        "nome": "Marcelo F",
+        "nome": "1015466",
         "matricula": "1015466",
         "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "equipe": "Marcelo F",
         "dias": {
           "1": "T",
           "2": "F",
@@ -7190,30 +6247,14 @@
           "11": "T",
           "12": "T",
           "13": "T",
-          "14": "LICENÇA PARTERNIDADE",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": ""
+          "14": "LICENÇA PARTERNIDADE"
         }
       },
       {
-        "nome": "Romulo",
+        "nome": "1015615",
         "matricula": "1015615",
         "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "equipe": "Romulo",
         "dias": {
           "1": "F",
           "2": "T",
@@ -7248,10 +6289,10 @@
         }
       },
       {
-        "nome": "Bruno",
+        "nome": "1008331",
         "matricula": "1008331",
         "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "equipe": "Bruno",
         "dias": {
           "1": "T",
           "2": "F",
@@ -7286,10 +6327,10 @@
         }
       },
       {
-        "nome": "Cassio",
+        "nome": "1009573",
         "matricula": "1009573",
         "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "equipe": "Cassio",
         "dias": {
           "1": "F",
           "2": "T",
@@ -7314,20 +6355,62 @@
           "21": "F",
           "22": "F",
           "23": "FÉRIAS",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
           "28": "T",
           "29": "T",
           "30": "F"
         }
       },
       {
-        "nome": "Cleber",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "RODRIGO/MARCELO",
+          "2": "ROMULO/ALAN",
+          "9": "RODRIGO/MARCELO",
+          "16": "ROMULO/ALAN",
+          "23": "RODRIGO/MARCELO",
+          "30": "ROMULO/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "ROMULO/ALAN",
+          "2": "RODRIGO/MARCELO",
+          "9": "ROMULO/ALAN",
+          "16": "RODRIGO/MARCELO",
+          "23": "ROMULO/ALAN",
+          "30": "RODRIGO/MARCELO"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "CLEBER"
+        }
+      },
+      {
+        "nome": "Matricula",
+        "matricula": "Matricula",
+        "horario": "Horário",
+        "equipe": "Nome",
+        "dias": {
+          "1": "SUPORTE TÉCNICO - CAPTAÇÃO"
+        }
+      },
+      {
+        "nome": "1000461",
         "matricula": "1000461",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Cleber",
         "dias": {
           "1": "F",
           "2": "F",
@@ -7362,10 +6445,10 @@
         }
       },
       {
-        "nome": "Marcelo",
+        "nome": "1000489",
         "matricula": "1000489",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Marcelo",
         "dias": {
           "1": "F",
           "2": "F",
@@ -7400,10 +6483,10 @@
         }
       },
       {
-        "nome": "Marcos",
+        "nome": "1000304",
         "matricula": "1000304",
         "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "equipe": "Marcos",
         "dias": {
           "1": "F",
           "2": "F",
@@ -7438,10 +6521,10 @@
         }
       },
       {
-        "nome": "Lucieudes",
+        "nome": "1003832",
         "matricula": "1003832",
         "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "equipe": "Lucieudes",
         "dias": {
           "1": "F",
           "2": "F",
@@ -7476,10 +6559,10 @@
         }
       },
       {
-        "nome": "Vinicius",
+        "nome": "1011369",
         "matricula": "1011369",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Vinicius",
         "dias": {
           "1": "F",
           "2": "F",
@@ -7490,10 +6573,6 @@
           "7": "F",
           "8": "F",
           "9": "FÉRIAS",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
           "14": "F",
           "15": "F",
           "16": "T",
@@ -7514,10 +6593,10 @@
         }
       },
       {
-        "nome": "Joao",
+        "nome": "1009828",
         "matricula": "1009828",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Joao",
         "dias": {
           "1": "F",
           "2": "T",
@@ -7552,10 +6631,10 @@
         }
       },
       {
-        "nome": "Simone",
+        "nome": "1000358",
         "matricula": "1000358",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Simone",
         "dias": {
           "1": "F",
           "2": "F",
@@ -7590,10 +6669,10 @@
         }
       },
       {
-        "nome": "Andre",
+        "nome": "1011372",
         "matricula": "1011372",
         "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "equipe": "Andre",
         "dias": {
           "1": "F",
           "2": "F",
@@ -7618,167 +6697,68 @@
           "21": "F",
           "22": "F",
           "23": "FÉRIAS",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
           "28": "F",
           "29": "F",
           "30": "T"
         }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Rodrigo/Marcelo",
-          "2": "Romulo/Alan",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "Rodrigo/Marcelo",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "Romulo/Alan",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "Rodrigo/Marcelo",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "Romulo/Alan"
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Romulo/Alan",
-          "2": "Rodrigo/Marcelo",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "Romulo/Alan",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "Rodrigo/Marcelo",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "Romulo/Alan",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "Rodrigo/Marcelo"
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Cleber",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": ""
-        }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Captação",
         "dias": {
-          "1": "Vinicius",
-          "2": "Marcos",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "Cleber",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "Marcelo",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "Lucieudes",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "Vinicius"
+          "1": "VINICIUS",
+          "2": "MARCOS",
+          "9": "CLEBER",
+          "16": "MARCELO",
+          "23": "LUCIEUDES",
+          "30": "VINICIUS"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Dezembro_Prototipo": {
     "num_dias": 31,
     "operadores": [
       {
-        "nome": "Rodrigo",
+        "nome": "Matricula",
+        "matricula": "Matricula",
+        "horario": "Horário",
+        "equipe": "Nome",
+        "dias": {
+          "1": "SUPORTE TÉCNICO - MONITORAÇÃO"
+        }
+      },
+      {
+        "nome": "1015103",
         "matricula": "1015103",
         "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "equipe": "Rodrigo",
         "dias": {
           "1": "T",
           "2": "T",
@@ -7814,10 +6794,10 @@
         }
       },
       {
-        "nome": "Alan",
+        "nome": "1014892",
         "matricula": "1014892",
         "horario": "06:00 - 15:00",
-        "equipe": "Monitoração",
+        "equipe": "Alan",
         "dias": {
           "1": "F",
           "2": "T",
@@ -7853,10 +6833,10 @@
         }
       },
       {
-        "nome": "Cleber",
+        "nome": "1013022",
         "matricula": "1013022",
         "horario": "10:00 - 19:00",
-        "equipe": "Monitoração",
+        "equipe": "Cleber",
         "dias": {
           "1": "T",
           "2": "F",
@@ -7892,22 +6872,12 @@
         }
       },
       {
-        "nome": "Marcelo F",
+        "nome": "1015466",
         "matricula": "1015466",
         "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "equipe": "Marcelo F",
         "dias": {
           "1": "LICENÇA PARTERNIDADE",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
           "12": "T",
           "13": "T",
           "14": "T",
@@ -7931,10 +6901,10 @@
         }
       },
       {
-        "nome": "Romulo",
+        "nome": "1015615",
         "matricula": "1015615",
         "horario": "14:00 - 23:00",
-        "equipe": "Monitoração",
+        "equipe": "Romulo",
         "dias": {
           "1": "T",
           "2": "T",
@@ -7970,10 +6940,10 @@
         }
       },
       {
-        "nome": "Bruno",
+        "nome": "1008331",
         "matricula": "1008331",
         "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "equipe": "Bruno",
         "dias": {
           "1": "T",
           "2": "T",
@@ -8009,10 +6979,10 @@
         }
       },
       {
-        "nome": "Cassio",
+        "nome": "1009573",
         "matricula": "1009573",
         "horario": "22:50 - 06:10",
-        "equipe": "Monitoração",
+        "equipe": "Cassio",
         "dias": {
           "1": "T",
           "2": "T",
@@ -8027,31 +6997,58 @@
           "11": "T",
           "12": "F",
           "13": "F",
-          "14": "FÉRIAS",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
+          "14": "FÉRIAS"
         }
       },
       {
-        "nome": "Cleber",
+        "nome": "Atividade - Chamados",
+        "matricula": "Atividade - Chamados",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "ROMULO/ALAN",
+          "7": "RODRIGO/MARCELO",
+          "14": "ROMULO/ALAN",
+          "21": "RODRIGO/MARCELO",
+          "28": "ROMULO/ALAN"
+        }
+      },
+      {
+        "nome": "Atividade - Incidentes/Email",
+        "matricula": "Atividade - Incidentes/Email",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "RODRIGO/MARCELO",
+          "7": "ROMULO/ALAN",
+          "14": "RODRIGO/MARCELO",
+          "21": "ROMULO/ALAN",
+          "28": "RODRIGO/MARCELO"
+        }
+      },
+      {
+        "nome": "Atividade - LATAM Geral",
+        "matricula": "Atividade - LATAM Geral",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "CLEBER"
+        }
+      },
+      {
+        "nome": "Matricula",
+        "matricula": "Matricula",
+        "horario": "Horário",
+        "equipe": "Nome",
+        "dias": {
+          "1": "SUPORTE TÉCNICO - CAPTAÇÃO"
+        }
+      },
+      {
+        "nome": "1000461",
         "matricula": "1000461",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Cleber",
         "dias": {
           "1": "T",
           "2": "T",
@@ -8087,10 +7084,10 @@
         }
       },
       {
-        "nome": "Marcelo",
+        "nome": "1000489",
         "matricula": "1000489",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Marcelo",
         "dias": {
           "1": "T",
           "2": "T",
@@ -8126,10 +7123,10 @@
         }
       },
       {
-        "nome": "Marcos",
+        "nome": "1000304",
         "matricula": "1000304",
         "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "equipe": "Marcos",
         "dias": {
           "1": "T",
           "2": "T",
@@ -8165,10 +7162,10 @@
         }
       },
       {
-        "nome": "Lucieudes",
+        "nome": "1003832",
         "matricula": "1003832",
         "horario": "10:00 - 19:00",
-        "equipe": "Captação",
+        "equipe": "Lucieudes",
         "dias": {
           "1": "T",
           "2": "T",
@@ -8204,10 +7201,10 @@
         }
       },
       {
-        "nome": "Vinicius",
+        "nome": "1011369",
         "matricula": "1011369",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Vinicius",
         "dias": {
           "1": "T",
           "2": "T",
@@ -8238,15 +7235,14 @@
           "27": "F",
           "28": "T",
           "29": "T",
-          "30": "FÉRIAS",
-          "31": ""
+          "30": "FÉRIAS"
         }
       },
       {
-        "nome": "Joao",
+        "nome": "1009828",
         "matricula": "1009828",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Joao",
         "dias": {
           "1": "T",
           "2": "T",
@@ -8255,20 +7251,6 @@
           "5": "F",
           "6": "F",
           "7": "FÉRIAS",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
           "22": "T",
           "23": "T",
           "24": "DAY OFF",
@@ -8282,10 +7264,10 @@
         }
       },
       {
-        "nome": "Simone",
+        "nome": "1000358",
         "matricula": "1000358",
         "horario": "08:00 - 17:00",
-        "equipe": "Captação",
+        "equipe": "Simone",
         "dias": {
           "1": "T",
           "2": "T",
@@ -8321,10 +7303,10 @@
         }
       },
       {
-        "nome": "Andre",
+        "nome": "1011372",
         "matricula": "1011372",
         "horario": "08:00 - 17:23",
-        "equipe": "Captação",
+        "equipe": "Andre",
         "dias": {
           "1": "T",
           "2": "T",
@@ -8357,155 +7339,46 @@
           "29": "T",
           "30": "T",
           "31": "F"
-        }
-      }
-    ],
-    "atividades": [
-      {
-        "nome": "Atividade - Chamados",
-        "dias": {
-          "1": "Romulo/Alan",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "Rodrigo/Marcelo",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "Romulo/Alan",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "Rodrigo/Marcelo",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "Romulo/Alan",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - Incidentes/Email",
-        "dias": {
-          "1": "Rodrigo/Marcelo",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "Romulo/Alan",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "Rodrigo/Marcelo",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "Romulo/Alan",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "Rodrigo/Marcelo",
-          "29": "",
-          "30": "",
-          "31": ""
-        }
-      },
-      {
-        "nome": "Atividade - LATAM Geral",
-        "dias": {
-          "1": "Cleber",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "",
-          "29": "",
-          "30": "",
-          "31": ""
         }
       },
       {
         "nome": "Atendimento de SobreaAviso",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Captação",
         "dias": {
-          "1": "Vinicius",
-          "2": "",
-          "3": "",
-          "4": "",
-          "5": "",
-          "6": "",
-          "7": "Marcos",
-          "8": "",
-          "9": "",
-          "10": "",
-          "11": "",
-          "12": "",
-          "13": "",
-          "14": "Cleber",
-          "15": "",
-          "16": "",
-          "17": "",
-          "18": "",
-          "19": "",
-          "20": "",
-          "21": "Marcelo",
-          "22": "",
-          "23": "",
-          "24": "",
-          "25": "",
-          "26": "",
-          "27": "",
-          "28": "Vinicius",
-          "29": "",
-          "30": "",
-          "31": ""
+          "1": "VINICIUS",
+          "7": "MARCOS",
+          "14": "CLEBER",
+          "21": "MARCELO",
+          "28": "VINICIUS"
         }
+      },
+      {
+        "nome": "Legenda:",
+        "matricula": "",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {
+          "1": "PESSOAL,"
+        }
+      },
+      {
+        "nome": "DAY OFF",
+        "matricula": "Aniversario",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
+      },
+      {
+        "nome": "FER",
+        "matricula": "Férias",
+        "horario": "",
+        "equipe": "Captação",
+        "dias": {}
       }
-    ]
+    ],
+    "atividades": []
   },
   "Plantao_Fim_Ano": {
     "natal": [

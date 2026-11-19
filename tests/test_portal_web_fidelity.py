@@ -78,14 +78,39 @@ try:
     print(f"Notificações drive rows: {len(notif_rows)}")
     assert len(notif_rows) >= 5, f"Expected at least 5 items in Notificações, got {len(notif_rows)}"
 
-    print("\n=== TEST 8: ACESSO REMOTO (DRIVE) ===")
+    print("\n=== TEST 8: ACESSO REMOTO (DRIVE & RDP FILES) ===")
     driver.execute_script("showPane('remoto');")
     time.sleep(0.2)
     pane = driver.find_element(By.CSS_SELECTOR, '.pane-container.active').get_attribute('id')
     assert pane == 'pane-drive-viewer', f"Expected pane-drive-viewer for remoto, got {pane}"
     remoto_rows = driver.find_elements(By.CSS_SELECTOR, '#drive-viewer-tbody tr')
-    print(f"Acesso Remoto drive rows: {len(remoto_rows)}")
+    print(f"Acesso Remoto drive root rows: {len(remoto_rows)}")
     assert len(remoto_rows) >= 5, f"Expected at least 5 items in Acesso Remoto, got {len(remoto_rows)}"
+
+    # Navigate into Guatemala -> Bloco 02
+    driver.execute_script("""
+      const guat = driveBreadcrumbs[0].items.find(it => it.name === 'Guatemala');
+      openDriveFolder(guat.id);
+    """)
+    time.sleep(0.2)
+    guat_rows = driver.find_elements(By.CSS_SELECTOR, '#drive-viewer-tbody tr')
+    print(f"Guatemala children rows: {len(guat_rows)}")
+    assert len(guat_rows) == 8, f"Expected 8 blocks in Guatemala, got {len(guat_rows)}"
+
+    # Open Bloco 02
+    driver.execute_script("""
+      const currentLevel = driveBreadcrumbs[driveBreadcrumbs.length - 1];
+      const b02 = currentLevel.items.find(it => it.name === 'Bloco 02');
+      openDriveFolder(b02.id);
+    """)
+    time.sleep(0.2)
+    b02_rows = driver.find_elements(By.CSS_SELECTOR, '#drive-viewer-tbody tr')
+    print(f"Bloco 02 files rows: {len(b02_rows)}")
+    assert len(b02_rows) == 2, f"Expected 2 RDP files in Bloco 02, got {len(b02_rows)}"
+    b02_text = driver.find_element(By.ID, 'drive-viewer-tbody').text
+    assert 'CS-GUA-CGT-BL02-01.rdp' in b02_text
+    assert 'CS-GUA-CGT-BL02-02.rdp' in b02_text
+    print("Guatemala > Bloco 02 RDP files verified with 100% success!")
 
     print("\n=== TEST 9: OS 3 RELATÓRIOS SEPARADOS (DRIVES) ===")
     driver.execute_script("showPane('relatorios_futebol');")
@@ -138,8 +163,43 @@ try:
     search_box.clear()
     driver.execute_script("document.getElementById('search-perm-box').value = ''; renderPermsTable();")
 
+    print("\n=== TEST 12: ESCALA DE TRABALHO (DRIVE & EXCEL ONLINE) ===")
+    driver.execute_script("showPane('escala');")
+    time.sleep(0.2)
+    pane = driver.find_element(By.CSS_SELECTOR, '.pane-container.active').get_attribute('id')
+    assert pane == 'pane-escala'
+    escala_html = driver.find_element(By.ID, 'pane-escala').get_attribute('outerHTML')
+    assert 'Editar no Excel Online' in escala_html
+    assert 'Doc.aspx?sourcedoc=' in escala_html
+    assert 'Biblioteca da Escala' in escala_html
+
+    # Open drive_escala
+    driver.execute_script("showPane('drive_escala');")
+    time.sleep(0.2)
+    pane = driver.find_element(By.CSS_SELECTOR, '.pane-container.active').get_attribute('id')
+    assert pane == 'pane-drive-viewer'
+    escala_drive_text = driver.find_element(By.ID, 'drive-viewer-tbody').text
+    assert 'Escala de trabalho 2026.xlsx' in escala_drive_text
+    print("Escala de Trabalho Drive & Excel Online link verified with 100% success!")
+
+    print("\n=== TEST 13: PÁGINA INICIAL (MONITOR 8092, ORGANOGRAMA, GOOGLE CHAT) ===")
+    driver.execute_script("showPane('home');")
+    time.sleep(0.2)
+    pane = driver.find_element(By.CSS_SELECTOR, '.pane-container.active').get_attribute('id')
+    assert pane == 'pane-home', f"Expected pane-home, got {pane}"
+    home_text = driver.find_element(By.ID, 'pane-home').text
+    home_html = driver.find_element(By.ID, 'pane-home').get_attribute('outerHTML')
+    assert '10.1.30.1:8092' in home_html
+    assert 'Monitor de Incidentes (Monitor_Serviços)' in home_text
+    assert 'Conheça Nossa Equipe' in home_text
+    assert 'Luiz De Sa Lemos' in home_text
+    assert 'Cleber De Souza Gonçalves' in home_text
+    assert 'chat.google.com' in home_html
+    assert 'Google Chat' in home_text
+    print("Página Inicial with Incident Monitor, Organograma & Google Chat verified with 100% success!")
+
     print("\n========================================================")
-    print("ALL 11 VERIFICATIONS PASSED WITH 100% SUCCESS!")
+    print("ALL 13 VERIFICATIONS PASSED WITH 100% SUCCESS!")
     print("========================================================")
 
 finally:

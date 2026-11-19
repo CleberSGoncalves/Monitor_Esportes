@@ -1641,6 +1641,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">Documentos <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('escala', '💼 Escala de Trabalho 2026', event)">💼 Escala de Trabalho 2026</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('drive_escala', '📁 Arquivos da Escala (Drive)', event)">📁 Arquivos da Escala (Drive)</a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('procedimentos', '📖 Procedimentos N1', event)">📖 Procedimentos N1 <span class="item-count-badge">__PROCEDIMENTOS_COUNT__</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('documentos', '📁 Documentos Compartilhados', event)">📁 Documentos Compartilhados <span class="item-count-badge">__DOCUMENTOS_COUNT__</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('capacitacao', '📋 Ficha de Capacitação', event)">📋 Ficha de Capacitação</a>
@@ -1781,7 +1782,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           </div>
         </div>
 
-        <!-- Grade 3x3 de Botões Brancos Idênticos ao SharePoint -->
+        <!-- Grade de Botões Brancos Idênticos ao SharePoint + Monitor de Incidentes -->
         <div class="hero-3x3-grid">
           <div class="hero-card" onclick="showPane('hospedeiros')">
             <div class="hero-card-icon">📞</div>
@@ -1827,17 +1828,101 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <div class="hero-card-icon">📡</div>
             <div>((•)) Programação de Eventos...</div>
           </div>
+
+          <div class="hero-card hero-highlight-card" style="border: 2px solid #EF4444; background: #FEF2F2;" onclick="window.open('http://10.1.30.1:8092/', '_blank')">
+            <div class="hero-card-icon" style="color: #EF4444;">🚨</div>
+            <div style="color: #991B1B; font-weight: 700;">Monitor de Incidentes (Monitor_Serviços) <span class="badge" style="background:#EF4444; color:#fff; font-size:10px;">NOVO</span></div>
+          </div>
         </div>
       </section>
 
       <!-- ÁREA INFERIOR DA PÁGINA (CHAMADA E LINKS EXTERNOS) -->
       <section class="home-lower-body">
+
+        <!-- SEÇÃO: CONHEÇA NOSSA EQUIPE & ORGANOGRAMA OPERACIONAL -->
+        <div class="team-showcase-section" style="margin-bottom: 30px;">
+          <div class="section-title-wrap" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 class="section-title" style="margin:0;">👥 Conheça Nossa Equipe & Organograma Operacional</h3>
+              <p class="section-desc" style="margin:4px 0 0 0;">Estrutura de liderança, coordenação e especialidades técnicas da Central de Suporte Captação.</p>
+            </div>
+            <button class="btn-action btn-action-primary" onclick="showPane('equipe')">Ver Equipe Completa ↗</button>
+          </div>
+
+          <!-- Grade Hierárquica do Organograma -->
+          <div class="organograma-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 16px;">
+            <!-- Diretoria -->
+            <div class="org-card" style="background:#fff; border: 1px solid #E2E8F0; border-top: 4px solid #004578; border-radius: 8px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                <div style="width:44px; height:44px; border-radius:50%; background:#004578; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">LL</div>
+                <div>
+                  <div style="font-weight:700; color:#1E293B; font-size:14px;">Luiz De Sa Lemos</div>
+                  <div style="font-size:11px; color:#0078D4; font-weight:600;">DIR. SUPORTE CAPTAÇÃO LATAM</div>
+                </div>
+              </div>
+              <div style="font-size:12px; color:#64748B; margin-bottom:10px;">Liderança executiva estratégica para operações de ingest e telemetria regional.</div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="badge badge-role-owner">Diretoria (Owner)</span>
+                <a href="mailto:luiz.lemos@ibope.com" style="font-size:11px; color:#0078D4; text-decoration:none; font-weight:600;">✉️ E-mail</a>
+              </div>
+            </div>
+
+            <!-- Coordenação Geral -->
+            <div class="org-card" style="background:#fff; border: 1px solid #E2E8F0; border-top: 4px solid #0078D4; border-radius: 8px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                <div style="width:44px; height:44px; border-radius:50%; background:#0078D4; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">CG</div>
+                <div>
+                  <div style="font-weight:700; color:#1E293B; font-size:14px;">Cleber De Souza Gonçalves</div>
+                  <div style="font-size:11px; color:#0078D4; font-weight:600;">COORD. SUPORTE CAPTAÇÃO</div>
+                </div>
+              </div>
+              <div style="font-size:12px; color:#64748B; margin-bottom:10px;">Gestão operacional, auditoria de transmissões, escala de plantão e automações.</div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="badge badge-role-owner">Coordenação (Owner)</span>
+                <a href="mailto:cleber.goncalves@ibope.com" style="font-size:11px; color:#0078D4; text-decoration:none; font-weight:600;">✉️ E-mail</a>
+              </div>
+            </div>
+
+            <!-- Liderança Técnica LATAM (N2) -->
+            <div class="org-card" style="background:#fff; border: 1px solid #E2E8F0; border-top: 4px solid #107C41; border-radius: 8px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                <div style="width:44px; height:44px; border-radius:50%; background:#107C41; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">MP</div>
+                <div>
+                  <div style="font-weight:700; color:#1E293B; font-size:14px;">Marcelo Pereira Silva</div>
+                  <div style="font-size:11px; color:#107C41; font-weight:600;">LÍDER TÉCNICO LATAM (N2)</div>
+                </div>
+              </div>
+              <div style="font-size:12px; color:#64748B; margin-bottom:10px;">Especialista em fluxos de transporte, receptores, headend e suporte nível 2.</div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="badge badge-role-write">Técnico N2</span>
+                <a href="mailto:marcelo.pereira@ibope.com" style="font-size:11px; color:#0078D4; text-decoration:none; font-weight:600;">✉️ E-mail</a>
+              </div>
+            </div>
+
+            <!-- Gestão do Portal & Automação -->
+            <div class="org-card" style="background:#fff; border: 1px solid #E2E8F0; border-top: 4px solid #8B5CF6; border-radius: 8px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                <div style="width:44px; height:44px; border-radius:50%; background:#8B5CF6; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">CO</div>
+                <div>
+                  <div style="font-weight:700; color:#1E293B; font-size:14px;">Cassio Esteves & Vinicius Dantas</div>
+                  <div style="font-size:11px; color:#8B5CF6; font-weight:600;">ADMINISTRADORES DO PORTAL</div>
+                </div>
+              </div>
+              <div style="font-size:12px; color:#64748B; margin-bottom:10px;">Administração de sistemas, esteira de dados, scripts de automação e telemetria.</div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="badge badge-role-owner">Admin / Automação</span>
+                <span style="font-size:11px; color:#64748B;">Suporte Captação</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="contact-callout-box">
-          <div class="contact-callout-header">Entre em contato com a nossa equipe</div>
+          <div class="contact-callout-header">💬 Entre em contato com a nossa equipe</div>
           <div class="contact-callout-body">
-            <p>Precisa de suporte imediato ou alinhamento técnico com o plantão da Captação? Chame diretamente no Teams.</p>
-            <a href="https://teams.microsoft.com/l/team/19:DbmEit-Jw5Egnzv9KJysAxgT20jeLg_9HvF-OtRncrE1@thread.tacv2/conversations?groupId=b85ee2f2-68d9-461a-8ba8-d4eecbf19d94&tenantId=1e355c04-e0a4-42ed-8e2d-7351591f0ef1" target="_blank" class="btn-contact-action">
-              Enviar uma mensagem
+            <p>Precisa de suporte imediato ou alinhamento técnico com o plantão da Captação? Chame diretamente no <b>Google Chat</b>.</p>
+            <a href="https://chat.google.com/" target="_blank" class="btn-contact-action" style="background: #00AC47; display:inline-flex; align-items:center; gap:6px;">
+              💬 Abrir Google Chat ↗
             </a>
           </div>
         </div>
@@ -1855,6 +1940,18 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           </div>
 
           <div class="waffle-links-grid">
+            <a href="http://10.1.30.1:8092/" target="_blank" class="waffle-link-card" style="border: 1px solid #FCA5A5; background: #FFF5F5;">
+              <span class="waffle-link-icon">🚨</span>
+              <span class="waffle-link-title" style="color: #991B1B; font-weight: 700;">Monitor de Incidentes (8092)</span>
+            </a>
+            <a href="https://chat.google.com/" target="_blank" class="waffle-link-card">
+              <span class="waffle-link-icon">💬</span>
+              <span class="waffle-link-title">Google Chat</span>
+            </a>
+            <a href="https://meet.google.com/" target="_blank" class="waffle-link-card">
+              <span class="waffle-link-icon">📹</span>
+              <span class="waffle-link-title">Google Meet</span>
+            </a>
             <a href="https://mediadna.kantaribopemedia.com/mediadna/Comum/PaginaInicial.aspx" target="_blank" class="waffle-link-card">
               <span class="waffle-link-icon">🧬</span>
               <span class="waffle-link-title">Site - Media DNA</span>
@@ -1931,9 +2028,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <option value="08:00">Captação / N2 (08:00 - 17:00)</option>
           </select>
         </div>
-        <div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <a href="https://adgbl.sharepoint.com/sites/suportecaptacao/_layouts/15/Doc.aspx?sourcedoc=%7BA29DD1D1-CE71-41BD-BA20-8D79237CC8D1%7D&file=Escala%20de%20trabalho%202026.xlsx&action=default&mobileredirect=true" target="_blank" class="btn-action" style="background: #107C41; color: #fff; text-decoration: none; font-weight: 600;" title="Abrir planilha oficial no Excel Online com permissões de edição">
+            ✏️ Editar no Excel Online ↗
+          </a>
+          <a href="javascript:void(0)" onclick="handleMenuClick('drive_escala', '📁 Arquivos da Escala (Drive)', event)" class="btn-action btn-action-secondary" title="Ver arquivos e pastas da biblioteca Escala de Trabalho">
+            📁 Biblioteca da Escala
+          </a>
           <a href="Escala_de_trabalho_2026.xlsx" download class="btn-action btn-action-primary" title="Baixar arquivo oficial da escala">
-            📥 Baixar Planilha Oficial (.xlsx)
+            📥 Baixar Planilha (.xlsx)
           </a>
         </div>
       </div>
@@ -2559,6 +2662,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <p class="section-desc">Acesso a todos os portais corporativos e ferramentas de telemetria.</p>
       </div>
       <div class="waffle-links-grid">
+        <a href="http://10.1.30.1:8092/" target="_blank" class="waffle-link-card" style="border: 1px solid #FCA5A5; background: #FFF5F5;"><span class="waffle-link-icon">🚨</span><span class="waffle-link-title" style="color: #991B1B; font-weight: 700;">Monitor de Incidentes (8092)</span></a>
+        <a href="https://chat.google.com/" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">💬</span><span class="waffle-link-title">Google Chat</span></a>
+        <a href="https://meet.google.com/" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">📹</span><span class="waffle-link-title">Google Meet</span></a>
         <a href="https://mediadna.kantaribopemedia.com/mediadna/Comum/PaginaInicial.aspx" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">🧬</span><span class="waffle-link-title">Site - Media DNA</span></a>
         <a href="http://10.1.0.39/redmine/login" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">📑</span><span class="waffle-link-title">Redmine</span></a>
         <a href="https://zbxsrvbr.kantaribopemedia.com/zabbix/zabbix.php?action=dashboard.view&dashboardid=152" target="_blank" class="waffle-link-card"><span class="waffle-link-icon">🖥️</span><span class="waffle-link-title">Zabbix</span></a>
@@ -2647,6 +2753,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     // ==========================================
     const SP_RESOURCE_MAP = {
       // Drives (Bibliotecas de Documentos com Pastas e Arquivos Reais)
+      'drive_escala': { type: 'drive', name: 'Escala de trabalho', title: 'Biblioteca de Documentos da Escala' },
       'procedimentos': { type: 'drive', name: 'Procedimentos', title: 'Procedimentos Operacionais Padrão (POPs N1)' },
       'documentos': { type: 'drive', name: 'Documentos', title: 'Documentos Compartilhados da Equipe' },
       'capacitacao': { type: 'drive', name: 'Ficha de Capacitação', title: 'Ficha de Capacitação' },
