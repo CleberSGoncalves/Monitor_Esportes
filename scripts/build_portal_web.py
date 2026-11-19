@@ -1003,7 +1003,15 @@ def generate_portal():
     with open(output_html, "w", encoding="utf-8") as f:
         f.write(html_content)
 
+    # Também salva em docs/index.html para o GitHub Pages oficial
+    docs_dir = os.path.join(base_dir, "docs")
+    os.makedirs(docs_dir, exist_ok=True)
+    docs_html = os.path.join(docs_dir, "index.html")
+    with open(docs_html, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
     print(f"Portal Web Suporte Captação gerado com sucesso em: {output_html}")
+    print(f"Publicação GitHub Pages atualizada em: {docs_html}")
     print(f"Tamanho do arquivo: {os.path.getsize(output_html)} bytes")
     return output_html
 
