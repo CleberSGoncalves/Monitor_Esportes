@@ -1160,6 +1160,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div class="suite-nav-right">
       <select id="user-role-select" class="role-switcher-select" onchange="onRoleChange()" title="Simulador de Perfil de Acesso">
         <option value="admin">👤 Cleber Gonçalves (Gestor/Admin)</option>
+        <option value="admin_cassio">👤 Cássio Esteves (Administrador)</option>
+        <option value="admin_vinicius">👤 Vinícius Dantas (Administrador)</option>
         <option value="operador">🛠️ Operador Suporte N1/N2</option>
         <option value="leitor">👁️ Visitante (NOC / SAC / Consulta)</option>
       </select>
@@ -1871,13 +1873,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <tr><td><b>Rodrigo de Almeida Meirelles</b></td><td>Técnico de Suporte Jr (N1)</td><td>rodrigo.meirelles@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
             <tr><td><b>Alan Kelvin Chura Carrillo</b></td><td>Técnico de Suporte Jr (N1)</td><td>alan.carrillo@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
             <tr><td><b>Bruno Lopes Viana</b></td><td>Técnico de Suporte Jr (N1)</td><td>bruno.viana@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
-            <tr><td><b>Cassio Esteves de Oliveira</b></td><td>Técnico de Suporte Jr (N1)</td><td>cassio.oliveira@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Cassio Esteves de Oliveira</b></td><td>ADMINISTRADOR DO PORTAL / Suporte Captação</td><td>cassio.esteves@ibope.com</td><td><span class="badge badge-role-owner">Administrador (Owner)</span></td></tr>
             <tr><td><b>Marcelo Fialho</b></td><td>Técnico de Suporte Jr (N1)</td><td>marcelo.fialho@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
             <tr><td><b>Rômulo Silva</b></td><td>Técnico de Suporte Jr (N1)</td><td>romulo.silva@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
             <tr><td><b>Joao Diego Silva Merino</b></td><td>Técnico de Suporte Pl (N2)</td><td>joao.merino@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
             <tr><td><b>Marcos Antonio Bezerra da Silva</b></td><td>Técnico de Suporte Sr (N2)</td><td>marcos.bezerra@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
             <tr><td><b>Lucieudes Vicente Ferreira</b></td><td>Técnico de Suporte Pl (N2)</td><td>lucieudes.ferreira@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
-            <tr><td><b>Vinicius Dantas Ferreira da Silva</b></td><td>Técnico de Suporte Pl (N2)</td><td>vinicius.dantas@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
+            <tr><td><b>Vinicius Dantas Ferreira da Silva</b></td><td>ADMINISTRADOR DO PORTAL / Suporte Captação</td><td>vinicius.dantas@ibope.com</td><td><span class="badge badge-role-owner">Administrador (Owner)</span></td></tr>
             <tr><td><b>Marcelo Pereira Silva</b></td><td>Líder Técnico LATAM (N2)</td><td>marcelo.pereira@ibope.com</td><td><span class="badge badge-role-write">Operador (Write)</span></td></tr>
           </tbody>
         </table>
@@ -1969,8 +1971,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       currentRole = sel.value;
       const avatar = document.getElementById("top-user-avatar");
 
-      if (currentRole === "admin") {
-        avatar.innerText = "CG";
+      if (currentRole.startsWith("admin")) {
+        if (currentRole === "admin_cassio") avatar.innerText = "CE";
+        else if (currentRole === "admin_vinicius") avatar.innerText = "VD";
+        else avatar.innerText = "CG";
         avatar.style.background = "#004578";
         document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "");
         const permTab = document.getElementById("nav-tab-permissoes");
@@ -2616,7 +2620,7 @@ def generate_portal():
         {"type": "user", "displayName": "ALAN KELVIN CHURA CARRILLO", "email": "alan.carrillo@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE JR (N1)", "google_role": "Operador"},
         {"type": "user", "displayName": "Bruno Lopes Viana", "email": "bruno.viana@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE JR (N1)", "google_role": "Operador"},
         {"type": "user", "displayName": "Cleber Rodrigo Gomes", "email": "cleber.gomes@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE JR (N1)", "google_role": "Operador"},
-        {"type": "user", "displayName": "Cassio Esteves De Oliveira", "email": "cassio.oliveira@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE JR (N1)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Cassio Esteves De Oliveira", "email": "cassio.esteves@ibope.com", "roles": ["owner"], "cargo": "ADMINISTRADOR DO PORTAL / SUPORTE CAPTAÇÃO", "google_role": "Administrador"},
         {"type": "user", "displayName": "RODRIGO DE ALMEIDA MEIRELLES", "email": "rodrigo.meirelles@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE JR (N1)", "google_role": "Operador"},
         {"type": "user", "displayName": "Rômulo Silva", "email": "romulo.silva@ibope.com", "roles": ["write"], "cargo": "Tecnico De Suporte Jr (N1)", "google_role": "Operador"},
         {"type": "user", "displayName": "Marcelo Fialho", "email": "Marcelo.Fialho@ibope.com", "roles": ["write"], "cargo": "Tecnico De Suporte Jr (N1)", "google_role": "Operador"},
@@ -2624,7 +2628,7 @@ def generate_portal():
         {"type": "user", "displayName": "Lucieudes Vicente Ferreira", "email": "lucieudes.ferreira@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE PL (N2)", "google_role": "Operador"},
         {"type": "user", "displayName": "Marcelo Pereira Silva", "email": "marcelo.pereira@ibope.com", "roles": ["write"], "cargo": "LIDER TECNICO LATAM (N2)", "google_role": "Operador"},
         {"type": "user", "displayName": "Marcos Antonio Bezerra Da Silva", "email": "marcos.bezerra@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE SR (N2)", "google_role": "Operador"},
-        {"type": "user", "displayName": "Vinicius Dantas Ferreira Da Silva", "email": "vinicius.dantas@ibope.com", "roles": ["write"], "cargo": "Tec. Suporte Pl (N2)", "google_role": "Operador"}
+        {"type": "user", "displayName": "Vinicius Dantas Ferreira Da Silva", "email": "vinicius.dantas@ibope.com", "roles": ["owner"], "cargo": "ADMINISTRADOR DO PORTAL / SUPORTE CAPTAÇÃO", "google_role": "Administrador"}
     ]
 
     all_permissions = []
