@@ -1,0 +1,305 @@
+[
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 1,
+      "zoneId": "05ef313f-28f3-4149-9f0b-8a0de631143b",
+      "sectionIndex": 1,
+      "sectionFactor": 8,
+      "controlIndex": 1
+    },
+    "zoneGroupMetadata": {
+      "type": 0,
+      "alignment": 0,
+      "isExpanded": true,
+      "showDividerLine": false,
+      "iconAlignment": "left"
+    },
+    "id": "00000000-0000-0000-0000-000000000002",
+    "controlType": 4,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "contentVersion": 5
+  },
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 1,
+      "zoneId": "05ef313f-28f3-4149-9f0b-8a0de631143b",
+      "sectionIndex": 1,
+      "sectionFactor": 8,
+      "controlIndex": 2
+    },
+    "zoneGroupMetadata": {
+      "type": 0,
+      "alignment": 0,
+      "isExpanded": true,
+      "showDividerLine": false,
+      "iconAlignment": "left"
+    },
+    "id": "00000000-0000-0000-0000-000000000003",
+    "controlType": 3,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "webPartId": "c70391ea-0b10-4ee9-b2b4-006d3fcad0cd",
+    "reservedWidth": 776,
+    "reservedHeight": 177
+  },
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 1,
+      "zoneId": "05ef313f-28f3-4149-9f0b-8a0de631143b",
+      "sectionIndex": 2,
+      "sectionFactor": 4,
+      "controlIndex": 1
+    },
+    "zoneGroupMetadata": {
+      "type": 0,
+      "alignment": 0,
+      "isExpanded": true,
+      "showDividerLine": false,
+      "iconAlignment": "left"
+    },
+    "id": "458c3634-fde8-4b95-8c06-b0f4b0b1ea47",
+    "controlType": 3,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "webPartId": "868ac3c3-cad7-4bd6-9a1c-14dc5cc8e823",
+    "reservedWidth": 364,
+    "reservedHeight": 94
+  },
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 2,
+      "zoneId": "b7d0ae64-168e-45b1-a19a-38bb47a790f4",
+      "sectionIndex": 1,
+      "sectionFactor": 12,
+      "controlIndex": 1
+    },
+    "emphasis": {
+      "zoneEmphasis": 1
+    },
+    "id": "0d74357d-ec2f-419c-87d0-2381fc0636d1",
+    "controlType": 3,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "webPartId": "df8e44e7-edd5-46d5-90da-aca1539313b8",
+    "reservedWidth": 1188,
+    "reservedHeight": 148
+  },
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 2,
+      "zoneId": "b7d0ae64-168e-45b1-a19a-38bb47a790f4",
+      "sectionIndex": 1,
+      "sectionFactor": 12,
+      "controlIndex": 2
+    },
+    "emphasis": {
+      "zoneEmphasis": 1
+    },
+    "id": "75ffe8d4-8db5-49e5-8e07-e19a093eaaf7",
+    "controlType": 3,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "webPartId": "0f087d7f-520e-42b7-89c0-496aaf979d58",
+    "reservedWidth": 1188,
+    "reservedHeight": 40
+  },
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 3,
+      "zoneId": "5f9b7194-a5d3-4b1e-8776-5bd61800295c",
+      "sectionIndex": 1,
+      "sectionFactor": 12,
+      "controlIndex": 1
+    },
+    "emphasis": {
+      "zoneEmphasis": 1
+    },
+    "zoneGroupMetadata": {
+      "type": 0,
+      "alignment": 1
+    },
+    "id": "e5b7e341-1801-4046-8857-e910de1bee45",
+    "controlType": 3,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "webPartId": "c70391ea-0b10-4ee9-b2b4-006d3fcad0cd",
+    "reservedWidth": 1188,
+    "reservedHeight": 175
+  },
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 4,
+      "zoneId": "bd7fbf78-1636-4d77-b756-084ac44f866c",
+      "sectionIndex": 1,
+      "sectionFactor": 4,
+      "controlIndex": 1
+    },
+    "emphasis": {
+      "zoneEmphasis": 3
+    },
+    "zoneGroupMetadata": {
+      "type": 1,
+      "isExpanded": true,
+      "showDividerLine": false,
+      "iconAlignment": "right",
+      "alignment": 0,
+      "displayName": "CONHEÇA NOSSA EQUIPE",
+      "headingLevel": 3
+    },
+    "id": "50b2815b-36ef-4805-b918-c320edfebb32",
+    "controlType": 3,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "webPartId": "7f718435-ee4d-431c-bdbf-9c4ff326f46e",
+    "reservedWidth": 364,
+    "reservedHeight": 145
+  },
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 4,
+      "zoneId": "bd7fbf78-1636-4d77-b756-084ac44f866c",
+      "sectionIndex": 1,
+      "sectionFactor": 4,
+      "controlIndex": 2
+    },
+    "emphasis": {
+      "zoneEmphasis": 3
+    },
+    "zoneGroupMetadata": {
+      "type": 1,
+      "isExpanded": true,
+      "showDividerLine": false,
+      "iconAlignment": "right",
+      "alignment": 0,
+      "displayName": "CONHEÇA NOSSA EQUIPE",
+      "headingLevel": 3
+    },
+    "id": "00000000-0000-0000-0000-000000000021",
+    "controlType": 3,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "webPartId": "7f718435-ee4d-431c-bdbf-9c4ff326f46e",
+    "reservedWidth": 364,
+    "reservedHeight": 231
+  },
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 4,
+      "zoneId": "bd7fbf78-1636-4d77-b756-084ac44f866c",
+      "sectionIndex": 1,
+      "sectionFactor": 4,
+      "controlIndex": 3
+    },
+    "emphasis": {
+      "zoneEmphasis": 3
+    },
+    "zoneGroupMetadata": {
+      "type": 1,
+      "isExpanded": true,
+      "showDividerLine": false,
+      "iconAlignment": "right",
+      "alignment": 0,
+      "displayName": "CONHEÇA NOSSA EQUIPE",
+      "headingLevel": 3
+    },
+    "id": "72080ad4-83d6-467d-9372-bc2dd7a90a5b",
+    "controlType": 3,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "webPartId": "7f718435-ee4d-431c-bdbf-9c4ff326f46e",
+    "reservedWidth": 364,
+    "reservedHeight": 145
+  },
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 4,
+      "zoneId": "bd7fbf78-1636-4d77-b756-084ac44f866c",
+      "sectionIndex": 2,
+      "sectionFactor": 4,
+      "controlIndex": 1
+    },
+    "emphasis": {
+      "zoneEmphasis": 3
+    },
+    "zoneGroupMetadata": {
+      "type": 1,
+      "isExpanded": true,
+      "showDividerLine": false,
+      "iconAlignment": "right",
+      "alignment": 0,
+      "displayName": "CONHEÇA NOSSA EQUIPE",
+      "headingLevel": 3
+    },
+    "id": "00000000-0000-0000-0000-000000000013",
+    "controlType": 3,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "webPartId": "7f718435-ee4d-431c-bdbf-9c4ff326f46e",
+    "reservedWidth": 364,
+    "reservedHeight": 662
+  },
+  {
+    "position": {
+      "layoutIndex": 1,
+      "zoneIndex": 4,
+      "zoneId": "bd7fbf78-1636-4d77-b756-084ac44f866c",
+      "sectionIndex": 3,
+      "sectionFactor": 4,
+      "controlIndex": 1
+    },
+    "emphasis": {
+      "zoneEmphasis": 3
+    },
+    "zoneGroupMetadata": {
+      "type": 1,
+      "isExpanded": true,
+      "showDividerLine": false,
+      "iconAlignment": "right",
+      "alignment": 0,
+      "displayName": "CONHEÇA NOSSA EQUIPE",
+      "headingLevel": 3
+    },
+    "id": "00000000-0000-0000-0000-000000000017",
+    "controlType": 3,
+    "isFromSectionTemplate": false,
+    "addedFromPersistedData": true,
+    "webPartId": "7f718435-ee4d-431c-bdbf-9c4ff326f46e",
+    "reservedWidth": 364,
+    "reservedHeight": 489
+  },
+  {
+    "controlType": 0,
+    "pageSettingsSlice": {
+      "isDefaultDescription": false,
+      "isAIGeneratedDescription": false,
+      "isDefaultThumbnail": true,
+      "isSpellCheckEnabled": true,
+      "globalRichTextStylingVersion": 0,
+      "rtePageSettings": {
+        "contentVersion": 5,
+        "indentationVersion": 1
+      },
+      "isEmailReady": false,
+      "webPartsPageSettings": {
+        "isTitleHeadingLevelsEnabled": false
+      }
+    },
+    "htmlAttributes": [
+      "modifiedDescription"
+    ]
+  },
+  {
+    "controlType": 14
+  }
+]
