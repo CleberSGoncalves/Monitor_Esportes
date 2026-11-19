@@ -194,6 +194,11 @@ def generate_portal():
       font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     }}
 
+    html, body {{
+      width: 100%;
+      overflow-x: hidden;
+    }}
+
     body {{
       background: var(--sp-body-bg);
       color: var(--sp-text-main);
@@ -1096,11 +1101,17 @@ def generate_portal():
     .check-yes {{ color: #10B981; font-weight: 700; }}
     .check-no {{ color: #EF4444; font-weight: 700; }}
 
-    @media (max-width: 900px) {{
-      .hero-banner {{ grid-template-columns: 1fr; padding: 24px; }}
-      .cta-container {{ grid-template-columns: 1fr; }}
+    @media (max-width: 1150px) {{
       .suite-nav-center {{ display: none; }}
       .suite-nav {{ padding: 0 12px; }}
+      .hero-banner {{ grid-template-columns: 1fr; padding: 20px; }}
+      .cta-container {{ grid-template-columns: 1fr; }}
+    }}
+
+    @media (max-width: 768px) {{
+      .quick-links-grid {{ grid-template-columns: 1fr; }}
+      .site-brand-info p {{ display: none; }}
+      .kpi-row {{ grid-template-columns: 1fr 1fr; }}
     }}
   </style>
 </head>
