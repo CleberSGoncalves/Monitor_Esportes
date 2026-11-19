@@ -12,13 +12,15 @@ import sys
 import re
 import json
 import time
+import logging
 import urllib.request
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List, Optional
-try:
-    import pdfplumber
-except ImportError:
-    pdfplumber = None
+
+# Silenciar avisos inofensivos de fontes do pdfminer (FontBBox None)
+logging.getLogger("pdfminer").setLevel(logging.ERROR)
+logging.getLogger("pdfminer.pdffont").setLevel(logging.ERROR)
+logging.getLogger("pdfminer.pdfinterp").setLevel(logging.ERROR)
 
 try:
     import pymupdf as fitz
@@ -27,6 +29,11 @@ except ImportError:
         import fitz
     except ImportError:
         fitz = None
+
+try:
+    import pdfplumber
+except ImportError:
+    pdfplumber = None
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NBA_CACHE_DIR = os.path.join(PROJECT_ROOT, "config", "nba_cache")
@@ -321,12 +328,12 @@ class NBAService:
 
         try:
             pages_text = []
-            if pdfplumber is not None:
-                with pdfplumber.open(pdf_path) as p:
-                    pages_text = [page.extract_text() or "" for page in p.pages]
-            elif fitz is not None:
+            if fitz is not None:
                 doc = fitz.open(pdf_path)
                 pages_text = [page.get_text() or "" for page in doc]
+            elif pdfplumber is not None:
+                with pdfplumber.open(pdf_path) as p:
+                    pages_text = [page.extract_text() or "" for page in p.pages]
             else:
                 print("⚠️ [NBA] Nenhum parser de PDF disponível (pdfplumber ou pymupdf).")
                 return parsed

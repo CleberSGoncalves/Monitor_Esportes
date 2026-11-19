@@ -362,6 +362,11 @@ class ReporteEventosMixin:
 
         # Configura gravação ativa de logs em log.txt
         try:
+            # Silenciar avisos inofensivos de bibliotecas terceiras (pdfminer)
+            logging.getLogger("pdfminer").setLevel(logging.ERROR)
+            logging.getLogger("pdfminer.pdffont").setLevel(logging.ERROR)
+            logging.getLogger("pdfminer.pdfinterp").setLevel(logging.ERROR)
+
             from logging.handlers import RotatingFileHandler
             log_path = get_app_path("log.txt")
             root_logger = logging.getLogger()
@@ -1683,6 +1688,7 @@ class ReporteEventosMixin:
                 for line in f:
                     line = line.strip()
                     if not line: continue
+                    if "FontBBox" in line or "font descriptor" in line: continue
                     todas_linhas_brutas.append(line)
 
                     # Formato 1: YYYY-MM-DD HH:MM:SS - NIVEL - arquivo.py 123 - mensagem

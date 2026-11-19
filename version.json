@@ -1,5 +1,5 @@
 {
-  "version": "2.5.17",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.17/Monitor_Esportes.exe",
-  "changelog": "v2.5.17: Suporte completo a estilização e formatação visual em lote no Google Sheets (890+ linhas) com badges coloridos (Cazé TV, Amazon Prime, Netflix, TNT, Record, PVID TV BOX), regras de formatação condicional automática nativas e função remota de formatação no Google Apps Script."
+  "version": "2.5.18",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.18/Monitor_Esportes.exe",
+  "changelog": "v2.5.18: Barra de comandos SharePoint (+ Novo, Editar no modo de exibição de grade, Atualizar, Exportar CSV) unificada em todas as listas do Portal Web (Streaming, Ocorrências, Hospedeiros, Antenistas, Hosts, Permissões, Listas Genéricas), RBAC com controle estrito de exibição por perfil, supressão de warnings FontBBox no parser NBA e sincronização paralela com logs em tempo real para o Portal Web."
 }

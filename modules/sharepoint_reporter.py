@@ -690,7 +690,7 @@ class SharePointReporter:
                 # Sincronização em paralelo para o Portal Web (Google Sites / GitHub Pages)
                 try:
                     from modules.portal_sync import PortalSyncManager
-                    PortalSyncManager.sync_report_to_portal(
+                    portal_ok = PortalSyncManager.sync_report_to_portal(
                         pdf_path=pdf_path,
                         drive_name="Relatorios_de_Jogos",
                         category="futebol",
@@ -700,6 +700,8 @@ class SharePointReporter:
                         plataforma=plataforma,
                         confianca=confianca
                     )
+                    if portal_ok:
+                        logger.info(f"🌐 [Portal Web] Relatório '{sp_filename}' publicado e sincronizado no novo Portal Web Suporte Captação (Futebol)!")
                 except Exception as e_portal:
                     logger.warning(f"[PortalSync] Aviso ao sincronizar com portal web: {e_portal}")
 

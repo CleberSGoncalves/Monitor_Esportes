@@ -231,10 +231,10 @@ class NBAAutonomousAuditor:
                 if not has_full_proofs:
                     self._log(f"⏳ [NBA AUTO] Relatório preliminar ({pdf_size} bytes) baseado no Game Book oficial. Aguardando disponibilização de highlights para comprovação visual completa.")
 
-                # c) Publicar no SharePoint na linha da partida
+                # c) Publicar no SharePoint e no Portal Web na linha da partida
                 sp_ok = SharePointNBAReporter.sync_nba_report(pdf, game, confianca=confianca_report)
                 if sp_ok:
-                    self._log(f"☁️ [SharePoint] Relatório de {match_disp} publicado no SharePoint ({confianca_report})!")
+                    self._log(f"☁️ [SharePoint & Portal Web] Relatório de {match_disp} publicado no SharePoint e sincronizado no Portal Web ({confianca_report})!")
                 else:
                     self._log(f"⚠️ [SharePoint] Falha temporária ao sincronizar {match_disp} no SharePoint.")
 

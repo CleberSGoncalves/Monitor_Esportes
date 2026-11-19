@@ -177,7 +177,7 @@ class SharePointYouTubeReporter:
                         logger.info(f"🎉 [SharePoint YouTube] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca 'Relatorio Jogos Youtube'!")
                         try:
                             from modules.portal_sync import PortalSyncManager
-                            PortalSyncManager.sync_report_to_portal(
+                            portal_ok = PortalSyncManager.sync_report_to_portal(
                                 pdf_path=pdf_path,
                                 drive_name="Relatorio Jogos Youtube",
                                 category="youtube",
@@ -187,6 +187,8 @@ class SharePointYouTubeReporter:
                                 plataforma=canal,
                                 confianca=confianca
                             )
+                            if portal_ok:
+                                logger.info(f"🌐 [Portal Web] Relatório '{sp_filename}' publicado e sincronizado no novo Portal Web Suporte Captação (YouTube)!")
                         except Exception as e_portal:
                             logger.warning(f"[PortalSync] Aviso ao sincronizar YouTube com portal web: {e_portal}")
                         return True

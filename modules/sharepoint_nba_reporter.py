@@ -173,7 +173,7 @@ class SharePointNBAReporter:
                     logger.info(f"🎉 [SharePoint NBA] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca NBA!")
                     try:
                         from modules.portal_sync import PortalSyncManager
-                        PortalSyncManager.sync_report_to_portal(
+                        portal_ok = PortalSyncManager.sync_report_to_portal(
                             pdf_path=pdf_path,
                             drive_name="Relatorios_de_Jogos_NBA",
                             category="nba",
@@ -183,6 +183,8 @@ class SharePointNBAReporter:
                             plataforma=plat_norm,
                             confianca=conf_val
                         )
+                        if portal_ok:
+                            logger.info(f"🌐 [Portal Web] Relatório '{sp_filename}' publicado e sincronizado no novo Portal Web Suporte Captação (NBA)!")
                     except Exception as e_portal:
                         logger.warning(f"[PortalSync] Aviso ao sincronizar NBA com portal web: {e_portal}")
                     return True

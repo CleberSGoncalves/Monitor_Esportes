@@ -2285,9 +2285,46 @@
         </div>
       </div>
 
-      <div class="filter-bar">
+      <!-- BARRA DE COMANDOS DO SHAREPOINT -->
+      <div class="sp-command-bar">
+        <div class="sp-command-left">
+          <button class="sp-btn-new" onclick="openNewStreamModal()" title="Adicionar novo evento à programação">
+            <span>+</span> Novo
+          </button>
+          <button id="btn-grid-stream" class="sp-btn-cmd btn-grid-edit" onclick="toggleStreamGridEdit()" title="Editar linhas e colunas diretamente no navegador">
+            <span id="btn-grid-stream-icon">田</span> <span id="btn-grid-stream-text">Editar no modo de exibição de grade</span>
+          </button>
+          <button class="sp-btn-cmd" onclick="renderTable()">
+            <span>↺</span> Atualizar
+          </button>
+          <button class="sp-btn-cmd" onclick="exportCSV()">
+            <span>📥</span> Exportar CSV
+          </button>
+          <button class="sp-btn-cmd action-admin-only" onclick="syncLiveAPI(this)">
+            <span>🔄</span> Sincronizar em Tempo Real
+          </button>
+        </div>
+        <div class="sp-command-search">
+          <input type="text" id="search-box" placeholder="Pesquisar nesta lista..." oninput="renderTable()">
+        </div>
+      </div>
+
+      <div class="sp-list-header-row">
+        <h2 class="sp-list-main-title">
+          Programação Streaming (862 Confrontos) <span class="star-icon">☆</span>
+        </h2>
+      </div>
+
+      <!-- ALERTA MODO GRADE STREAMING -->
+      <div id="stream-grid-mode-alert" style="display: none; background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #0078D4; padding: 10px 16px; border-radius: 4px; margin-bottom: 12px; font-size: 13px; color: #1E3A8A; align-items: center; justify-content: space-between;">
+        <div>
+          <b>⚡ Modo de exibição de grade ativado:</b> Você pode editar qualquer célula diretamente na tabela (campeonato, partida, canal, pvid, status). As alterações são salvas automaticamente.
+        </div>
+        <button type="button" class="btn-action btn-action-primary" style="padding: 4px 12px; font-size: 12px;" onclick="toggleStreamGridEdit()">💾 Concluir e Salvar</button>
+      </div>
+
+      <div class="filter-bar" style="margin-bottom: 12px;">
         <div class="filter-inputs" style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
-          <input type="text" id="search-box" class="search-field" style="min-width: 240px; flex: 1;" placeholder="🔍 Buscar partida, campeonato, responsável ou data...">
           <select id="filter-mes" class="select-field" onchange="renderTable()">
             <option value="">Todos os Meses</option>
             <option value="Janeiro">Janeiro</option>
@@ -2322,10 +2359,6 @@
             <option value="não exibido">Não Exibido</option>
           </select>
           <button type="button" id="btn-clear-stream-filters" class="btn-action btn-action-secondary" onclick="clearStreamFilters()" title="Limpar todos os filtros">Limpar ✕</button>
-        </div>
-        <div style="display: flex; gap: 8px; margin-top: 8px;">
-          <button class="btn-action btn-action-secondary action-admin-only" onclick="syncLiveAPI(this)">🔄 Sincronizar em Tempo Real</button>
-          <button class="btn-action btn-action-primary" onclick="exportCSV()">📥 Exportar CSV</button>
         </div>
       </div>
 
@@ -2362,18 +2395,39 @@
 
     <!-- ABA 4: CONTATOS HOSPEDEIROS (500 REGISTROS NATIVOS) -->
     <div id="pane-hospedeiros" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">📞 Contatos Técnicos de Hospedeiros (500 Registros)</h2>
-        <p class="section-desc">Diretório completo de centrais e técnicos de recepção e captação em todas as praças.</p>
+      <!-- BARRA DE COMANDOS DO SHAREPOINT -->
+      <div class="sp-command-bar">
+        <div class="sp-command-left">
+          <button class="sp-btn-new" onclick="openNewHospedeiroModal()" title="Adicionar novo contato de hospedeiro">
+            <span>+</span> Novo
+          </button>
+          <button id="btn-grid-hosp" class="sp-btn-cmd btn-grid-edit" onclick="toggleHospGridEdit()" title="Editar linhas e colunas diretamente no navegador">
+            <span id="btn-grid-hosp-icon">田</span> <span id="btn-grid-hosp-text">Editar no modo de exibição de grade</span>
+          </button>
+          <button class="sp-btn-cmd" onclick="renderHospedeirosTable()">
+            <span>↺</span> Atualizar
+          </button>
+          <button class="sp-btn-cmd" onclick="exportHospedeirosCSV()">
+            <span>📥</span> Exportar CSV
+          </button>
+        </div>
+        <div class="sp-command-search">
+          <input type="text" id="search-hosp-box" placeholder="Pesquisar nesta lista..." oninput="renderHospedeirosTable()">
+        </div>
       </div>
 
-      <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-hosp-box" class="search-field" placeholder="🔍 Buscar por cidade, técnico, especialidade ou telefone...">
-        </div>
+      <div class="sp-list-header-row">
+        <h2 class="sp-list-main-title">
+          Contatos Técnicos de Hospedeiros (500 Registros) <span class="star-icon">☆</span>
+        </h2>
+      </div>
+
+      <!-- ALERTA MODO GRADE HOSPEDEIROS -->
+      <div id="hosp-grid-mode-alert" style="display: none; background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #0078D4; padding: 10px 16px; border-radius: 4px; margin-bottom: 12px; font-size: 13px; color: #1E3A8A; align-items: center; justify-content: space-between;">
         <div>
-          <button class="btn-action btn-action-primary" onclick="exportHospedeirosCSV()">📥 Exportar Hospedeiros CSV</button>
+          <b>⚡ Modo de exibição de grade ativado:</b> Você pode editar qualquer célula diretamente na tabela (cidade, nome, especialidade, telefones). As alterações são salvas automaticamente.
         </div>
+        <button type="button" class="btn-action btn-action-primary" style="padding: 4px 12px; font-size: 12px;" onclick="toggleHospGridEdit()">💾 Concluir e Salvar</button>
       </div>
 
       <div class="sp-table-wrap">
@@ -2505,8 +2559,12 @@
     <div id="pane-antenistas" class="pane-container">
       <div class="sp-command-bar">
         <div class="sp-command-left">
-          <button class="sp-btn-new" onclick="openNewAntenistaModal()"><span>+</span> Novo</button>
+          <button class="sp-btn-new" onclick="openNewAntenistaModal()" title="Adicionar novo antenista"><span>+</span> Novo</button>
+          <button id="btn-grid-ante" class="sp-btn-cmd btn-grid-edit" onclick="toggleAnteGridEdit()" title="Editar linhas e colunas diretamente no navegador">
+            <span id="btn-grid-ante-icon">田</span> <span id="btn-grid-ante-text">Editar no modo de exibição de grade</span>
+          </button>
           <button class="sp-btn-cmd" onclick="renderAntenistasTable()"><span>↺</span> Atualizar</button>
+          <button class="sp-btn-cmd" onclick="exportAntenistasCSV()"><span>📥</span> Exportar CSV</button>
         </div>
         <div class="sp-command-search">
           <input type="text" id="search-ante-box" placeholder="Pesquisar antenistas..." oninput="renderAntenistasTable()">
@@ -2514,6 +2572,13 @@
       </div>
       <div class="sp-list-header-row">
         <h2 class="sp-list-main-title">Contatos de Antenistas <span class="star-icon">☆</span></h2>
+      </div>
+      <!-- ALERTA MODO GRADE ANTENISTAS -->
+      <div id="ante-grid-mode-alert" style="display: none; background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #0078D4; padding: 10px 16px; border-radius: 4px; margin-bottom: 12px; font-size: 13px; color: #1E3A8A; align-items: center; justify-content: space-between;">
+        <div>
+          <b>⚡ Modo de exibição de grade ativado:</b> Você pode editar qualquer célula diretamente na tabela (nome, praça, empresa, telefones). As alterações são salvas automaticamente.
+        </div>
+        <button type="button" class="btn-action btn-action-primary" style="padding: 4px 12px; font-size: 12px;" onclick="toggleAnteGridEdit()">💾 Concluir e Salvar</button>
       </div>
       <div class="sp-table-wrap">
         <div class="sp-table-scroll">
@@ -2540,8 +2605,12 @@
     <div id="pane-hosts" class="pane-container">
       <div class="sp-command-bar">
         <div class="sp-command-left">
-          <button class="sp-btn-new" onclick="openNewHostModal()"><span>+</span> Novo Host</button>
+          <button class="sp-btn-new" onclick="openNewHostModal()" title="Cadastrar novo Host"><span>+</span> Novo Host</button>
+          <button id="btn-grid-hosts" class="sp-btn-cmd btn-grid-edit" onclick="toggleHostGridEdit()" title="Editar linhas e colunas diretamente no navegador">
+            <span id="btn-grid-hosts-icon">田</span> <span id="btn-grid-hosts-text">Editar no modo de exibição de grade</span>
+          </button>
           <button class="sp-btn-cmd" onclick="renderHostsTable()"><span>↺</span> Atualizar</button>
+          <button class="sp-btn-cmd" onclick="exportHostsCSV()"><span>📥</span> Exportar CSV</button>
         </div>
         <div class="sp-command-search">
           <input type="text" id="search-hosts-box" placeholder="Pesquisar hosts ou cidades..." oninput="renderHostsTable()">
@@ -2549,6 +2618,13 @@
       </div>
       <div class="sp-list-header-row">
         <h2 class="sp-list-main-title">Cadastro - Hosts (220 Praças Ativas) <span class="star-icon">☆</span></h2>
+      </div>
+      <!-- ALERTA MODO GRADE HOSTS -->
+      <div id="hosts-grid-mode-alert" style="display: none; background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #0078D4; padding: 10px 16px; border-radius: 4px; margin-bottom: 12px; font-size: 13px; color: #1E3A8A; align-items: center; justify-content: space-between;">
+        <div>
+          <b>⚡ Modo de exibição de grade ativado:</b> Você pode editar qualquer célula diretamente na tabela (código do host, status). As alterações são salvas automaticamente.
+        </div>
+        <button type="button" class="btn-action btn-action-primary" style="padding: 4px 12px; font-size: 12px;" onclick="toggleHostGridEdit()">💾 Concluir e Salvar</button>
       </div>
       <div class="sp-table-wrap">
         <div class="sp-table-scroll">
@@ -2634,10 +2710,14 @@
     <div id="pane-list-viewer" class="pane-container">
       <div class="sp-command-bar">
         <div class="sp-command-left">
-          <button class="sp-btn-new" onclick="openNewListItemModal()"><span>+</span> Novo</button>
-          <button id="btn-grid-generic" class="sp-btn-cmd" onclick="toggleGenericListGridEdit()"><span id="btn-grid-generic-icon">田</span> <span id="btn-grid-generic-text">Editar no modo de exibição de grade</span></button>
-          <button class="sp-btn-cmd" onclick="exportGenericListCSV()"><span>📥</span> Exportar CSV</button>
+          <button class="sp-btn-new" onclick="openNewListItemModal()" title="Adicionar novo registro a esta lista"><span>+</span> Novo</button>
+          <button id="btn-grid-generic" class="sp-btn-cmd btn-grid-edit" onclick="toggleGenericListGridEdit()" title="Editar linhas e colunas diretamente no navegador"><span id="btn-grid-generic-icon">田</span> <span id="btn-grid-generic-text">Editar no modo de exibição de grade</span></button>
+          <button class="sp-btn-cmd" onclick="filterRealListTable()" title="Atualizar dados da lista"><span>↺</span> Atualizar</button>
+          <button class="sp-btn-cmd" onclick="exportGenericListCSV()" title="Exportar para CSV"><span>📥</span> Exportar CSV</button>
           <button class="sp-btn-cmd" onclick="handleMenuClick('home', 'Página Inicial')"><span>🏠</span> Voltar ao Início</button>
+        </div>
+        <div class="sp-command-search">
+          <input type="text" id="list-viewer-search" placeholder="Pesquisar nesta lista..." oninput="filterRealListTable()">
         </div>
       </div>
       
@@ -2797,17 +2877,39 @@
 
     <!-- ABA 13: PERMISSÕES & RBAC -->
     <div id="pane-permissoes" class="pane-container">
-      <div class="section-title-wrap">
-        <h2 class="section-title">🔐 Controle de Acessos & Mapeamento RBAC (52 Registros)</h2>
-        <p class="section-desc">Matriz de permissões migrada do SharePoint para perfis corporativos Google Workspace.</p>
+      <!-- BARRA DE COMANDOS DO SHAREPOINT -->
+      <div class="sp-command-bar">
+        <div class="sp-command-left">
+          <button class="sp-btn-new action-admin-only" onclick="openNewPermModal()" title="Cadastrar nova permissão ou usuário">
+            <span>+</span> Novo
+          </button>
+          <button id="btn-grid-perms" class="sp-btn-cmd btn-grid-edit action-admin-only" onclick="togglePermsGridEdit()" title="Editar linhas e colunas diretamente no navegador">
+            <span id="btn-grid-perms-icon">田</span> <span id="btn-grid-perms-text">Editar no modo de exibição de grade</span>
+          </button>
+          <button class="sp-btn-cmd" onclick="renderPermsTable()">
+            <span>↺</span> Atualizar
+          </button>
+          <button class="sp-btn-cmd" onclick="exportPermsCSV()">
+            <span>📥</span> Exportar CSV
+          </button>
+        </div>
+        <div class="sp-command-search">
+          <input type="text" id="search-perm-box" placeholder="Pesquisar nesta lista..." oninput="renderPermsTable()">
+        </div>
       </div>
-      <div class="filter-bar">
-        <div class="filter-inputs">
-          <input type="text" id="search-perm-box" class="search-field" placeholder="🔍 Buscar usuário ou grupo...">
-        </div>
+
+      <div class="sp-list-header-row">
+        <h2 class="sp-list-main-title">
+          Controle de Acessos & Mapeamento RBAC (52 Registros) <span class="star-icon">☆</span>
+        </h2>
+      </div>
+
+      <!-- ALERTA MODO GRADE PERMISSÕES -->
+      <div id="perms-grid-mode-alert" style="display: none; background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #0078D4; padding: 10px 16px; border-radius: 4px; margin-bottom: 12px; font-size: 13px; color: #1E3A8A; align-items: center; justify-content: space-between;">
         <div>
-          <button class="btn-action btn-action-primary" onclick="exportPermsCSV()">📥 Exportar Permissões CSV</button>
+          <b>⚡ Modo de exibição de grade ativado:</b> Você pode editar qualquer célula diretamente na tabela (nome, email, nível, papel, escopo). As alterações são salvas automaticamente.
         </div>
+        <button type="button" class="btn-action btn-action-primary" style="padding: 4px 12px; font-size: 12px;" onclick="togglePermsGridEdit()">💾 Concluir e Salvar</button>
       </div>
       <div class="sp-table-wrap">
         <table class="sp-list-table">
@@ -3132,6 +3234,204 @@
     </div>
   </div>
 
+  <!-- MODAL DE NOVO EVENTO STREAMING -->
+  <div class="modal-overlay" id="modal-new-stream-event">
+    <div class="modal-card" style="max-width: 720px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">📺</span>
+          <h3>Novo Confronto / Evento Streaming</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeNewStreamModal()">&times;</button>
+      </div>
+      <form id="form-new-stream" onsubmit="saveNewStreamEvent(event)">
+        <div class="modal-body" style="max-height: 72vh; overflow-y: auto;">
+          <div class="sp-form-grid">
+            <div class="sp-form-group">
+              <label class="sp-form-label">Mês *</label>
+              <select id="new-stream-mes" class="sp-form-select" required>
+                <option value="Janeiro">Janeiro</option>
+                <option value="Fevereiro">Fevereiro</option>
+                <option value="Março">Março</option>
+                <option value="Abril">Abril</option>
+                <option value="Maio">Maio</option>
+                <option value="Junho">Junho</option>
+                <option value="Julho">Julho</option>
+                <option value="Agosto">Agosto</option>
+                <option value="Setembro">Setembro</option>
+                <option value="Outubro">Outubro</option>
+                <option value="Novembro" selected>Novembro</option>
+                <option value="Dezembro">Dezembro</option>
+              </select>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Data do Confronto (DD/MM/YYYY) *</label>
+              <input type="text" id="new-stream-data" class="sp-form-input" placeholder="Ex: 19/11/2026" required>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Horário (HH:MM) *</label>
+              <input type="text" id="new-stream-horario" class="sp-form-input" placeholder="Ex: 20:00" required>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Campeonato / Competição *</label>
+              <input type="text" id="new-stream-campeonato" class="sp-form-input" placeholder="Ex: Brasileirão Série A" required>
+            </div>
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Partida / Confronto *</label>
+              <input type="text" id="new-stream-partida" class="sp-form-input" placeholder="Ex: Palmeiras x Corinthians" required>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Canal de Transmissão *</label>
+              <select id="new-stream-canal" class="sp-form-select" required>
+                <option value="Cazé TV" selected>Cazé TV</option>
+                <option value="Amazon Prime">Amazon Prime</option>
+                <option value="Netflix">Netflix</option>
+                <option value="TNT / MAX / Record">TNT / MAX / Record</option>
+                <option value="YouTube">YouTube</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">PVID TV BOX</label>
+              <input type="text" id="new-stream-pvid" class="sp-form-input" placeholder="Ex: CAZÉTV - 3571">
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Responsável Gravação</label>
+              <input type="text" id="new-stream-resp" class="sp-form-input" placeholder="Ex: Cleber BL01 e Backup">
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Status de Entrega</label>
+              <select id="new-stream-status" class="sp-form-select">
+                <option value="Exibido" selected>Exibido</option>
+                <option value="Em andamento">Em andamento</option>
+                <option value="Pendente">Pendente</option>
+                <option value="Cancelado">Cancelado</option>
+              </select>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Programado</label>
+              <select id="new-stream-programado" class="sp-form-select">
+                <option value="SIM" selected>SIM</option>
+                <option value="NÃO">NÃO</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="sp-modal-footer">
+          <button type="button" class="btn-action btn-action-secondary" onclick="closeNewStreamModal()">Cancelar</button>
+          <button type="submit" class="btn-action btn-action-primary" style="display: flex; align-items: center; gap: 6px;">
+            <span>💾</span> Salvar Confronto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE NOVO HOSPEDEIRO -->
+  <div class="modal-overlay" id="modal-new-hospedeiro">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">📞</span>
+          <h3>Novo Contato de Hospedeiro</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeNewHospedeiroModal()">&times;</button>
+      </div>
+      <form id="form-new-hospedeiro" onsubmit="saveNewHospedeiro(event)">
+        <div class="modal-body" style="max-height: 72vh; overflow-y: auto;">
+          <div class="sp-form-grid">
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Cidade / Praça / UF *</label>
+              <input type="text" id="new-hosp-cidade" class="sp-form-input" placeholder="Ex: Montes Claros / MG" required>
+            </div>
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Nome do Técnico / Central *</label>
+              <input type="text" id="new-hosp-nome" class="sp-form-input" placeholder="Ex: Carlos Eduardo Silva" required>
+            </div>
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Especialidade / Cargo</label>
+              <input type="text" id="new-hosp-esp" class="sp-form-input" placeholder="Ex: Técnico de Recepção / Antenista">
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Telefone Comercial</label>
+              <input type="text" id="new-hosp-telcom" class="sp-form-input" placeholder="Ex: (38) 3221-0000">
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Telefone Celular</label>
+              <input type="text" id="new-hosp-telcel" class="sp-form-input" placeholder="Ex: (38) 99999-0000">
+            </div>
+          </div>
+        </div>
+        <div class="sp-modal-footer">
+          <button type="button" class="btn-action btn-action-secondary" onclick="closeNewHospedeiroModal()">Cancelar</button>
+          <button type="submit" class="btn-action btn-action-primary" style="display: flex; align-items: center; gap: 6px;">
+            <span>💾</span> Salvar Hospedeiro
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE NOVA PERMISSÃO -->
+  <div class="modal-overlay" id="modal-new-perm">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">🔐</span>
+          <h3>Nova Permissão / Acesso RBAC</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeNewPermModal()">&times;</button>
+      </div>
+      <form id="form-new-perm" onsubmit="saveNewPerm(event)">
+        <div class="modal-body" style="max-height: 72vh; overflow-y: auto;">
+          <div class="sp-form-grid">
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Nome do Usuário ou Grupo *</label>
+              <input type="text" id="new-perm-nome" class="sp-form-input" placeholder="Ex: João Diego Silva" required>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Tipo</label>
+              <select id="new-perm-tipo" class="sp-form-select">
+                <option value="user" selected>Usuário (user)</option>
+                <option value="group">Grupo (group)</option>
+              </select>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">E-mail Corporativo *</label>
+              <input type="email" id="new-perm-email" class="sp-form-input" placeholder="Ex: joao.diego@ibope.com" required>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Nível SharePoint</label>
+              <select id="new-perm-sp" class="sp-form-select">
+                <option value="Proprietário">Proprietário (Full Control)</option>
+                <option value="Membro" selected>Membro (Edit / Contribute)</option>
+                <option value="Visitante">Visitante (Read)</option>
+              </select>
+            </div>
+            <div class="sp-form-group">
+              <label class="sp-form-label">Perfil Google Workspace</label>
+              <select id="new-perm-google" class="sp-form-select">
+                <option value="Gestor/Admin">Gestor / Admin</option>
+                <option value="Operador" selected>Operador (Write)</option>
+                <option value="Leitor">Leitor (Read-Only)</option>
+              </select>
+            </div>
+            <div class="sp-form-group full-width">
+              <label class="sp-form-label">Escopo / Setor</label>
+              <input type="text" id="new-perm-escopo" class="sp-form-input" placeholder="Ex: Suporte Captação / Coleta">
+            </div>
+          </div>
+        </div>
+        <div class="sp-modal-footer">
+          <button type="button" class="btn-action btn-action-secondary" onclick="closeNewPermModal()">Cancelar</button>
+          <button type="submit" class="btn-action btn-action-primary" style="display: flex; align-items: center; gap: 6px;">
+            <span>💾</span> Salvar Permissão
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- CONTAINER DE NOTIFICAÇÕES TOAST -->
   <div id="sp-toast-container"></div>
 
@@ -3215,8 +3515,8 @@
         const permTab = document.getElementById("nav-tab-permissoes");
         if (permTab) permTab.style.display = "";
 
-        // Botões de criação e edição ativos
-        document.querySelectorAll(".sp-btn-new, #btn-grid-oco, #btn-grid-generic").forEach(el => el.style.display = "");
+        // Todos os botões de criação e edição ativos
+        document.querySelectorAll(".sp-btn-new, .btn-grid-edit").forEach(el => el.style.display = "");
 
         if (escalaBadge) {
           escalaBadge.innerText = "✏️ Permissão de Edição (Administrador)";
@@ -3234,7 +3534,7 @@
         if (permTab) permTab.style.display = "none";
 
         // Operador tem permissão de inclusão e edição em ocorrências e listas operacionais
-        document.querySelectorAll(".sp-btn-new, #btn-grid-oco, #btn-grid-generic").forEach(el => el.style.display = "");
+        document.querySelectorAll(".sp-btn-new:not(.action-admin-only), .btn-grid-edit:not(.action-admin-only)").forEach(el => el.style.display = "");
 
         if (escalaBadge) {
           escalaBadge.innerText = "🔒 Somente Leitura (Gestão da Escala Restrita à Administração)";
@@ -3252,7 +3552,7 @@
         if (permTab) permTab.style.display = "none";
 
         // Modo estritamente somente leitura: sem botões de criação ou modo grade
-        document.querySelectorAll(".sp-btn-new, #btn-grid-oco, #btn-grid-generic").forEach(el => el.style.display = "none");
+        document.querySelectorAll(".sp-btn-new, .btn-grid-edit").forEach(el => el.style.display = "none");
 
         if (escalaBadge) {
           escalaBadge.innerText = "🔒 Somente Leitura (Visitante / Consulta)";
@@ -4278,6 +4578,108 @@
       renderTable();
     }
 
+    let isStreamGridEditMode = false;
+
+    function openNewStreamModal() {
+      const modal = document.getElementById("modal-new-stream-event");
+      if (modal) modal.style.display = "flex";
+    }
+
+    function closeNewStreamModal() {
+      const modal = document.getElementById("modal-new-stream-event");
+      if (modal) modal.style.display = "none";
+    }
+
+    function saveNewStreamEvent(event) {
+      if (event) event.preventDefault();
+      const mes = document.getElementById("new-stream-mes")?.value || "Novembro";
+      const data = document.getElementById("new-stream-data")?.value.trim() || "";
+      const horario = document.getElementById("new-stream-horario")?.value.trim() || "";
+      const campeonato = document.getElementById("new-stream-campeonato")?.value.trim() || "";
+      const partida = document.getElementById("new-stream-partida")?.value.trim() || "";
+      const canal = document.getElementById("new-stream-canal")?.value || "Cazé TV";
+      const pvid = document.getElementById("new-stream-pvid")?.value.trim() || "-";
+      const resp = document.getElementById("new-stream-resp")?.value.trim() || "Equipe Suporte";
+      const status = document.getElementById("new-stream-status")?.value || "Exibido";
+      const programado = document.getElementById("new-stream-programado")?.value || "SIM";
+
+      if (!partida || !data) {
+        showToast("⚠️ Preencha a partida e a data do confronto!", "warning");
+        return;
+      }
+
+      const newId = "stream_" + Date.now();
+      const newEvent = {
+        id: newId,
+        mes: mes,
+        data: data,
+        horario: horario,
+        campeonato: campeonato,
+        partida: partida,
+        responsavel: resp,
+        canal: canal,
+        pvid: pvid,
+        status_entrega: status,
+        programado: programado
+      };
+
+      allEvents.unshift(newEvent);
+
+      try {
+        let customEvents = JSON.parse(localStorage.getItem('sp_custom_streaming_events') || '[]');
+        customEvents.unshift(newEvent);
+        localStorage.setItem('sp_custom_streaming_events', JSON.stringify(customEvents));
+      } catch (e) {
+        console.warn("Erro ao salvar evento local:", e);
+      }
+
+      closeNewStreamModal();
+      document.getElementById("form-new-stream")?.reset();
+      renderTable();
+      showToast(`✅ Confronto '${partida}' cadastrado na programação!`, "success");
+    }
+
+    function toggleStreamGridEdit() {
+      isStreamGridEditMode = !isStreamGridEditMode;
+      const btn = document.getElementById("btn-grid-stream");
+      const icon = document.getElementById("btn-grid-stream-icon");
+      const txt = document.getElementById("btn-grid-stream-text");
+      const alertBox = document.getElementById("stream-grid-mode-alert");
+
+      if (isStreamGridEditMode) {
+        if (btn) btn.classList.add("btn-grid-active");
+        if (icon) icon.innerText = "💾";
+        if (txt) txt.innerText = "Sair do modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "flex";
+        showToast("Modo de exibição de grade ativado. Clique nas células para editar.", "info");
+      } else {
+        if (btn) btn.classList.remove("btn-grid-active");
+        if (icon) icon.innerText = "田";
+        if (txt) txt.innerText = "Editar no modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "none";
+        showToast("Modo de exibição de grade finalizado. Todas as alterações salvas!", "success");
+      }
+      renderTable();
+    }
+
+    function updateStreamField(id, field, value) {
+      const item = allEvents.find(e => (String(e.id) === String(id) || String(e.partida) === String(id)));
+      if (!item) return;
+
+      item[field] = value;
+
+      try {
+        let customEdits = JSON.parse(localStorage.getItem('sp_custom_streaming_edits') || '{}');
+        if (!customEdits[id]) customEdits[id] = {};
+        customEdits[id][field] = value;
+        localStorage.setItem('sp_custom_streaming_edits', JSON.stringify(customEdits));
+      } catch (e) {
+        console.warn("Erro ao persistir edição streaming:", e);
+      }
+
+      showToast(`💾 Alteração salva em ${field}!`, "success");
+    }
+
     function renderTable() {
       initStreamingFilters();
       const searchBox = document.getElementById("search-box");
@@ -4342,6 +4744,47 @@
       filtered.forEach((ev) => {
         count++;
         const tr = document.createElement("tr");
+
+        if (isStreamGridEditMode) {
+          const evId = ev.id || `${ev.partida}_${ev.data}`;
+          tr.innerHTML = `
+            <td class="td-center" style="color: #64748B; font-weight: 600;">${count}</td>
+            <td class="td-center"><div contenteditable="true" class="sp-grid-cell" onblur="updateStreamField('${evId}', 'mes', this.innerText.trim())">${ev.mes || ''}</div></td>
+            <td class="td-center"><div contenteditable="true" class="sp-grid-cell" onblur="updateStreamField('${evId}', 'data', this.innerText.trim())">${ev.data || ''}</div></td>
+            <td class="td-center"><div contenteditable="true" class="sp-grid-cell" onblur="updateStreamField('${evId}', 'horario', this.innerText.trim())">${ev.horario || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateStreamField('${evId}', 'campeonato', this.innerText.trim())">${ev.campeonato || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell sp-grid-cell-wide" onblur="updateStreamField('${evId}', 'partida', this.innerText.trim())">${ev.partida || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateStreamField('${evId}', 'responsavel', this.innerText.trim())">${ev.responsavel || ''}</div></td>
+            <td class="td-center">
+              <select class="sp-grid-select" onchange="updateStreamField('${evId}', 'canal', this.value)">
+                <option value="Cazé TV" ${String(ev.canal).includes('Cazé') ? 'selected' : ''}>Cazé TV</option>
+                <option value="Amazon Prime" ${String(ev.canal).includes('Amazon') || String(ev.canal).includes('Prime') ? 'selected' : ''}>Amazon Prime</option>
+                <option value="Netflix" ${String(ev.canal).includes('Netflix') ? 'selected' : ''}>Netflix</option>
+                <option value="TNT / MAX / Record" ${String(ev.canal).includes('TNT') || String(ev.canal).includes('Record') ? 'selected' : ''}>TNT / MAX / Record</option>
+                <option value="YouTube" ${String(ev.canal).includes('YouTube') ? 'selected' : ''}>YouTube</option>
+                <option value="Outros" ${!['Cazé', 'Amazon', 'Prime', 'Netflix', 'TNT', 'Record', 'YouTube'].some(k => String(ev.canal).includes(k)) ? 'selected' : ''}>Outros</option>
+              </select>
+            </td>
+            <td class="td-center"><div contenteditable="true" class="sp-grid-cell" onblur="updateStreamField('${evId}', 'pvid', this.innerText.trim())">${ev.pvid || ''}</div></td>
+            <td class="td-center">
+              <select class="sp-grid-select sp-grid-select-sm" onchange="updateStreamField('${evId}', 'status_entrega', this.value)">
+                <option value="Exibido" ${ev.status_entrega === 'Exibido' ? 'selected' : ''}>Exibido</option>
+                <option value="Em andamento" ${ev.status_entrega === 'Em andamento' ? 'selected' : ''}>Em andamento</option>
+                <option value="Pendente" ${ev.status_entrega === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                <option value="Cancelado" ${ev.status_entrega === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+              </select>
+            </td>
+            <td class="td-center">
+              <select class="sp-grid-select sp-grid-select-sm" onchange="updateStreamField('${evId}', 'programado', this.value)">
+                <option value="SIM" ${String(ev.programado).toUpperCase() === 'SIM' ? 'selected' : ''}>SIM</option>
+                <option value="NÃO" ${String(ev.programado).toUpperCase() !== 'SIM' ? 'selected' : ''}>NÃO</option>
+              </select>
+            </td>
+          `;
+          tbody.appendChild(tr);
+          return;
+        }
+
         tr.innerHTML = `
           <td class="td-center" style="color: #64748B; font-weight: 600;">${count}</td>
           <td class="td-center">${ev.mes || '-'}</td>
@@ -4388,6 +4831,98 @@
       renderHospedeirosTable();
     }
 
+    let isHospGridEditMode = false;
+
+    function openNewHospedeiroModal() {
+      const modal = document.getElementById("modal-new-hospedeiro");
+      if (modal) modal.style.display = "flex";
+    }
+
+    function closeNewHospedeiroModal() {
+      const modal = document.getElementById("modal-new-hospedeiro");
+      if (modal) modal.style.display = "none";
+    }
+
+    function saveNewHospedeiro(event) {
+      if (event) event.preventDefault();
+      const cidade = document.getElementById("new-hosp-cidade")?.value.trim() || "";
+      const nome = document.getElementById("new-hosp-nome")?.value.trim() || "";
+      const esp = document.getElementById("new-hosp-esp")?.value.trim() || "Técnico de Recepção";
+      const telcom = document.getElementById("new-hosp-telcom")?.value.trim() || "-";
+      const telcel = document.getElementById("new-hosp-telcel")?.value.trim() || "-";
+
+      if (!cidade || !nome) {
+        showToast("⚠️ Preencha a cidade e o nome do técnico!", "warning");
+        return;
+      }
+
+      const newId = "hosp_" + Date.now();
+      const newHosp = {
+        id: newId,
+        Title: cidade,
+        Nome1: nome,
+        Especialidade: esp,
+        Telefone_x0020_Comercial: telcom,
+        Telefone_x0020_Celular: telcel
+      };
+
+      allHospedeiros.unshift(newHosp);
+
+      try {
+        let customHosp = JSON.parse(localStorage.getItem('sp_custom_hospedeiros') || '[]');
+        customHosp.unshift(newHosp);
+        localStorage.setItem('sp_custom_hospedeiros', JSON.stringify(customHosp));
+      } catch (e) {
+        console.warn("Erro ao salvar hospedeiro local:", e);
+      }
+
+      closeNewHospedeiroModal();
+      document.getElementById("form-new-hospedeiro")?.reset();
+      renderHospedeirosTable();
+      showToast(`✅ Hospedeiro '${nome}' (${cidade}) cadastrado com sucesso!`, "success");
+    }
+
+    function toggleHospGridEdit() {
+      isHospGridEditMode = !isHospGridEditMode;
+      const btn = document.getElementById("btn-grid-hosp");
+      const icon = document.getElementById("btn-grid-hosp-icon");
+      const txt = document.getElementById("btn-grid-hosp-text");
+      const alertBox = document.getElementById("hosp-grid-mode-alert");
+
+      if (isHospGridEditMode) {
+        if (btn) btn.classList.add("btn-grid-active");
+        if (icon) icon.innerText = "💾";
+        if (txt) txt.innerText = "Sair do modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "flex";
+        showToast("Modo de exibição de grade ativado. Clique nas células para editar.", "info");
+      } else {
+        if (btn) btn.classList.remove("btn-grid-active");
+        if (icon) icon.innerText = "田";
+        if (txt) txt.innerText = "Editar no modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "none";
+        showToast("Modo de exibição de grade finalizado. Todas as alterações salvas!", "success");
+      }
+      renderHospedeirosTable();
+    }
+
+    function updateHospField(id, field, value) {
+      const item = allHospedeiros.find(h => (String(h.id) === String(id) || String(h.Title) === String(id)));
+      if (!item) return;
+
+      item[field] = value;
+
+      try {
+        let customEdits = JSON.parse(localStorage.getItem('sp_custom_hospedeiros_edits') || '{}');
+        if (!customEdits[id]) customEdits[id] = {};
+        customEdits[id][field] = value;
+        localStorage.setItem('sp_custom_hospedeiros_edits', JSON.stringify(customEdits));
+      } catch (e) {
+        console.warn("Erro ao persistir edição hospedeiro:", e);
+      }
+
+      showToast(`💾 Alteração salva em ${field}!`, "success");
+    }
+
     function renderHospedeirosTable() {
       const sBox = document.getElementById("search-hosp-box");
       const q = sBox ? sBox.value.toLowerCase().trim() : "";
@@ -4414,6 +4949,21 @@
       list.forEach((h) => {
         count++;
         const tr = document.createElement("tr");
+
+        if (isHospGridEditMode) {
+          const hospId = h.id || `${h.Title}_${h.Nome1}`;
+          tr.innerHTML = `
+            <td class="td-center" style="color: #64748B;">${count}</td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateHospField('${hospId}', 'Title', this.innerText.trim())">${h.Title || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateHospField('${hospId}', 'Nome1', this.innerText.trim())">${h.Nome1 || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateHospField('${hospId}', 'Especialidade', this.innerText.trim())">${h.Especialidade || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateHospField('${hospId}', 'Telefone_x0020_Comercial', this.innerText.trim())">${h.Telefone_x0020_Comercial || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateHospField('${hospId}', 'Telefone_x0020_Celular', this.innerText.trim())">${h.Telefone_x0020_Celular || ''}</div></td>
+          `;
+          tbody.appendChild(tr);
+          return;
+        }
+
         tr.innerHTML = `
           <td class="td-center" style="color: #64748B;">${count}</td>
           <td><b>${h.Title || '-'}</b></td>
@@ -4844,6 +5394,65 @@
       }
     }
 
+    let isAnteGridEditMode = false;
+
+    function toggleAnteGridEdit() {
+      isAnteGridEditMode = !isAnteGridEditMode;
+      const btn = document.getElementById("btn-grid-ante");
+      const icon = document.getElementById("btn-grid-ante-icon");
+      const txt = document.getElementById("btn-grid-ante-text");
+      const alertBox = document.getElementById("ante-grid-mode-alert");
+
+      if (isAnteGridEditMode) {
+        if (btn) btn.classList.add("btn-grid-active");
+        if (icon) icon.innerText = "💾";
+        if (txt) txt.innerText = "Sair do modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "flex";
+        showToast("Modo de exibição de grade ativado. Clique nas células para editar.", "info");
+      } else {
+        if (btn) btn.classList.remove("btn-grid-active");
+        if (icon) icon.innerText = "田";
+        if (txt) txt.innerText = "Editar no modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "none";
+        showToast("Modo de exibição de grade finalizado. Todas as alterações salvas!", "success");
+      }
+      renderAntenistasTable();
+    }
+
+    function updateAnteField(id, field, value) {
+      const item = allAntenistas.find(a => (String(a.id) === String(id) || String(a.Title) === String(id)));
+      if (!item) return;
+
+      item[field] = value;
+
+      try {
+        let customEdits = JSON.parse(localStorage.getItem('sp_custom_antenistas_edits') || '{}');
+        if (!customEdits[id]) customEdits[id] = {};
+        customEdits[id][field] = value;
+        localStorage.setItem('sp_custom_antenistas_edits', JSON.stringify(customEdits));
+      } catch (e) {
+        console.warn("Erro ao persistir edição antenista:", e);
+      }
+
+      showToast(`💾 Alteração salva em ${field}!`, "success");
+    }
+
+    function exportAntenistasCSV() {
+      let csv = `Nome / Contato;Cidade / Praca;Especialidade / Cargo;Empresa;Telefone Comercial;Telefone Celular\n`;
+      allAntenistas.forEach(a => {
+        csv += `"${a.Title || ''}";"${a.field_0 || ''}";"${a.Cargo || ''}";"${a.Empresa || ''}";"${a.Telefone_x0020_Comercial || ''}";"${a.Telefone_x0020_Celular || ''}"\n`;
+      });
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Contatos_Antenistas_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("📥 Exportação de Antenistas CSV concluída com sucesso!", "success");
+    }
+
     function renderAntenistasTable() {
       const sBox = document.getElementById("search-ante-box");
       const q = sBox ? sBox.value.toLowerCase().trim() : "";
@@ -4865,6 +5474,21 @@
         }
 
         const tr = document.createElement("tr");
+
+        if (isAnteGridEditMode) {
+          const anteId = a.id || `${a.Title}_${a.field_0}`;
+          tr.innerHTML = `
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateAnteField('${anteId}', 'Title', this.innerText.trim())">${a.Title || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateAnteField('${anteId}', 'field_0', this.innerText.trim())">${a.field_0 || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateAnteField('${anteId}', 'Cargo', this.innerText.trim())">${a.Cargo || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateAnteField('${anteId}', 'Empresa', this.innerText.trim())">${a.Empresa || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateAnteField('${anteId}', 'Telefone_x0020_Comercial', this.innerText.trim())">${a.Telefone_x0020_Comercial || ''}</div></td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updateAnteField('${anteId}', 'Telefone_x0020_Celular', this.innerText.trim())">${a.Telefone_x0020_Celular || ''}</div></td>
+          `;
+          tbody.appendChild(tr);
+          return;
+        }
+
         tr.innerHTML = `
           <td><b>${nome}</b></td>
           <td><span style="font-weight: 600; color: #0078D4;">${cidade}</span></td>
@@ -4875,6 +5499,59 @@
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    let isHostGridEditMode = false;
+
+    function toggleHostGridEdit() {
+      isHostGridEditMode = !isHostGridEditMode;
+      const btn = document.getElementById("btn-grid-hosts");
+      const icon = document.getElementById("btn-grid-hosts-icon");
+      const txt = document.getElementById("btn-grid-hosts-text");
+      const alertBox = document.getElementById("hosts-grid-mode-alert");
+
+      if (isHostGridEditMode) {
+        if (btn) btn.classList.add("btn-grid-active");
+        if (icon) icon.innerText = "💾";
+        if (txt) txt.innerText = "Sair do modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "flex";
+        showToast("Modo de exibição de grade ativado. Clique nas células para editar.", "info");
+      } else {
+        if (btn) btn.classList.remove("btn-grid-active");
+        if (icon) icon.innerText = "田";
+        if (txt) txt.innerText = "Editar no modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "none";
+        showToast("Modo de exibição de grade finalizado. Todas as alterações salvas!", "success");
+      }
+      renderHostsTable();
+    }
+
+    function updateHostField(id, value) {
+      allHosts[id] = value;
+      try {
+        let customHosts = JSON.parse(localStorage.getItem('sp_custom_hosts') || '{}');
+        customHosts[id] = value;
+        localStorage.setItem('sp_custom_hosts', JSON.stringify(customHosts));
+      } catch (e) {
+        console.warn("Erro ao persistir edição host:", e);
+      }
+      showToast(`💾 Host #${id} atualizado com sucesso!`, "success");
+    }
+
+    function exportHostsCSV() {
+      let csv = `ID;Codigo do Host / Praca;Status\n`;
+      Object.keys(allHosts).sort((a,b) => Number(a) - Number(b)).forEach(id => {
+        csv += `"${id}";"${allHosts[id]}";"Ativo"\n`;
+      });
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Cadastro_Hosts_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("📥 Exportação de Hosts CSV concluída com sucesso!", "success");
     }
 
     function renderHostsTable() {
@@ -4891,6 +5568,20 @@
         count++;
 
         const tr = document.createElement("tr");
+
+        if (isHostGridEditMode) {
+          tr.innerHTML = `
+            <td class="td-center" style="color: #64748B;">${id}</td>
+            <td><div contenteditable="true" class="sp-grid-cell sp-grid-cell-wide" onblur="updateHostField('${id}', this.innerText.trim())">${name}</div></td>
+            <td class="td-center"><span class="sp-badge sp-badge-concluido">Ativo</span></td>
+            <td class="td-center">
+              <button class="btn-action btn-action-secondary" onclick="searchHostInOco('${encodeURIComponent(name)}')">Ver Incidentes</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+          return;
+        }
+
         tr.innerHTML = `
           <td class="td-center" style="color: #64748B;">${id}</td>
           <td><b>${name}</b></td>
@@ -4971,6 +5662,100 @@
       });
     }
 
+    let isPermsGridEditMode = false;
+
+    function openNewPermModal() {
+      const modal = document.getElementById("modal-new-perm");
+      if (modal) modal.style.display = "flex";
+    }
+
+    function closeNewPermModal() {
+      const modal = document.getElementById("modal-new-perm");
+      if (modal) modal.style.display = "none";
+    }
+
+    function saveNewPerm(event) {
+      if (event) event.preventDefault();
+      const nome = document.getElementById("new-perm-nome")?.value.trim() || "";
+      const tipo = document.getElementById("new-perm-tipo")?.value || "user";
+      const email = document.getElementById("new-perm-email")?.value.trim() || "";
+      const sp_role = document.getElementById("new-perm-sp")?.value || "Membro";
+      const google_role = document.getElementById("new-perm-google")?.value || "Operador";
+      const escopo = document.getElementById("new-perm-escopo")?.value.trim() || "Suporte Captação";
+
+      if (!nome || !email) {
+        showToast("⚠️ Preencha o nome e o e-mail corporativo!", "warning");
+        return;
+      }
+
+      const newPerm = {
+        id: "perm_" + Date.now(),
+        name: nome,
+        type: tipo,
+        email: email,
+        sp_role: sp_role,
+        google_role: google_role,
+        scope: escopo,
+        cargo: escopo
+      };
+
+      allPermissions.unshift(newPerm);
+
+      try {
+        let customPerms = JSON.parse(localStorage.getItem('sp_custom_permissions') || '[]');
+        customPerms.unshift(newPerm);
+        localStorage.setItem('sp_custom_permissions', JSON.stringify(customPerms));
+      } catch (e) {
+        console.warn("Erro ao salvar permissão local:", e);
+      }
+
+      closeNewPermModal();
+      document.getElementById("form-new-perm")?.reset();
+      renderPermsTable();
+      showToast(`✅ Permissão para '${nome}' cadastrada com sucesso!`, "success");
+    }
+
+    function togglePermsGridEdit() {
+      isPermsGridEditMode = !isPermsGridEditMode;
+      const btn = document.getElementById("btn-grid-perms");
+      const icon = document.getElementById("btn-grid-perms-icon");
+      const txt = document.getElementById("btn-grid-perms-text");
+      const alertBox = document.getElementById("perms-grid-mode-alert");
+
+      if (isPermsGridEditMode) {
+        if (btn) btn.classList.add("btn-grid-active");
+        if (icon) icon.innerText = "💾";
+        if (txt) txt.innerText = "Sair do modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "flex";
+        showToast("Modo de exibição de grade ativado. Clique nas células para editar.", "info");
+      } else {
+        if (btn) btn.classList.remove("btn-grid-active");
+        if (icon) icon.innerText = "田";
+        if (txt) txt.innerText = "Editar no modo de exibição de grade";
+        if (alertBox) alertBox.style.display = "none";
+        showToast("Modo de exibição de grade finalizado. Todas as alterações salvas!", "success");
+      }
+      renderPermsTable();
+    }
+
+    function updatePermField(id, field, value) {
+      const item = allPermissions.find(p => (String(p.id) === String(id) || String(p.email) === String(id)));
+      if (!item) return;
+
+      item[field] = value;
+
+      try {
+        let customEdits = JSON.parse(localStorage.getItem('sp_custom_perms_edits') || '{}');
+        if (!customEdits[id]) customEdits[id] = {};
+        customEdits[id][field] = value;
+        localStorage.setItem('sp_custom_perms_edits', JSON.stringify(customEdits));
+      } catch (e) {
+        console.warn("Erro ao persistir edição permissão:", e);
+      }
+
+      showToast(`💾 Alteração salva em ${field}!`, "success");
+    }
+
     function renderPermsTable() {
       const tbody = document.getElementById("perms-table-body");
       if (!tbody) return;
@@ -4998,6 +5783,39 @@
         else if (p.google_role === "Operador") badgeClass = "badge-role-write";
 
         const tr = document.createElement("tr");
+
+        if (isPermsGridEditMode) {
+          const permId = p.id || p.email;
+          tr.innerHTML = `
+            <td class="td-center" style="color: #64748B;">${i+1}</td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updatePermField('${permId}', 'name', this.innerText.trim())">${p.name || ''}</div></td>
+            <td>
+              <select class="sp-grid-select sp-grid-select-sm" onchange="updatePermField('${permId}', 'type', this.value)">
+                <option value="user" ${p.type === 'user' ? 'selected' : ''}>user</option>
+                <option value="group" ${p.type === 'group' ? 'selected' : ''}>group</option>
+              </select>
+            </td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updatePermField('${permId}', 'email', this.innerText.trim())">${p.email || ''}</div></td>
+            <td>
+              <select class="sp-grid-select" onchange="updatePermField('${permId}', 'sp_role', this.value)">
+                <option value="Proprietário" ${String(p.sp_role).includes('Proprietário') ? 'selected' : ''}>Proprietário</option>
+                <option value="Membro" ${String(p.sp_role).includes('Membro') ? 'selected' : ''}>Membro</option>
+                <option value="Visitante" ${String(p.sp_role).includes('Visitante') ? 'selected' : ''}>Visitante</option>
+              </select>
+            </td>
+            <td>
+              <select class="sp-grid-select" onchange="updatePermField('${permId}', 'google_role', this.value)">
+                <option value="Administrador" ${p.google_role === 'Administrador' ? 'selected' : ''}>Administrador</option>
+                <option value="Operador" ${p.google_role === 'Operador' ? 'selected' : ''}>Operador</option>
+                <option value="Leitor" ${p.google_role === 'Leitor' ? 'selected' : ''}>Leitor</option>
+              </select>
+            </td>
+            <td><div contenteditable="true" class="sp-grid-cell" onblur="updatePermField('${permId}', 'scope', this.innerText.trim())">${p.scope || ''}</div></td>
+          `;
+          tbody.appendChild(tr);
+          return;
+        }
+
         tr.innerHTML = `
           <td class="td-center" style="color: #64748B;">${i+1}</td>
           <td><b>${p.name}</b></td>
@@ -5021,7 +5839,7 @@
         </div>
         <p><b>Passo 1:</b> Verificar status de telemetria no Zabbix e confirmar sinal de entrada.</p>
         <p><b>Passo 2:</b> Em caso de falha no receptor TV BOX, executar reinicialização via comando remoto ou ciclo de energia.</p>
-        <p><b>Passo 3:</b> Registrar o ticket de incidente no Redmine e notificar o plantão da Captação via Teams.</p>
+        <p><b>Passo 3:</b> Registrar o ticket de incidente no Redmine e notificar o plantão da Captação via Google Chat.</p>
         <div style="margin-top: 20px; text-align: right;">
           <button class="btn-action btn-action-primary" onclick="closeModal()">Fechar Procedimento</button>
         </div>
@@ -5354,6 +6172,27 @@
     window.closeNewDriveFileModal = closeNewDriveFileModal;
     window.saveNewDriveFile = saveNewDriveFile;
     window.toggleDriveGridMode = toggleDriveGridMode;
+    window.openNewStreamModal = openNewStreamModal;
+    window.closeNewStreamModal = closeNewStreamModal;
+    window.saveNewStreamEvent = saveNewStreamEvent;
+    window.toggleStreamGridEdit = toggleStreamGridEdit;
+    window.updateStreamField = updateStreamField;
+    window.openNewHospedeiroModal = openNewHospedeiroModal;
+    window.closeNewHospedeiroModal = closeNewHospedeiroModal;
+    window.saveNewHospedeiro = saveNewHospedeiro;
+    window.toggleHospGridEdit = toggleHospGridEdit;
+    window.updateHospField = updateHospField;
+    window.toggleAnteGridEdit = toggleAnteGridEdit;
+    window.updateAnteField = updateAnteField;
+    window.exportAntenistasCSV = exportAntenistasCSV;
+    window.toggleHostGridEdit = toggleHostGridEdit;
+    window.updateHostField = updateHostField;
+    window.exportHostsCSV = exportHostsCSV;
+    window.openNewPermModal = openNewPermModal;
+    window.closeNewPermModal = closeNewPermModal;
+    window.saveNewPerm = saveNewPerm;
+    window.togglePermsGridEdit = togglePermsGridEdit;
+    window.updatePermField = updatePermField;
 
     // Inicialização
     initEscalaMonths();

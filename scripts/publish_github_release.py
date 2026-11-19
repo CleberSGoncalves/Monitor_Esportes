@@ -18,8 +18,8 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.17"
-    release_name = "v2.5.17 - Estilização Completa e Formatação Automática no Google Sheets"
+    tag = "v2.5.18"
+    release_name = "v2.5.18 - Barra de Comandos SharePoint e Edição em Grade em Todas as Listas + Supressão FontBBox"
     body = (
         "### Novidades da versão v2.5.17:\n"
         "- 🎨 **Estilização Visual Completa no Google Sheets (890+ Linhas)**:\n"
