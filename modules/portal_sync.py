@@ -5,6 +5,7 @@ sejam publicados simultaneamente no Microsoft SharePoint e no novo Portal Web.
 """
 
 import os
+import sys
 import json
 import uuid
 import shutil
@@ -14,7 +15,23 @@ from typing import Optional, Dict, Any
 
 logger = logging.getLogger(__name__)
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+def get_project_root() -> str:
+    """Retorna o diretório raiz do projeto mesmo quando executado empacotado via PyInstaller."""
+    if getattr(sys, "frozen", False):
+        exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+        if os.path.basename(exe_dir).lower() == "dist":
+            return os.path.dirname(exe_dir)
+        if os.path.exists(os.path.join(exe_dir, "config")):
+            return exe_dir
+        parent = os.path.dirname(exe_dir)
+        if os.path.exists(os.path.join(parent, "config")):
+            return parent
+        return exe_dir
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+PROJECT_ROOT = get_project_root()
 
 
 class PortalSyncManager:
@@ -45,10 +62,11 @@ class PortalSyncManager:
 
         try:
             target_filename = filename or os.path.basename(pdf_path)
+            project_root = get_project_root()
             
             # 1. Copiar o PDF para docs/reports/<category>/ e portal_web/reports/<category>/
-            docs_dest_dir = os.path.join(PROJECT_ROOT, "docs", "reports", category)
-            portal_dest_dir = os.path.join(PROJECT_ROOT, "portal_web", "reports", category)
+            docs_dest_dir = os.path.join(project_root, "docs", "reports", category)
+            portal_dest_dir = os.path.join(project_root, "portal_web", "reports", category)
             os.makedirs(docs_dest_dir, exist_ok=True)
             os.makedirs(portal_dest_dir, exist_ok=True)
 
@@ -65,7 +83,7 @@ class PortalSyncManager:
             relative_web_url = f"reports/{category}/{target_filename}"
 
             # 2. Atualizar config/sharepoint_portal_master_data.json
-            master_data_path = os.path.join(PROJECT_ROOT, "config", "sharepoint_portal_master_data.json")
+            master_data_path = os.path.join(project_root, "config", "sharepoint_portal_master_data.json")
             if not os.path.exists(master_data_path):
                 logger.error(f"[PortalSync] Arquivo master data não encontrado: {master_data_path}")
                 return False
