@@ -1,0 +1,312 @@
+[
+  {
+    "id": "3",
+    "roles": [
+      "owner"
+    ],
+    "type": "group",
+    "displayName": "Proprietários do Suporte Captação"
+  },
+  {
+    "id": "4",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "Visitantes da Suporte Captação"
+  },
+  {
+    "id": "22",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "NOC"
+  },
+  {
+    "id": "23",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "SAC"
+  },
+  {
+    "id": "34",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "AdIntell Lideres"
+  },
+  {
+    "id": "44",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "Cadastro"
+  },
+  {
+    "id": "71",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "Classificação de mídia"
+  },
+  {
+    "id": "72",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "Coleta"
+  },
+  {
+    "id": "82",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "Controle de Qualidade"
+  },
+  {
+    "id": "93",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "Preços"
+  },
+  {
+    "id": "100",
+    "roles": [
+      "write"
+    ],
+    "type": "group",
+    "displayName": "Suporte Captação"
+  },
+  {
+    "id": "108",
+    "roles": [
+      "write"
+    ],
+    "type": "group",
+    "displayName": "Suporte Captação - Admin"
+  },
+  {
+    "id": "113",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "Audiencia"
+  },
+  {
+    "id": "119",
+    "roles": [
+      "read"
+    ],
+    "type": "group",
+    "displayName": "Comercial"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8dmljZW50ZS5tYWRyZUBpYm9wZS5jb20",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Vicente Paulo Madre",
+    "email": "vicente.madre@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8ZGF2aS5saW1hQGlib3BlLmNvbQ",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Davi Silva Marques de Lima",
+    "email": "davi.lima@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8cmVuYW4uc2lxdWVpcmFAaWJvcGUuY29t",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "RENAN MORAIS SIQUEIRA",
+    "email": "renan.siqueira@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8ZmVsaXBlLnBhbG1lamFuZUBpYm9wZS5jb20",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "FELIPE PALMEJANE",
+    "email": "felipe.palmejane@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8ZWRpdmFsZG8ub2xpdmVpcmFAaWJvcGUuY29t",
+    "roles": [
+      "write"
+    ],
+    "type": "user",
+    "displayName": "Edivaldo Antonio De Oliveira",
+    "email": "edivaldo.oliveira@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8YWxiZXJ0by5rb2ppbWFAaWJvcGUuY29t",
+    "roles": [
+      "write"
+    ],
+    "type": "user",
+    "displayName": "Alberto Takao Kojima",
+    "email": "alberto.kojima@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8bWFyY29zLmhlbnJpcXVlQGlib3BlLmNvbQ",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Marcos Jose Henrique",
+    "email": "marcos.henrique@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8anVsaWEuYmV0dHV6QGlib3BlLmNvbQ",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "JULIA BETTUZ",
+    "email": "julia.bettuz@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8dGlhZ28uc2FudG9zQGlib3BlLmNvbQ",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Tiago Alves Dos Santos",
+    "email": "tiago.santos@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8bGFlcnRlLmp1bmlvckBpYm9wZS5jb20",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Laerte Finotelli Junior",
+    "email": "laerte.junior@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8Y2FtaWxhLmNhcnJpY29AaWJvcGUuY29t",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Camila Gonçalves Carriço De Rezende",
+    "email": "camila.carrico@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8dGhpYWdvLm1hY2llbEBpYm9wZS5jb20",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Thiago Maciel Da Silva",
+    "email": "thiago.maciel@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8amFuYWluYS5tZWxvQGlib3BlLmNvbQ",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Janaina Alves De Melo",
+    "email": "janaina.melo@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8YXJ0dXIubmVib3RAZmlmdHk1Ymx1ZS5jb20",
+    "roles": [
+      "write"
+    ],
+    "type": "user",
+    "displayName": "Artur Nebot",
+    "email": "artur.nebot@fifty5blue.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8c2lsdmlvLmp1bmlvckBpYm9wZS5jb20",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Silvio Junior",
+    "email": "silvio.junior@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8anVsaW8ucGV0aXRvQGlib3BlLmNvbQ",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Julio Cesar Petito dos Santos",
+    "email": "julio.petito@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8Z2FicmllbGUubW91cmFAaWJvcGUuY29t",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Gabriele Alves De Moura",
+    "email": "gabriele.moura@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8YnJ1bmEuYWx2ZXNAaWJvcGUuY29t",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Bruna Alves de Almeida Araujo",
+    "email": "bruna.alves@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8bWFyaWFuYS5tYXJ0aW5zQGlib3BlLmNvbQ",
+    "roles": [
+      "write"
+    ],
+    "type": "user",
+    "displayName": "Mariana Luiza Santos Donato Martins",
+    "email": "mariana.martins@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8cmVpbmFsZG8ubW9udGVpcm9AaWJvcGUuY29t",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Reinaldo De Almeida Monteiro",
+    "email": "reinaldo.monteiro@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8amF2aWVyLnJhbW9uQGlib3BlLmNvbQ",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Javier Ramon",
+    "email": "javier.ramon@ibope.com"
+  },
+  {
+    "id": "aTowIy5mfG1lbWJlcnNoaXB8YWxiZXJ0by5tYXJpbm9AaWJvcGUuY29t",
+    "roles": [
+      "read"
+    ],
+    "type": "user",
+    "displayName": "Alberto Marino",
+    "email": "alberto.marino@ibope.com"
+  }
+]

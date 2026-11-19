@@ -3,32 +3,129 @@
 Gerador do Portal Web Oficial do Suporte Captação (Kantar IBOPE Media).
 Gera um portal intranet moderno, responsivo, profissional e 100% fiel à HomePage
 original do SharePoint (https://adgbl.sharepoint.com/sites/suportecaptacao/SitePages/HomePage.aspx),
-integrado com a Programação Oficial de Eventos Streaming (Google Sheets & SharePoint).
+integrado com a Programação Oficial de Eventos Streaming (Google Sheets & SharePoint)
+e com o Módulo Completo de Permissões e Controle de Acesso (RBAC).
 """
 
 import os
 import json
+import csv
 
 def generate_portal():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     json_path = os.path.join(base_dir, "config", "sharepoint_clean_migrated_events.json")
+    perms_path = os.path.join(base_dir, "config", "sharepoint_extracted_permissions.json")
     output_dir = os.path.join(base_dir, "portal_web")
     os.makedirs(output_dir, exist_ok=True)
     output_html = os.path.join(output_dir, "index.html")
 
+    # 1. Eventos Streaming
     events = []
     if os.path.exists(json_path):
         with open(json_path, "r", encoding="utf-8") as f:
             events = json.load(f)
-
     events_json_str = json.dumps(events, ensure_ascii=False)
+
+    # 2. Permissões Extraídas do SharePoint
+    raw_perms = []
+    if os.path.exists(perms_path):
+        with open(perms_path, "r", encoding="utf-8") as f:
+            raw_perms = json.load(f)
+
+    # Adiciona os membros da equipe que têm papéis específicos na HomePage
+    team_members_roles = [
+        {"type": "user", "displayName": "Cleber De Souza Goncalves", "email": "cleber.goncalves@ibope.com", "roles": ["owner"], "cargo": "COORD. SUPORTE CAPTAÇÃO", "google_role": "Administrador"},
+        {"type": "user", "displayName": "Luiz De Sa Lemos", "email": "luiz.lemos@ibope.com", "roles": ["owner"], "cargo": "DIR. SUPORTE CAPTAÇÃO LATAM", "google_role": "Administrador"},
+        {"type": "user", "displayName": "Andre Toshio Uiete Uehara", "email": "andre.uehara@ibope.com", "roles": ["write"], "cargo": "Assistente Administrativo", "google_role": "Operador"},
+        {"type": "user", "displayName": "Maria Simone De Santana Matos", "email": "maria.matos@ibope.com", "roles": ["write"], "cargo": "Analista de dados Jr.", "google_role": "Operador"},
+        {"type": "user", "displayName": "ALAN KELVIN CHURA CARRILLO", "email": "alan.carrillo@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE JR (N1)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Bruno Lopes Viana", "email": "bruno.viana@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE JR (N1)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Cleber Rodrigo Gomes", "email": "cleber.gomes@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE JR (N1)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Cassio Esteves De Oliveira", "email": "cassio.oliveira@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE JR (N1)", "google_role": "Operador"},
+        {"type": "user", "displayName": "RODRIGO DE ALMEIDA MEIRELLES", "email": "rodrigo.meirelles@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE JR (N1)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Rômulo Silva", "email": "romulo.silva@ibope.com", "roles": ["write"], "cargo": "Tecnico De Suporte Jr (N1)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Marcelo Fialho", "email": "Marcelo.Fialho@ibope.com", "roles": ["write"], "cargo": "Tecnico De Suporte Jr (N1)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Joao Diego Silva Merino", "email": "joao.merino@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE PL (N2)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Lucieudes Vicente Ferreira", "email": "lucieudes.ferreira@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE PL (N2)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Marcelo Pereira Silva", "email": "marcelo.pereira@ibope.com", "roles": ["write"], "cargo": "LIDER TECNICO LATAM (N2)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Marcos Antonio Bezerra Da Silva", "email": "marcos.bezerra@ibope.com", "roles": ["write"], "cargo": "TEC. SUPORTE SR (N2)", "google_role": "Operador"},
+        {"type": "user", "displayName": "Vinicius Dantas Ferreira Da Silva", "email": "vinicius.dantas@ibope.com", "roles": ["write"], "cargo": "Tec. Suporte Pl (N2)", "google_role": "Operador"}
+    ]
+
+    all_permissions = []
+    seen_identifiers = set()
+
+    # Adiciona a equipe operacional primeiro
+    for m in team_members_roles:
+        seen_identifiers.add(m["email"].lower())
+        all_permissions.append({
+            "name": m["displayName"],
+            "type": "Usuário",
+            "email": m["email"],
+            "sp_role": "Proprietário (owner)" if "owner" in m["roles"] else "Edição (write)",
+            "google_role": m["google_role"],
+            "cargo": m["cargo"],
+            "scope": "Acesso Completo (Todas as Seções & Ações)" if m["google_role"] == "Administrador" else "Operacional (Streaming, Receptores, POPs)"
+        })
+
+    # Adiciona as permissões extraídas do SharePoint
+    for p in raw_perms:
+        p_name = p.get("displayName") or "Desconhecido"
+        p_type = "Grupo de Segurança" if p.get("type") == "group" else "Usuário"
+        p_email = p.get("email") or "-"
+        p_roles = p.get("roles") or []
+
+        if p_email != "-" and p_email.lower() in seen_identifiers:
+            continue
+        if p_email != "-":
+            seen_identifiers.add(p_email.lower())
+        else:
+            if p_name.lower() in seen_identifiers:
+                continue
+            seen_identifiers.add(p_name.lower())
+
+        is_owner = "owner" in p_roles
+        is_write = "write" in p_roles
+        
+        if is_owner:
+            sp_r = "Proprietário (owner)"
+            g_r = "Administrador"
+            scope_desc = "Acesso Total & Gestão de Permissões"
+        elif is_write:
+            sp_r = "Colaborador (write)"
+            g_r = "Operador"
+            scope_desc = "Edição da Grade Streaming & Monitoramento"
+        else:
+            sp_r = "Visitante (read)"
+            g_r = "Leitor"
+            scope_desc = "Consulta à Programação & Links Úteis"
+
+        all_permissions.append({
+            "name": p_name,
+            "type": p_type,
+            "email": p_email,
+            "sp_role": sp_r,
+            "google_role": g_r,
+            "cargo": "Grupo Corporativo" if p_type == "Grupo de Segurança" else "Colaborador",
+            "scope": scope_desc
+        })
+
+    perms_json_str = json.dumps(all_permissions, ensure_ascii=False)
+
+    # 3. Exporta CSV oficial de permissões para Google Workspace / Google Sites
+    csv_path = os.path.join(base_dir, "config", "permissoes_google_workspace_suportecaptacao.csv")
+    with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Nome", "Tipo", "Email", "Nivel_SharePoint", "Nivel_Google_Sites", "Cargo_Funcao", "Escopo_Permissoes"])
+        for p in all_permissions:
+            writer.writerow([p["name"], p["type"], p["email"], p["sp_role"], p["google_role"], p["cargo"], p["scope"]])
 
     html_content = f"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suporte e Captação | Portal Corporativo & Streaming Hub</title>
+  <title>Suporte e Captação | Portal Corporativo & Hub de Streaming</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -76,7 +173,6 @@ def generate_portal():
       --shadow-hover: 0 6.4px 14.4px 0 rgba(0,0,0,0.132), 0 1.2px 3.6px 0 rgba(0,0,0,0.108);
     }}
 
-    /* Modo Noturno Operacional (Opcional) */
     body.dark-mode {{
       --sp-body-bg: #0B0F19;
       --sp-card-bg: #1E293B;
@@ -167,7 +263,7 @@ def generate_portal():
 
     .suite-nav-center {{
       flex: 1;
-      max-width: 520px;
+      max-width: 480px;
       margin: 0 20px;
     }}
 
@@ -197,6 +293,23 @@ def generate_portal():
       display: flex;
       align-items: center;
       gap: 12px;
+    }}
+
+    .role-switcher-select {{
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #FFFFFF;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }}
+
+    .role-switcher-select option {{
+      background: #004578;
+      color: #FFFFFF;
     }}
 
     .nav-pill-btn {{
@@ -232,7 +345,7 @@ def generate_portal():
       color: #FFFFFF;
     }}
 
-    /* Menu de Navegação do Site (SharePoint Quick Launch / Hub Nav) */
+    /* Menu de Navegação do Site */
     .site-nav-bar {{
       background: var(--sp-card-bg);
       border-bottom: 1px solid var(--sp-border);
@@ -314,7 +427,6 @@ def generate_portal():
       font-weight: 700;
     }}
 
-    /* Conteúdo Principal */
     .main-body {{
       max-width: 1440px;
       width: 100%;
@@ -397,7 +509,7 @@ def generate_portal():
       color: #CBD5E1;
     }}
 
-    /* SEÇÃO 1: LINKS ÚTEIS (QUICK LINKS - BUTTON LAYOUT SHAREPOINT) */
+    /* SEÇÃO 1: LINKS ÚTEIS */
     .section-title-wrap {{
       margin-bottom: 16px;
     }}
@@ -479,7 +591,7 @@ def generate_portal():
       margin-top: 2px;
     }}
 
-    /* SEÇÃO 2: CHAMADA PARA AÇÃO (CTA & BOTÕES) */
+    /* SEÇÃO 2: CTAS */
     .cta-container {{
       display: grid;
       grid-template-columns: 2fr 1.2fr;
@@ -573,7 +685,7 @@ def generate_portal():
       background: var(--sp-theme-dark-alt);
     }}
 
-    /* SEÇÃO 3: LINKS EXTERNOS (WAFFLE / TILES LAYOUT) */
+    /* SEÇÃO 3: LINKS EXTERNOS */
     .waffle-links-grid {{
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
@@ -613,7 +725,7 @@ def generate_portal():
       line-height: 1.3;
     }}
 
-    /* SEÇÃO 4: CONHEÇA NOSSA EQUIPE (PEOPLE WEB PART SHAREPOINT) */
+    /* SEÇÃO 4: EQUIPE */
     .team-section-card {{
       background: var(--sp-card-bg);
       border: 1px solid var(--sp-border);
@@ -722,7 +834,7 @@ def generate_portal():
       text-decoration: underline;
     }}
 
-    /* SEÇÃO 5: PROGRAMAÇÃO STREAMING & TABELAS */
+    /* SEÇÃO 5: TABELAS & ABAS */
     .pane-container {{
       display: none;
     }}
@@ -854,7 +966,7 @@ def generate_portal():
       border-color: var(--sp-theme-primary);
     }}
 
-    /* Tabela Idêntica às SharePoint Modern Lists */
+    /* Tabelas */
     .sp-table-wrap {{
       background: #FFFFFF;
       border: 1px solid #CBD5E1;
@@ -946,7 +1058,11 @@ def generate_portal():
     .badge-exibido {{ background: var(--badge-exib-bg); color: var(--badge-exib-txt); }}
     .badge-nao-exibido {{ background: var(--badge-nao-bg); color: var(--badge-nao-txt); }}
 
-    /* Rodapé Corporativo */
+    /* Badges de Permissão */
+    .badge-role-owner {{ background: #EDE9FE; color: #6D28D9; border: 1px solid #DDD6FE; }}
+    .badge-role-write {{ background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }}
+    .badge-role-read {{ background: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }}
+
     .site-footer {{
       background: var(--sp-card-bg);
       border-top: 1px solid var(--sp-border);
@@ -965,6 +1081,20 @@ def generate_portal():
       font-size: 12px;
       color: var(--sp-text-secondary);
     }}
+
+    /* Matriz RBAC */
+    .rbac-matrix-table th, .rbac-matrix-table td {{
+      padding: 10px 14px;
+      border: 1px solid var(--sp-border);
+      font-size: 12px;
+    }}
+    .rbac-matrix-table th {{
+      background: var(--sp-theme-lighter);
+      color: var(--sp-theme-dark);
+      font-weight: 700;
+    }}
+    .check-yes {{ color: #10B981; font-weight: 700; }}
+    .check-no {{ color: #EF4444; font-weight: 700; }}
 
     @media (max-width: 900px) {{
       .hero-banner {{ grid-template-columns: 1fr; padding: 24px; }}
@@ -994,10 +1124,17 @@ def generate_portal():
     </div>
 
     <div class="suite-nav-right">
+      <!-- Seletor de Perfil RBAC Ativo -->
+      <select id="user-role-select" class="role-switcher-select" onchange="onRoleChange()" title="Simulador de Perfil de Acesso">
+        <option value="admin">👤 Cleber Gonçalves (Gestor/Admin)</option>
+        <option value="operador">🛠️ Operador Suporte N1/N2</option>
+        <option value="leitor">👁️ Visitante (NOC / SAC / Consulta)</option>
+      </select>
+
       <button class="nav-pill-btn" onclick="toggleDarkMode()" title="Alternar Modo Escuro / Claro">
         <span id="dark-mode-icon">🌙</span> Modo Operacional
       </button>
-      <div class="user-avatar" title="Kantar IBOPE Media — Suporte Captação">SC</div>
+      <div class="user-avatar" id="top-user-avatar" title="Kantar IBOPE Media — Suporte Captação">CG</div>
     </div>
   </header>
 
@@ -1017,6 +1154,7 @@ def generate_portal():
         <button class="tab-link" onclick="showPane('streaming')">⚽ Programação Streaming (862)</button>
         <button class="tab-link" onclick="showPane('receptores')">📡 Receptores & TV BOX</button>
         <button class="tab-link" onclick="showPane('equipe')">👥 Equipe & Contatos</button>
+        <button class="tab-link" id="nav-tab-permissoes" onclick="showPane('permissoes')">🔐 Permissões & Acessos</button>
         <button class="tab-link" onclick="showPane('links')">🔗 Links Úteis & Externos</button>
       </div>
     </div>
@@ -1043,7 +1181,7 @@ def generate_portal():
         </div>
       </section>
 
-      <!-- SEÇÃO LINKS ÚTEIS (9 CARDS DO SHAREPOINT ORIGINAL) -->
+      <!-- SEÇÃO LINKS ÚTEIS -->
       <section>
         <div class="section-title-wrap">
           <h2 class="section-title">📌 Links úteis</h2>
@@ -1125,7 +1263,7 @@ def generate_portal():
         </div>
       </section>
 
-      <!-- SEÇÃO CHAMADA PARA AÇÃO & SUGESTÕES (CTAS DO SHAREPOINT ORIGINAL) -->
+      <!-- SEÇÃO CHAMADA PARA AÇÃO & SUGESTÕES -->
       <section class="cta-container">
         <div class="cta-banner-card">
           <div>
@@ -1146,7 +1284,7 @@ def generate_portal():
         </div>
       </section>
 
-      <!-- SEÇÃO LINKS EXTERNOS (WAFFLE DO SHAREPOINT ORIGINAL) -->
+      <!-- SEÇÃO LINKS EXTERNOS -->
       <section>
         <div class="section-title-wrap">
           <h2 class="section-title">🌐 Links Externos</h2>
@@ -1196,7 +1334,7 @@ def generate_portal():
         </div>
       </section>
 
-      <!-- SEÇÃO CONHEÇA NOSSA EQUIPE (PEOPLE DO SHAREPOINT ORIGINAL) -->
+      <!-- SEÇÃO CONHEÇA NOSSA EQUIPE -->
       <section class="team-section-card">
         <div class="section-title-wrap" style="margin-bottom: 20px;">
           <h2 class="section-title">👥 CONHEÇA NOSSA EQUIPE</h2>
@@ -1389,7 +1527,6 @@ def generate_portal():
     <!-- ABA 2: PROGRAMAÇÃO STREAMING COMPLETA (862 JOGOS) -->
     <div id="pane-streaming" class="pane-container">
 
-      <!-- Métricas / KPIs -->
       <div class="kpi-row">
         <div class="kpi-box">
           <div class="kpi-box-label">Total de Confrontos</div>
@@ -1418,7 +1555,6 @@ def generate_portal():
         </div>
       </div>
 
-      <!-- Barra de Filtros e Busca -->
       <div class="filter-bar">
         <div class="filter-inputs">
           <input type="text" id="search-box" class="search-field" placeholder="🔍 Buscar partida, campeonato, responsável ou data...">
@@ -1439,12 +1575,11 @@ def generate_portal():
           </select>
         </div>
         <div style="display: flex; gap: 8px;">
-          <button class="btn-action btn-action-secondary" onclick="syncLiveAPI()">🔄 Sincronizar em Tempo Real</button>
+          <button class="btn-action btn-action-secondary action-admin-only" onclick="syncLiveAPI()">🔄 Sincronizar em Tempo Real</button>
           <button class="btn-action btn-action-primary" onclick="exportCSV()">📥 Exportar CSV</button>
         </div>
       </div>
 
-      <!-- Tabela Oficial de Eventos -->
       <div class="sp-table-wrap">
         <div class="sp-table-scroll">
           <table class="sp-list-table">
@@ -1464,7 +1599,7 @@ def generate_portal():
               </tr>
             </thead>
             <tbody id="table-body">
-              <!-- Linhas geradas via JavaScript -->
+              <!-- Renderizado via JS -->
             </tbody>
           </table>
         </div>
@@ -1552,7 +1687,7 @@ def generate_portal():
       </div>
     </div>
 
-    <!-- ABA 4: EQUIPE (ESPELHO DEDICADO) -->
+    <!-- ABA 4: EQUIPE -->
     <div id="pane-equipe" class="pane-container">
       <div class="team-section-card">
         <div class="section-title-wrap" style="margin-bottom: 20px;">
@@ -1560,12 +1695,147 @@ def generate_portal():
           <p class="section-desc">Contatos, cargos e divisões de plantão da equipe de Suporte Captação.</p>
         </div>
         <p style="font-size: 13px; color: var(--sp-text-secondary); margin-bottom: 16px;">
-          Todos os membros da equipe contam com perfis integrados ao Microsoft 365. Clique no e-mail para abrir mensagem direta no Outlook ou Teams.
+          Todos os membros da equipe contam com perfis integrados ao Microsoft 365 e Google Workspace. Clique no e-mail para abrir mensagem direta no Outlook, Teams ou Gmail corporativo.
         </p>
       </div>
     </div>
 
-    <!-- ABA 5: LINKS & SISTEMAS -->
+    <!-- ABA 5: PERMISSÕES & CONTROLE DE ACESSO (RBAC) -->
+    <div id="pane-permissoes" class="pane-container">
+      
+      <div class="section-title-wrap">
+        <h2 class="section-title">🔐 Permissões & Controle de Acesso (SharePoint & Google Sites)</h2>
+        <p class="section-desc">
+          Mapeamento oficial de grupos de segurança e usuários extraídos da Microsoft Graph API, sincronizados para gestão de acesso corporativo no Google Workspace.
+        </p>
+      </div>
+
+      <!-- KPIs de Acesso -->
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-box-label">Total de Entidades</div>
+          <div class="kpi-box-val" id="kpi-perm-total">0</div>
+          <div class="kpi-box-sub">Grupos & Usuários Mapeados</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #8B5CF6;">
+          <div class="kpi-box-label">Proprietários / Admin</div>
+          <div class="kpi-box-val" id="kpi-perm-owners" style="color: #8B5CF6;">0</div>
+          <div class="kpi-box-sub">Controle Total do Portal</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #10B981;">
+          <div class="kpi-box-label">Operadores / Edição</div>
+          <div class="kpi-box-val" id="kpi-perm-writers" style="color: #10B981;">0</div>
+          <div class="kpi-box-sub">Edição de Grade & Sinais</div>
+        </div>
+        <div class="kpi-box" style="border-left: 4px solid #0078D4;">
+          <div class="kpi-box-label">Visitantes / Leitura</div>
+          <div class="kpi-box-val" id="kpi-perm-readers" style="color: #0078D4;">0</div>
+          <div class="kpi-box-sub">Consulta de Eventos & POPs</div>
+        </div>
+      </div>
+
+      <!-- Matriz Visual de Acesso por Módulo -->
+      <div class="team-section-card" style="margin-bottom: 20px;">
+        <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--sp-theme-primary); display: flex; align-items: center; gap: 8px;">
+          🛡️ Matriz de Controle por Módulo & Nível de Perfil
+        </h3>
+        <div style="overflow-x: auto;">
+          <table class="rbac-matrix-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th>Módulo do Portal</th>
+                <th style="text-align: center;">👑 Administrador (Gestores)</th>
+                <th style="text-align: center;">🛠️ Operador (Suporte N1/N2)</th>
+                <th style="text-align: center;">👁️ Leitor (NOC, SAC, Comercial)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>⚽ Programação Streaming</b></td>
+                <td style="text-align: center;" class="check-yes">Visualizar, Sincronizar, Editar e Exportar</td>
+                <td style="text-align: center;" class="check-yes">Visualizar, Atualizar Status e Exportar</td>
+                <td style="text-align: center;">Apenas Visualizar Consulta</td>
+              </tr>
+              <tr>
+                <td><b>📡 Receptores & TV BOX (PVIDs)</b></td>
+                <td style="text-align: center;" class="check-yes">Gerenciar PVIDs, Redundância e Hardware</td>
+                <td style="text-align: center;" class="check-yes">Consultar e Verificar Sinal Técnico</td>
+                <td style="text-align: center;">Visualização Restrita</td>
+              </tr>
+              <tr>
+                <td><b>👥 Equipe & Contatos</b></td>
+                <td style="text-align: center;" class="check-yes">Gerenciar Escala e Estrutura</td>
+                <td style="text-align: center;" class="check-yes">Consultar Turnos e Contatos</td>
+                <td style="text-align: center;" class="check-yes">Consultar Contatos do Plantão</td>
+              </tr>
+              <tr>
+                <td><b>🔐 Permissões & Acessos</b></td>
+                <td style="text-align: center;" class="check-yes">Acesso Total & Exportação para Google Sites</td>
+                <td style="text-align: center;" class="check-no">Apenas Consulta Própria</td>
+                <td style="text-align: center;" class="check-no">Acesso Oculto</td>
+              </tr>
+              <tr>
+                <td><b>🔗 Links Úteis & Sistemas</b></td>
+                <td style="text-align: center;" class="check-yes">Gerenciar e Adicionar Atalhos</td>
+                <td style="text-align: center;" class="check-yes">Acesso a Todos os Links</td>
+                <td style="text-align: center;" class="check-yes">Acesso aos Links Públicos</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Barra de Filtros de Permissões -->
+      <div class="filter-bar">
+        <div class="filter-inputs">
+          <input type="text" id="search-perm-box" class="search-field" placeholder="🔍 Buscar usuário, grupo corporativo ou e-mail...">
+          <select id="filter-perm-type" class="select-field">
+            <option value="">Todos os Tipos (Grupos & Usuários)</option>
+            <option value="Grupo de Segurança">Grupos de Segurança</option>
+            <option value="Usuário">Usuários Individuais</option>
+          </select>
+          <select id="filter-perm-role" class="select-field">
+            <option value="">Todos os Níveis de Acesso</option>
+            <option value="Administrador">Administrador / Owner</option>
+            <option value="Operador">Operador / Write</option>
+            <option value="Leitor">Leitor / Read</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-action btn-action-primary" onclick="exportPermsCSV()">📥 Exportar Lista para Google Sites (CSV)</button>
+        </div>
+      </div>
+
+      <!-- Tabela de Permissões -->
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead>
+              <tr>
+                <th class="td-center">#</th>
+                <th>Nome / Grupo</th>
+                <th class="td-center">Tipo</th>
+                <th>E-mail Corporativo</th>
+                <th class="td-center">Nível SharePoint</th>
+                <th class="td-center">Nível Google Sites</th>
+                <th>Escopo de Acesso</th>
+              </tr>
+            </thead>
+            <tbody id="perms-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary); display: flex; justify-content: space-between;">
+        <div>Mostrando <b id="showing-perms-count" style="color: var(--sp-theme-primary);">0</b> registros de acesso</div>
+        <div>Mapeado via Microsoft Graph API & Google Workspace RBAC</div>
+      </div>
+
+    </div>
+
+    <!-- ABA 6: LINKS & SISTEMAS -->
     <div id="pane-links" class="pane-container">
       <div class="section-title-wrap">
         <h2 class="section-title">🔗 Diretório de Links & Sistemas Oficiais</h2>
@@ -1579,13 +1849,48 @@ def generate_portal():
   <footer class="site-footer">
     <div class="site-footer-container">
       <div><b>Kantar IBOPE Media</b> — Central de Operações & Suporte Captação © 2026</div>
-      <div>Sincronizado automaticamente via <b>Monitor de Esportes v2.5.17</b> & Google Workspace</div>
+      <div>Sincronizado automaticamente via <b>Monitor de Esportes v2.5.17</b>, SharePoint Graph API & Google Workspace</div>
     </div>
   </footer>
 
   <script>
-    // Dataset inicial seguro
+    // Datasets integrados
     let allEvents = {events_json_str};
+    let allPermissions = {perms_json_str};
+
+    // Controle de Perfil RBAC Ativo
+    let currentRole = "admin";
+
+    function onRoleChange() {{
+      const sel = document.getElementById("user-role-select");
+      currentRole = sel.value;
+      const avatar = document.getElementById("top-user-avatar");
+
+      if (currentRole === "admin") {{
+        avatar.innerText = "CG";
+        avatar.style.background = "#004578";
+        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "");
+        const permTab = document.getElementById("nav-tab-permissoes");
+        if (permTab) permTab.style.display = "";
+      }} else if (currentRole === "operador") {{
+        avatar.innerText = "OP";
+        avatar.style.background = "#059669";
+        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "");
+        const permTab = document.getElementById("nav-tab-permissoes");
+        if (permTab) permTab.style.display = "";
+      }} else {{
+        avatar.innerText = "LE";
+        avatar.style.background = "#64748B";
+        document.querySelectorAll(".action-admin-only").forEach(el => el.style.display = "none");
+        const permTab = document.getElementById("nav-tab-permissoes");
+        if (permTab) permTab.style.display = "none";
+        // Se estava na aba de permissões, volta para home
+        const activePane = document.querySelector(".pane-container.active");
+        if (activePane && activePane.id === "pane-permissoes") {{
+          showPane("home");
+        }}
+      }}
+    }}
 
     // Navegação de Abas
     function showPane(paneId) {{
@@ -1604,7 +1909,7 @@ def generate_portal():
       window.scrollTo({{ top: 0, behavior: 'smooth' }});
     }}
 
-    // Modo Escuro Operacional
+    // Modo Escuro
     function toggleDarkMode() {{
       document.body.classList.toggle('dark-mode');
       const isDark = document.body.classList.contains('dark-mode');
@@ -1631,7 +1936,7 @@ def generate_portal():
       return '<span class="badge badge-pendente">' + (status || "Pendente") + '</span>';
     }}
 
-    // Renderizar Tabela
+    // Renderizar Tabela de Eventos
     function renderTable() {{
       const searchBox = document.getElementById("search-box");
       const q = searchBox ? searchBox.value.toLowerCase() : "";
@@ -1697,6 +2002,69 @@ def generate_portal():
       if (elShowing) elShowing.innerText = count;
     }}
 
+    // Renderizar Tabela de Permissões
+    function renderPermsTable() {{
+      const searchBox = document.getElementById("search-perm-box");
+      const q = searchBox ? searchBox.value.toLowerCase() : "";
+      const typeBox = document.getElementById("filter-perm-type");
+      const fType = typeBox ? typeBox.value.toLowerCase() : "";
+      const roleBox = document.getElementById("filter-perm-role");
+      const fRole = roleBox ? roleBox.value.toLowerCase() : "";
+
+      const tbody = document.getElementById("perms-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let count = 0;
+      let owners = 0, writers = 0, readers = 0;
+
+      allPermissions.forEach((p, idx) => {{
+        const gRole = p.google_role || "Leitor";
+        if (gRole === "Administrador") owners++;
+        else if (gRole === "Operador") writers++;
+        else readers++;
+
+        if (fType && !String(p.type || "").toLowerCase().includes(fType)) return;
+        if (fRole && !gRole.toLowerCase().includes(fRole)) return;
+
+        if (q) {{
+          const fullText = (
+            (p.name || '') + " " + (p.email || '') + " " + (p.sp_role || '') + " " + (p.cargo || '')
+          ).toLowerCase();
+          if (!fullText.includes(q)) return;
+        }}
+
+        count++;
+        let roleBadgeClass = "badge-role-read";
+        if (gRole === "Administrador") roleBadgeClass = "badge-role-owner";
+        else if (gRole === "Operador") roleBadgeClass = "badge-role-write";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="td-center" style="color: #64748B; font-weight: 600;">${{count}}</td>
+          <td><b>${{p.name}}</b> <span style="font-size: 11px; color: var(--sp-text-muted);">(${{p.cargo || '-'}})</span></td>
+          <td class="td-center"><span class="badge" style="background:#F1F5F9; color:#475569;">${{p.type}}</span></td>
+          <td>${{p.email && p.email !== '-' ? `<a href="mailto:${{p.email}}" style="color: var(--sp-theme-primary); text-decoration:none;">✉️ ${{p.email}}</a>` : '<span style="color:#94A3B8;">(Grupo de Segurança)</span>'}}</td>
+          <td class="td-center"><span style="font-size: 11px; font-weight:600;">${{p.sp_role}}</span></td>
+          <td class="td-center"><span class="badge ${{roleBadgeClass}}">${{p.google_role}}</span></td>
+          <td style="font-size: 12px; color: var(--sp-text-secondary);">${{p.scope}}</td>
+        `;
+        tbody.appendChild(tr);
+      }});
+
+      const elTotal = document.getElementById("kpi-perm-total");
+      if (elTotal) elTotal.innerText = allPermissions.length;
+      const elOwners = document.getElementById("kpi-perm-owners");
+      if (elOwners) elOwners.innerText = owners;
+      const elWriters = document.getElementById("kpi-perm-writers");
+      if (elWriters) elWriters.innerText = writers;
+      const elReaders = document.getElementById("kpi-perm-readers");
+      if (elReaders) elReaders.innerText = readers;
+      const elShowing = document.getElementById("showing-perms-count");
+      if (elShowing) elShowing.innerText = count;
+    }}
+
+    // Event Listeners Eventos
     const sBox = document.getElementById("search-box");
     if (sBox) sBox.addEventListener("input", renderTable);
     const fCanalEl = document.getElementById("filter-canal");
@@ -1704,7 +2072,15 @@ def generate_portal():
     const fStatusEl = document.getElementById("filter-status");
     if (fStatusEl) fStatusEl.addEventListener("change", renderTable);
 
-    // Global Search na Suite Nav
+    // Event Listeners Permissões
+    const sPermBox = document.getElementById("search-perm-box");
+    if (sPermBox) sPermBox.addEventListener("input", renderPermsTable);
+    const fPermType = document.getElementById("filter-perm-type");
+    if (fPermType) fPermType.addEventListener("change", renderPermsTable);
+    const fPermRole = document.getElementById("filter-perm-role");
+    if (fPermRole) fPermRole.addEventListener("change", renderPermsTable);
+
+    // Global Search
     const gSearch = document.getElementById("global-search");
     if (gSearch) {{
       gSearch.addEventListener("input", function(e) {{
@@ -1719,7 +2095,7 @@ def generate_portal():
       }});
     }}
 
-    // Sincronização em tempo real com Google Sheets
+    // Sincronização em tempo real
     async function syncLiveAPI() {{
       const btn = event.target;
       const originalText = btn.innerText;
@@ -1748,7 +2124,7 @@ def generate_portal():
       }}
     }}
 
-    // Exportar CSV
+    // Exportar CSV Eventos
     function exportCSV() {{
       let csv = "Indice,Mes,Data,Horario,Campeonato,Partida,Responsavel,Canal,PVID,Status,Programado\\n";
       allEvents.forEach((ev, i) => {{
@@ -1762,8 +2138,23 @@ def generate_portal():
       a.click();
     }}
 
+    // Exportar CSV Permissões Google
+    function exportPermsCSV() {{
+      let csv = "Nome,Tipo,Email,Nivel_SharePoint,Nivel_Google_Sites,Cargo,Escopo\\n";
+      allPermissions.forEach((p) => {{
+        csv += `"${{p.name}}","${{p.type}}","${{p.email}}","${{p.sp_role}}","${{p.google_role}}","${{p.cargo||''}}","${{p.scope||''}}"\\n`;
+      }});
+      const blob = new Blob([csv], {{ type: 'text/csv;charset=utf-8;' }});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "permissoes_suporte_captacao_google_sites.csv";
+      a.click();
+    }}
+
     // Render Inicial
     renderTable();
+    renderPermsTable();
   </script>
 </body>
 </html>"""
@@ -1779,6 +2170,7 @@ def generate_portal():
 
     print(f"Portal Web Suporte Captação gerado com sucesso em: {output_html}")
     print(f"Publicação atualizada em: {docs_html}")
+    print(f"Planilha de permissões para Google Workspace gerada em: {csv_path}")
     print(f"Tamanho do arquivo: {os.path.getsize(output_html)} bytes")
     return output_html
 

@@ -3,7 +3,7 @@ import os
 import pytest
 from scripts.build_portal_web import generate_portal
 
-def test_build_portal_web_creates_file_and_validates_sharepoint_replica():
+def test_build_portal_web_creates_file_and_validates_sharepoint_replica_and_rbac():
     html_path = generate_portal()
     assert os.path.exists(html_path)
     assert os.path.getsize(html_path) > 100000
@@ -69,3 +69,17 @@ def test_build_portal_web_creates_file_and_validates_sharepoint_replica():
     assert "PV3623" in content
     assert "PV3687" in content
     assert "PV3679" in content
+
+    # 7. Validação do Módulo de Permissões & RBAC (SharePoint Graph & Google Sites)
+    assert "allPermissions" in content
+    assert "Permissões & Controle de Acesso" in content
+    assert "user-role-select" in content
+    assert "exportPermsCSV" in content
+    assert "Proprietários do Suporte Captação" in content
+    assert "Visitantes da Suporte Captação" in content
+
+    # 8. Validação do arquivo CSV gerado para Google Workspace
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    csv_perm = os.path.join(base_dir, "config", "permissoes_google_workspace_suportecaptacao.csv")
+    assert os.path.exists(csv_perm)
+    assert os.path.getsize(csv_perm) > 500
