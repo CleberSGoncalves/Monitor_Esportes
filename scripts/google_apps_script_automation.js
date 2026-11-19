@@ -32,9 +32,12 @@ function formatarDataBR(val, ss) {
 function onOpen() {
   try {
     SpreadsheetApp.getUi()
-      .createMenu("⚡ Formatação")
+      .createMenu("⚡ Suporte Captação")
       .addItem("🎨 Formatar Toda a Planilha (890+ Linhas)", "formatarTodaPlanilha")
       .addItem("🛡️ Ativar Formatação Condicional Automática", "configurarFormatacaoCondicional")
+      .addSeparator()
+      .addItem("📢 Enviar Agenda de Transmissões para o Google Chat", "menuEnviarAgendaGoogleChat")
+      .addItem("⏰ Configurar Disparo Diário Automático (09:00)", "configurarDisparoDiarioAgenda")
       .addToUi();
   } catch (e) {
     // Modo headless / sem UI
@@ -234,6 +237,80 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    // 1. Ação Especial: Disparo da Agenda de Streaming para o Google Chat
+    if (data.action === "send_chat_agenda") {
+      const resChat = enviarAgendaGoogleChat(data.webhook_url);
+      return ContentService.createTextOutput(JSON.stringify(resChat))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 2. Manipulação da Lista de Ocorrências (API REST para PowerShell / Cássio)
+    if (data.resource === "ocorrencias") {
+      let sheetOc = ss.getSheetByName("Painel de Ocorrências");
+      if (!sheetOc) {
+        sheetOc = ss.insertSheet("Painel de Ocorrências");
+        sheetOc.appendRow([
+          "ID", "Status", "Criado Em", "Host", "CS", "Veículo",
+          "Equipamento", "Tipo de Problema", "Em Recuperação",
+          "Gravação Streaming", "Informar Operação", "Ações Executadas",
+          "Área Responsável", "Redmine"
+        ]);
+        sheetOc.getRange(1, 1, 1, 14).setBackground("#0F172A").setFontColor("#FFFFFF").setFontWeight("bold");
+        sheetOc.setFrozenRows(1);
+      }
+
+      if (data.action === "insert") {
+        const item = data.item || data;
+        const newId = String(item.id || sheetOc.getLastRow());
+        const criadoEm = item.Criado || formatarDataBR(new Date(), ss);
+        sheetOc.appendRow([
+          newId,
+          item.Status || "Em andamento",
+          criadoEm,
+          item.Host || "-",
+          item.CS || "01",
+          item.Veiculo || "Todos",
+          item.Equipamento || "ATRIA",
+          item.TipoProblema || "Sem sinal",
+          item.EmRecuperacao || "Não",
+          item.GravacaoStreaming || "Não",
+          item.InformarOperacao ? "SIM" : "NÃO",
+          item.AcoesExecutadas || "-",
+          item.AreaResponsavel || "N1",
+          item.Redmine || ""
+        ]);
+        return ContentService.createTextOutput(JSON.stringify({
+          status: "success",
+          action: "insert",
+          id: newId,
+          message: "Ocorrência inserida com sucesso no Painel de Ocorrências do Google."
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+
+      if (data.action === "update" && data.id) {
+        const lastR = sheetOc.getLastRow();
+        let updated = false;
+        if (lastR > 1) {
+          const ids = sheetOc.getRange(2, 1, lastR - 1, 1).getValues();
+          for (let rowIdx = 0; rowIdx < ids.length; rowIdx++) {
+            if (String(ids[rowIdx][0]) === String(data.id)) {
+              const actualRow = rowIdx + 2;
+              if (data.item.Status) sheetOc.getRange(actualRow, 2).setValue(data.item.Status);
+              if (data.item.AcoesExecutadas) sheetOc.getRange(actualRow, 12).setValue(data.item.AcoesExecutadas);
+              updated = true;
+              break;
+            }
+          }
+        }
+        return ContentService.createTextOutput(JSON.stringify({
+          status: updated ? "success" : "not_found",
+          id: data.id,
+          updated: updated
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+
     const sheet = ss.getSheetByName("Programação de eventos - Stream") || ss.getActiveSheet();
     
     // Ação: Formatar toda a planilha imediatamente
@@ -370,8 +447,234 @@ function doPost(e) {
   }
 }
 
+/**
+ * FUNÇÕES DE DISPARO DA AGENDA PARA O GOOGLE CHAT
+ * Substitui o antigo fluxo do Power Automate / Teams
+ */
+
+function menuEnviarAgendaGoogleChat() {
+  const ui = SpreadsheetApp.getUi();
+  const props = PropertiesService.getScriptProperties();
+  let webhook = props.getProperty("GOOGLE_CHAT_WEBHOOK_URL");
+
+  if (!webhook) {
+    const prompt = ui.prompt(
+      "Configuração do Google Chat",
+      "Cole a URL do Webhook do espaço 'Streaming - Gravações':",
+      ui.ButtonSet.OK_CANCEL
+    );
+    if (prompt.getSelectedButton() === ui.Button.OK) {
+      webhook = prompt.getResponseText().trim();
+      if (webhook) {
+        props.setProperty("GOOGLE_CHAT_WEBHOOK_URL", webhook);
+      } else {
+        ui.alert("Operação cancelada: Webhook não fornecido.");
+        return;
+      }
+    } else {
+      return;
+    }
+  }
+
+  const res = enviarAgendaGoogleChat(webhook);
+  if (res.status === "success") {
+    ui.alert("✅ Sucesso!", "A agenda foi postada no grupo 'Streaming - Gravações' do Google Chat!\nHoje: " + res.hoje + " jogo(s)\nAmanhã: " + res.amanha + " jogo(s)", ui.ButtonSet.OK);
+  } else {
+    ui.alert("❌ Erro", "Falha ao disparar para o Google Chat: " + (res.body || res.message), ui.ButtonSet.OK);
+  }
+}
+
+function configurarDisparoDiarioAgenda() {
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(t => {
+    if (t.getHandlerFunction() === "enviarAgendaGoogleChat") {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+
+  ScriptApp.newTrigger("enviarAgendaGoogleChat")
+    .timeBased()
+    .everyDays(1)
+    .atHour(9)
+    .create();
+
+  try {
+    SpreadsheetApp.getUi().alert("⏰ Gatilho Ativado", "O disparo diário automático da Agenda de Transmissões foi agendado para rodar todos os dias às 09:00 no Google Chat!", SpreadsheetApp.getUi().ButtonSet.OK);
+  } catch(e) {}
+}
+
+function enviarAgendaGoogleChat(webhookUrl) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Programação de eventos - Stream") || ss.getActiveSheet();
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return { status: "empty", message: "Nenhum evento na planilha." };
+  }
+
+  const tz = ss.getSpreadsheetTimeZone() || "America/Sao_Paulo";
+  const hoje = new Date();
+  const amanha = new Date(hoje.getTime() + 24 * 60 * 60 * 1000);
+
+  const hojeStr = Utilities.formatDate(hoje, tz, "dd/MM/yyyy");
+  const amanhaStr = Utilities.formatDate(amanha, tz, "dd/MM/yyyy");
+
+  const values = sheet.getRange(2, 1, lastRow - 1, 11).getValues();
+  const jogosHoje = [];
+  const jogosAmanha = [];
+
+  for (let i = 0; i < values.length; i++) {
+    const row = values[i];
+    const dataCell = formatarDataBR(row[2], ss);
+    const ev = {
+      partida: String(row[5] || "").trim(),
+      horario: String(row[3] || "").trim(),
+      responsavel: String(row[6] || "Marcos BL01 e Backup").trim(),
+      canal: String(row[7] || "").trim(),
+      pvid: String(row[8] || (row[7] ? row[7] + " - TV BOX" : "")).trim()
+    };
+    if (dataCell === hojeStr) {
+      jogosHoje.push(ev);
+    } else if (dataCell === amanhaStr) {
+      jogosAmanha.push(ev);
+    }
+  }
+
+  const url = webhookUrl || PropertiesService.getScriptProperties().getProperty("GOOGLE_CHAT_WEBHOOK_URL");
+  if (!url) {
+    return { status: "missing_webhook", message: "Webhook do Google Chat não configurado." };
+  }
+
+  const payload = montarCardAgendaGoogleChat(hojeStr, jogosHoje, amanhaStr, jogosAmanha);
+  const options = {
+    method: "post",
+    contentType: "application/json; charset=UTF-8",
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch(url, options);
+  return {
+    status: response.getResponseCode() === 200 ? "success" : "error",
+    code: response.getResponseCode(),
+    body: response.getContentText(),
+    hoje: jogosHoje.length,
+    amanha: jogosAmanha.length
+  };
+}
+
+function montarCardAgendaGoogleChat(hojeStr, jogosHoje, amanhaStr, jogosAmanha) {
+  const sections = [];
+
+  // Seção Hoje
+  const widgetsHoje = [];
+  if (jogosHoje.length === 0) {
+    widgetsHoje.push({
+      decoratedText: {
+        text: "<i>Nenhuma transmissão programada para hoje.</i>"
+      }
+    });
+  } else {
+    jogosHoje.forEach(j => {
+      widgetsHoje.push({
+        decoratedText: {
+          topLabel: (j.horario || "--:--") + " • " + j.responsavel,
+          text: "<b>" + j.partida + "</b>",
+          bottomLabel: "📺 " + j.pvid,
+          wrapText: true
+        }
+      });
+    });
+  }
+  sections.push({
+    header: "Hoje - " + hojeStr,
+    widgets: widgetsHoje
+  });
+
+  // Seção Amanhã
+  const widgetsAmanha = [];
+  if (jogosAmanha.length === 0) {
+    widgetsAmanha.push({
+      decoratedText: {
+        text: "<i>Nenhuma transmissão programada para amanhã.</i>"
+      }
+    });
+  } else {
+    jogosAmanha.forEach(j => {
+      widgetsAmanha.push({
+        decoratedText: {
+          topLabel: (j.horario || "--:--") + " • " + j.responsavel,
+          text: "<b>" + j.partida + "</b>",
+          bottomLabel: "📺 " + j.pvid,
+          wrapText: true
+        }
+      });
+    });
+  }
+  sections.push({
+    header: "Amanhã - " + amanhaStr,
+    widgets: widgetsAmanha
+  });
+
+  return {
+    cardsV2: [
+      {
+        cardId: "agenda-streaming-" + hojeStr.replace(/\//g, "-"),
+        card: {
+          header: {
+            title: "Agenda de Transmissões",
+            subtitle: "Programação de jogos de hoje e amanhã",
+            imageUrl: "https://fonts.gstatic.com/s/i/short-term/release/googlestyles/sports_soccer/default/48px.png",
+            imageType: "CIRCLE"
+          },
+          sections: sections
+        }
+      }
+    ]
+  };
+}
+
 function doGet(e) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // 1. Ação Especial: Disparo ou consulta da Agenda do Google Chat via GET
+  if (e && e.parameter && e.parameter.action === "send_chat_agenda") {
+    const resChat = enviarAgendaGoogleChat(e.parameter.webhook_url);
+    return ContentService.createTextOutput(JSON.stringify(resChat)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // 2. Consulta de Ocorrências (API REST para PowerShell / Cássio)
+  if (e && e.parameter && e.parameter.resource === "ocorrencias") {
+    const sheetOc = ss.getSheetByName("Painel de Ocorrências");
+    if (!sheetOc || sheetOc.getLastRow() < 2) {
+      return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+    }
+    const vals = sheetOc.getRange(2, 1, sheetOc.getLastRow() - 1, 14).getValues();
+    let ocs = vals.map(r => ({
+      id: String(r[0]),
+      Status: r[1],
+      Criado: r[2],
+      Host: r[3],
+      CS: r[4],
+      Veiculo: r[5],
+      Equipamento: r[6],
+      TipoProblema: r[7],
+      EmRecuperacao: r[8],
+      GravacaoStreaming: r[9],
+      InformarOperacao: r[10] === "SIM",
+      AcoesExecutadas: r[11],
+      AreaResponsavel: r[12],
+      Redmine: r[13]
+    }));
+
+    if (e.parameter.status) {
+      ocs = ocs.filter(o => String(o.Status).toLowerCase() === e.parameter.status.toLowerCase());
+    }
+    if (e.parameter.host) {
+      ocs = ocs.filter(o => String(o.Host).toLowerCase().includes(e.parameter.host.toLowerCase()));
+    }
+    return ContentService.createTextOutput(JSON.stringify(ocs)).setMimeType(ContentService.MimeType.JSON);
+  }
+
   const sheet = ss.getSheetByName("Programação de eventos - Stream") || ss.getActiveSheet();
   const lastRow = sheet.getLastRow();
   
@@ -393,8 +696,8 @@ function doGet(e) {
     }));
   }
   
-  // Se chamado com ?format=json ou ?api=1, retorna JSON puro para o Monitor_Esportes
-  if (e && e.parameter && (e.parameter.format === 'json' || e.parameter.api === '1')) {
+  // Se chamado com ?format=json ou ?api=1, retorna JSON puro para o Monitor_Esportes ou PowerShell
+  if (e && e.parameter && (e.parameter.format === 'json' || e.parameter.api === '1' || e.parameter.resource === 'streaming')) {
     return ContentService.createTextOutput(JSON.stringify(results)).setMimeType(ContentService.MimeType.JSON);
   }
   
