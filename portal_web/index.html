@@ -258,9 +258,10 @@
     /* NAVEGAÇÃO SUPERIOR ESTILO SHAREPOINT MODERNO COM DROPDOWNS */
     .sp-top-nav-bar {
       background: #004578;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       position: relative;
-      z-index: 100;
+      z-index: 1000;
+      overflow: visible !important;
     }
 
     .sp-top-nav-container {
@@ -271,19 +272,15 @@
       justify-content: space-between;
       box-sizing: border-box;
       min-height: 48px;
+      overflow: visible !important;
     }
 
     .sp-nav-menus {
       display: flex;
       align-items: center;
-      gap: 2px;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .sp-nav-menus::-webkit-scrollbar {
-      display: none;
+      gap: 3px;
+      flex-wrap: wrap;
+      overflow: visible !important;
     }
 
     .sp-menu-item {
@@ -304,60 +301,65 @@
       gap: 6px;
       white-space: nowrap;
       transition: all 0.15s ease;
+      user-select: none;
     }
 
     .sp-menu-btn:hover {
       color: #FFFFFF;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.12);
     }
 
-    .sp-menu-btn.active {
+    .sp-menu-btn.active,
+    .sp-menu-item.open > .sp-menu-btn {
       color: #FFFFFF;
       border-bottom-color: #50E6FF;
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.16);
     }
 
     .sp-caret {
       font-size: 9px;
       opacity: 0.8;
       transition: transform 0.2s ease;
+      pointer-events: none;
     }
 
-    .sp-menu-item:hover .sp-caret {
+    .sp-menu-item:hover > .sp-menu-btn .sp-caret,
+    .sp-menu-item.open > .sp-menu-btn .sp-caret {
       transform: rotate(180deg);
     }
 
-    /* DROPDOWN MENU FLYOUT */
+    /* DROPDOWN MENU FLYOUT (BLINDADO CONTRA CLIPPING E IFRAMES) */
     .sp-dropdown-menu {
       position: absolute;
       top: 100%;
       left: 0;
-      min-width: 280px;
+      min-width: 290px;
       background: #FFFFFF;
       border-radius: 4px;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
-      border: 1px solid #E2E8F0;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+      border: 1px solid #CBD5E1;
       padding: 6px 0;
       display: none;
-      z-index: 1000;
-      animation: fadeInDropdown 0.15s ease;
+      z-index: 9999 !important;
+      animation: fadeInDropdown 0.12s ease;
+      pointer-events: auto;
     }
 
     @keyframes fadeInDropdown {
-      from { opacity: 0; transform: translateY(-4px); }
+      from { opacity: 0; transform: translateY(-3px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .sp-menu-item:hover .sp-dropdown-menu,
-    .sp-menu-item:focus-within .sp-dropdown-menu {
-      display: block;
+    .sp-menu-item:hover > .sp-dropdown-menu,
+    .sp-menu-item.open > .sp-dropdown-menu {
+      display: block !important;
     }
 
     .sp-dropdown-link {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 9px 18px;
+      padding: 10px 18px;
       color: #1E293B;
       text-decoration: none;
       font-size: 13px;
@@ -365,11 +367,19 @@
       cursor: pointer;
       transition: all 0.12s ease;
       white-space: nowrap;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      box-sizing: border-box;
+      user-select: none;
     }
 
-    .sp-dropdown-link:hover {
+    .sp-dropdown-link:hover,
+    .sp-dropdown-link:focus {
       background: #F1F5F9;
       color: #0078D4;
+      outline: none;
     }
 
     .sp-dropdown-link .item-count-badge {
@@ -1545,90 +1555,90 @@
       <div class="sp-nav-menus">
         <!-- Página Inicial -->
         <div class="sp-menu-item">
-          <button class="sp-menu-btn tab-link active" onclick="showPane('home')">Página Inicial</button>
+          <button type="button" class="sp-menu-btn tab-link active" onclick="handleMenuClick('home', 'Página Inicial', event)">Página Inicial</button>
         </div>
 
         <!-- Documentos ⌵ -->
         <div class="sp-menu-item">
-          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">Documentos <span class="sp-caret">⌵</span></button>
+          <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">Documentos <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
-            <a class="sp-dropdown-link" onclick="showPane('escala')">💼 Escala de Trabalho 2026</a>
-            <a class="sp-dropdown-link" onclick="showPane('procedimentos')">📖 Procedimentos N1 <span class="item-count-badge">68</span></a>
-            <a class="sp-dropdown-link" onclick="showPane('documentos')">📁 Documentos Compartilhados <span class="item-count-badge">28</span></a>
-            <a class="sp-dropdown-link" onclick="showPane('capacitacao')">📋 Ficha de Capacitação</a>
-            <a class="sp-dropdown-link" onclick="showPane('tratativa')">📑 Tratativa de Problemas de Captação</a>
-            <a class="sp-dropdown-link" onclick="showPane('doctecnicos')">📡 Documentos Técnicos (PayTV)</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('escala', '💼 Escala de Trabalho 2026', event)">💼 Escala de Trabalho 2026</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('procedimentos', '📖 Procedimentos N1', event)">📖 Procedimentos N1 <span class="item-count-badge">68</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('documentos', '📁 Documentos Compartilhados', event)">📁 Documentos Compartilhados <span class="item-count-badge">28</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('capacitacao', '📋 Ficha de Capacitação', event)">📋 Ficha de Capacitação</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('tratativa', '📑 Tratativa de Problemas de Captação', event)">📑 Tratativa de Problemas de Captação</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('doctecnicos', '📡 Documentos Técnicos (PayTV)', event)">📡 Documentos Técnicos (PayTV)</a>
           </div>
         </div>
 
         <!-- Administração ⌵ -->
         <div class="sp-menu-item">
-          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">Administração <span class="sp-caret">⌵</span></button>
+          <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">Administração <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
-            <a class="sp-dropdown-link" onclick="showPane('metas')">🎯 Metas & OKRs da Equipe</a>
-            <a class="sp-dropdown-link" onclick="showPane('contratos')">📝 Controle de Contratos Parceiros</a>
-            <a class="sp-dropdown-link" onclick="showPane('fornecedores')">🏢 Avaliação Técnica de Fornecedores</a>
-            <a class="sp-dropdown-link" onclick="showPane('solicitacoes')">🔑 Solicitações de Acesso</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('metas', '🎯 Metas & OKRs da Equipe', event)">🎯 Metas & OKRs da Equipe</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('contratos', '📝 Controle de Contratos Parceiros', event)">📝 Controle de Contratos Parceiros</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('fornecedores', '🏢 Avaliação Técnica de Fornecedores', event)">🏢 Avaliação Técnica de Fornecedores</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('solicitacoes', '🔑 Solicitações de Acesso', event)">🔑 Solicitações de Acesso</a>
           </div>
         </div>
 
         <!-- Qualidade ⌵ -->
         <div class="sp-menu-item">
-          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">Qualidade <span class="sp-caret">⌵</span></button>
+          <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">Qualidade <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
-            <a class="sp-dropdown-link" onclick="showPane('sla')">⏱️ SLA de Atendimento</a>
-            <a class="sp-dropdown-link" onclick="showPane('dashboard')">📊 Dashboard & Indicadores</a>
-            <a class="sp-dropdown-link" onclick="showPane('notificacoes')">🔔 Análise de Notificações</a>
-            <a class="sp-dropdown-link" onclick="showPane('backup')">💾 Validação de Backup</a>
-            <a class="sp-dropdown-link" onclick="showPane('analisedados')">📈 Análise de Dados</a>
-            <a class="sp-dropdown-link" onclick="showPane('falhas')">⚠️ Confirmação de Falhas</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('sla', '⏱️ SLA de Atendimento', event)">⏱️ SLA de Atendimento</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('dashboard', '📊 Dashboard & Indicadores', event)">📊 Dashboard & Indicadores</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('notificacoes', '🔔 Análise de Notificações', event)">🔔 Análise de Notificações</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('backup', '💾 Validação de Backup', event)">💾 Validação de Backup</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('analisedados', '📈 Análise de Dados', event)">📈 Análise de Dados</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('falhas', '⚠️ Confirmação de Falhas', event)">⚠️ Confirmação de Falhas</a>
           </div>
         </div>
 
         <!-- Contato ⌵ -->
         <div class="sp-menu-item">
-          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">Contato <span class="sp-caret">⌵</span></button>
+          <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">Contato <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
-            <a class="sp-dropdown-link" onclick="showPane('hospedeiros')">📞 Contato Técnico de Hospedeiros <span class="item-count-badge">500</span></a>
-            <a class="sp-dropdown-link" onclick="showPane('antenistas')">🛠️ Contatos de Antenistas <span class="item-count-badge">5</span></a>
-            <a class="sp-dropdown-link" onclick="showPane('equipe')">👥 Equipe do Suporte Captação</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('hospedeiros', '📞 Contato Técnico de Hospedeiros', event)">📞 Contato Técnico de Hospedeiros <span class="item-count-badge">500</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('antenistas', '🛠️ Contatos de Antenistas', event)">🛠️ Contatos de Antenistas <span class="item-count-badge">5</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('equipe', '👥 Equipe do Suporte Captação', event)">👥 Equipe do Suporte Captação</a>
           </div>
         </div>
 
         <!-- DEV ⌵ -->
         <div class="sp-menu-item">
-          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">DEV <span class="sp-caret">⌵</span></button>
+          <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">DEV <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
-            <a class="sp-dropdown-link" onclick="showPane('automacoes')">🤖 Repositório de Automações</a>
-            <a class="sp-dropdown-link" onclick="showPane('redmine')">🐞 Redmine (Demandas)</a>
-            <a class="sp-dropdown-link" onclick="showPane('hosts')">📡 Cadastro de Hosts <span class="item-count-badge">220</span></a>
-            <a class="sp-dropdown-link" onclick="showPane('cidades')">🏙️ Mapeamento de Cidades e Emissoras</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('automacoes', '🤖 Repositório de Automações', event)">🤖 Repositório de Automações</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redmine', '🐞 Redmine (Demandas)', event)">🐞 Redmine (Demandas)</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('hosts', '📡 Cadastro de Hosts', event)">📡 Cadastro de Hosts <span class="item-count-badge">220</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('cidades', '🏙️ Mapeamento de Cidades e Emissoras', event)">🏙️ Mapeamento de Cidades e Emissoras</a>
           </div>
         </div>
 
         <!-- Suporte ⌵ -->
         <div class="sp-menu-item">
-          <button class="sp-menu-btn tab-link" onclick="toggleDropdown(this)">Suporte <span class="sp-caret">⌵</span></button>
+          <button type="button" class="sp-menu-btn" onclick="toggleDropdown(this, event)">Suporte <span class="sp-caret">⌵</span></button>
           <div class="sp-dropdown-menu">
-            <a class="sp-dropdown-link" onclick="showPane('ocorrencias')">🚨 Painel de Ocorrências <span class="item-count-badge">1000</span></a>
-            <a class="sp-dropdown-link" onclick="showPane('streaming')">⚽ Programação Streaming <span class="item-count-badge">862</span></a>
-            <a class="sp-dropdown-link" onclick="showPane('gestaoservicos')">⚙️ Painel de Gestão de Serviços dos CS</a>
-            <a class="sp-dropdown-link" onclick="showPane('monitoramentocanais')">📺 Monitoramento de Canais CS</a>
-            <a class="sp-dropdown-link" onclick="showPane('redescs')">🌐 Configurações de Rede do CS</a>
-            <a class="sp-dropdown-link" onclick="showPane('redepcd')">🖥️ Mapeamento de Rede do CPD</a>
-            <a class="sp-dropdown-link" onclick="showPane('remoto')">🎮 Acesso Remoto & América Central</a>
-            <a class="sp-dropdown-link" onclick="showPane('relatoriosjogos')">🏀 Relatórios de Jogos (YouTube & NBA)</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('ocorrencias', '🚨 Painel de Ocorrências', event)">🚨 Painel de Ocorrências <span class="item-count-badge">1000</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('streaming', '⚽ Programação Streaming', event)">⚽ Programação Streaming <span class="item-count-badge">862</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('gestaoservicos', '⚙️ Painel de Gestão de Serviços dos CS', event)">⚙️ Painel de Gestão de Serviços dos CS</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('monitoramentocanais', '📺 Monitoramento de Canais CS', event)">📺 Monitoramento de Canais CS</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redescs', '🌐 Configurações de Rede do CS', event)">🌐 Configurações de Rede do CS</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redepcd', '🖥️ Mapeamento de Rede do CPD', event)">🖥️ Mapeamento de Rede do CPD</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('remoto', '🎮 Acesso Remoto & América Central', event)">🎮 Acesso Remoto & América Central</a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('relatoriosjogos', '🏀 Relatórios de Jogos (YouTube & NBA)', event)">🏀 Relatórios de Jogos (YouTube & NBA)</a>
           </div>
         </div>
 
         <!-- Links de Internet dos Parceiros -->
         <div class="sp-menu-item">
-          <button class="sp-menu-btn tab-link" onclick="showPane('links')">Links de Internet dos Parceiros</button>
+          <button type="button" class="sp-menu-btn tab-link" onclick="handleMenuClick('links', 'Links de Internet dos Parceiros', event)">Links de Internet dos Parceiros</button>
         </div>
 
         <!-- Permissões (RBAC) -->
         <div class="sp-menu-item action-admin-only" id="nav-tab-permissoes">
-          <button class="sp-menu-btn tab-link" onclick="showPane('permissoes')">🔐 Permissões</button>
+          <button type="button" class="sp-menu-btn tab-link" onclick="handleMenuClick('permissoes', '🔐 Permissões', event)">🔐 Permissões</button>
         </div>
       </div>
     </div>
@@ -2221,26 +2231,51 @@
       </div>
     </div>
 
-    <!-- SUBMENU GENÉRICO: VISUALIZADOR DE LISTAS NATIVAS DO SHAREPOINT -->
+    <!-- SUBMENU GENÉRICO: VISUALIZADOR DE LISTAS NATIVAS DO SHAREPOINT (ESTILO 1:1) -->
     <div id="pane-list-viewer" class="pane-container">
       <div class="sp-command-bar">
         <div class="sp-command-left">
-          <button class="sp-btn-new action-admin-only" onclick="alert('Conectado ao SharePoint')"><span>+</span> Novo Item</button>
-          <button class="sp-btn-cmd" onclick="showPane('home')"><span>🏠</span> Voltar ao Início</button>
+          <button class="sp-btn-new action-admin-only" onclick="alert('Formulário de inclusão conectado ao SharePoint Online')"><span>+</span> Novo</button>
+          <button class="sp-btn-cmd" onclick="alert('Modo de exibição de grade ativado')"><span>田</span> Editar no modo de exibição de grade</button>
+          <button class="sp-btn-cmd" onclick="exportGenericListCSV()"><span>📥</span> Exportar CSV</button>
+          <button class="sp-btn-cmd" onclick="handleMenuClick('home', 'Página Inicial')"><span>🏠</span> Voltar ao Início</button>
         </div>
       </div>
+      
       <div class="sp-list-header-row">
-        <h2 class="sp-list-main-title" id="list-viewer-title">Lista do SharePoint <span class="star-icon">☆</span></h2>
-      </div>
-      <div class="card" style="padding: 24px; border-left: 4px solid #0078D4;">
-        <h3 id="list-viewer-subtitle" style="font-size: 16px; color: #1E293B; margin-bottom: 8px;">Módulo Integrado ao SharePoint</h3>
-        <p id="list-viewer-desc" style="color: #64748B; font-size: 13.5px; line-height: 1.5; margin-bottom: 16px;">
-          Esta lista está sincronizada com a esteira oficial do SharePoint Online da Central de Suporte e Captação.
-        </p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;" id="list-viewer-actions">
-          <button class="btn-action btn-action-primary" onclick="showPane('home')">Ir para Página Inicial</button>
-          <button class="btn-action btn-action-secondary" onclick="showPane('ocorrencias')">Ver Painel de Ocorrências</button>
+        <div>
+          <div style="font-size: 12px; color: #64748B; margin-bottom: 4px;">Suporte Captação &rsaquo; Listas do SharePoint</div>
+          <h2 class="sp-list-main-title" id="list-viewer-title">Lista do SharePoint <span class="star-icon">☆</span></h2>
         </div>
+        <div class="sp-views-bar">
+          <span class="sp-view-tab active">Todos os Itens</span>
+        </div>
+      </div>
+
+      <p id="list-viewer-desc" style="color: #64748B; font-size: 13px; margin: 4px 0 14px 0; line-height: 1.5;">
+        Esta lista está sincronizada com a esteira oficial do SharePoint Online da Central de Suporte e Captação.
+      </p>
+
+      <div class="filter-bar">
+        <div class="filter-inputs" style="width: 100%;">
+          <input type="text" id="list-viewer-search" class="search-field" oninput="filterListViewerTable()" placeholder="🔍 Buscar registros nesta lista...">
+        </div>
+      </div>
+
+      <div class="sp-table-wrap">
+        <div class="sp-table-scroll">
+          <table class="sp-list-table">
+            <thead id="list-viewer-thead">
+              <!-- Renderizado via JS -->
+            </thead>
+            <tbody id="list-viewer-tbody">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top: 10px; font-size: 12px; color: var(--sp-text-secondary);" id="list-viewer-footer">
+        Sincronizado com a Central de Suporte e Captação
       </div>
     </div>
 
@@ -2578,19 +2613,300 @@
       }
     }
 
+    // ==========================================
+    // CATÁLOGO DE SUBMENUS & LISTAS NATIVAS DO SHAREPOINT
+    // ==========================================
+    const SP_LISTS_CATALOG = {
+      capacitacao: {
+        title: "Ficha de Capacitação",
+        desc: "Registro oficial de capacitações, treinamentos técnicos e certificações operacionais da equipe de Captação.",
+        columns: ["#", "Colaborador", "Treinamento / Certificação", "Data", "Instrutor / Responsável", "Status"],
+        rows: [
+          ["1", "Rodrigo Meirelles", "Operação Receptores ATRIA e Decoders TDT", "15/01/2026", "Cleber Gonçalves", "<span class='badge badge-exibido'>Concluído</span>"],
+          ["2", "Alan Kelvin", "Diagnóstico de Enlace e Roteadores de Praça", "22/01/2026", "Vinicius Dantas", "<span class='badge badge-exibido'>Concluído</span>"],
+          ["3", "Bruno Viana", "Procedimentos de Gravação Streaming CazéTV", "05/02/2026", "Marcelo Pereira", "<span class='badge badge-exibido'>Concluído</span>"],
+          ["4", "Marcelo Fialho", "Conformidade CLT Art. 66 & Gestão de Plantões", "12/02/2026", "Luiz Lemos", "<span class='badge badge-exibido'>Concluído</span>"],
+          ["5", "Rômulo Silva", "Mapeamento e Reset Remoto de TV BOX", "18/02/2026", "Marcos Bezerra", "<span class='badge badge-exibido'>Concluído</span>"]
+        ]
+      },
+      tratativa: {
+        title: "Tratativa de Problemas de Captação",
+        desc: "Fluxos de contingência, escalonamento N1/N2/N3 e resolução de indisponibilidade de sinal em praças críticas.",
+        columns: ["#", "Praça / Cidade", "Incidente", "Classificação", "Ação Imediata", "Responsável", "Status"],
+        rows: [
+          ["1", "Montes Claros / MG", "Queda de sinal digital SBT", "Crítico", "Acionamento de hospedeiro local para reboot de receptor", "N1 Plantão", "<span class='badge badge-exibido'>Resolvido</span>"],
+          ["2", "Vilhena / RO", "Falha de link de fibra óptica", "Grave", "Ativação de link secundário 4G de contingência", "N2 Engenharia", "<span class='badge badge-exibido'>Resolvido</span>"],
+          ["3", "Resende / RJ", "Perda de sincronismo Band Barra Mansa", "Médio", "Reajuste de sintonia remota via ATRIA", "N1 Plantão", "<span class='badge badge-exibido'>Resolvido</span>"],
+          ["4", "Taubaté / SP", "Travamento de decoder TV BOX", "Crítico", "Ciclo de energia inteligente via PDU remota", "N1 Plantão", "<span class='badge badge-exibido'>Resolvido</span>"]
+        ]
+      },
+      doctecnicos: {
+        title: "Documentos Técnicos (PayTV)",
+        desc: "Manuais técnicos de decodificadores PayTV, especificações de satélite e parâmetros de modulação DVB-S2.",
+        columns: ["#", "Documento", "Plataforma / Operadora", "Versão", "Última Atualização", "Tipo", "Ações"],
+        rows: [
+          ["1", "Manual de Configuração TV BOX OTT Android", "Streaming & OTT", "v3.2", "10/01/2026", "PDF", "<a href='#' class='btn-doc-download'>Visualizar</a>"],
+          ["2", "Tabela de Frequências e Transponders StarOne D2", "Satélite PayTV", "v2026.1", "15/01/2026", "XLSX", "<a href='#' class='btn-doc-download'>Visualizar</a>"],
+          ["3", "Guia de Troubleshooting Receptores ATRIA", "PayTV / Ingest", "v4.0", "01/02/2026", "PDF", "<a href='#' class='btn-doc-download'>Visualizar</a>"]
+        ]
+      },
+      contratos: {
+        title: "Controle de Contratos Parceiros",
+        desc: "Acompanhamento de vigência, reajustes e acordos de nível de serviço com hospedeiros de recepção.",
+        columns: ["#", "Parceiro / Hospedeiro", "Praça", "Contrato Nº", "Vigência", "SLA Acordado", "Status"],
+        rows: [
+          ["1", "Central de Recepção Montes Claros", "Montes Claros / MG", "CT-2024-089", "Dez/2026", "99.8%", "<span class='badge badge-exibido'>Vigente</span>"],
+          ["2", "Recepção e Antenas Vilhena", "Vilhena / RO", "CT-2023-044", "Nov/2026", "99.5%", "<span class='badge badge-exibido'>Vigente</span>"],
+          ["3", "Telecomunicações Resende", "Resende / RJ", "CT-2024-112", "Jan/2027", "99.9%", "<span class='badge badge-exibido'>Vigente</span>"]
+        ]
+      },
+      fornecedores: {
+        title: "Avaliação Técnica de Fornecedores",
+        desc: "Critérios de qualidade, pontualidade no envio de mídias e prontidão técnica de parceiros credenciados.",
+        columns: ["#", "Fornecedor", "Escopo", "Índice de Qualidade", "Tempo Médio Reparo", "Classificação", "Status"],
+        rows: [
+          ["1", "ATRIA Broadcast Solutions", "Receptores & Ingest", "9.8 / 10", "< 2 horas", "Classe A", "<span class='badge badge-exibido'>Homologado</span>"],
+          ["2", "SatCom Brasil", "Manutenção de Antenas", "9.5 / 10", "< 4 horas", "Classe A", "<span class='badge badge-exibido'>Homologado</span>"],
+          ["3", "FiberLink Telecom", "Conectividade Praças", "9.2 / 10", "< 3 horas", "Classe B", "<span class='badge badge-exibido'>Homologado</span>"]
+        ]
+      },
+      solicitacoes: {
+        title: "Solicitações de Acesso",
+        desc: "Controle de pedidos de novos acessos, permissões no portal e credenciamento de técnicos e auditores.",
+        columns: ["#", "Solicitante", "Área", "Perfil Solicitado", "Data Solicitação", "Aprovador", "Status"],
+        rows: [
+          ["1", "Cassio Esteves de Oliveira", "Suporte Captação", "Administrador (Owner)", "18/11/2026", "Cleber Gonçalves", "<span class='badge badge-exibido'>Aprovado</span>"],
+          ["2", "Vinicius Dantas Ferreira", "Suporte Captação", "Administrador (Owner)", "18/11/2026", "Cleber Gonçalves", "<span class='badge badge-exibido'>Aprovado</span>"],
+          ["3", "Auditoria Externa", "Qualidade & Compliance", "Leitura (Viewer)", "10/11/2026", "Luiz Lemos", "<span class='badge badge-exibido'>Aprovado</span>"]
+        ]
+      },
+      sla: {
+        title: "SLA de Atendimento",
+        desc: "Métricas de tempo de resposta para incidentes de captação e transmissão ao vivo.",
+        columns: ["#", "Severidade", "Tempo Máximo Resposta", "Tempo Máximo Solução", "Meta Cumprimento", "Atingido 2026", "Status"],
+        rows: [
+          ["1", "Gravíssima (Sinal fora do ar)", "10 minutos", "45 minutos", "99.0%", "99.7%", "<span class='badge badge-exibido'>Conforme</span>"],
+          ["2", "Alta (Degradação de áudio/vídeo)", "20 minutos", "2 horas", "98.0%", "98.9%", "<span class='badge badge-exibido'>Conforme</span>"],
+          ["3", "Média (Alerta de telemetria)", "45 minutos", "6 horas", "95.0%", "97.4%", "<span class='badge badge-exibido'>Conforme</span>"]
+        ]
+      },
+      notificacoes: {
+        title: "Análise de Notificações",
+        desc: "Histórico de alertas disparados pelos sensores de monitoramento de fluxo de gravação.",
+        columns: ["#", "Estação / Praça", "Origem Alerta", "Tipo de Notificação", "Data / Hora", "Ação", "Status"],
+        rows: [
+          ["1", "BRMG-MCL-TDT (Montes Claros)", "Sensor ATRIA", "Oscilação de Bitrate", "18/11/2026 19:08", "Reconexão automática", "<span class='badge badge-exibido'>Resolvido</span>"],
+          ["2", "BRRO-VHA (Vilhena)", "Ping Watchdog", "Perda de Pacotes", "18/11/2026 19:05", "Alerta enviado N1", "<span class='badge badge-exibido'>Resolvido</span>"]
+        ]
+      },
+      backup: {
+        title: "Validação de Backup",
+        desc: "Auditoria diária de retenção de gravações brutas e logs de telemetria de todas as praças.",
+        columns: ["#", "Storage / Unidade", "Volume de Dados", "Última Sincronização", "Checksum SHA-256", "Status"],
+        rows: [
+          ["1", "Storage Ingest São Paulo", "42.8 TB", "18/11/2026 23:50", "OK (Validado)", "<span class='badge badge-exibido'>100% Íntegro</span>"],
+          ["2", "Storage Nuvem AWS / S3", "18.4 TB", "18/11/2026 23:45", "OK (Validado)", "<span class='badge badge-exibido'>100% Íntegro</span>"]
+        ]
+      },
+      analisedados: {
+        title: "Análise de Dados",
+        desc: "Relatórios de consolidação volumétrica de transmissões captadas e disponibilidade de praças.",
+        columns: ["#", "Métrica Analisada", "Período", "Total Eventos", "Taxa de Sucesso", "Tendência"],
+        rows: [
+          ["1", "Disponibilidade Global de Sinais", "Novembro/2026", "862 Jogos", "99.85%", "Estável ↗"],
+          ["2", "Tempo Médio de Atendimento N1", "Novembro/2026", "1.000 Ocorrências", "14 minutos", "Melhoria ↗"]
+        ]
+      },
+      falhas: {
+        title: "Confirmação de Falhas",
+        desc: "Registro de confirmação técnica de falhas de transmissão por motivo de força maior ou emissora local.",
+        columns: ["#", "Praça", "Emissora", "Motivo Confirmado", "Comprovação Oficial", "Status"],
+        rows: [
+          ["1", "Itumbiara / GO", "BAND", "Interrupção na geradora local da emissora", "Ofício da emissora anexado", "<span class='badge badge-exibido'>Confirmado</span>"],
+          ["2", "Resende / RJ", "Band Barra Mansa", "Manutenção na torre de transmissão", "E-mail de aviso do engenheiro", "<span class='badge badge-exibido'>Confirmado</span>"]
+        ]
+      },
+      automacoes: {
+        title: "Repositório de Automações",
+        desc: "Scripts autônomos, bots de ingest, rotinas de auditoria de esportes e sincronização com Google Sheets.",
+        columns: ["#", "Script / Bot", "Função", "Linguagem", "Execução", "Status"],
+        rows: [
+          ["1", "Monitor_Esportes.exe", "Auditoria autônoma YouTube Live & CazéTV com Grounding Oficial", "Python 3.12", "Serviço Contínuo", "<span class='badge badge-exibido'>Ativo</span>"],
+          ["2", "google_sheets_sync.py", "Sincronização bidirecional do Portal com Google Workspace", "Python 3.12", "Automático", "<span class='badge badge-exibido'>Ativo</span>"],
+          ["3", "audit_nba_autonomous.py", "Auditoria automatizada de transmissões NBA no Prime Video", "Python 3.12", "Noturno", "<span class='badge badge-exibido'>Ativo</span>"]
+        ]
+      },
+      redmine: {
+        title: "Redmine (Demandas e Melhorias)",
+        desc: "Acompanhamento de chamados e solicitações de melhoria do portal e infraestrutura de captação.",
+        columns: ["#", "ID Ticket", "Assunto / Demanda", "Autor", "Prioridade", "Situação"],
+        rows: [
+          ["1", "#9860", "Ajuste na rotina de detecção automática de TV BOX", "Vinicius Dantas", "Alta", "<span class='badge badge-exibido'>Resolvido</span>"],
+          ["2", "#9857", "Sincronização da escala 2026 com regras do Artigo 66 CLT", "Cleber Gonçalves", "Urgente", "<span class='badge badge-exibido'>Concluído</span>"],
+          ["3", "#9105", "Reconfiguração de receptores na praça Itumbiara", "Lucieudes Ferreira", "Normal", "<span class='badge badge-exibido'>Concluído</span>"]
+        ]
+      },
+      cidades: {
+        title: "Mapeamento de Cidades e Emissoras",
+        desc: "Catálogo completo de capitais, praças do interior e canais de TV monitorados no território nacional.",
+        columns: ["#", "Cidade / Praça", "UF", "Região", "Canais Monitorados", "Status da Captação"],
+        rows: [
+          ["1", "São Paulo", "SP", "Sudeste", "Globo, Record, SBT, Band, Cultura, Gazeta, RedeTV", "<span class='badge badge-exibido'>Operacional</span>"],
+          ["2", "Rio de Janeiro", "RJ", "Sudeste", "Globo RJ, Record RJ, SBT RJ, Band RJ", "<span class='badge badge-exibido'>Operacional</span>"],
+          ["3", "Montes Claros", "MG", "Sudeste", "InterTV Grande Minas, Record Minas, SBT", "<span class='badge badge-exibido'>Operacional</span>"],
+          ["4", "Vilhena", "RO", "Norte", "Rede Amazônica, TV Allamanda, SIC TV", "<span class='badge badge-exibido'>Operacional</span>"]
+        ]
+      },
+      gestaoservicos: {
+        title: "Painel de Gestão de Serviços dos CS",
+        desc: "Monitoramento de integridade e serviços das centrais de suporte e recepção distribuídas.",
+        columns: ["#", "Central (CS)", "Host", "Serviço Ingest", "Uptime", "Carga CPU", "Status"],
+        rows: [
+          ["1", "CS São Paulo 01", "BRSP-SAO-CPD01", "Daemon Ingest CazéTV", "99.98%", "18%", "<span class='badge badge-exibido'>Online</span>"],
+          ["2", "CS São Paulo 02", "BRSP-SAO-CPD02", "Daemon Ingest Prime Video", "99.95%", "22%", "<span class='badge badge-exibido'>Online</span>"],
+          ["3", "CS Rio de Janeiro", "BRRJ-RIO-CPD01", "Daemon Ingest Transmissões RJ", "99.90%", "15%", "<span class='badge badge-exibido'>Online</span>"]
+        ]
+      },
+      monitoramentocanais: {
+        title: "Monitoramento de Canais CS",
+        desc: "Supervisão em tempo real de feed de vídeo, áudio e status de gravação de cada canal ativo.",
+        columns: ["#", "Canal / Sinal", "Praça", "PVID", "Resolução", "Áudio", "Status Ingest"],
+        rows: [
+          ["1", "Cazé TV YouTube Live", "São Paulo / Nacional", "PV3623", "1080p60", "AAC Stereo", "<span class='badge badge-exibido'>Gravando</span>"],
+          ["2", "Amazon Prime Sports", "São Paulo / Nacional", "PV3687", "1080p60", "5.1 Surround", "<span class='badge badge-exibido'>Gravando</span>"],
+          ["3", "Globo SP HD", "São Paulo", "PV1001", "1080i", "Dolby Digital", "<span class='badge badge-exibido'>Gravando</span>"]
+        ]
+      },
+      redescs: {
+        title: "Configurações de Rede do CS",
+        desc: "Topologia de rede, faixas de IP e rotas dedicadas para ingest de dados das centrais.",
+        columns: ["#", "Central", "Interface", "IP / CIDR", "Gateway", "DNS Primário", "Status"],
+        rows: [
+          ["1", "CS Matriz São Paulo", "eth0 (Fibra 10G)", "10.1.0.10/24", "10.1.0.1", "10.1.0.2", "<span class='badge badge-exibido'>Ativo</span>"],
+          ["2", "CS Contingência Alphaville", "eth0 (Fibra 1G)", "10.2.0.10/24", "10.2.0.1", "10.1.0.2", "<span class='badge badge-exibido'>Ativo</span>"]
+        ]
+      },
+      redepcd: {
+        title: "Mapeamento de Rede do CPD",
+        desc: "Mapeamento físico e lógico de switches, servidores e PDUs nos racks do datacenter de captação.",
+        columns: ["#", "Equipamento", "Rack", "Unidade (U)", "IP de Gerência", "VLAN", "Status"],
+        rows: [
+          ["1", "Switch Core Cisco Nexus", "Rack A1", "U42-U44", "10.1.254.1", "VLAN 100", "<span class='badge badge-exibido'>Ativo</span>"],
+          ["2", "Servidor Ingest 01 (Dell R740)", "Rack A1", "U20-U22", "10.1.254.11", "VLAN 200", "<span class='badge badge-exibido'>Ativo</span>"],
+          ["3", "Servidor Ingest 02 (Dell R740)", "Rack A1", "U23-U25", "10.1.254.12", "VLAN 200", "<span class='badge badge-exibido'>Ativo</span>"]
+        ]
+      },
+      remoto: {
+        title: "Acesso Remoto & América Central",
+        desc: "Credenciamento de túneis seguros e acesso remoto às centrais de transmissão internacionais.",
+        columns: ["#", "País / Região", "Central", "Método de Conexão", "Autenticação", "Status"],
+        rows: [
+          ["1", "Costa Rica", "CS San José", "VPN IPsec WireGuard", "MFA Duo", "<span class='badge badge-exibido'>Conectado</span>"],
+          ["2", "Guatemala", "CS Cidade da Guatemala", "VPN IPsec WireGuard", "MFA Duo", "<span class='badge badge-exibido'>Conectado</span>"],
+          ["3", "Panamá", "CS Cidade do Panamá", "VPN IPsec WireGuard", "MFA Duo", "<span class='badge badge-exibido'>Conectado</span>"]
+        ]
+      },
+      relatoriosjogos: {
+        title: "Relatórios de Jogos (YouTube & NBA)",
+        desc: "Repositório oficial de relatórios de auditoria com parecer técnico e comprovação de horários CBF.",
+        columns: ["#", "Partida / Evento", "Transmissão", "Data do Jogo", "Horário Oficial", "Auditoria", "Relatório PDF"],
+        rows: [
+          ["1", "Flamengo x Vasco da Gama", "Cazé TV (YouTube)", "15/11/2026", "16:00 - 18:05", "100% Conforme", "<a href='#' class='btn-doc-download'>Baixar PDF (2 Páginas)</a>"],
+          ["2", "Palmeiras x Corinthians", "Cazé TV (YouTube)", "16/11/2026", "20:00 - 22:08", "100% Conforme", "<a href='#' class='btn-doc-download'>Baixar PDF (2 Páginas)</a>"],
+          ["3", "Boston Celtics x LA Lakers", "Amazon Prime (NBA)", "17/11/2026", "21:30 - 00:05", "100% Conforme", "<a href='#' class='btn-doc-download'>Baixar PDF (2 Páginas)</a>"]
+        ]
+      }
+    };
+
+    let currentGenericListKey = null;
+
+    function renderGenericList(listKey) {
+      currentGenericListKey = listKey;
+      const data = SP_LISTS_CATALOG[listKey];
+      if (!data) return;
+
+      const tEl = document.getElementById('list-viewer-title');
+      const dEl = document.getElementById('list-viewer-desc');
+      const thead = document.getElementById('list-viewer-thead');
+      const searchBox = document.getElementById('list-viewer-search');
+
+      if (tEl) tEl.innerHTML = data.title + ' <span class="star-icon">☆</span>';
+      if (dEl) dEl.innerText = data.desc;
+      if (searchBox) searchBox.value = '';
+
+      if (thead) {
+        thead.innerHTML = '<tr>' + data.columns.map((col, idx) => `<th class="${idx === 0 ? 'td-center' : ''}">${col}</th>`).join('') + '</tr>';
+      }
+
+      filterListViewerTable();
+    }
+
+    function filterListViewerTable() {
+      if (!currentGenericListKey) return;
+      const data = SP_LISTS_CATALOG[currentGenericListKey];
+      if (!data) return;
+
+      const q = (document.getElementById('list-viewer-search')?.value || '').toLowerCase().trim();
+      const tbody = document.getElementById('list-viewer-tbody');
+      const footer = document.getElementById('list-viewer-footer');
+
+      const filtered = data.rows.filter(row => {
+        if (!q) return true;
+        return row.some(cell => String(cell).toLowerCase().includes(q));
+      });
+
+      if (tbody) {
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="${data.columns.length}" style="text-align:center; padding: 24px; color: #94A3B8;">Nenhum registro encontrado para esta busca.</td></tr>`;
+        } else {
+          tbody.innerHTML = filtered.map(row => {
+            return '<tr>' + row.map((cell, idx) => `<td class="${idx === 0 ? 'td-center' : ''}">${cell}</td>`).join('') + '</tr>';
+          }).join('');
+        }
+      }
+
+      if (footer) {
+        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${data.rows.length}</b> registros &bull; Sincronizado com a esteira do SharePoint Online`;
+      }
+    }
+
+    function exportGenericListCSV() {
+      if (!currentGenericListKey) return;
+      const data = SP_LISTS_CATALOG[currentGenericListKey];
+      if (!data) return;
+
+      let csv = data.columns.join(';') + '\n';
+      data.rows.forEach(row => {
+        const cleanRow = row.map(c => `"${String(c).replace(/<[^>]+>/g, '').replace(/"/g, '""')}"`);
+        csv += cleanRow.join(';') + '\n';
+      });
+
+      const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sharepoint_${currentGenericListKey}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
     function showPane(paneId, title, desc) {
       document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.pane-container').forEach(pane => pane.classList.remove('active'));
 
       let targetPane = document.getElementById('pane-' + paneId);
       if (!targetPane) {
-        // Se for uma lista genérica do SharePoint, abre o visualizador de listas
+        // Se for uma das listas do catálogo SharePoint, renderiza no list-viewer
         targetPane = document.getElementById('pane-list-viewer');
-        if (targetPane) {
+        if (SP_LISTS_CATALOG[paneId]) {
+          renderGenericList(paneId);
+        } else if (targetPane) {
           const tEl = document.getElementById('list-viewer-title');
           const dEl = document.getElementById('list-viewer-desc');
-          if (tEl) tEl.innerHTML = (title || 'Lista do SharePoint: ' + paneId) + ' <span class="star-icon">☆</span>';
-          if (dEl) dEl.innerText = desc || 'Esta lista está sincronizada com a esteira oficial do SharePoint Online da Central de Suporte e Captação.';
+          if (tEl) tEl.innerHTML = (title || 'Lista: ' + paneId) + ' <span class="star-icon">☆</span>';
+          if (dEl) dEl.innerText = desc || 'Esta lista do SharePoint Online está sincronizada com a Central de Suporte e Captação.';
         }
       }
 
@@ -2616,13 +2932,27 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function toggleDropdown(btn) {
-      const parent = btn.parentElement;
+    function toggleDropdown(btn, ev) {
+      if (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+      }
+      const parent = btn.closest('.sp-menu-item');
+      if (!parent) return;
       const isOpen = parent.classList.contains('open');
       document.querySelectorAll('.sp-menu-item').forEach(item => item.classList.remove('open'));
       if (!isOpen) {
         parent.classList.add('open');
       }
+    }
+
+    function handleMenuClick(paneId, title, ev) {
+      if (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+      }
+      document.querySelectorAll('.sp-menu-item').forEach(item => item.classList.remove('open'));
+      showPane(paneId, title);
     }
 
     document.addEventListener('click', function(e) {
@@ -3452,6 +3782,10 @@
     window.toggleOcoSort = toggleOcoSort;
     window.searchHostInOco = searchHostInOco;
     window.toggleDropdown = toggleDropdown;
+    window.handleMenuClick = handleMenuClick;
+    window.filterListViewerTable = filterListViewerTable;
+    window.exportGenericListCSV = exportGenericListCSV;
+    window.renderGenericList = renderGenericList;
     window.renderAntenistasTable = renderAntenistasTable;
     window.renderHostsTable = renderHostsTable;
 
