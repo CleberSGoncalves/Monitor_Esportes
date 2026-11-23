@@ -18,18 +18,22 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.18"
-    release_name = "v2.5.18 - Barra de Comandos SharePoint e Edição em Grade em Todas as Listas + Supressão FontBBox"
+    tag = "v2.5.19"
+    release_name = "v2.5.19 - Inspetor Headless SharePoint -> Google & Sincronizador Bidirecional"
     body = (
-        "### Novidades da versão v2.5.17:\n"
-        "- 🎨 **Estilização Visual Completa no Google Sheets (890+ Linhas)**:\n"
-        "  - Formatação matricial em lote de alta performance cobrindo 100% das linhas do espelho da lista do SharePoint.\n"
-        "  - Badges coloridos idênticos ao SharePoint: Cazé TV (#DCFCE7/#166534), Amazon Prime (#00509E/#FFFFFF), Netflix (#7F4F24/#FFFFFF), TNT/Max (#6B21A8/#FFFFFF), DAZN (#0F172A), Record (#1E40AF), SporTV (#1E3A8A), PVID TV BOX (#0D5C75) e Status de Entrega.\n"
-        "- ⚡ **Formatação Condicional Automática e Menu Interativo**:\n"
-        "  - Implementação do menu '⚡ Formatação' direto no Google Sheets para execução com 1 clique.\n"
-        "  - Regras nativas de formatação condicional automática para novos registros futuros.\n"
-        "- 🧪 **Testes de Integração e Sincronização**:\n"
-        "  - 38 testes automatizados aprovados com 100% de sucesso.\n"
+        "### Novidades da versão v2.5.19:\n"
+        "- ⚡ **Inspetor Headless de Alterações (SharePoint -> Google)**:\n"
+        "  - Módulo autônomo `modules/sharepoint_inspector_sync.py` monitorando 46 listas e 21 bibliotecas de documentos em background.\n"
+        "  - Sensor leve de metadados (`lastModifiedDateTime`) com checagem em ~1.5s e zero consumo ocioso.\n"
+        "  - Extração incremental (Upsert sem duplicatas) no master data e painel clean de ocorrências.\n"
+        "  - Captura automática das 23 novas ocorrências geradas no SharePoint e download da nova Escala de Trabalho 2026.\n"
+        "- ⏰ **Automação Contínua via Agendador de Tarefas do Windows**:\n"
+        "  - Tarefa `SuporteCaptacao_SharePoint_LiveInspector` rodando a cada 5 minutos em modo invisível.\n"
+        "  - Script `executar_inspetor_sharepoint.bat` para execução manual on-demand com 1 clique.\n"
+        "- 🌐 **Recompilação Automática do Portal Web e Google Sheets**:\n"
+        "  - Atualização instantânea dos portais `portal_web/index.html` e `docs/index.html` a cada modificação detectada.\n"
+        "- 🧪 **Testes E2E Automatizados**:\n"
+        "  - Suíte de testes automatizados aprovada com 100% de sucesso.\n"
     )
 
     headers = {

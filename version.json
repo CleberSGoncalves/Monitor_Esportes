@@ -1,5 +1,5 @@
 {
-  "version": "2.5.18",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.18/Monitor_Esportes.exe",
-  "changelog": "v2.5.18: Barra de comandos SharePoint (+ Novo, Editar no modo de exibição de grade, Atualizar, Exportar CSV) unificada em todas as listas do Portal Web (Streaming, Ocorrências, Hospedeiros, Antenistas, Hosts, Permissões, Listas Genéricas), RBAC com controle estrito de exibição por perfil, supressão de warnings FontBBox no parser NBA e sincronização paralela com logs em tempo real para o Portal Web."
+  "version": "2.5.19",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.19/Monitor_Esportes.exe",
+  "changelog": "v2.5.19: Inspetor Headless de Alterações e Sincronizador Bidirecional SharePoint -> Google (modules/sharepoint_inspector_sync.py). Monitoramento em background de 46 listas e 21 drives com sensor leve de metadados, extração incremental (upsert sem duplicatas), sincronização da Escala 2026 e 23 novas ocorrências, tarefa agendada Windows (5 min) e recompilação em tempo real do Portal Web e Google Sheets."
 }

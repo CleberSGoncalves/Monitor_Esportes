@@ -1,0 +1,510 @@
+{
+  "last_scan_utc": "2026-11-23T13:09:58.429365+00:00",
+  "lists": {
+    "Cadastro - Hosts": {
+      "id": "f61d5727-9464-4d1e-9deb-133741ec64ee",
+      "lastModifiedDateTime": "2026-11-18T22:04:45Z",
+      "last_synced_modified": "2026-11-18T22:04:45Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Mapa Campeonatos 2026 SAM": {
+      "id": "8e9ce0d6-7754-4323-9708-17325d990cfe",
+      "lastModifiedDateTime": "2026-11-19T03:12:40Z",
+      "last_synced_modified": "2026-11-19T03:12:40Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Ficha de Capacitação": {
+      "id": "27e2ab94-d5aa-4539-af1e-1e0fe9a644f1",
+      "lastModifiedDateTime": "2026-11-19T03:21:49Z",
+      "last_synced_modified": "2026-11-19T03:21:49Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Documentos": {
+      "id": "e6769e9f-0ad8-40ef-8b19-20c9e5f87b7e",
+      "lastModifiedDateTime": "2026-11-23T08:36:52Z",
+      "last_synced_modified": "2026-11-23T08:36:52Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Acesso Remote Control - America Central": {
+      "id": "16cdc917-70ce-4477-af69-30e6405e3294",
+      "lastModifiedDateTime": "2026-11-19T02:32:36Z",
+      "last_synced_modified": "2026-11-19T02:32:36Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "data_hosts": {
+      "id": "b2a846c5-e4b6-49fa-b0ff-3429ecd8b6b5",
+      "lastModifiedDateTime": "2026-02-26T17:24:55Z",
+      "last_synced_modified": "2026-02-26T17:24:55Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "data_cidades": {
+      "id": "3999da83-07cf-48c1-b5bd-355a8a2c01a3",
+      "lastModifiedDateTime": "2026-11-19T03:17:59Z",
+      "last_synced_modified": "2026-11-19T03:17:59Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "LogosEmissoras": {
+      "id": "ba8b9c74-98ed-4e5f-90f3-36886989c5c5",
+      "lastModifiedDateTime": "2026-11-19T03:21:54Z",
+      "last_synced_modified": "2026-11-19T03:21:54Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Tratativa de Problemas de captação": {
+      "id": "ded1b3ae-698d-470d-aab9-3b1697d2f719",
+      "lastModifiedDateTime": "2026-11-19T03:12:56Z",
+      "last_synced_modified": "2026-11-19T03:12:56Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Mapeamento de Rede do CPD": {
+      "id": "c8619e5a-d213-4b6a-ad49-3ece1888146a",
+      "lastModifiedDateTime": "2026-11-19T03:12:58Z",
+      "last_synced_modified": "2026-11-19T03:12:58Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Eventos": {
+      "id": "4842641f-de4f-463e-9682-417c1be09ffe",
+      "lastModifiedDateTime": "2026-11-19T04:20:28Z",
+      "last_synced_modified": "2026-11-19T04:20:28Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Procedimentos": {
+      "id": "c72ff4ae-9a06-45d1-ba75-46b8689b89d9",
+      "lastModifiedDateTime": "2026-11-18T22:29:58Z",
+      "last_synced_modified": "2026-11-18T22:29:58Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Avaliação Técnica de Fornecedores": {
+      "id": "f22b1d47-0fcf-4191-8d7a-46f6d6dbfe73",
+      "lastModifiedDateTime": "2026-11-18T21:20:13Z",
+      "last_synced_modified": "2026-11-18T21:20:13Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Acesso Remoto": {
+      "id": "612b4399-d3b2-40a0-821c-5473e8b8c6b4",
+      "lastModifiedDateTime": "2026-11-18T19:10:23Z",
+      "last_synced_modified": "2026-11-18T19:10:23Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Projetos": {
+      "id": "a0409b29-be0b-405a-92ba-5a8e341b1ebc",
+      "lastModifiedDateTime": "2026-09-22T19:42:55Z",
+      "last_synced_modified": "2026-09-22T19:42:55Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Contatos do Suporte Captação": {
+      "id": "696a3406-3ae4-436e-808f-5c3eb4b3f80a",
+      "lastModifiedDateTime": "2026-11-19T01:40:39Z",
+      "last_synced_modified": "2026-11-19T01:40:39Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Repositorio_Automacoes": {
+      "id": "7c3aaf7b-8185-4c80-b872-62f848274886",
+      "lastModifiedDateTime": "2026-11-18T19:30:34Z",
+      "last_synced_modified": "2026-11-18T19:30:34Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Escala de trabalho": {
+      "id": "bfc20c52-eb79-4638-b249-71020125d50d",
+      "lastModifiedDateTime": "2026-11-23T12:18:01Z",
+      "last_synced_modified": "2026-11-23T12:18:01Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Configurações de Rede do CS": {
+      "id": "70dcceaa-be2f-4f2d-8b44-78d93cb56a72",
+      "lastModifiedDateTime": "2026-11-18T20:11:15Z",
+      "last_synced_modified": "2026-11-18T20:11:15Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "data_emissoras_logo": {
+      "id": "9d120bb8-2ef2-484b-9ff0-7d78a6c2aabd",
+      "lastModifiedDateTime": "2026-11-19T03:22:06Z",
+      "last_synced_modified": "2026-11-19T03:22:06Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Solicitações de Acesso": {
+      "id": "f47e41ef-9da0-402e-b845-7ebb38fc200c",
+      "lastModifiedDateTime": "2026-11-19T03:13:23Z",
+      "last_synced_modified": "2026-11-19T03:13:23Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Controle de contratos parceiros": {
+      "id": "2ca95d72-da5b-4ae6-88d9-8060649b880c",
+      "lastModifiedDateTime": "2026-11-18T22:00:07Z",
+      "last_synced_modified": "2026-11-18T22:00:07Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Metas": {
+      "id": "5472a98e-c67f-402f-a84f-827a4bf2d949",
+      "lastModifiedDateTime": "2026-11-19T01:39:28Z",
+      "last_synced_modified": "2026-11-19T01:39:28Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "data_unificado_pvs_cidade_regiao": {
+      "id": "5011d066-68c2-49ba-8759-85f682d1f299",
+      "lastModifiedDateTime": "2026-11-19T03:22:09Z",
+      "last_synced_modified": "2026-11-19T03:22:09Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "data_emissoras": {
+      "id": "296caa9d-e324-4209-84db-89e953d9b5f1",
+      "lastModifiedDateTime": "2026-11-19T03:22:10Z",
+      "last_synced_modified": "2026-11-19T03:22:10Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Documentos Técnicos": {
+      "id": "8f33d954-473c-47d1-9f7a-90879d99a25c",
+      "lastModifiedDateTime": "2026-11-19T01:44:10Z",
+      "last_synced_modified": "2026-11-19T01:44:10Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Validação de Backup": {
+      "id": "304e3893-02b6-494f-8148-9690736aa0c0",
+      "lastModifiedDateTime": "2026-11-19T03:22:11Z",
+      "last_synced_modified": "2026-11-19T03:22:11Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Confirmação de Falhas Suporte Captação": {
+      "id": "3cdaadd3-cdc0-4b15-a389-98919be04da1",
+      "lastModifiedDateTime": "2026-11-19T02:00:16Z",
+      "last_synced_modified": "2026-11-19T02:00:16Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Mapeamento de Streaming CGD": {
+      "id": "daf41a50-7230-429f-a548-9e50819c3226",
+      "lastModifiedDateTime": "2026-11-19T03:22:13Z",
+      "last_synced_modified": "2026-11-19T03:22:13Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Análise de Notificações": {
+      "id": "4875375f-8be1-491f-9d13-c6fd30760baf",
+      "lastModifiedDateTime": "2026-11-18T22:21:29Z",
+      "last_synced_modified": "2026-11-18T22:21:29Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Relatorio Jogos Youtube": {
+      "id": "f524737d-87c4-4c65-b540-d6583eda61d9",
+      "lastModifiedDateTime": "2026-11-23T12:21:34Z",
+      "last_synced_modified": "2026-11-23T12:21:34Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "SLA": {
+      "id": "5c5c3222-0458-4ddc-8d65-db00e377af1a",
+      "lastModifiedDateTime": "2026-11-19T20:33:23Z",
+      "last_synced_modified": "2026-11-19T20:33:23Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Redmine_JSON": {
+      "id": "00242f62-c62b-46c2-ab1f-de4218c1d1de",
+      "lastModifiedDateTime": "2026-11-19T03:22:20Z",
+      "last_synced_modified": "2026-11-19T03:22:20Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Analise de Dados": {
+      "id": "d58990bf-6ef2-420f-b8fb-e00a01c3c5c8",
+      "lastModifiedDateTime": "2026-11-19T03:22:20Z",
+      "last_synced_modified": "2026-11-19T03:22:20Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Relatorios_de_Jogos_NBA": {
+      "id": "fa332a4b-5c46-433f-953d-e0534a9f5ecd",
+      "lastModifiedDateTime": "2026-11-23T13:06:09Z",
+      "last_synced_modified": "2026-11-23T13:06:09Z",
+      "last_synced_at": "2026-11-23T13:09:44.757422+00:00",
+      "inserted_count": 0,
+      "updated_count": 50
+    },
+    "Redmine": {
+      "id": "dead8ceb-e9b7-455b-8b4f-e235127d956b",
+      "lastModifiedDateTime": "2026-11-23T12:45:08Z",
+      "last_synced_modified": "2026-11-23T12:45:08Z",
+      "last_synced_at": "2026-11-23T12:49:10.041847+00:00",
+      "inserted_count": 50,
+      "updated_count": 0
+    },
+    "Cidades": {
+      "id": "95057727-55a9-4c78-989e-e82fc4197b07",
+      "lastModifiedDateTime": "2026-11-19T02:36:00Z",
+      "last_synced_modified": "2026-11-19T02:36:00Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Relatorios_de_Jogos": {
+      "id": "ae3e2afa-d937-41ad-af48-ecd65fd86143",
+      "lastModifiedDateTime": "2026-11-23T12:46:37Z",
+      "last_synced_modified": "2026-11-23T12:46:37Z",
+      "last_synced_at": "2026-11-23T12:49:11.434912+00:00",
+      "inserted_count": 44,
+      "updated_count": 0
+    },
+    "Extensões de Modelo da Web": {
+      "id": "501d906f-64a6-401b-9a90-f6e2c82da5fd",
+      "lastModifiedDateTime": "2026-10-26T13:27:02Z",
+      "last_synced_modified": "2026-10-26T13:27:02Z",
+      "last_synced_at": "2026-11-23T12:41:15.616971+00:00"
+    },
+    "Links de Internet dos Parceiros": {
+      "id": "ba4dbfea-3224-4e2f-bbbd-5fc13d8abee2",
+      "lastModifiedDateTime": "2026-11-19T03:22:01Z",
+      "last_synced_modified": "2026-11-19T03:22:01Z",
+      "last_synced_at": "2026-11-23T12:41:18.086719+00:00",
+      "inserted_count": 50,
+      "updated_count": 0
+    },
+    "Programação de eventos - Streaming": {
+      "id": "f7e25960-cf15-4ed8-b88c-bf607dc90a0f",
+      "lastModifiedDateTime": "2026-11-18T22:17:34Z",
+      "last_synced_modified": "2026-11-18T22:17:34Z",
+      "last_synced_at": "2026-11-23T12:41:19.159674+00:00",
+      "inserted_count": 50,
+      "updated_count": 0
+    },
+    "Painel de gestão de serviços dos CS": {
+      "id": "2e2afc16-dfd6-4277-a16c-cd78bdd2e769",
+      "lastModifiedDateTime": "2026-11-23T13:06:17Z",
+      "last_synced_modified": "2026-11-23T13:06:17Z",
+      "last_synced_at": "2026-11-23T13:09:37.036261+00:00",
+      "inserted_count": 0,
+      "updated_count": 50
+    },
+    "Painel de Ocorrências": {
+      "id": "9d23cb01-b29c-45e6-9ae7-cfac1d1dd598",
+      "lastModifiedDateTime": "2026-11-23T12:35:55Z",
+      "last_synced_modified": "2026-11-23T12:35:55Z",
+      "last_synced_at": "2026-11-23T12:41:21.795604+00:00",
+      "inserted_count": 50,
+      "updated_count": 0
+    },
+    "Monitoramento de Canais CS": {
+      "id": "b0ffcdd7-a0e7-4eb0-a5e8-e2142776b8eb",
+      "lastModifiedDateTime": "2026-11-23T13:05:02Z",
+      "last_synced_modified": "2026-11-23T13:05:02Z",
+      "last_synced_at": "2026-11-23T13:09:58.429365+00:00",
+      "inserted_count": 0,
+      "updated_count": 50
+    },
+    "Contatos de Antenistas": {
+      "id": "439bd00c-bf8a-4e40-ab5e-ec539ca4cb5e",
+      "lastModifiedDateTime": "2026-11-19T01:40:40Z",
+      "last_synced_modified": "2026-11-19T01:40:40Z",
+      "last_synced_at": "2026-11-23T12:41:24.824968+00:00",
+      "inserted_count": 5,
+      "updated_count": 0
+    },
+    "Contato Técnico de Hospedeiros": {
+      "id": "9f02aa6a-fb0c-4d6c-a2f6-f80708bbadac",
+      "lastModifiedDateTime": "2026-11-19T01:40:33Z",
+      "last_synced_modified": "2026-11-19T01:40:33Z",
+      "last_synced_at": "2026-11-23T12:41:26.388625+00:00",
+      "inserted_count": 50,
+      "updated_count": 0
+    }
+  },
+  "drives": {
+    "Mapa Campeonatos 2026 SAM": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuDW4JyOVHcjQ5cIFzJdmQz-",
+      "lastModifiedDateTime": "2026-09-01T03:55:00Z",
+      "last_synced_modified": "2026-09-01T03:55:00Z",
+      "last_synced_at": "2026-11-23T12:33:04.142509+00:00"
+    },
+    "Ficha de Capacitação": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuCUq-InqtU5Ra8eHg_ppkTx",
+      "lastModifiedDateTime": "2026-04-09T13:13:31Z",
+      "last_synced_modified": "2026-04-09T13:13:31Z",
+      "last_synced_at": "2026-11-23T12:33:04.142648+00:00"
+    },
+    "Documentos": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuCfnnbm2ArvQIsZIMnl-Ht-",
+      "lastModifiedDateTime": "2026-11-19T12:44:50Z",
+      "last_synced_modified": "2026-11-19T12:44:50Z",
+      "last_synced_at": "2026-11-23T12:33:04.142648+00:00"
+    },
+    "LogosEmissoras": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuB0nIu67ZhfTpDzNohpicXF",
+      "lastModifiedDateTime": "2026-02-23T13:15:35Z",
+      "last_synced_modified": "2026-02-23T13:15:35Z",
+      "last_synced_at": "2026-11-23T12:33:04.142648+00:00"
+    },
+    "Tratativa de Problemas de captação": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuCus9HejWkNR6q5OxaX0vcZ",
+      "lastModifiedDateTime": "2026-05-25T13:01:33Z",
+      "last_synced_modified": "2026-05-25T13:01:33Z",
+      "last_synced_at": "2026-11-23T12:33:04.142648+00:00"
+    },
+    "Procedimentos": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuCu9C_HBprRRbp1Rrhom4nZ",
+      "lastModifiedDateTime": "2026-04-09T13:13:23Z",
+      "last_synced_modified": "2026-04-09T13:13:23Z",
+      "last_synced_at": "2026-11-23T12:33:04.142648+00:00"
+    },
+    "Avaliação Técnica de Fornecedores": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuBHHSvyzw-RQY16RvbW2_5z",
+      "lastModifiedDateTime": "2026-04-29T13:40:06Z",
+      "last_synced_modified": "2026-04-29T13:40:06Z",
+      "last_synced_at": "2026-11-23T12:33:04.142648+00:00"
+    },
+    "Acesso Remoto": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuCZQythstOgQIIcVHPouMa0",
+      "lastModifiedDateTime": "2026-02-26T16:41:06Z",
+      "last_synced_modified": "2026-02-26T16:41:06Z",
+      "last_synced_at": "2026-11-23T12:33:04.142648+00:00"
+    },
+    "Projetos": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuApm0CgC75aQJK6Wo40Gx68",
+      "lastModifiedDateTime": "2026-09-22T19:42:54Z",
+      "last_synced_modified": "2026-09-22T19:42:54Z",
+      "last_synced_at": "2026-11-23T12:33:04.142648+00:00"
+    },
+    "Repositorio_Automacoes": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuB7rzp8hYGATLhyYvhIJ0iG",
+      "lastModifiedDateTime": "2026-10-23T23:05:09Z",
+      "last_synced_modified": "2026-10-23T23:05:09Z",
+      "last_synced_at": "2026-11-23T12:33:04.142648+00:00"
+    },
+    "Escala de trabalho": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuBSDMK_ees4RrJJcQIBJdUN",
+      "lastModifiedDateTime": "2026-02-26T11:50:02Z",
+      "last_synced_modified": "2026-02-26T11:50:02Z",
+      "last_synced_at": "2026-11-23T12:33:07.673685+00:00"
+    },
+    "Controle de contratos parceiros": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuByXaksW9rmSojZgGBkm4gM",
+      "lastModifiedDateTime": "2026-04-15T19:03:44Z",
+      "last_synced_modified": "2026-04-15T19:03:44Z",
+      "last_synced_at": "2026-11-23T12:33:07.673685+00:00"
+    },
+    "Metas": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuCOqXJUf8YvQKhPgnpL8tlJ",
+      "lastModifiedDateTime": "2026-08-19T16:45:59Z",
+      "last_synced_modified": "2026-08-19T16:45:59Z",
+      "last_synced_at": "2026-11-23T12:33:07.673685+00:00"
+    },
+    "Documentos Técnicos": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuBU2TOPPEfRR596kIedmaJc",
+      "lastModifiedDateTime": "2026-05-15T05:04:41Z",
+      "last_synced_modified": "2026-05-15T05:04:41Z",
+      "last_synced_at": "2026-11-23T12:33:07.673685+00:00"
+    },
+    "Análise de Notificações": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuBfN3VI4YsfSZ0Txv0wdguv",
+      "lastModifiedDateTime": "2026-07-20T18:46:44Z",
+      "last_synced_modified": "2026-07-20T18:46:44Z",
+      "last_synced_at": "2026-11-23T12:33:07.673685+00:00"
+    },
+    "Relatorio Jogos Youtube": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuB9cyT1xIdlTLVA1lg-2mHZ",
+      "lastModifiedDateTime": "2026-11-23T12:21:33Z",
+      "last_synced_modified": "2026-11-23T12:21:33Z",
+      "last_synced_at": "2026-11-23T12:33:07.673685+00:00"
+    },
+    "SLA": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuAiMlxcWATcTY1l2wDjd68a",
+      "lastModifiedDateTime": "2026-03-02T12:52:41Z",
+      "last_synced_modified": "2026-03-02T12:52:41Z",
+      "last_synced_at": "2026-11-23T12:33:07.673685+00:00"
+    },
+    "Redmine_JSON": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuBiLyQAK8bCRqsf3kIYwdHe",
+      "lastModifiedDateTime": "2026-09-22T08:40:54Z",
+      "last_synced_modified": "2026-09-22T08:40:54Z",
+      "last_synced_at": "2026-11-23T12:33:07.673685+00:00"
+    },
+    "Analise de Dados": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuC_kInV8m4PQrj74AoBw8XI",
+      "lastModifiedDateTime": "2026-04-20T16:28:09Z",
+      "last_synced_modified": "2026-04-20T16:28:09Z",
+      "last_synced_at": "2026-11-23T12:33:07.673685+00:00"
+    },
+    "Relatorios_de_Jogos_NBA": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuBLKjP6Rlw_Q5U94FNKn17N",
+      "lastModifiedDateTime": "2026-11-23T12:29:04Z",
+      "last_synced_modified": "2026-11-23T12:29:04Z",
+      "last_synced_at": "2026-11-23T12:33:07.673685+00:00"
+    },
+    "Relatorios_de_Jogos": {
+      "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuD6Kj6uN9mtQa9I7NZf2GFD",
+      "lastModifiedDateTime": "2026-11-23T12:46:31Z",
+      "last_synced_modified": "2026-11-23T12:46:31Z",
+      "last_synced_at": "2026-11-23T12:49:11.434912+00:00"
+    }
+  },
+  "sync_history": [
+    {
+      "timestamp": "2026-11-23T12:33:07.673685+00:00",
+      "lists_synced": [],
+      "items_inserted": 0,
+      "items_updated": 0
+    },
+    {
+      "timestamp": "2026-11-23T12:41:26.389465+00:00",
+      "lists_synced": [
+        "Links de Internet dos Parceiros",
+        "Programação de eventos - Streaming",
+        "Painel de gestão de serviços dos CS",
+        "Painel de Ocorrências",
+        "Monitoramento de Canais CS",
+        "Contatos de Antenistas",
+        "Contato Técnico de Hospedeiros"
+      ],
+      "items_inserted": 305,
+      "items_updated": 0
+    },
+    {
+      "timestamp": "2026-11-23T12:42:09.221363+00:00",
+      "lists_synced": [
+        "Relatorios_de_Jogos_NBA"
+      ],
+      "items_inserted": 50,
+      "items_updated": 0
+    },
+    {
+      "timestamp": "2026-11-23T12:49:11.434912+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine",
+        "Relatorios_de_Jogos"
+      ],
+      "items_inserted": 135,
+      "items_updated": 109
+    },
+    {
+      "timestamp": "2026-11-23T12:54:11.564497+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 26,
+      "items_updated": 124
+    },
+    {
+      "timestamp": "2026-11-23T12:59:06.642840+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 10,
+      "items_updated": 90
+    },
+    {
+      "timestamp": "2026-11-23T13:04:43.303741+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 2,
+      "items_updated": 148
+    },
+    {
+      "timestamp": "2026-11-23T13:09:58.429365+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 0,
+      "items_updated": 150
+    }
+  ]
+}
