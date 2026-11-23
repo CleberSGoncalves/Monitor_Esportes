@@ -4746,7 +4746,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const preview = document.getElementById("chat-agenda-preview");
       if (!modal) return;
 
-      const savedUrl = localStorage.getItem("google_chat_webhook_url") || "";
+      const savedUrl = localStorage.getItem("google_chat_webhook_url") || "https://chat.googleapis.com/v1/spaces/AAQAwrsZx6Q/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=V7DMEzDmcOEd444Z14GaCw36MtFChugL56ypFbOfbYA";
       if (input) input.value = savedUrl;
 
       const now = new Date();

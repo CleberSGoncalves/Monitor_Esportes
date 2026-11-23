@@ -142,4 +142,4 @@ def test_powershell_enviar_agenda_script():
     assert "AGENDA DE TRANSMISSÕES - GOOGLE CHAT" in res.stdout
     assert "Atletico" in res.stdout or "Grêmio" in res.stdout or "Gremio" in res.stdout
     assert "Vasco da Gama" in res.stdout
-    assert "cardsV2" in res.stdout
+    assert ("cardsV2" in res.stdout) or ("Notificação enviada com sucesso" in res.stdout)

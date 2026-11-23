@@ -1,5 +1,5 @@
 {
-  "streaming_webhook_url": "",
+  "streaming_webhook_url": "https://chat.googleapis.com/v1/spaces/AAQAwrsZx6Q/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=V7DMEzDmcOEd444Z14GaCw36MtFChugL56ypFbOfbYA",
   "agendamento_diario": "09:00",
   "descricao": "Webhook oficial do espaço 'Streaming - Gravações' no Google Chat (Suporte Captação LATAM)"
 }

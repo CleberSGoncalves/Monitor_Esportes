@@ -31,6 +31,18 @@ param(
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
+# Carregar Webhook padrão de config se não informado
+if ([string]::IsNullOrWhiteSpace($WebhookUrl)) {
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $cfgPath = Join-Path (Split-Path -Parent $scriptDir) "config\google_chat_webhook.json"
+    if (Test-Path $cfgPath) {
+        try {
+            $cfgJson = Get-Content -Path $cfgPath -Raw -Encoding UTF8 | ConvertFrom-Json
+            $WebhookUrl = $cfgJson.streaming_webhook_url
+        } catch {}
+    }
+}
+
 # Determinar datas de Hoje e Amanhã
 if ([string]::IsNullOrWhiteSpace($DataBase)) {
     $dtHoje = Get-Date
