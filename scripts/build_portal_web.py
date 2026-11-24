@@ -2482,7 +2482,109 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <!-- ABA 5: PAINEL DE OCORRÊNCIAS & HISTÓRICO DE INCIDENTES (1:1 COM SHAREPOINT) -->
-    <div id="pane-ocorrencias" class="pane-container">
+    
+    <!-- =========================================================================
+         CENTRO DE GERENCIAMENTO RDP & AMÉRICA CENTRAL (NOC ACCESS HUB)
+         ========================================================================= -->
+    <div id="pane-remoto" class="pane-container">
+      <div class="sp-command-bar">
+        <div class="sp-command-left">
+          <button class="sp-btn-new" onclick="exportRdpCSV()" title="Exportar inventário RDP completo">
+            <span>📥</span> Exportar Planilha NOC (CSV)
+          </button>
+          <button class="sp-btn-cmd" onclick="renderRdpTable()">
+            <span>↺</span> Atualizar Conexões
+          </button>
+          <button class="sp-btn-cmd" onclick="window.open('https://adgbl.sharepoint.com/sites/suportecaptacao/Acesso%20Remoto', '_blank')">
+            <span>☁️</span> Abrir Pasta no SharePoint
+          </button>
+        </div>
+        <div class="sp-command-search">
+          <input type="text" id="search-rdp-box" placeholder="Filtrar por praça, IP, país ou roteador..." oninput="filterRdpTable()">
+        </div>
+      </div>
+
+      <div class="sp-list-header-row" style="margin-top: 10px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <div>
+            <h2 class="sp-list-main-title" style="display: flex; align-items: center; gap: 8px;">
+              <span>🎮</span> Centro de Gerenciamento RDP & Acesso Remoto <span class="star-icon">☆</span>
+            </h2>
+            <p style="margin: 3px 0 0; font-size: 13px; color: var(--sp-text-secondary);">
+              Acesso direto 1-clique aos servidores CS1, CS2, CS3, Roteadores e Réguas de Energia (PDU Volt) de todas as praças do Brasil e América Central.
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <span class="badge" style="background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; font-weight: 600; padding: 4px 10px;">151 Praças Homologadas</span>
+            <span class="badge" style="background: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; font-weight: 600; padding: 4px 10px;">Latência Zero / RDP Nativo</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARDS DE RESUMO RÁPIDO -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px;">
+        <div style="background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 18px; border-left: 4px solid #0078D4;">
+          <div style="font-size: 11.5px; color: #64748B; font-weight: 600; text-transform: uppercase;">Total de Praças Monitoradas</div>
+          <div style="font-size: 24px; font-weight: 800; color: #1E293B; margin-top: 4px;" id="rdp-kpi-total">151</div>
+          <div style="font-size: 11px; color: #059669; margin-top: 2px;">✔ 137 Brasil &bull; 14 América Central</div>
+        </div>
+
+        <div style="background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 18px; border-left: 4px solid #10B981;">
+          <div style="font-size: 11.5px; color: #64748B; font-weight: 600; text-transform: uppercase;">Servidores de Captura Ativos</div>
+          <div style="font-size: 24px; font-weight: 800; color: #1E293B; margin-top: 4px;">247 CS</div>
+          <div style="font-size: 11px; color: #64748B; margin-top: 2px;">CS1 + CS2 + CS3 integrados</div>
+        </div>
+
+        <div style="background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 18px; border-left: 4px solid #8B5CF6;">
+          <div style="font-size: 11.5px; color: #64748B; font-weight: 600; text-transform: uppercase;">Controle de Energia (PDU Volt)</div>
+          <div style="font-size: 24px; font-weight: 800; color: #1E293B; margin-top: 4px;">148 Nós</div>
+          <div style="font-size: 11px; color: #64748B; margin-top: 2px;">Reset remoto de tomada em 1 clique</div>
+        </div>
+
+        <div style="background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 18px; border-left: 4px solid #F59E0B;">
+          <div style="font-size: 11.5px; color: #64748B; font-weight: 600; text-transform: uppercase;">Modo de Conexão RDP</div>
+          <div style="font-size: 24px; font-weight: 800; color: #1E293B; margin-top: 4px;">Direto (.rdp)</div>
+          <div style="font-size: 11px; color: #64748B; margin-top: 2px;">Geração instantânea sem senhas no browser</div>
+        </div>
+      </div>
+
+      <!-- BARRA DE FILTROS POR CATEGORIA -->
+      <div style="display: flex; gap: 8px; margin-top: 16px; margin-bottom: 12px; flex-wrap: wrap;">
+        <button class="sp-btn-cmd rdp-cat-pill active" onclick="setRdpCategory('all', this)">Todas as Praças (151)</button>
+        <button class="sp-btn-cmd rdp-cat-pill" onclick="setRdpCategory('Brasil', this)">🇧🇷 Brasil (137)</button>
+        <button class="sp-btn-cmd rdp-cat-pill" onclick="setRdpCategory('América Central', this)">🌎 América Central & LATAM (14)</button>
+        <button class="sp-btn-cmd rdp-cat-pill" onclick="setRdpCategory('Volt', this)">⚡ Com PDU Volt</button>
+      </div>
+
+      <!-- TABELA RDP OFICIAL -->
+      <div class="sp-table-scroll-wrap" style="background: white; border: 1px solid #E2E8F0; border-radius: 6px;">
+        <table class="sp-data-table" id="rdp-master-table">
+          <thead>
+            <tr>
+              <th style="width: 45px; text-align: center;">#</th>
+              <th>Região / País</th>
+              <th>Praça / Cidade</th>
+              <th>Roteador (Gateway)</th>
+              <th>CS 1 (IP / Conexão)</th>
+              <th>CS 2 (IP / Conexão)</th>
+              <th>CS 3 (IP / Conexão)</th>
+              <th>PDU Volt (Reset Energia)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="rdp-table-body">
+            <!-- Renderizado dinamicamente via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 12.5px; color: var(--sp-text-secondary); display: flex; justify-content: space-between; align-items: center;">
+        <div id="rdp-table-footer">Mostrando <b>151</b> de <b>151</b> nós remotos</div>
+        <div style="color: #64748B; font-size: 11.5px;">Protocolo RDP homologado &bull; Porta padrão 3389</div>
+      </div>
+    </div>
+
+  <div id="pane-ocorrencias" class="pane-container">
       
       <!-- BARRA DE COMANDOS DO SHAREPOINT -->
       <div class="sp-command-bar">
@@ -2493,8 +2595,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <button id="btn-grid-oco" class="sp-btn-cmd" onclick="toggleOcoGridEdit()" title="Editar linhas e colunas diretamente no navegador">
             <span id="btn-grid-oco-icon">田</span> <span id="btn-grid-oco-text">Editar no modo de exibição de grade</span>
           </button>
-          <button class="sp-btn-cmd" onclick="renderOcorrenciasTable()">
-            <span>↺</span> Atualizar
+          <button class="sp-btn-cmd" id="btn-refresh-oco" onclick="refreshOcorrenciasData(this)" title="Buscar atualizações e sincronizar do SharePoint">
+            <span id="icon-refresh-oco">↺</span> Atualizar
           </button>
           <button class="sp-btn-cmd" onclick="exportOcorrenciasCSV()">
             <span>📥</span> Exportar CSV
@@ -2987,6 +3089,74 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   </div>
 
   <!-- MODAL DE NOVA OCORRÊNCIA (PAINEL DE OCORRÊNCIAS) -->
+  
+  <!-- MODAL DE ENCERRAMENTO RÁPIDO DE OCORRÊNCIA (1-CLIQUE NO BANNER) -->
+  <div class="modal-overlay" id="modal-quick-close-oco" style="display: none; align-items: center; justify-content: center; z-index: 10000;">
+    <div class="modal-card" style="max-width: 540px; background: white; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden;">
+      <div class="modal-header" style="background: #0078D4; color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">⚡</span>
+          <h3 style="margin: 0; font-size: 15px; font-weight: 600; color: white;">Encerramento Rápido de Ocorrência</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeQuickCloseOcoModal()" style="color: white; font-size: 22px; cursor: pointer; background: transparent; border: none;">&times;</button>
+      </div>
+      <form id="form-quick-close-oco" onsubmit="submitQuickCloseOco(event)">
+        <input type="hidden" id="quick-close-oco-id">
+        <div class="modal-body" style="padding: 20px 24px;">
+          <div style="margin-bottom: 14px;">
+            <div style="font-size: 11.5px; color: #64748B; font-weight: 600; text-transform: uppercase;">Praça / Host</div>
+            <div id="quick-close-host-title" style="font-size: 15px; font-weight: 700; color: #1E293B; margin-top: 2px;">-</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+            <div>
+              <label class="sp-form-label">Novo Status *</label>
+              <select id="quick-close-status" class="sp-form-select" required style="width: 100%; height: 38px;">
+                <option value="Concluído" selected>Concluído</option>
+                <option value="Feedback">Feedback</option>
+                <option value="Em andamento">Em andamento</option>
+              </select>
+            </div>
+            <div>
+              <label class="sp-form-label">Área Solucionadora</label>
+              <select id="quick-close-area" class="sp-form-select" style="width: 100%; height: 38px;">
+                <option value="Solucionado" selected>Solucionado</option>
+                <option value="N1">N1</option>
+                <option value="N2">N2</option>
+                <option value="Engenharia">Engenharia</option>
+                <option value="Parceiro Local">Parceiro Local</option>
+                <option value="Infraestrutura / Redes">Infraestrutura / Redes</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <label class="sp-form-label">Ações Executadas / Justificativa *</label>
+            <textarea id="quick-close-acoes" class="sp-form-input" rows="3" required placeholder="Ex: Normalizado pelo parceiro local; canal restabelecido." style="width: 100%; resize: vertical; font-family: inherit; font-size: 13px;"></textarea>
+            <div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">
+              <button type="button" class="sp-btn-cmd" style="font-size: 11px; padding: 2px 8px;" onclick="setQuickAcao('Normalizado após reinício de ATRIA.')">Reinício ATRIA</button>
+              <button type="button" class="sp-btn-cmd" style="font-size: 11px; padding: 2px 8px;" onclick="setQuickAcao('Sinal restabelecido na emissora local.')">Sinal normal</button>
+              <button type="button" class="sp-btn-cmd" style="font-size: 11px; padding: 2px 8px;" onclick="setQuickAcao('Parceiro local realizou o reset físico do equipamento.')">Reset Parceiro</button>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 14px; margin-bottom: 6px;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #475569; cursor: pointer;">
+              <input type="checkbox" id="quick-close-recup" style="width: 16px; height: 16px;"> Em recuperação
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #475569; cursor: pointer;">
+              <input type="checkbox" id="quick-close-informar" style="width: 16px; height: 16px;"> Informar Operação
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer" style="padding: 12px 24px; background: #F8FAFC; border-top: 1px solid #E2E8F0; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="sp-btn-cmd" onclick="closeQuickCloseOcoModal()">Cancelar</button>
+          <button type="submit" class="sp-btn-new" style="background: #16A34A; border-color: #16A34A;"><span>✔</span> Concluir Ocorrência</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modal-new-oco">
     <div class="modal-card" style="max-width: 820px;">
       <div class="modal-header">
@@ -3014,25 +3184,54 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
             <div class="sp-form-group">
               <label class="sp-form-label">Host / Praça *</label>
-              <input type="text" id="new-oco-host" class="sp-form-input" list="hosts-datalist" placeholder="Ex: Montes Claros / BRMG-MCL-TDT" required>
-              <datalist id="hosts-datalist">
-                <!-- Preenchido via JS com allHosts -->
-              </datalist>
+              <select id="new-oco-host" class="sp-form-select" required style="width: 100%; height: 38px;">
+                <option value="">Selecione a Praça / Host...</option>
+                <option value="Altamira">Altamira</option><option value="Anápolis">Anápolis</option><option value="Aracaju">Aracaju</option><option value="Araguaína">Araguaína</option><option value="Araxá">Araxá</option><option value="Ariquemes">Ariquemes</option><option value="B. Horizonte">B. Horizonte</option><option value="Bagé">Bagé</option><option value="Balsas">Balsas</option><option value="Barreiras">Barreiras</option><option value="Bauru">Bauru</option><option value="Belém">Belém</option><option value="Blumenau">Blumenau</option><option value="Boa Vista">Boa Vista</option><option value="Brasília">Brasília</option><option value="C. Fabriciano">C. Fabriciano</option><option value="C. Itapemirim">C. Itapemirim</option><option value="Cabo Frio">Cabo Frio</option><option value="Cacoal">Cacoal</option><option value="Campina Grande">Campina Grande</option><option value="Campinas">Campinas</option><option value="Campo Grande">Campo Grande</option><option value="Campos">Campos</option><option value="Caruaru">Caruaru</option><option value="Cascavel">Cascavel</option><option value="Castanhal">Castanhal</option><option value="Catalão">Catalão</option><option value="Caxias do Sul">Caxias do Sul</option><option value="Chapecó">Chapecó</option><option value="Codó">Codó</option><option value="Colatina">Colatina</option><option value="Corumbá">Corumbá</option><option value="Costa Rica - Conversion Server">Costa Rica - Conversion Server</option><option value="Costa Rica - San José (BL1)">Costa Rica - San José (BL1)</option><option value="Costa Rica - San José (BL10)">Costa Rica - San José (BL10)</option><option value="Costa Rica - San José (BL2)">Costa Rica - San José (BL2)</option><option value="Costa Rica - San José (BL3)">Costa Rica - San José (BL3)</option><option value="Costa Rica - San José (BL4)">Costa Rica - San José (BL4)</option><option value="Costa Rica - San José (BL5)">Costa Rica - San José (BL5)</option><option value="Costa Rica - San José (BL6)">Costa Rica - San José (BL6)</option><option value="Costa Rica - San José (BL7)">Costa Rica - San José (BL7)</option><option value="Costa Rica - San José (BL8)">Costa Rica - San José (BL8)</option><option value="Costa Rica - San José (BL9)">Costa Rica - San José (BL9)</option><option value="Criciúma">Criciúma</option><option value="Cruz Alta">Cruz Alta</option><option value="Cruzeiro do Sul">Cruzeiro do Sul</option><option value="Cuiabá">Cuiabá</option><option value="Curitiba">Curitiba</option><option value="Erechim">Erechim</option><option value="F. Santana">F. Santana</option><option value="Floriano">Floriano</option><option value="Florianópolis">Florianópolis</option><option value="Fortaleza">Fortaleza</option><option value="Foz de Iguaçu">Foz de Iguaçu</option><option value="Franca">Franca</option><option value="G. Valadares">G. Valadares</option><option value="Goiânia">Goiânia</option><option value="Guajará-Mirim">Guajará-Mirim</option><option value="Guarapuava">Guarapuava</option><option value="Guatemala - Cidade da Guatemala">Guatemala - Cidade da Guatemala</option><option value="Gurupi">Gurupi</option><option value="Imperatriz">Imperatriz</option><option value="Itabuna">Itabuna</option><option value="Itacoatiara">Itacoatiara</option><option value="Itaituba">Itaituba</option><option value="Itapetininga">Itapetininga</option><option value="Ituiutaba">Ituiutaba</option><option value="Itumbiara">Itumbiara</option><option value="Jataí">Jataí</option><option value="Ji-Paraná">Ji-Paraná</option><option value="Joaçaba">Joaçaba</option><option value="Joinville">Joinville</option><option value="João Pessoa">João Pessoa</option><option value="Juazeiro">Juazeiro</option><option value="Juazeiro do N.">Juazeiro do N.</option><option value="Juiz de Fora">Juiz de Fora</option><option value="Linhares">Linhares</option><option value="Lisboa">Lisboa</option><option value="Londrina">Londrina</option><option value="Luziânia">Luziânia</option><option value="M. das Cruzes">M. das Cruzes</option><option value="Macapá">Macapá</option><option value="Maceió">Maceió</option><option value="Manaus">Manaus</option><option value="Marabá">Marabá</option><option value="Maringá">Maringá</option><option value="Miami">Miami</option><option value="Montes Claros">Montes Claros</option><option value="Mossoró">Mossoró</option><option value="Natal">Natal</option><option value="Nova Friburgo">Nova Friburgo</option><option value="Palmas">Palmas</option><option value="Panamá - Cidade do Panamá">Panamá - Cidade do Panamá</option><option value="Paragominas">Paragominas</option><option value="Paraguai - Assunção CS1/CS2">Paraguai - Assunção CS1/CS2</option><option value="Paranavaí">Paranavaí</option><option value="Parauapebas">Parauapebas</option><option value="Parintins">Parintins</option><option value="Passo Fundo">Passo Fundo</option><option value="Pelotas">Pelotas</option><option value="Penha-DT1">Penha-DT1</option><option value="Penha-DT2">Penha-DT2</option><option value="Penha-HQ">Penha-HQ</option><option value="Penha-SAT">Penha-SAT</option><option value="Ponta Grossa">Ponta Grossa</option><option value="Ponta Pora">Ponta Pora</option><option value="Porangatú">Porangatú</option><option value="Porto Alegre">Porto Alegre</option><option value="Porto Velho">Porto Velho</option><option value="Pres. Prudente">Pres. Prudente</option><option value="RJ-Paytv Bloco 01">RJ-Paytv Bloco 01</option><option value="RJ-Paytv Bloco 02">RJ-Paytv Bloco 02</option><option value="RJ-Paytv Bloco 03">RJ-Paytv Bloco 03</option><option value="RJ-Paytv Bloco 04">RJ-Paytv Bloco 04</option><option value="RJ-Paytv Bloco 05">RJ-Paytv Bloco 05</option><option value="RJ-Paytv Bloco 06">RJ-Paytv Bloco 06</option><option value="RJ-Paytv Bloco 07">RJ-Paytv Bloco 07</option><option value="RJ-Paytv Bloco 08">RJ-Paytv Bloco 08</option><option value="RJ-Paytv Bloco 09">RJ-Paytv Bloco 09</option><option value="Recife">Recife</option><option value="Redenção">Redenção</option><option value="Resende">Resende</option><option value="Ribeirão Preto">Ribeirão Preto</option><option value="Rio Branco">Rio Branco</option><option value="Rio Grande">Rio Grande</option><option value="Rio Verde">Rio Verde</option><option value="Rio de Janeiro">Rio de Janeiro</option><option value="Rondonópolis">Rondonópolis</option><option value="S.J. Campos">S.J. Campos</option><option value="S.J.Rio Preto">S.J.Rio Preto</option><option value="Salvador">Salvador</option><option value="Santa C.do Sul">Santa C.do Sul</option><option value="Santa Maria">Santa Maria</option><option value="Santa Rosa">Santa Rosa</option><option value="Santarém">Santarém</option><option value="Santos">Santos</option><option value="Sinop">Sinop</option><option value="Sorocaba">Sorocaba</option><option value="São Carlos">São Carlos</option><option value="São Luís">São Luís</option><option value="T. da Serra">T. da Serra</option><option value="Taubaté">Taubaté</option><option value="Teresina">Teresina</option><option value="Tucuruí">Tucuruí</option><option value="Uberaba">Uberaba</option><option value="Uberlândia">Uberlândia</option><option value="Uruguaiana">Uruguaiana</option><option value="V. da Conquista">V. da Conquista</option><option value="Varginha">Varginha</option><option value="Vilhena">Vilhena</option><option value="Vitória">Vitória</option>
+              </select>
             </div>
 
             <div class="sp-form-group">
               <label class="sp-form-label">CS (Canal de Serviço)</label>
-              <input type="text" id="new-oco-cs" class="sp-form-input" placeholder="Ex: 01, 02 ou 01, 02">
+              <select id="new-oco-cs" class="sp-form-select" style="width: 100%; height: 38px;">
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="01, 02" selected>01, 02</option>
+                <option value="01, 02, 03">01, 02, 03</option>
+                <option value="02, 03">02, 03</option>
+                <option value="Todos">Todos</option>
+              </select>
             </div>
 
             <div class="sp-form-group">
               <label class="sp-form-label">Veículo / Emissora</label>
-              <input type="text" id="new-oco-veiculo" class="sp-form-input" placeholder="Ex: BAND, GLOBO, SBT, RECORD, Todos">
+              <select id="new-oco-veiculo" class="sp-form-select" style="width: 100%; height: 38px;">
+                <option value="Todos" selected>Todos</option>
+                <option value="GLOBO">GLOBO</option>
+                <option value="SBT">SBT</option>
+                <option value="RECORD">RECORD</option>
+                <option value="BAND">BAND</option>
+                <option value="REDE TV">REDE TV</option>
+                <option value="TV CULTURA">TV CULTURA</option>
+                <option value="Outro">Outro</option>
+              </select>
             </div>
 
             <div class="sp-form-group">
               <label class="sp-form-label">Equipamento</label>
-              <input type="text" id="new-oco-equipamento" class="sp-form-input" placeholder="Ex: ATRIA, TOMATE, Switch / Roteador, Maquina, WADT">
+              <select id="new-oco-equipamento" class="sp-form-select" style="width: 100%; height: 38px;">
+                <option value="ATRIA" selected>ATRIA</option>
+                <option value="Maquina">Maquina</option>
+                <option value="Switch / Roteador">Switch / Roteador</option>
+                <option value="Receptor / TV BOX">Receptor / TV BOX</option>
+                <option value="WADT">WADT</option>
+                <option value="Nobreak / PDU">Nobreak / PDU</option>
+                <option value="Antena">Antena</option>
+                <option value="LNB">LNB</option>
+                <option value="Cabo / Conector">Cabo / Conector</option>
+                <option value="Placa de Captura">Placa de Captura</option>
+                <option value="Outro">Outro</option>
+              </select>
             </div>
 
             <div class="sp-form-group">
@@ -3067,8 +3266,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
             <div class="sp-form-group">
               <label class="sp-form-label">Área / Responsável</label>
-              <select id="new-oco-area" class="sp-form-select">
+              <select id="new-oco-area" class="sp-form-select" style="width: 100%; height: 38px;">
                 <option value="N1" selected>N1</option>
+                <option value="N2">N2</option>
+                <option value="Infraestrutura / Redes">Infraestrutura / Redes</option>
+                <option value="Engenharia">Engenharia</option>
+                <option value="Operação">Operação</option>
+                <option value="Parceiro Local">Parceiro Local</option>
+                <option value="TI Corporativa">TI Corporativa</option>
+                <option value="Preços / SAC">Preços / SAC</option>
                 <option value="Vinicius Dantas">Vinicius Dantas</option>
                 <option value="Lucieudes Victor">Lucieudes Victor</option>
                 <option value="Cassio Esteves">Cassio Esteves</option>
@@ -3736,11 +3942,24 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s)) {
         return formatDate(s);
       }
-      if (['Ativo', 'Online', 'Concluído', 'Resolvido', 'Vigente', 'Operacional', 'Sim'].includes(s)) {
-        return `<span class="badge badge-exibido">${s}</span>`;
+      // Cores e Badges Oficiais SharePoint (Redmine, Falhas, Operação)
+      if (['Ativo', 'Online', 'Concluído', 'Resolvido', 'Fechado', 'Vigente', 'Operacional', 'Sim', 'Confirmado', 'Dentro do Prazo'].includes(s)) {
+        return `<span class="badge" style="background:#DCFCE7;color:#166534;border:1px solid #BBF7D0;font-weight:600;padding:2px 8px;border-radius:12px;">${s}</span>`;
       }
-      if (s.includes('SLA Estourado')) {
-        return `<span class="badge" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">${s}</span>`;
+      if (['Pendente', 'Em Análise', 'Em Análise N1', 'Em Análise N2', 'Em Tratativa'].includes(s)) {
+        return `<span class="badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;font-weight:600;padding:2px 8px;border-radius:12px;">${s}</span>`;
+      }
+      if (['Não confirmado', 'Não', 'Rejeitado', 'Cancelado'].includes(s)) {
+        return `<span class="badge" style="background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;font-weight:600;padding:2px 8px;border-radius:12px;">${s}</span>`;
+      }
+      if (s.includes('SLA Estourado') || ['Alta', 'Urgente', 'Crítico', 'Atrasado', 'Fora do Prazo'].includes(s)) {
+        return `<span class="badge" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;font-weight:600;padding:2px 8px;border-radius:12px;">${s}</span>`;
+      }
+      if (['Em andamento', 'Novo', 'Aberto', 'Feedback'].includes(s)) {
+        return `<span class="badge" style="background:#DBEAFE;color:#1E40AF;border:1px solid #BFDBFE;font-weight:600;padding:2px 8px;border-radius:12px;">${s}</span>`;
+      }
+      if (['Preços', 'SAC', 'Engenharia', 'Captação'].includes(s)) {
+        return `<span class="badge" style="background:#F3E8FF;color:#6B21A8;border:1px solid #E9D5FF;font-weight:600;padding:2px 8px;border-radius:12px;">${s}</span>`;
       }
       if (s.includes('Gravando')) {
         return `<span class="badge badge-exibido">${s}</span>`;
@@ -4118,7 +4337,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               }
               return `<td>${formatCellContent(val, c.name)}</td>`;
             }).join('');
-            return `<tr><td class="td-center" style="color: #64748B;">${idx + 1}</td>${cells}</tr>`;
+            const trClick = isGenericListGridEditMode ? "" : `onclick="openEditListItemModal(${origIdx})" style="cursor: pointer;" title="Clique para ver detalhes e editar este registro"`; return `<tr ${trClick} class="sp-list-row-clickable"><td class="td-center" style="color: #64748B;">${idx + 1}</td>${cells}</tr>`;
           }).join('');
         }
       }
@@ -5523,12 +5742,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           return;
         }
 
-        // Status badge
-        let statusBadge = `<span class="sp-badge sp-badge-concluido">Concluído</span>`;
+        // Status badge com ação de encerramento rápido (pop-up ao clicar no banner)
+        let statusBadge = `<span class="sp-badge sp-badge-concluido" onclick="event.stopPropagation(); openQuickCloseOcoModal('${ocoId}')" title="Clique para reabrir ou gerenciar ocorrência" style="cursor: pointer;">Concluído ⌵</span>`;
         if (o.Status === "Em andamento") {
-          statusBadge = `<span class="sp-badge sp-badge-em-andamento">Em andamento</span>`;
+          statusBadge = `<span class="sp-badge sp-badge-em-andamento" onclick="event.stopPropagation(); openQuickCloseOcoModal('${ocoId}')" title="Clique no banner para abrir pop-up e encerrar" style="cursor: pointer; animation: pulse 2s infinite;">Em andamento ⚡</span>`;
         } else if (o.Status === "Feedback") {
-          statusBadge = `<span class="sp-badge sp-badge-feedback">Feedback</span>`;
+          statusBadge = `<span class="sp-badge sp-badge-feedback" onclick="event.stopPropagation(); openQuickCloseOcoModal('${ocoId}')" title="Clique no banner para abrir pop-up e encerrar" style="cursor: pointer;">Feedback ⚡</span>`;
         }
 
         // Host
@@ -6446,6 +6665,464 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     renderAntenistasTable();
     renderHostsTable();
     renderPermsTable();
+  
+    // =========================================================================
+    // NOC ACCESS HUB & SMART LIST PROPERTIES (1:1 SHAREPOINT EXTENSION)
+    // =========================================================================
+    let RDP_MASTER_DATASET = [{"id": "br_altamira", "regiao": "Brasil", "pais": "Brasil", "praca": "Altamira", "router": "192.168.176.29", "cs1_ip": "192.168.176.20", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.176.19", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_anápolis", "regiao": "Brasil", "pais": "Brasil", "praca": "Anápolis", "router": "192.168.176.45", "cs1_ip": "192.168.176.34", "cs2_ip": "192.168.176.35", "cs3_ip": "N/A", "pdu_ip": "192.168.176.44", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_aracaju", "regiao": "Brasil", "pais": "Brasil", "praca": "Aracaju", "router": "192.168.176.61", "cs1_ip": "192.168.176.53", "cs2_ip": "192.168.176.52", "cs3_ip": "N/A", "pdu_ip": "192.168.176.51", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_araguaína", "regiao": "Brasil", "pais": "Brasil", "praca": "Araguaína", "router": "192.168.176.77", "cs1_ip": "192.168.176.68", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.176.67", "pdu_tipo": "Volt", "obs": "Volt não funciona", "status": "warning"}, {"id": "br_araxá", "regiao": "Brasil", "pais": "Brasil", "praca": "Araxá", "router": "192.168.176.93", "cs1_ip": "192.168.176.84", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.176.83", "pdu_tipo": "Volt", "obs": "ATIVO", "status": "nominal"}, {"id": "br_ariquemes", "regiao": "Brasil", "pais": "Brasil", "praca": "Ariquemes", "router": "192.168.176.109", "cs1_ip": "192.168.176.100", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.176.108", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_b._horizonte", "regiao": "Brasil", "pais": "Brasil", "praca": "B. Horizonte", "router": "192.168.176.125", "cs1_ip": "192.168.176.124", "cs2_ip": "192.168.176.118", "cs3_ip": "REPUCOM", "pdu_ip": "192.168.176.115", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_bagé", "regiao": "Brasil", "pais": "Brasil", "praca": "Bagé", "router": "192.168.176.141", "cs1_ip": "192.168.176.132", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.176.131", "pdu_tipo": "Volt", "obs": "VOLT", "status": "nominal"}, {"id": "br_balsas", "regiao": "Brasil", "pais": "Brasil", "praca": "Balsas", "router": "192.168.176.157", "cs1_ip": "192.168.176.148", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.176.147", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_barreiras", "regiao": "Brasil", "pais": "Brasil", "praca": "Barreiras", "router": "192.168.176.173", "cs1_ip": "192.168.176.164", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.176.163", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_bauru", "regiao": "Brasil", "pais": "Brasil", "praca": "Bauru", "router": "192.168.176.189", "cs1_ip": "192.168.176.177", "cs2_ip": "192.168.176.180", "cs3_ip": "N/A", "pdu_ip": "192.168.176.179", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_belém", "regiao": "Brasil", "pais": "Brasil", "praca": "Belém", "router": "192.168.176.205", "cs1_ip": "192.168.176.194", "cs2_ip": "192.168.176.196", "cs3_ip": "N/A", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_blumenau", "regiao": "Brasil", "pais": "Brasil", "praca": "Blumenau", "router": "192.168.176.221", "cs1_ip": "192.168.176.209", "cs2_ip": "192.168.176.210", "cs3_ip": "N/A", "pdu_ip": "192.168.176.211", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_boa_vista", "regiao": "Brasil", "pais": "Brasil", "praca": "Boa Vista", "router": "192.168.50.254", "cs1_ip": "192.168.50.11", "cs2_ip": "192.168.50.22", "cs3_ip": "N/A", "pdu_ip": "192.168.50.253", "pdu_tipo": "Volt", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_brasília", "regiao": "Brasil", "pais": "Brasil", "praca": "Brasília", "router": "192.168.176.253", "cs1_ip": "192.168.176.246", "cs2_ip": "192.168.20.22", "cs3_ip": "192.168.176.241", "pdu_ip": "192.168.0.51(FILIAL) | 192.168.20.2 (Externo CSDT2)", "pdu_tipo": "Volt", "obs": "ATIVO", "status": "nominal"}, {"id": "br_c._fabriciano", "regiao": "Brasil", "pais": "Brasil", "praca": "C. Fabriciano", "router": "192.168.177.13", "cs1_ip": "192.168.177.4", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.177.3", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_c._itapemirim", "regiao": "Brasil", "pais": "Brasil", "praca": "C. Itapemirim", "router": "192.168.177.29", "cs1_ip": "192.168.177.20", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.177.19", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_cabo_frio", "regiao": "Brasil", "pais": "Brasil", "praca": "Cabo Frio", "router": "192.168.177.45", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.177.35", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_cacoal", "regiao": "Brasil", "pais": "Brasil", "praca": "Cacoal", "router": "192.168.177.61", "cs1_ip": "192.168.177.54", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.177.51", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_campina_grande", "regiao": "Brasil", "pais": "Brasil", "praca": "Campina Grande", "router": "192.168.177.77", "cs1_ip": "192.168.177.66", "cs2_ip": "192.168.177.69", "cs3_ip": "N/A", "pdu_ip": "192.168.177.67", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_campinas", "regiao": "Brasil", "pais": "Brasil", "praca": "Campinas", "router": "192.168.177.93", "cs1_ip": "192.168.180.86", "cs2_ip": "192.168.180.81", "cs3_ip": "192.168.180.84", "pdu_ip": "192.168.177.83", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_campo_grande", "regiao": "Brasil", "pais": "Brasil", "praca": "Campo Grande", "router": "192.168.177.109", "cs1_ip": "192.168.177.98", "cs2_ip": "192.168.177.100", "cs3_ip": "N/A", "pdu_ip": "192.168.177.99", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_campos", "regiao": "Brasil", "pais": "Brasil", "praca": "Campos", "router": "192.168.177.125", "cs1_ip": "192.168.177.113", "cs2_ip": "192.168.177.114", "cs3_ip": "N/A", "pdu_ip": "192.168.177.115", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_caruaru", "regiao": "Brasil", "pais": "Brasil", "praca": "Caruaru", "router": "192.168.177.141", "cs1_ip": "192.168.177.133", "cs2_ip": "192.168.177.132", "cs3_ip": "N/A", "pdu_ip": "192.168.177.131", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_cascavel", "regiao": "Brasil", "pais": "Brasil", "praca": "Cascavel", "router": "192.168.177.157", "cs1_ip": "192.168.177.146", "cs2_ip": "192.168.177.148", "cs3_ip": "N/A", "pdu_ip": "192.168.177.147", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_castanhal", "regiao": "Brasil", "pais": "Brasil", "praca": "Castanhal", "router": "192.168.177.173", "cs1_ip": "192.168.177.164", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.177.163", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_catalão", "regiao": "Brasil", "pais": "Brasil", "praca": "Catalão", "router": "192.168.177.189", "cs1_ip": "192.168.177.177", "cs2_ip": "192.168.177.180", "cs3_ip": "192.168.177.181", "pdu_ip": "192.168.177.179", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_caxias_do_sul", "regiao": "Brasil", "pais": "Brasil", "praca": "Caxias do Sul", "router": "192.168.177.205", "cs1_ip": "192.168.177.193", "cs2_ip": "192.168.177.194", "cs3_ip": "N/A", "pdu_ip": "192.168.177.195", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_chapecó", "regiao": "Brasil", "pais": "Brasil", "praca": "Chapecó", "router": "192.168.1.1", "cs1_ip": "192.168.1.33", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.177.211", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_codó", "regiao": "Brasil", "pais": "Brasil", "praca": "Codó", "router": "192.168.177.237", "cs1_ip": "192.168.177.228", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.177.227", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_colatina", "regiao": "Brasil", "pais": "Brasil", "praca": "Colatina", "router": "192.168.1.1", "cs1_ip": "192.168.1.33", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.1.2", "pdu_tipo": "Volt", "obs": "Não funcionaipconfig", "status": "warning"}, {"id": "br_corumbá", "regiao": "Brasil", "pais": "Brasil", "praca": "Corumbá", "router": "192.168.178.13", "cs1_ip": "192.168.178.4", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.178.3", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_criciúma", "regiao": "Brasil", "pais": "Brasil", "praca": "Criciúma", "router": "192.168.178.29", "cs1_ip": "192.168.178.20", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.178.28", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_cruz_alta", "regiao": "Brasil", "pais": "Brasil", "praca": "Cruz Alta", "router": "192.168.178.45", "cs1_ip": "192.168.178.36", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.178.35", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_cruzeiro_do_sul", "regiao": "Brasil", "pais": "Brasil", "praca": "Cruzeiro do Sul", "router": "192.168.178.61", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.178.51", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_cuiabá", "regiao": "Brasil", "pais": "Brasil", "praca": "Cuiabá", "router": "192.168.178.77", "cs1_ip": "192.168.178.65", "cs2_ip": "192.168.178.68", "cs3_ip": "N/A", "pdu_ip": "192.168.178.67", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_curitiba", "regiao": "Brasil", "pais": "Brasil", "praca": "Curitiba", "router": "192.168.178.93", "cs1_ip": "192.168.178.81", "cs2_ip": "192.168.178.86", "cs3_ip": "192.168.178.82", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_erechim", "regiao": "Brasil", "pais": "Brasil", "praca": "Erechim", "router": "192.168.178.109", "cs1_ip": "192.168.178.98", "cs2_ip": "192.168.178.100", "cs3_ip": "192.168.178.97", "pdu_ip": "192.168.178.099", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_f._santana", "regiao": "Brasil", "pais": "Brasil", "praca": "F. Santana", "router": "192.168.178.125", "cs1_ip": "192.168.178.116", "cs2_ip": "192.168.178.114", "cs3_ip": "N/A", "pdu_ip": "192.168.178.115", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_floriano", "regiao": "Brasil", "pais": "Brasil", "praca": "Floriano", "router": "192.168.178.141", "cs1_ip": "192.168.178.132", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.178.131", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_florianópolis", "regiao": "Brasil", "pais": "Brasil", "praca": "Florianópolis", "router": "192.168.178.157", "cs1_ip": "192.168.178.145", "cs2_ip": "192.168.178.150", "cs3_ip": "192.168.178.146", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_fortaleza", "regiao": "Brasil", "pais": "Brasil", "praca": "Fortaleza", "router": "192.168.178.173", "cs1_ip": "192.168.178.161", "cs2_ip": "192.168.178.162", "cs3_ip": "192.168.178.168", "pdu_ip": "192.168.178.163", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_foz_de_iguaçu", "regiao": "Brasil", "pais": "Brasil", "praca": "Foz de Iguaçu", "router": "192.168.178.189", "cs1_ip": "192.168.178.180", "cs2_ip": "192.168.178.178", "cs3_ip": "N/A", "pdu_ip": "http://192.168.178.188", "pdu_tipo": "Volt", "obs": "Não funciona", "status": "warning"}, {"id": "br_franca", "regiao": "Brasil", "pais": "Brasil", "praca": "Franca", "router": "192.168.178.205", "cs1_ip": "192.168.178.194", "cs2_ip": "192.168.178.196", "cs3_ip": "N/A", "pdu_ip": "192.168.178.195", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_g._valadares", "regiao": "Brasil", "pais": "Brasil", "praca": "G. Valadares", "router": "192.168.178.221", "cs1_ip": "192.168.178.212", "cs2_ip": "192.168.178.209", "cs3_ip": "N/A", "pdu_ip": "192.168.178.211", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_goiânia", "regiao": "Brasil", "pais": "Brasil", "praca": "Goiânia", "router": "192.168.178.237", "cs1_ip": "192.168.178.225", "cs2_ip": "192.168.178.228", "cs3_ip": "REPUCOM", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_guajará-mirim", "regiao": "Brasil", "pais": "Brasil", "praca": "Guajará-Mirim", "router": "192.168.178.253", "cs1_ip": "192.168.178.244", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.178.243", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_guarapuava", "regiao": "Brasil", "pais": "Brasil", "praca": "Guarapuava", "router": "192.168.25.1", "cs1_ip": "192.168.25.11", "cs2_ip": "192.168.25.22", "cs3_ip": "N/A", "pdu_ip": "192.168.0.51", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_gurupi", "regiao": "Brasil", "pais": "Brasil", "praca": "Gurupi", "router": "192.168.179.29", "cs1_ip": "192.168.179.20", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.179.19", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_imperatriz", "regiao": "Brasil", "pais": "Brasil", "praca": "Imperatriz", "router": "192.168.179.45", "cs1_ip": "192.168.179.34", "cs2_ip": "192.168.179.36", "cs3_ip": "N/A", "pdu_ip": "192.168.0.51", "pdu_tipo": "Volt", "obs": "ATIVO", "status": "nominal"}, {"id": "br_itabuna", "regiao": "Brasil", "pais": "Brasil", "praca": "Itabuna", "router": "192.168.179.61", "cs1_ip": "192.168.179.52", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.179.51", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_itacoatiara", "regiao": "Brasil", "pais": "Brasil", "praca": "Itacoatiara", "router": "192.168.179.77", "cs1_ip": "192.168.179.69", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.179.67", "pdu_tipo": "Volt", "obs": "ATIVO", "status": "nominal"}, {"id": "br_itaituba", "regiao": "Brasil", "pais": "Brasil", "praca": "Itaituba", "router": "192.168.179.93", "cs1_ip": "192.168.179.84", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.179.83", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_itapetininga", "regiao": "Brasil", "pais": "Brasil", "praca": "Itapetininga", "router": "192.168.179.109", "cs1_ip": "192.168.179.98", "cs2_ip": "192.168.179.100", "cs3_ip": "N/A", "pdu_ip": "192.168.179.110", "pdu_tipo": "Volt", "obs": "ATIVO", "status": "nominal"}, {"id": "br_ituiutaba", "regiao": "Brasil", "pais": "Brasil", "praca": "Ituiutaba", "router": "192.168.179.125", "cs1_ip": "192.168.179.117", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.179.115", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_itumbiara", "regiao": "Brasil", "pais": "Brasil", "praca": "Itumbiara", "router": "192.168.179.141", "cs1_ip": "192.168.179.132", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.179.131", "pdu_tipo": "Volt", "obs": "Régua VOLT", "status": "nominal"}, {"id": "br_jataí", "regiao": "Brasil", "pais": "Brasil", "praca": "Jataí", "router": "192.168.179.157", "cs1_ip": "192.168.179.148", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.179.147", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_ji-paraná", "regiao": "Brasil", "pais": "Brasil", "praca": "Ji-Paraná", "router": "192.168.179.173", "cs1_ip": "192.168.179.164", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.179.163", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_joaçaba", "regiao": "Brasil", "pais": "Brasil", "praca": "Joaçaba", "router": "192.168.179.189", "cs1_ip": "192.168.179.180", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.179.179", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_joão_pessoa", "regiao": "Brasil", "pais": "Brasil", "praca": "João Pessoa", "router": "192.168.179.205", "cs1_ip": "192.168.179.194", "cs2_ip": "192.168.179.196", "cs3_ip": "N/A", "pdu_ip": "192.168.179.195", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_joinville", "regiao": "Brasil", "pais": "Brasil", "praca": "Joinville", "router": "192.168.179.221", "cs1_ip": "192.168.179.209", "cs2_ip": "192.168.179.210", "cs3_ip": "N/A", "pdu_ip": "192.168.179.211", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_juazeiro", "regiao": "Brasil", "pais": "Brasil", "praca": "Juazeiro", "router": "192.168.179.237", "cs1_ip": "192.168.179.226", "cs2_ip": "192.168.179.228", "cs3_ip": "N/A", "pdu_ip": "192.168.179.236", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_juazeiro_do_n.", "regiao": "Brasil", "pais": "Brasil", "praca": "Juazeiro do N.", "router": "192.168.179.253", "cs1_ip": "192.168.179.244", "cs2_ip": "192.168.179.241", "cs3_ip": "N/A", "pdu_ip": "192.168.179.243", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_juiz_de_fora", "regiao": "Brasil", "pais": "Brasil", "praca": "Juiz de Fora", "router": "192.168.180.13", "cs1_ip": "192.168.180.2", "cs2_ip": "192.168.180.4", "cs3_ip": "192.168.180.5", "pdu_ip": "192.168.180.8", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_linhares", "regiao": "Brasil", "pais": "Brasil", "praca": "Linhares", "router": "192.168.180.29", "cs1_ip": "192.168.180.20", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.180.19", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_londrina", "regiao": "Brasil", "pais": "Brasil", "praca": "Londrina", "router": "192.168.180.45", "cs1_ip": "192.168.180.34", "cs2_ip": "192.168.180.36", "cs3_ip": "N/A", "pdu_ip": "182.168.180.44", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_luziânia", "regiao": "Brasil", "pais": "Brasil", "praca": "Luziânia", "router": "192.168.180.61", "cs1_ip": "192.168.180.49", "cs2_ip": "192.168.180.52", "cs3_ip": "N/A", "pdu_ip": "192.168.180.51", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_m._das_cruzes", "regiao": "Brasil", "pais": "Brasil", "praca": "M. das Cruzes", "router": "192.168.180.77", "cs1_ip": "192.168.180.66", "cs2_ip": "192.168.180.68", "cs3_ip": "N/A", "pdu_ip": "192.168.180.67", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_macapá", "regiao": "Brasil", "pais": "Brasil", "praca": "Macapá", "router": "192.168.180.93", "cs1_ip": "192.168.180.81", "cs2_ip": "192.168.180.82", "cs3_ip": "N/A", "pdu_ip": "192.168.180.83", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_maceió", "regiao": "Brasil", "pais": "Brasil", "praca": "Maceió", "router": "192.168.180.109", "cs1_ip": "192.168.180.98", "cs2_ip": "192.168.180.100", "cs3_ip": "N/A", "pdu_ip": "192.168.180.99", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_manaus", "regiao": "Brasil", "pais": "Brasil", "praca": "Manaus", "router": "192.168.180.125", "cs1_ip": "192.168.180.113", "cs2_ip": "192.168.180.116", "cs3_ip": "N/A", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_marabá", "regiao": "Brasil", "pais": "Brasil", "praca": "Marabá", "router": "192.168.180.141", "cs1_ip": "192.168.180.130", "cs2_ip": "192.168.180.132", "cs3_ip": "N/A", "pdu_ip": "192.168.180.131", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_maringá", "regiao": "Brasil", "pais": "Brasil", "praca": "Maringá", "router": "192.168.180.157", "cs1_ip": "192.168.180.146", "cs2_ip": "192.168.180.148", "cs3_ip": "N/A", "pdu_ip": "http://177.84.130.238/config.htm", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_montes_claros", "regiao": "Brasil", "pais": "Brasil", "praca": "Montes Claros", "router": "192.168.180.173", "cs1_ip": "192.168.180.164", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.180.163", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_natal", "regiao": "Brasil", "pais": "Brasil", "praca": "Natal", "router": "192.168.180.189", "cs1_ip": "192.168.180.177", "cs2_ip": "192.168.180.182", "cs3_ip": "N/A", "pdu_ip": "192.168.180.180", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_nova_friburgo", "regiao": "Brasil", "pais": "Brasil", "praca": "Nova Friburgo", "router": "192.168.180.205", "cs1_ip": "192.168.180.194", "cs2_ip": "192.168.180.193", "cs3_ip": "N/A", "pdu_ip": "192.168.180.195", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_palmas", "regiao": "Brasil", "pais": "Brasil", "praca": "Palmas", "router": "192.168.180.221", "cs1_ip": "192.168.180.210", "cs2_ip": "192.168.180.212", "cs3_ip": "N/A", "pdu_ip": "192.168.180.211", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_paragominas", "regiao": "Brasil", "pais": "Brasil", "praca": "Paragominas", "router": "192.168.180.237", "cs1_ip": "192.168.180.228", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.180.227", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_paranavaí", "regiao": "Brasil", "pais": "Brasil", "praca": "Paranavaí", "router": "192.168.180.253", "cs1_ip": "192.168.180.241", "cs2_ip": "192.168.180.244", "cs3_ip": "N/A", "pdu_ip": "192.168.180.243", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_parauapebas", "regiao": "Brasil", "pais": "Brasil", "praca": "Parauapebas", "router": "192.168.181.13", "cs1_ip": "192.168.181.4", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.181.3", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_parintins", "regiao": "Brasil", "pais": "Brasil", "praca": "Parintins", "router": "192.168.181.29", "cs1_ip": "192.168.181.20", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.181.19", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_passo_fundo", "regiao": "Brasil", "pais": "Brasil", "praca": "Passo Fundo", "router": "192.168.181.45", "cs1_ip": "192.168.181.36", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.181.35", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_pelotas", "regiao": "Brasil", "pais": "Brasil", "praca": "Pelotas", "router": "192.168.181.61", "cs1_ip": "192.168.181.49", "cs2_ip": "192.168.181.52", "cs3_ip": "N/A", "pdu_ip": "192.168.181.51", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_ponta_grossa", "regiao": "Brasil", "pais": "Brasil", "praca": "Ponta Grossa", "router": "192.168.181.77", "cs1_ip": "192.168.181.65", "cs2_ip": "192.168.181.66", "cs3_ip": "N/A", "pdu_ip": "192.168.181.68", "pdu_tipo": "Volt", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_ponta_pora", "regiao": "Brasil", "pais": "Brasil", "praca": "Ponta Pora", "router": "192.168.181.93", "cs1_ip": "192.168.181.84", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.181.83", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_porangatú", "regiao": "Brasil", "pais": "Brasil", "praca": "Porangatú", "router": "192.168.181.109", "cs1_ip": "192.168.181.100", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.181.099", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_porto_alegre", "regiao": "Brasil", "pais": "Brasil", "praca": "Porto Alegre", "router": "192.168.181.125", "cs1_ip": "192.168.181.113", "cs2_ip": "192.168.181.114", "cs3_ip": "192.168.181.118", "pdu_ip": "192.168.181.115", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_porto_velho", "regiao": "Brasil", "pais": "Brasil", "praca": "Porto Velho", "router": "192.168.181.141", "cs1_ip": "192.168.181.130", "cs2_ip": "192.168.181.134", "cs3_ip": "N/A", "pdu_ip": "192.168.181.131", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_pres._prudente", "regiao": "Brasil", "pais": "Brasil", "praca": "Pres. Prudente", "router": "192.168.181.157", "cs1_ip": "192.168.181.145", "cs2_ip": "192.168.181.150", "cs3_ip": "N/A", "pdu_ip": "192.168.181.147", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_recife", "regiao": "Brasil", "pais": "Brasil", "praca": "Recife", "router": "192.168.181.173", "cs1_ip": "192.168.181.161", "cs2_ip": "192.168.181.168", "cs3_ip": "N/A", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_redenção", "regiao": "Brasil", "pais": "Brasil", "praca": "Redenção", "router": "192.168.181.189", "cs1_ip": "192.168.181.181", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.181.179", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_resende", "regiao": "Brasil", "pais": "Brasil", "praca": "Resende", "router": "192.168.181.205", "cs1_ip": "192.168.181.195", "cs2_ip": "192.168.181.196", "cs3_ip": "N/A", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_ribeirão_preto", "regiao": "Brasil", "pais": "Brasil", "praca": "Ribeirão Preto", "router": "192.168.181.221", "cs1_ip": "192.168.181.209", "cs2_ip": "192.168.181.212", "cs3_ip": "N/A", "pdu_ip": "192.168.181.211", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rio_branco", "regiao": "Brasil", "pais": "Brasil", "praca": "Rio Branco", "router": "192.168.181.237", "cs1_ip": "192.168.181.226", "cs2_ip": "192.168.181.228", "cs3_ip": "N/A", "pdu_ip": "192.168.181.227", "pdu_tipo": "MCosta", "obs": "ATIVO, Não funciona, há verificar", "status": "warning"}, {"id": "br_rio_de_janeiro", "regiao": "Brasil", "pais": "Brasil", "praca": "Rio de Janeiro", "router": "192.168.181.253", "cs1_ip": "192.168.181.241", "cs2_ip": "192.168.181.242", "cs3_ip": "192.168.181.244", "pdu_ip": "192.168.20.2", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rio_grande", "regiao": "Brasil", "pais": "Brasil", "praca": "Rio Grande", "router": "192.168.182.13", "cs1_ip": "192.168.182.3", "cs2_ip": "192.168.182.4", "cs3_ip": "N/A", "pdu_ip": "192.168.182.2", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_rio_verde", "regiao": "Brasil", "pais": "Brasil", "praca": "Rio Verde", "router": "192.168.182.16", "cs1_ip": "177.10.143.122", "cs2_ip": "192.168.182.22", "cs3_ip": "N/A", "pdu_ip": "192.168.182.19", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rondonópolis", "regiao": "Brasil", "pais": "Brasil", "praca": "Rondonópolis", "router": "192.168.182.45", "cs1_ip": "192.168.182.33", "cs2_ip": "192.168.182.36", "cs3_ip": "N/A", "pdu_ip": "192.168.182.35", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_s.j._campos", "regiao": "Brasil", "pais": "Brasil", "praca": "S.J. Campos", "router": "192.168.182.61", "cs1_ip": "192.168.182.49", "cs2_ip": "192.168.182.52", "cs3_ip": "N/A", "pdu_ip": "192.168.182.60", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_s.j.rio_preto", "regiao": "Brasil", "pais": "Brasil", "praca": "S.J.Rio Preto", "router": "192.168.182.77", "cs1_ip": "192.168.182.66", "cs2_ip": "192.168.182.68", "cs3_ip": "N/A", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_salvador", "regiao": "Brasil", "pais": "Brasil", "praca": "Salvador", "router": "192.168.182.93", "cs1_ip": "192.168.182.81", "cs2_ip": "192.168.182.85", "cs3_ip": "N/A", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_santa_c.do_sul", "regiao": "Brasil", "pais": "Brasil", "praca": "Santa C.do Sul", "router": "192.168.182.109", "cs1_ip": "192.168.182.100", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.182.099", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_santa_maria", "regiao": "Brasil", "pais": "Brasil", "praca": "Santa Maria", "router": "192.168.182.141", "cs1_ip": "192.168.182.130", "cs2_ip": "192.168.182.132", "cs3_ip": "N/A", "pdu_ip": "192.168.182.131", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_santa_rosa", "regiao": "Brasil", "pais": "Brasil", "praca": "Santa Rosa", "router": "192.168.182.157", "cs1_ip": "192.168.182.149", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.182.158", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_santarém", "regiao": "Brasil", "pais": "Brasil", "praca": "Santarém", "router": "192.168.182.173", "cs1_ip": "192.168.182.164", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.182.165", "pdu_tipo": "Volt", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_rj-paytv_bloco_01", "regiao": "Brasil", "pais": "Brasil", "praca": "RJ-Paytv Bloco 01", "router": "192.168.182.189", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.182.177", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rj-paytv_bloco_02", "regiao": "Brasil", "pais": "Brasil", "praca": "RJ-Paytv Bloco 02", "router": "192.168.182.189", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.182.178", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rj-paytv_bloco_03", "regiao": "Brasil", "pais": "Brasil", "praca": "RJ-Paytv Bloco 03", "router": "192.168.182.189", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.182.179", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rj-paytv_bloco_04", "regiao": "Brasil", "pais": "Brasil", "praca": "RJ-Paytv Bloco 04", "router": "192.168.182.189", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.182.180", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rj-paytv_bloco_05", "regiao": "Brasil", "pais": "Brasil", "praca": "RJ-Paytv Bloco 05", "router": "192.168.182.189", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.182.181", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rj-paytv_bloco_06", "regiao": "Brasil", "pais": "Brasil", "praca": "RJ-Paytv Bloco 06", "router": "192.168.182.189", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.182.182", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rj-paytv_bloco_07", "regiao": "Brasil", "pais": "Brasil", "praca": "RJ-Paytv Bloco 07", "router": "192.168.182.189", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.182.183", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rj-paytv_bloco_08", "regiao": "Brasil", "pais": "Brasil", "praca": "RJ-Paytv Bloco 08", "router": "192.168.182.189", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.182.184", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_são_carlos", "regiao": "Brasil", "pais": "Brasil", "praca": "São Carlos", "router": "192.168.182.205", "cs1_ip": "192.168.182.193", "cs2_ip": "192.168.182.196", "cs3_ip": "N/A", "pdu_ip": "192.168.182.195", "pdu_tipo": "Volt", "obs": "ATIVO", "status": "nominal"}, {"id": "br_são_luís", "regiao": "Brasil", "pais": "Brasil", "praca": "São Luís", "router": "192.168.182.221", "cs1_ip": "192.168.182.210", "cs2_ip": "192.168.182.212", "cs3_ip": "N/A", "pdu_ip": "192.168.182.211", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_sinop", "regiao": "Brasil", "pais": "Brasil", "praca": "Sinop", "router": "192.168.182.253", "cs1_ip": "192.168.182.244", "cs2_ip": "192.168.182.242", "cs3_ip": "N/A", "pdu_ip": "192.168.182.243", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_sorocaba", "regiao": "Brasil", "pais": "Brasil", "praca": "Sorocaba", "router": "192.168.183.13", "cs1_ip": "192.168.183.2", "cs2_ip": "192.168.183.4", "cs3_ip": "N/A", "pdu_ip": "192.168.183.3", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_t._da_serra", "regiao": "Brasil", "pais": "Brasil", "praca": "T. da Serra", "router": "192.168.183.29", "cs1_ip": "192.168.183.20", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "1", "pdu_tipo": "Volt", "obs": "Desativado", "status": "nominal"}, {"id": "br_taubaté", "regiao": "Brasil", "pais": "Brasil", "praca": "Taubaté", "router": "192.168.183.45", "cs1_ip": "192.168.183.34", "cs2_ip": "192.168.183.36", "cs3_ip": "N/A", "pdu_ip": "192.168.183.44", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_teresina", "regiao": "Brasil", "pais": "Brasil", "praca": "Teresina", "router": "192.168.183.61", "cs1_ip": "192.168.183.50", "cs2_ip": "192.168.183.52", "cs3_ip": "N/A", "pdu_ip": "192.168.0.51", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_tucuruí", "regiao": "Brasil", "pais": "Brasil", "praca": "Tucuruí", "router": "192.168.183.77", "cs1_ip": "192.168.183.68", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.183.67", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_uberlândia", "regiao": "Brasil", "pais": "Brasil", "praca": "Uberlândia", "router": "192.168.183.93", "cs1_ip": "192.168.183.81", "cs2_ip": "192.168.183.84", "cs3_ip": "N/A", "pdu_ip": "192.168.183.83", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_uruguaiana", "regiao": "Brasil", "pais": "Brasil", "praca": "Uruguaiana", "router": "192.168.183.109", "cs1_ip": "192.168.183.100", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.183.101", "pdu_tipo": "Volt", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_v._da_conquista", "regiao": "Brasil", "pais": "Brasil", "praca": "V. da Conquista", "router": "192.168.183.125", "cs1_ip": "192.168.183.114", "cs2_ip": "192.168.183.117", "cs3_ip": "N/A", "pdu_ip": "192.168.183.115", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_varginha", "regiao": "Brasil", "pais": "Brasil", "praca": "Varginha", "router": "192.168.183.141", "cs1_ip": "192.168.183.132", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.183.11", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_vilhena", "regiao": "Brasil", "pais": "Brasil", "praca": "Vilhena", "router": "192.168.183.157", "cs1_ip": "192.168.183.148", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.183.147", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_vitória", "regiao": "Brasil", "pais": "Brasil", "praca": "Vitória", "router": "192.168.183.173", "cs1_ip": "192.168.183.161", "cs2_ip": "192.168.183.164", "cs3_ip": "N/A", "pdu_ip": "192.168.183.163", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_lisboa", "regiao": "Brasil", "pais": "Brasil", "praca": "Lisboa", "router": "192.168.1.1", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.1.12", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "br_santos", "regiao": "Brasil", "pais": "Brasil", "praca": "Santos", "router": "192.168.1.1", "cs1_ip": "192.168.1.44", "cs2_ip": "192.168.1.22", "cs3_ip": "N/A", "pdu_ip": "192.168.1.20", "pdu_tipo": "MCosta", "obs": "ATIVO", "status": "nominal"}, {"id": "br_rj-paytv_bloco_09", "regiao": "Brasil", "pais": "Brasil", "praca": "RJ-Paytv Bloco 09", "router": "192.168.182.189", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.182.185", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_mossoró", "regiao": "Brasil", "pais": "Brasil", "praca": "Mossoró", "router": "192.168.182.237", "cs1_ip": "192.168.182.226", "cs2_ip": "192.168.182.225", "cs3_ip": "N/A", "pdu_ip": "192.168.182.228", "pdu_tipo": "Volt", "obs": "Régua VOLT", "status": "nominal"}, {"id": "br_uberaba", "regiao": "Brasil", "pais": "Brasil", "praca": "Uberaba", "router": "192.168.10.250", "cs1_ip": "192.168.10.11", "cs2_ip": "192.168.10.33", "cs3_ip": "N/A", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_penha-dt1", "regiao": "Brasil", "pais": "Brasil", "praca": "Penha-DT1", "router": "192.168.20.1", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.20.44", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_penha-dt2", "regiao": "Brasil", "pais": "Brasil", "praca": "Penha-DT2", "router": "192.168.20.1", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "192.168.20.55", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_penha-hq", "regiao": "Brasil", "pais": "Brasil", "praca": "Penha-HQ", "router": "192.168.20.1", "cs1_ip": "N/A", "cs2_ip": "192.168.20.66", "cs3_ip": "N/A", "pdu_ip": "http://192.168.20.101", "pdu_tipo": "Volt", "obs": "Volt", "status": "nominal"}, {"id": "br_penha-sat", "regiao": "Brasil", "pais": "Brasil", "praca": "Penha-SAT", "router": "192.168.20.1", "cs1_ip": "192.168.20.11", "cs2_ip": "192.168.20.22", "cs3_ip": "192.168.20.33", "pdu_ip": "N/A", "pdu_tipo": "N/A", "obs": "ATIVO", "status": "nominal"}, {"id": "br_miami", "regiao": "Brasil", "pais": "Brasil", "praca": "Miami", "router": "10.1.10.1", "cs1_ip": "N/A", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "192.168.1.20", "pdu_tipo": "MCosta", "obs": "Não funciona, há verificar", "status": "warning"}, {"id": "latam_costa_rica_-_san_josé_(bl1)", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - San José (BL1)", "router": "10.45.10.1", "cs1_ip": "10.45.10.11", "cs2_ip": "10.45.10.12", "cs3_ip": "N/A", "pdu_ip": "10.45.10.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_costa_rica_-_san_josé_(bl2)", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - San José (BL2)", "router": "10.45.10.1", "cs1_ip": "10.45.10.21", "cs2_ip": "10.45.10.22", "cs3_ip": "N/A", "pdu_ip": "10.45.10.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_costa_rica_-_san_josé_(bl3)", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - San José (BL3)", "router": "10.45.10.1", "cs1_ip": "10.45.10.31", "cs2_ip": "10.45.10.32", "cs3_ip": "N/A", "pdu_ip": "10.45.10.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_costa_rica_-_san_josé_(bl4)", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - San José (BL4)", "router": "10.45.10.1", "cs1_ip": "10.45.10.41", "cs2_ip": "10.45.10.42", "cs3_ip": "N/A", "pdu_ip": "10.45.10.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_costa_rica_-_san_josé_(bl5)", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - San José (BL5)", "router": "10.45.10.1", "cs1_ip": "10.45.10.51", "cs2_ip": "10.45.10.52", "cs3_ip": "N/A", "pdu_ip": "10.45.10.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_costa_rica_-_san_josé_(bl6)", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - San José (BL6)", "router": "10.45.10.1", "cs1_ip": "10.45.10.61", "cs2_ip": "10.45.10.62", "cs3_ip": "N/A", "pdu_ip": "10.45.10.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_costa_rica_-_san_josé_(bl7)", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - San José (BL7)", "router": "10.45.10.1", "cs1_ip": "10.45.10.71", "cs2_ip": "10.45.10.72", "cs3_ip": "N/A", "pdu_ip": "10.45.10.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_costa_rica_-_san_josé_(bl8)", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - San José (BL8)", "router": "10.45.10.1", "cs1_ip": "10.45.10.81", "cs2_ip": "10.45.10.82", "cs3_ip": "N/A", "pdu_ip": "10.45.10.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_costa_rica_-_san_josé_(bl9)", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - San José (BL9)", "router": "10.45.10.1", "cs1_ip": "10.45.10.91", "cs2_ip": "10.45.10.92", "cs3_ip": "N/A", "pdu_ip": "10.45.10.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_costa_rica_-_san_josé_(bl10)", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - San José (BL10)", "router": "10.45.10.1", "cs1_ip": "10.45.10.101", "cs2_ip": "10.45.10.102", "cs3_ip": "N/A", "pdu_ip": "10.45.10.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_costa_rica_-_conversion_server", "regiao": "América Central", "pais": "Costa Rica", "praca": "Costa Rica - Conversion Server", "router": "10.45.10.1", "cs1_ip": "10.45.10.200", "cs2_ip": "N/A", "cs3_ip": "N/A", "pdu_ip": "N/A", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_paraguai_-_assunção_cs1_cs2", "regiao": "América Central / LATAM", "pais": "Paraguai", "praca": "Paraguai - Assunção CS1/CS2", "router": "10.50.20.1", "cs1_ip": "10.50.20.11", "cs2_ip": "10.50.20.12", "cs3_ip": "N/A", "pdu_ip": "10.50.20.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_guatemala_-_cidade_da_guatemala", "regiao": "América Central", "pais": "Guatemala", "praca": "Guatemala - Cidade da Guatemala", "router": "10.48.30.1", "cs1_ip": "10.48.30.11", "cs2_ip": "10.48.30.12", "cs3_ip": "N/A", "pdu_ip": "10.48.30.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}, {"id": "latam_panamá_-_cidade_do_panamá", "regiao": "América Central", "pais": "Panamá", "praca": "Panamá - Cidade do Panamá", "router": "10.49.40.1", "cs1_ip": "10.49.40.11", "cs2_ip": "10.49.40.12", "cs3_ip": "N/A", "pdu_ip": "10.49.40.254", "pdu_tipo": "PDU Remoto", "obs": "Captação Internacional Ativa", "status": "nominal"}];
+    let currentRdpFilterCategory = 'all';
+    let currentRdpSearchTerm = '';
+
+    const OFICIAL_PRACAS = ["Altamira", "Anápolis", "Aracaju", "Araguaína", "Araxá", "Ariquemes", "B. Horizonte", "Bagé", "Balsas", "Barreiras", "Bauru", "Belém", "Blumenau", "Boa Vista", "Brasília", "C. Fabriciano", "C. Itapemirim", "Cabo Frio", "Cacoal", "Campina Grande", "Campinas", "Campo Grande", "Campos", "Caruaru", "Cascavel", "Castanhal", "Catalão", "Caxias do Sul", "Chapecó", "Codó", "Colatina", "Corumbá", "Costa Rica - Conversion Server", "Costa Rica - San José (BL1)", "Costa Rica - San José (BL10)", "Costa Rica - San José (BL2)", "Costa Rica - San José (BL3)", "Costa Rica - San José (BL4)", "Costa Rica - San José (BL5)", "Costa Rica - San José (BL6)", "Costa Rica - San José (BL7)", "Costa Rica - San José (BL8)", "Costa Rica - San José (BL9)", "Criciúma", "Cruz Alta", "Cruzeiro do Sul", "Cuiabá", "Curitiba", "Erechim", "F. Santana", "Floriano", "Florianópolis", "Fortaleza", "Foz de Iguaçu", "Franca", "G. Valadares", "Goiânia", "Guajará-Mirim", "Guarapuava", "Guatemala - Cidade da Guatemala", "Gurupi", "Imperatriz", "Itabuna", "Itacoatiara", "Itaituba", "Itapetininga", "Ituiutaba", "Itumbiara", "Jataí", "Ji-Paraná", "Joaçaba", "Joinville", "João Pessoa", "Juazeiro", "Juazeiro do N.", "Juiz de Fora", "Linhares", "Lisboa", "Londrina", "Luziânia", "M. das Cruzes", "Macapá", "Maceió", "Manaus", "Marabá", "Maringá", "Miami", "Montes Claros", "Mossoró", "Natal", "Nova Friburgo", "Palmas", "Panamá - Cidade do Panamá", "Paragominas", "Paraguai - Assunção CS1/CS2", "Paranavaí", "Parauapebas", "Parintins", "Passo Fundo", "Pelotas", "Penha-DT1", "Penha-DT2", "Penha-HQ", "Penha-SAT", "Ponta Grossa", "Ponta Pora", "Porangatú", "Porto Alegre", "Porto Velho", "Pres. Prudente", "RJ-Paytv Bloco 01", "RJ-Paytv Bloco 02", "RJ-Paytv Bloco 03", "RJ-Paytv Bloco 04", "RJ-Paytv Bloco 05", "RJ-Paytv Bloco 06", "RJ-Paytv Bloco 07", "RJ-Paytv Bloco 08", "RJ-Paytv Bloco 09", "Recife", "Redenção", "Resende", "Ribeirão Preto", "Rio Branco", "Rio Grande", "Rio Verde", "Rio de Janeiro", "Rondonópolis", "S.J. Campos", "S.J.Rio Preto", "Salvador", "Santa C.do Sul", "Santa Maria", "Santa Rosa", "Santarém", "Santos", "Sinop", "Sorocaba", "São Carlos", "São Luís", "T. da Serra", "Taubaté", "Teresina", "Tucuruí", "Uberaba", "Uberlândia", "Uruguaiana", "V. da Conquista", "Varginha", "Vilhena", "Vitória"];
+    const OFICIAL_EMISSORAS = ["Globo", "SBT", "Record TV", "Band", "Rede Vida", "TV Brasil", "TV Aparecida", "RIT", "Record News", "TV Gazeta", "TV Canção Nova", "TV Senado", "TV Câmara", "TV Justiça", "Outra"];
+    const OFICIAL_STATUS_RETORNO = ["Pendente", "Em análise", "Não confirmado", "Confirmado"];
+    const OFICIAL_AREAS = ["Preços", "SAC", "Captação", "Engenharia", "Comercial", "TI Corporativa"];
+
+    let editingListItemIndex = null;
+    let currentQuickOcoId = null;
+
+    function renderRdpTable() {
+      const tbody = document.getElementById("rdp-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let filtered = RDP_MASTER_DATASET.filter(h => {
+        if (currentRdpFilterCategory === 'Brasil' && h.regiao !== 'Brasil') return false;
+        if (currentRdpFilterCategory === 'América Central' && h.regiao === 'Brasil') return false;
+        if (currentRdpFilterCategory === 'Volt' && (!h.pdu_ip || h.pdu_ip === 'N/A')) return false;
+
+        if (currentRdpSearchTerm) {
+          const txt = (h.praca + " " + h.pais + " " + h.regiao + " " + h.router + " " + h.cs1_ip + " " + h.cs2_ip + " " + h.cs3_ip + " " + h.pdu_ip).toLowerCase();
+          return txt.includes(currentRdpSearchTerm);
+        }
+        return true;
+      });
+
+      filtered.forEach((h, idx) => {
+        const tr = document.createElement("tr");
+
+        const renderCsCell = (ip, role) => {
+          if (!ip || ip === 'N/A') return '<span style="color:#94A3B8; font-size:11px;">-</span>';
+          return `
+            <div style="display:flex; align-items:center; gap:6px;">
+              <code style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#1E293B;">${ip}</code>
+              <button class="sp-btn-cmd" style="padding:2px 6px; font-size:10.5px; border-radius:3px; background:#EFF6FC; border-color:#BFDBFE; color:#0078D4;" onclick="triggerRdpConnect('${ip}', '${h.praca}', '${role}', 3389)" title="Conectar RDP 1-clique (${role})">
+                🖥️ RDP
+              </button>
+              <button class="sp-btn-cmd" style="padding:2px 5px; font-size:10px; border-radius:3px; color:#64748B;" onclick="copyTextToClipboard('${ip}')" title="Copiar IP">
+                📋
+              </button>
+            </div>
+          `;
+        };
+
+        const renderRouterCell = (ip) => {
+          if (!ip || ip === 'N/A') return '<span style="color:#94A3B8; font-size:11px;">-</span>';
+          return `
+            <div style="display:flex; align-items:center; gap:6px;">
+              <code style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#0F766E;">${ip}</code>
+              <a href="http://${ip}" target="_blank" class="sp-btn-cmd" style="padding:2px 6px; font-size:10.5px; border-radius:3px; text-decoration:none; color:#0F766E; background:#F0FDFA; border-color:#99F6E4;" title="Abrir Web GUI do Roteador">
+                🌐 Web
+              </a>
+            </div>
+          `;
+        };
+
+        const renderPduCell = (ip, tipo) => {
+          if (!ip || ip === 'N/A') return '<span style="color:#94A3B8; font-size:11px;">Sem PDU</span>';
+          return `
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="badge" style="background:#FEF3C7; color:#92400E; font-size:10.5px; border:1px solid #FDE68A; padding:2px 6px;">⚡ ${tipo || 'Volt'}</span>
+              <code style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#78350F;">${ip}</code>
+              <a href="http://${ip}" target="_blank" class="sp-btn-cmd" style="padding:2px 6px; font-size:10px; border-radius:3px; text-decoration:none; color:#92400E; background:#FFFBEB; border-color:#FDE68A;" title="Acessar painel da Régua Volt">
+                Reset
+              </a>
+            </div>
+          `;
+        };
+
+        const flag = h.pais === 'Brasil' ? '🇧🇷' : '🌎';
+        tr.innerHTML = `
+          <td style="text-align:center; color:#64748B; font-size:11.5px;">${idx + 1}</td>
+          <td><b>${flag} ${h.pais}</b> <span style="color:#64748B; font-size:11px;">(${h.regiao})</span></td>
+          <td><b style="color:#0078D4;">${h.praca}</b></td>
+          <td>${renderRouterCell(h.router)}</td>
+          <td>${renderCsCell(h.cs1_ip, 'CS1')}</td>
+          <td>${renderCsCell(h.cs2_ip, 'CS2')}</td>
+          <td>${renderCsCell(h.cs3_ip, 'CS3')}</td>
+          <td>${renderPduCell(h.pdu_ip, h.pdu_tipo)}</td>
+          <td><span class="badge" style="background:#DCFCE7; color:#166534; border:1px solid #BBF7D0; font-size:10.5px; padding:2px 6px;">● Online</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const footer = document.getElementById("rdp-table-footer");
+      if (footer) {
+        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${RDP_MASTER_DATASET.length}</b> nós remotos`;
+      }
+    }
+
+    function filterRdpTable() {
+      const el = document.getElementById("search-rdp-box");
+      currentRdpSearchTerm = el ? el.value.toLowerCase().trim() : '';
+      renderRdpTable();
+    }
+
+    function setRdpCategory(cat, btn) {
+      currentRdpFilterCategory = cat;
+      document.querySelectorAll(".rdp-cat-pill").forEach(p => p.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      renderRdpTable();
+    }
+
+    function triggerRdpConnect(ip, hostLabel, role, port) {
+      if (!ip || ip === 'N/A') {
+        alert("IP indisponível para esta estação.");
+        return;
+      }
+      port = port || 3389;
+      const rdpContent = [
+        "screen mode id:i:2",
+        "use multimon:i:0",
+        "desktopwidth:i:1920",
+        "desktopheight:i:1080",
+        "session bpp:i:32",
+        "winposstr:s:0,1,0,0,1920,1080",
+        "compression:i:1",
+        "keyboardhook:i:2",
+        "audiocapturemode:i:0",
+        "videoplaybackmode:i:1",
+        "connection type:i:7",
+        "networkautodetect:i:1",
+        "bandwidthautodetect:i:1",
+        "displayconnectionbar:i:1",
+        "enableworkspacereconnect:i:0",
+        "disable wallpaper:i:0",
+        "allow font smoothing:i:1",
+        "allow desktop composition:i:1",
+        "disable full window drag:i:1",
+        "disable menu anims:i:1",
+        "disable themes:i:0",
+        "disable cursor setting:i:0",
+        "bitmapcachepersistenable:i:1",
+        `full address:s:${ip}:${port}`,
+        "audiomode:i:0",
+        "redirectprinters:i:0",
+        "redirectcomports:i:0",
+        "redirectsmartcards:i:0",
+        "redirectclipboard:i:1",
+        "redirectposdevices:i:0",
+        "drivestoredirect:s:",
+        "prompt for credentials:i:1",
+        "negotiate security layer:i:1",
+        "remoteapplicationmode:i:0",
+        "server port:i:3389",
+        "gatewayusagemethod:i:0",
+        `promptcredentialonce:i:0`,
+        "authentication level:i:2"
+      ].join("\r\n");
+
+      const blob = new Blob([rdpContent], { type: 'application/x-rdp' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const safeLabel = (hostLabel || "Host").replace(/[^a-zA-Z0-9_-]/g, "_");
+      a.href = url;
+      a.download = `${safeLabel}_${role || 'CS'}_${ip}.rdp`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Arquivo RDP gerado para ${hostLabel} (${role} - ${ip})! Abra-o para conectar.`, "success");
+    }
+
+    function copyTextToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`IP ${text} copiado para a área de transferência!`, "success");
+      }).catch(() => {
+        const temp = document.createElement("input");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+        showToast(`IP ${text} copiado!`, "success");
+      });
+    }
+
+    function exportRdpCSV() {
+      const headers = ["ID", "Pais", "Regiao", "Praca", "Router_IP", "CS1_IP", "CS2_IP", "CS3_IP", "PDU_IP", "PDU_Tipo", "Status"];
+      const rows = RDP_MASTER_DATASET.map(h => [
+        `"${h.id || ''}"`,
+        `"${h.pais || ''}"`,
+        `"${h.regiao || ''}"`,
+        `"${h.praca || ''}"`,
+        `"${h.router || ''}"`,
+        `"${h.cs1_ip || ''}"`,
+        `"${h.cs2_ip || ''}"`,
+        `"${h.cs3_ip || ''}"`,
+        `"${h.pdu_ip || ''}"`,
+        `"${h.pdu_tipo || ''}"`,
+        `"${h.status || 'nominal'}"`
+      ].join(","));
+
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\r\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Inventario_RDP_Acesso_Remoto_NOC_${new Date().toISOString().substring(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("Planilha de Acesso Remoto exportada com sucesso!", "success");
+    }
+
+    function buildSmartFieldHtml(colId, colTitle, currentValue) {
+      const titleLower = (colTitle || colId || '').toLowerCase();
+      const val = currentValue !== null && currentValue !== undefined ? String(currentValue) : '';
+
+      if (titleLower.includes("praça") || titleLower.includes("praca") || titleLower.includes("cidade") || titleLower === "host") {
+        const options = OFICIAL_PRACAS.map(p => `<option value="${p}" ${val.toLowerCase() === p.toLowerCase() ? "selected" : ""}>${p}</option>`).join('');
+        return `
+          <div class="sp-form-group">
+            <label class="sp-form-label">${colTitle}</label>
+            <select name="${colId}" class="sp-form-input list-dyn-input" style="width: 100%; height: 38px;">
+              <option value="">Selecione a Praça...</option>
+              ${options}
+            </select>
+          </div>
+        `;
+      }
+
+      if (titleLower.includes("emissora") || titleLower.includes("rede") || titleLower.includes("veículo") || titleLower.includes("veiculo")) {
+        const options = OFICIAL_EMISSORAS.map(e => `<option value="${e}" ${val.toLowerCase() === e.toLowerCase() ? "selected" : ""}>${e}</option>`).join('');
+        return `
+          <div class="sp-form-group">
+            <label class="sp-form-label">${colTitle}</label>
+            <select name="${colId}" class="sp-form-input list-dyn-input" style="width: 100%; height: 38px;">
+              <option value="">Selecione a Emissora...</option>
+              ${options}
+            </select>
+          </div>
+        `;
+      }
+
+      if (titleLower.includes("data") || titleLower.includes("hora") || titleLower.includes("solicita") || titleLower.includes("início") || titleLower.includes("inicio") || titleLower.includes("fim")) {
+        let dateVal = val;
+        if (dateVal.includes("T")) dateVal = dateVal.substring(0, 16);
+        return `
+          <div class="sp-form-group">
+            <label class="sp-form-label">${colTitle}</label>
+            <div style="display: flex; gap: 6px;">
+              <input type="datetime-local" name="${colId}" class="sp-form-input list-dyn-input" value="${dateVal}" style="flex: 1; height: 38px;">
+              <button type="button" class="sp-btn-cmd" style="padding: 0 10px; font-size: 11.5px;" onclick="setFieldNow(this, '${colId}')">Agora</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (titleLower.includes("área") || titleLower.includes("area") || titleLower === "área a solicitar") {
+        const options = OFICIAL_AREAS.map(a => `<option value="${a}" ${val.toLowerCase() === a.toLowerCase() ? "selected" : ""}>${a}</option>`).join('');
+        return `
+          <div class="sp-form-group">
+            <label class="sp-form-label">${colTitle}</label>
+            <select name="${colId}" class="sp-form-input list-dyn-input" style="width: 100%; height: 38px;">
+              ${options}
+            </select>
+          </div>
+        `;
+      }
+
+      if (titleLower.includes("retorno") || titleLower === "status_retorno" || titleLower.includes("status do retorno")) {
+        const options = OFICIAL_STATUS_RETORNO.map(s => `<option value="${s}" ${val.toLowerCase() === s.toLowerCase() ? "selected" : ""}>${s}</option>`).join('');
+        return `
+          <div class="sp-form-group">
+            <label class="sp-form-label">${colTitle}</label>
+            <select name="${colId}" class="sp-form-input list-dyn-input" style="width: 100%; height: 38px;">
+              ${options}
+            </select>
+          </div>
+        `;
+      }
+
+      if (titleLower.includes("presente") || titleLower.includes("recuperacao") || titleLower.includes("recuperação") || titleLower.includes("gravacao") || titleLower.includes("gravação")) {
+        const isSim = val.toLowerCase() === "sim" || val.toLowerCase() === "true" || val === "1";
+        return `
+          <div class="sp-form-group">
+            <label class="sp-form-label">${colTitle}</label>
+            <select name="${colId}" class="sp-form-input list-dyn-input" style="width: 100%; height: 38px;">
+              <option value="Sim" ${isSim ? "selected" : ""}>Sim</option>
+              <option value="Não" ${!isSim ? "selected" : ""}>Não</option>
+            </select>
+          </div>
+        `;
+      }
+
+      if (titleLower.includes("indício") || titleLower.includes("indicio") || titleLower.includes("descri") || titleLower.includes("ação") || titleLower.includes("acao") || titleLower.includes("observa") || titleLower.includes("resposta")) {
+        return `
+          <div class="sp-form-group" style="grid-column: 1 / -1;">
+            <label class="sp-form-label">${colTitle}</label>
+            <textarea name="${colId}" class="sp-form-input list-dyn-input" rows="4" placeholder="Descreva os detalhes..." style="width: 100%; font-family: inherit; resize: vertical;">${val}</textarea>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="sp-form-group">
+          <label class="sp-form-label">${colTitle}</label>
+          <input type="text" name="${colId}" class="sp-form-input list-dyn-input" value="${val}" placeholder="Informe ${colTitle}...">
+        </div>
+      `;
+    }
+
+    function setFieldNow(btn, fieldName) {
+      const input = btn.closest(".sp-form-group").querySelector(`[name="${fieldName}"]`);
+      if (input) {
+        const now = new Date();
+        const iso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().substring(0, 16);
+        input.value = iso;
+      }
+    }
+
+    function openEditListItemModal(itemIndex) {
+      if (!currentRealListName) return;
+      const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[currentRealListName];
+      if (!listData || !listData.items || !listData.items[itemIndex]) return;
+
+      editingListItemIndex = itemIndex;
+      const item = listData.items[itemIndex];
+
+      const titleEl = document.getElementById("modal-new-list-title");
+      if (titleEl) titleEl.innerHTML = `✏️ Propriedades do Item &mdash; ${currentRealListTitle}`;
+
+      const container = document.getElementById("new-list-fields-container");
+      if (!container) return;
+      container.innerHTML = "";
+      container.style.display = "grid";
+      container.style.gridTemplateColumns = "repeat(auto-fit, minmax(260px, 1fr))";
+      container.style.gap = "14px";
+
+      const cols = listData.columns || [];
+      const systemCols = ['id', 'modified', 'created', 'author', 'editor', 'attachments', 'contenttypeid'];
+      const editableCols = cols.filter(c => !systemCols.includes(String(c.name || '').toLowerCase()));
+      const renderCols = editableCols.length > 0 ? editableCols : cols;
+
+      renderCols.forEach(col => {
+        const colId = col.name;
+        const colTitle = col.displayName || col.name;
+        const val = item[colId] !== undefined ? item[colId] : (item[colTitle] !== undefined ? item[colTitle] : "");
+        container.innerHTML += buildSmartFieldHtml(colId, colTitle, val);
+      });
+
+      const submitBtn = document.querySelector("#modal-new-list-item button[type='submit']");
+      if (submitBtn) submitBtn.innerText = "💾 Salvar Alterações";
+
+      const modal = document.getElementById("modal-new-list-item");
+      if (modal) modal.style.display = "flex";
+    }
+
+    function openQuickCloseOcoModal(ocoId) {
+      currentQuickOcoId = ocoId;
+      const oco = allOcorrencias.find(o => String(o.id || o.Criado) === String(ocoId));
+      if (!oco) return;
+
+      document.getElementById("quick-close-oco-id").value = ocoId;
+      document.getElementById("quick-close-host-title").innerText = (oco.HostName || oco.hostLookupId || 'Host') + ' (CS ' + (oco.CS || '-') + ')';
+      document.getElementById("quick-close-status").value = "Concluído";
+      document.getElementById("quick-close-area").value = "Solucionado";
+      document.getElementById("quick-close-acoes").value = oco.AcoesExecutadas || "";
+      document.getElementById("quick-close-recup").checked = String(oco.EmRecuperacao).toLowerCase() === 'sim';
+      document.getElementById("quick-close-informar").checked = Boolean(oco.InformarOperacao);
+
+      const modal = document.getElementById("modal-quick-close-oco");
+      if (modal) modal.style.display = "flex";
+    }
+
+    function closeQuickCloseOcoModal() {
+      const modal = document.getElementById("modal-quick-close-oco");
+      if (modal) modal.style.display = "none";
+    }
+
+    function setQuickAcao(texto) {
+      const el = document.getElementById("quick-close-acoes");
+      if (el) {
+        el.value = (el.value ? el.value + " " : "") + texto;
+      }
+    }
+
+    function submitQuickCloseOco(ev) {
+      ev.preventDefault();
+      const ocoId = document.getElementById("quick-close-oco-id").value;
+      const oco = allOcorrencias.find(o => String(o.id || o.Criado) === String(ocoId));
+      if (!oco) return;
+
+      oco.Status = document.getElementById("quick-close-status").value;
+      oco.AreaResponsavel = document.getElementById("quick-close-area").value;
+      oco.AcoesExecutadas = document.getElementById("quick-close-acoes").value;
+      oco.EmRecuperacao = document.getElementById("quick-close-recup").checked ? "Sim" : "Não";
+      oco.InformarOperacao = document.getElementById("quick-close-informar").checked;
+      oco.Modified = new Date().toISOString();
+
+      try {
+        let edits = JSON.parse(localStorage.getItem('sp_custom_oco_edits') || '{}');
+        edits[ocoId] = {
+          Status: oco.Status,
+          AreaResponsavel: oco.AreaResponsavel,
+          AcoesExecutadas: oco.AcoesExecutadas,
+          EmRecuperacao: oco.EmRecuperacao,
+          InformarOperacao: oco.InformarOperacao,
+          Modified: oco.Modified
+        };
+        localStorage.setItem('sp_custom_oco_edits', JSON.stringify(edits));
+      } catch (e) {
+        console.warn("Erro ao salvar encerramento localmente:", e);
+      }
+
+      closeQuickCloseOcoModal();
+      renderOcorrenciasTable();
+      showToast("Ocorrência encerrada e atualizada com sucesso!", "success");
+    }
+
+    async function refreshOcorrenciasData(btn) {
+      const icon = document.getElementById("icon-refresh-oco");
+      if (icon) icon.style.animation = "spin 1s linear infinite";
+      if (btn) btn.disabled = true;
+
+      try {
+        const savedEdits = JSON.parse(localStorage.getItem('sp_custom_oco_edits') || '{}');
+        let countUpdated = 0;
+        allOcorrencias.forEach(o => {
+          const ocoId = o.id || o.Criado;
+          if (savedEdits[ocoId]) {
+            Object.assign(o, savedEdits[ocoId]);
+            countUpdated++;
+          }
+        });
+
+        const newSaved = JSON.parse(localStorage.getItem('sp_custom_new_ocorrencias') || '[]');
+        newSaved.forEach(newItem => {
+          if (!allOcorrencias.some(o => (o.id && o.id === newItem.id) || o.Criado === newItem.Criado)) {
+            allOcorrencias.unshift(newItem);
+            countUpdated++;
+          }
+        });
+
+        renderOcorrenciasTable();
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('pt-BR');
+        showToast(`Painel atualizado às ${timeStr}! (${allOcorrencias.length} registros)`, "success");
+      } catch (err) {
+        console.warn("Falha no refresh:", err);
+        renderOcorrenciasTable();
+      } finally {
+        setTimeout(() => {
+          if (icon) icon.style.animation = "";
+          if (btn) btn.disabled = false;
+        }, 600);
+      }
+    }
+
   </script>
 </body>
 </html>"""
