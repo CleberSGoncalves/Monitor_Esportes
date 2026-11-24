@@ -18,22 +18,20 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.19"
-    release_name = "v2.5.19 - Inspetor Headless SharePoint -> Google & Sincronizador Bidirecional"
+    tag = "v2.5.20"
+    release_name = "v2.5.20 - Sincronização Automática Streaming no Google Portal & Enriquecimento de Escala"
     body = (
-        "### Novidades da versão v2.5.19:\n"
-        "- ⚡ **Inspetor Headless de Alterações (SharePoint -> Google)**:\n"
-        "  - Módulo autônomo `modules/sharepoint_inspector_sync.py` monitorando 46 listas e 21 bibliotecas de documentos em background.\n"
-        "  - Sensor leve de metadados (`lastModifiedDateTime`) com checagem em ~1.5s e zero consumo ocioso.\n"
-        "  - Extração incremental (Upsert sem duplicatas) no master data e painel clean de ocorrências.\n"
-        "  - Captura automática das 23 novas ocorrências geradas no SharePoint e download da nova Escala de Trabalho 2026.\n"
-        "- ⏰ **Automação Contínua via Agendador de Tarefas do Windows**:\n"
-        "  - Tarefa `SuporteCaptacao_SharePoint_LiveInspector` rodando a cada 5 minutos em modo invisível.\n"
-        "  - Script `executar_inspetor_sharepoint.bat` para execução manual on-demand com 1 clique.\n"
-        "- 🌐 **Recompilação Automática do Portal Web e Google Sheets**:\n"
-        "  - Atualização instantânea dos portais `portal_web/index.html` e `docs/index.html` a cada modificação detectada.\n"
+        "### Novidades da versão v2.5.20:\n"
+        "- ⚽ **Sincronização Automática da Programação de Streaming (SharePoint -> Google Portal & Sheets)**:\n"
+        "  - O motor de sincronização agora atualiza automaticamente o dataset canônico `config/sharepoint_clean_migrated_events.json` e a planilha Google Sheets oficial.\n"
+        "  - Novos jogos adicionados no SharePoint (como Grêmio x Palmeiras pela Copa do Brasil) são imediatamente integrados ao Google Portal com data, horário, canal e badges corretos.\n"
+        "- 👤 **Associação Automática da Escala de Gravação e PVID TV BOX**:\n"
+        "  - Eventos inseridos sem operador ou sem PVID no SharePoint são associados automaticamente à escala de gravação ('Cleber BL01 e Backup' e 'Prime Video - PV3687').\n"
+        "  - Enriquecimento reverso via Microsoft Graph API PATCH, preenchendo os campos no próprio SharePoint para manter paridade absoluta entre ambos os ambientes.\n"
+        "- 📊 **Contadores Dinâmicos e Título Responsivo no Portal**:\n"
+        "  - Título do portal e contadores de confrontos agora refletem com precisão o total real de jogos (864 confrontos).\n"
         "- 🧪 **Testes E2E Automatizados**:\n"
-        "  - Suíte de testes automatizados aprovada com 100% de sucesso.\n"
+        "  - Suíte completa de testes unitários e integração aprovada com 100% de sucesso.\n"
     )
 
     headers = {

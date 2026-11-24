@@ -130,6 +130,8 @@ class SharePointInspectorSync:
         self.state_file = state_file or os.path.join(self.project_root, "config", "sharepoint_sync_state.json")
         self.master_data_file = master_data_file or os.path.join(self.project_root, "config", "sharepoint_portal_master_data.json")
         self.painel_ocorrencias_file = os.path.join(self.project_root, "config", "painel_ocorrencias_clean_live.json")
+        self.clean_migrated_events_file = os.path.join(self.project_root, "config", "sharepoint_clean_migrated_events.json")
+        self.google_sheets_api_url = "https://script.google.com/macros/s/AKfycbxzWKi1dNiGUiF15Ysl_69Pe2dt2vUpe1UBQ9xadPenmnsH68VOk6W1ZMwhRQkRpkBX/exec"
         self.escala_excel_file = os.path.join(self.project_root, "config", "Escala de trabalho 2026.xlsx")
         self.escala_json_file = os.path.join(self.project_root, "config", "escala_completa_2026.json")
         self.chat_webhook_file = os.path.join(self.project_root, "config", "google_chat_webhook.json")
@@ -148,7 +150,7 @@ class SharePointInspectorSync:
         method: str = "GET",
         json_payload: Optional[dict] = None,
         extra_headers: Optional[dict] = None,
-        max_retries: int = 2
+        max_retries: int = 4
     ) -> requests.Response:
         """Executa chamada HTTP ao Graph API com backoff inteligente anti-throttling (429)."""
         token = self.get_token()
@@ -162,7 +164,7 @@ class SharePointInspectorSync:
 
         for attempt in range(max_retries):
             try:
-                time.sleep(0.35)  # Espaçamento preventivo
+                time.sleep(0.6)  # Espaçamento preventivo
                 if method.upper() == "GET":
                     resp = self.session.get(url, headers=headers, timeout=25)
                 elif method.upper() == "POST":
@@ -173,8 +175,8 @@ class SharePointInspectorSync:
                 if resp.status_code == 200:
                     return resp
                 elif resp.status_code == 429:
-                    retry_after = int(resp.headers.get("Retry-After", 5))
-                    wait_sec = min(max(retry_after + 1, 3), 12)
+                    retry_after = int(resp.headers.get("Retry-After", 6))
+                    wait_sec = min(max(retry_after + 1, 6), 25)
                     logger.warning(f"[Graph 429 Throttled] Aguardando {wait_sec}s (tentativa {attempt+1}/{max_retries})...")
                     time.sleep(wait_sec)
                 elif resp.status_code == 401:
@@ -423,9 +425,11 @@ class SharePointInspectorSync:
         except Exception as e:
             logger.error(f"Erro ao salvar master data: {e}")
 
-        # 2. Tratamento Especial para 'Painel de Ocorrências'
+        # 2. Tratamento Especial para 'Painel de Ocorrências' e 'Programação de eventos - Streaming'
         if list_name == "Painel de Ocorrências":
             self._sync_painel_ocorrencias_clean(raw_items)
+        elif list_name == "Programação de eventos - Streaming":
+            self._sync_streaming_clean(raw_items)
 
         logger.info(f"✅ Lista '{list_name}' sincronizada: +{inserted_count} novos, {updated_count} atualizados.")
         return (inserted_count, updated_count)
@@ -482,6 +486,221 @@ class SharePointInspectorSync:
             logger.info(f"📋 Painel de Ocorrências clean atualizado com sucesso ({len(clean_items)} ocorrências totais).")
         except Exception as e:
             logger.error(f"Erro ao salvar painel_ocorrencias_clean_live.json: {e}")
+
+    def _patch_sharepoint_item_streaming(self, item_id: str, responsavel: str, pvid: str) -> bool:
+        """Atualiza no SharePoint o Responsável pela Gravação e o PVID caso estejam vazios."""
+        try:
+            list_id = ALL_LISTS_MAP.get("Programação de eventos - Streaming")
+            if not list_id or not item_id:
+                return False
+            url = f"https://graph.microsoft.com/v1.0/sites/{self.site_id}/lists/{list_id}/items/{item_id}/fields"
+            payload = {}
+            if responsavel:
+                payload["BKP_x0020__x0028_Uso_x0020_Supor"] = responsavel
+            if pvid:
+                payload["PVID"] = pvid
+            if not payload:
+                return False
+            resp = self._request_graph(url, method="PATCH", json_payload=payload)
+            if resp.status_code == 200:
+                logger.info(f"✨ SharePoint Item #{item_id} enriquecido com sucesso (Responsável: '{responsavel}', PVID: '{pvid}').")
+                return True
+            return False
+        except Exception as e:
+            logger.warning(f"Não foi possível efetuar patch no SharePoint Item #{item_id}: {e}")
+            return False
+
+    def _push_to_google_sheets(self, events: List[dict]) -> bool:
+        """Envia eventos novos/atualizados para a planilha Google Sheets oficial via Web App."""
+        try:
+            if not events:
+                return True
+            payload = {"events": events}
+            resp = self.session.post(self.google_sheets_api_url, json=payload, timeout=25)
+            if resp.status_code == 200:
+                logger.info(f"📊 Google Sheets sincronizado com sucesso: {len(events)} eventos transmitidos.")
+                return True
+            else:
+                logger.warning(f"Google Sheets retornou HTTP {resp.status_code}: {resp.text[:200]}")
+                return False
+        except Exception as e:
+            logger.warning(f"Falha ao enviar eventos para Google Sheets Web App: {e}")
+            return False
+
+    def _sync_streaming_clean(self, raw_items: List[dict]) -> Tuple[int, int]:
+        """
+        Sincroniza a programação de streaming com o dataset canônico:
+        config/sharepoint_clean_migrated_events.json e Google Sheets.
+        Garante associação de responsável da escala e PVID se vazios no SharePoint.
+        """
+        clean_events = []
+        if os.path.exists(self.clean_migrated_events_file):
+            try:
+                with open(self.clean_migrated_events_file, "r", encoding="utf-8") as f:
+                    clean_events = json.load(f)
+            except Exception as e:
+                logger.error(f"Erro ao carregar sharepoint_clean_migrated_events.json: {e}")
+
+        existing_by_id = {}
+        existing_by_key = {}
+        for idx, ev in enumerate(clean_events):
+            sp_id = str(ev.get("id_sharepoint", "")).strip()
+            if sp_id:
+                existing_by_id[sp_id] = idx
+            partida = str(ev.get("partida", "")).strip().lower()
+            data = str(ev.get("data", "")).strip()
+            if partida and data:
+                existing_by_key[(partida, data)] = idx
+
+        meses_nomes = [
+            "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+        ]
+
+        def parse_date_to_br(raw_date: Any) -> Tuple[str, str, str]:
+            """Retorna (data_dd_mm_yyyy, mes_nome, ano_yyyy)."""
+            if not raw_date:
+                return ("", "", "")
+            s = str(raw_date).strip()
+            if "T" in s:
+                d_part = s.split("T")[0]
+                p = d_part.split("-")
+                if len(p) == 3:
+                    y, m, d = p[0], p[1], p[2]
+                    m_idx = int(m) - 1
+                    m_nome = meses_nomes[m_idx] if 0 <= m_idx < 12 else ""
+                    return (f"{d}/{m}/{y}", m_nome, y)
+            elif "/" in s:
+                p = s.split("/")
+                if len(p) == 3:
+                    d, m, y = p[0].zfill(2), p[1].zfill(2), p[2]
+                    m_idx = int(m) - 1
+                    m_nome = meses_nomes[m_idx] if 0 <= m_idx < 12 else ""
+                    return (f"{d}/{m}/{y}", m_nome, y)
+            return (s, "", "")
+
+        inserted_count = 0
+        updated_count = 0
+        events_to_push = []
+
+        for r_item in raw_items:
+            item_id = str(r_item.get("id", ""))
+            f = r_item.get("fields", {})
+
+            partida = str(f.get("Partida") or "").strip()
+            campeonato = str(f.get("Title") or f.get("LinkTitle") or "").strip()
+            horario = str(f.get("Hor_x00e1_rio") or "16:00").strip()
+
+            raw_data = f.get("Data")
+            data_br, mes_calc, ano_calc = parse_date_to_br(raw_data)
+            mes = str(f.get("M_x00ea_s") or mes_calc or "").strip()
+
+            canal_raw = f.get("Transmiss_x00e3_o")
+            if isinstance(canal_raw, list):
+                canal = ", ".join(str(c) for c in canal_raw if c).strip()
+            else:
+                canal = str(canal_raw or "Amazon Prime").strip()
+            if not canal:
+                canal = "Amazon Prime"
+
+            # Responsável pela gravação
+            responsavel = str(f.get("BKP_x0020__x0028_Uso_x0020_Supor") or "").strip()
+            orig_resp_empty = not bool(responsavel)
+            if not responsavel:
+                # Regra de ouro da escala: Cleber BL01 e Backup padrão
+                responsavel = "Cleber BL01 e Backup"
+
+            # PVID TV BOX
+            pvid = str(f.get("PVID") or "").strip()
+            orig_pvid_empty = not bool(pvid)
+            if not pvid:
+                c_low = canal.lower()
+                if "prime" in c_low or "amazon" in c_low:
+                    pvid = "Prime Video - PV3687"
+                elif "cazé" in c_low or "caze" in c_low:
+                    pvid = "CAZETV - PV3625"
+                elif "netflix" in c_low:
+                    pvid = "Netflix - PV3679"
+                elif "tnt" in c_low or "max" in c_low:
+                    pvid = "TNT - 316"
+                elif "record" in c_low:
+                    pvid = "Record - 58"
+                elif "dazn" in c_low:
+                    pvid = "DAZN - PVBOX"
+                else:
+                    pvid = f"{canal} - PVBOX"
+
+            # Sort key (YYYY-MM-DD_HH:MM)
+            if data_br and "/" in data_br:
+                dp = data_br.split("/")
+                sort_key = f"{dp[2]}-{dp[1]}-{dp[0]}_{horario}"
+            else:
+                sort_key = f"9999-12-31_{horario}"
+
+            # Enriquecer o SharePoint de volta apenas para confrontos vigentes/futuros ou recém-criados
+            # (evita sobrecarga de throttling do Graph API com jogos retroativos antigos)
+            today_str = datetime.now().strftime("%Y-%m-%d")
+            is_upcoming_or_new = (sort_key >= today_str) or (item_id not in existing_by_id)
+            if (orig_resp_empty or orig_pvid_empty) and item_id and is_upcoming_or_new:
+                self._patch_sharepoint_item_streaming(item_id, responsavel, pvid)
+
+            status_entrega = str(f.get("StatusdeEntrega") or "Pendente").strip()
+            programado_raw = str(f.get("Programado_x0020_TV_x0020_BOX_x0") or "NÃO").strip().upper()
+            programado = "SIM" if programado_raw in ["SIM", "S", "TRUE", "1"] else "NÃO"
+
+            formatted_item = {
+                "id_sharepoint": item_id,
+                "anexos": "",
+                "mes": mes,
+                "data": data_br,
+                "horario": horario,
+                "campeonato": campeonato,
+                "partida": partida,
+                "responsavel": responsavel,
+                "canal": canal,
+                "pvid": pvid,
+                "status_entrega": status_entrega,
+                "programado": programado,
+                "_sort_key": sort_key
+            }
+
+            match_key = (partida.lower(), data_br)
+            if item_id in existing_by_id:
+                idx = existing_by_id[item_id]
+                clean_events[idx].update(formatted_item)
+                updated_count += 1
+                events_to_push.append(formatted_item)
+            elif match_key in existing_by_key:
+                idx = existing_by_key[match_key]
+                clean_events[idx].update(formatted_item)
+                updated_count += 1
+                events_to_push.append(formatted_item)
+            else:
+                clean_events.append(formatted_item)
+                existing_by_id[item_id] = len(clean_events) - 1
+                existing_by_key[match_key] = len(clean_events) - 1
+                inserted_count += 1
+                events_to_push.append(formatted_item)
+
+        # Ordenar cronologicamente por _sort_key
+        try:
+            clean_events.sort(key=lambda x: x.get("_sort_key", ""))
+        except Exception:
+            pass
+
+        # Salvar dataset limpo
+        try:
+            with open(self.clean_migrated_events_file, "w", encoding="utf-8") as f_out:
+                json.dump(clean_events, f_out, indent=2, ensure_ascii=False)
+            logger.info(f"⚽ Programação Streaming clean atualizada ({len(clean_events)} eventos totais, +{inserted_count} novos, {updated_count} atualizados).")
+        except Exception as e:
+            logger.error(f"Erro ao salvar sharepoint_clean_migrated_events.json: {e}")
+
+        # Enviar eventos novos para a nuvem Google Sheets
+        if events_to_push:
+            self._push_to_google_sheets(events_to_push)
+
+        return (inserted_count, updated_count)
 
     def sync_drive_items(self, drive_meta: dict) -> int:
         """Sincroniza bibliotecas de arquivos/relatórios (ex: Escala de trabalho ou relatórios)."""

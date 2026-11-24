@@ -2337,8 +2337,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
 
       <div class="sp-list-header-row">
-        <h2 class="sp-list-main-title">
-          Programação Streaming (862 Confrontos) <span class="star-icon">☆</span>
+        <h2 class="sp-list-main-title" id="streaming-list-title">
+          Programação Streaming (__EVENTS_COUNT__ Confrontos) <span class="star-icon">☆</span>
         </h2>
       </div>
 
@@ -5043,6 +5043,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       document.getElementById("kpi-netflix").innerText = netflix;
       document.getElementById("kpi-outros").innerText = outros;
       document.getElementById("showing-count").innerText = count;
+      const streamTitleEl = document.getElementById("streaming-list-title");
+      if (streamTitleEl) {
+        streamTitleEl.innerHTML = `Programação Streaming (${allEvents.length} Confrontos) <span class="star-icon">☆</span>`;
+      }
     }
 
     let hospSortCol = null;

@@ -1,7 +1,109 @@
 [
   {
-    "id": "15524",
+    "id": "15529",
     "Status": "Em andamento",
+    "Criado": "2026-11-24T14:32:01Z",
+    "hostLookupId": "77",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "Equopamento Dt01 sem comunicação , enviado msg ao parceiro",
+    "AreaResponsavel": "N1",
+    "Redmine": "N1"
+  },
+  {
+    "id": "15528",
+    "Status": "Concluido",
+    "Criado": "2026-11-24T12:09:08Z",
+    "hostLookupId": "61",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Switch / Roteador"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "Equipamentos Offline, enviado msg ao parceiro",
+    "AreaResponsavel": "N1",
+    "Redmine": "N1"
+  },
+  {
+    "id": "15527",
+    "Status": "Em andamento",
+    "Criado": "2026-11-24T01:37:08Z",
+    "hostLookupId": "160",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Estamos sem comunicação com nossa máquina CS2. Já enviamos uma mensagem ao parceiro local para que verifique a situação. No momento, estamos aguardando um retorno.",
+    "AreaResponsavel": "N1",
+    "Redmine": "N1"
+  },
+  {
+    "id": "15526",
+    "Status": "Concluido",
+    "Criado": "2026-11-23T23:33:51Z",
+    "hostLookupId": "157",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "Estamos sem comunicação com nossa máquina CS1. Já enviamos uma mensagem ao parceiro local para que verifique a situação. No momento, estamos aguardando um retorno.\n ",
+    "AreaResponsavel": "N1",
+    "Redmine": "N1"
+  },
+  {
+    "id": "15525",
+    "Status": "Concluido",
+    "Criado": "2026-11-23T19:40:00Z",
+    "hostLookupId": "212",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "Estamos sem comunicação com nossas máquinas. Já enviamos uma mensagem ao parceiro local para que verifique a situação. No momento, estamos aguardando um retorno.\n ",
+    "AreaResponsavel": "N1",
+    "Redmine": "N1"
+  },
+  {
+    "id": "15524",
+    "Status": "Concluido",
     "Criado": "2026-11-23T18:01:48Z",
     "hostLookupId": "131",
     "CS": [

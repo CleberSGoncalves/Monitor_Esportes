@@ -1,5 +1,5 @@
 {
-  "version": "2.5.19",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.19/Monitor_Esportes.exe",
-  "changelog": "v2.5.19: Inspetor Headless de Alterações e Sincronizador Bidirecional SharePoint -> Google (modules/sharepoint_inspector_sync.py). Monitoramento em background de 46 listas e 21 drives com sensor leve de metadados, extração incremental (upsert sem duplicatas), sincronização da Escala 2026 e 23 novas ocorrências, tarefa agendada Windows (5 min) e recompilação em tempo real do Portal Web e Google Sheets."
+  "version": "2.5.20",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.20/Monitor_Esportes.exe",
+  "changelog": "v2.5.20: Sincronização automática e contínua da Programação Streaming (sharepoint_clean_migrated_events.json) no Google Portal e Google Sheets. Associação automática de responsável (Cleber BL01 e Backup) e PVID oficial para eventos vazios com patch reverso no SharePoint. Título e contadores dinâmicos no portal (864 confrontos) e integração 100% headless."
 }

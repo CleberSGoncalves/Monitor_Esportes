@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import pytest
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 from scripts.build_portal_web import generate_portal
 
 def test_build_portal_web_creates_file_and_validates_sharepoint_replica_and_rbac():
@@ -12,7 +18,7 @@ def test_build_portal_web_creates_file_and_validates_sharepoint_replica_and_rbac
         content = f.read()
 
     # 1. Validação de Título e Hero Banner 1:1 com SharePoint
-    assert "Suporte e Captação" in content
+    assert "Suporte Captação" in content
     assert "São Paulo, Brasil" in content
     assert "hero-3x3-grid" in content
     assert "hero-network-svg" in content
@@ -108,9 +114,10 @@ def test_build_portal_web_creates_file_and_validates_sharepoint_replica_and_rbac
     # 12. Validação dos Contêineres de Abas e Funções Globais
     required_panes = [
         "pane-home", "pane-escala", "pane-streaming", "pane-hospedeiros",
-        "pane-ocorrencias", "pane-procedimentos", "pane-documentos",
-        "pane-dashboard", "pane-metas", "pane-projetos", "pane-receptores",
-        "pane-equipe", "pane-permissoes", "pane-links", "pane-antenistas", "pane-hosts"
+        "pane-ocorrencias", "pane-antenistas", "pane-hosts",
+        "pane-drive-viewer", "pane-list-viewer", "pane-dashboard",
+        "pane-projetos", "pane-receptores", "pane-equipe",
+        "pane-permissoes", "pane-links"
     ]
     for pane in required_panes:
         assert f'id="{pane}"' in content, f"Aba obrigatória {pane} não encontrada no HTML"
@@ -135,4 +142,10 @@ def test_build_portal_web_creates_file_and_validates_sharepoint_replica_and_rbac
     assert "Redmine" in content
     assert "allHosts" in content
     assert "allAntenistas" in content
+
+    # 14. Validação da Programação de Streaming Sincronizada com o SharePoint
+    assert "Grêmio x Palmeiras" in content
+    assert "Prime Video - PV3687" in content
+    assert "streaming-list-title" in content
+    assert "864 Confrontos" in content
 

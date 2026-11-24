@@ -271,3 +271,99 @@ def test_end_to_end_sync_cycle(tmp_path):
     assert "Lista Teste" in saved_state["lists"]
     assert saved_state["lists"]["Lista Teste"]["last_synced_modified"] == "2026-11-23T12:30:00Z"
     assert len(saved_state["sync_history"]) == 1
+
+
+def test_sync_streaming_clean_upsert_and_patch(tmp_path):
+    """Valida o sincronizador de streaming: conversão canônica, inferência de escala e patch bidirecional."""
+    state_file = str(tmp_path / "state.json")
+    master_file = str(tmp_path / "master.json")
+    clean_events_file = str(tmp_path / "sharepoint_clean_migrated_events.json")
+
+    # Base inicial com 1 evento antigo
+    initial_events = [
+        {
+            "id_sharepoint": "100",
+            "anexos": "",
+            "mes": "Novembro",
+            "data": "24/11/2026",
+            "horario": "17:00",
+            "campeonato": "CBF - Brasileirão Série A",
+            "partida": "Chapecoense x Palmeiras",
+            "responsavel": "Lucieudes BL01 e Backup",
+            "canal": "Cazé TV",
+            "pvid": "CAZETV - PV3625",
+            "status_entrega": "Pendente",
+            "programado": "NÃO",
+            "_sort_key": "2026-11-24_17:00"
+        }
+    ]
+    with open(clean_events_file, "w", encoding="utf-8") as f:
+        json.dump(initial_events, f)
+
+    inspector = SharePointInspectorSync(state_file=state_file, master_data_file=master_file)
+    inspector.clean_migrated_events_file = clean_events_file
+
+    # Item do SharePoint equivalente ao Grêmio x Palmeiras (ID 37731) com campos vazios
+    raw_sp_item = {
+        "id": "37731",
+        "fields": {
+            "Title": "CBF - Copa do Brasil",
+            "M_x00ea_s": "Dezembro",
+            "Data": "2026-12-06T12:00:00Z",
+            "Hor_x00e1_rio": "16:00",
+            "Partida": "Grêmio x Palmeiras",
+            "Transmiss_x00e3_o": ["Amazon Prime"],
+            "BKP_x0020__x0028_Uso_x0020_Supor": None,  # Vazio no SharePoint
+            "PVID": None,  # Vazio no SharePoint
+            "StatusdeEntrega": "Pendente",
+            "Programado_x0020_TV_x0020_BOX_x0": "NÂO"
+        }
+    }
+
+    patch_called = []
+    def mock_patch(item_id, responsavel, pvid):
+        patch_called.append((item_id, responsavel, pvid))
+        return True
+
+    sheets_pushed = []
+    def mock_push(events):
+        sheets_pushed.extend(events)
+        return True
+
+    inspector._patch_sharepoint_item_streaming = mock_patch
+    inspector._push_to_google_sheets = mock_push
+
+    ins, upd = inspector._sync_streaming_clean([raw_sp_item])
+    assert ins == 1
+    assert upd == 0
+
+    # 1. Valida que o SharePoint recebeu o PATCH de enriquecimento
+    assert len(patch_called) == 1
+    assert patch_called[0][0] == "37731"
+    assert patch_called[0][1] == "Cleber BL01 e Backup"
+    assert patch_called[0][2] == "Prime Video - PV3687"
+
+    # 2. Valida que foi enviado para o Google Sheets
+    assert len(sheets_pushed) == 1
+    assert sheets_pushed[0]["partida"] == "Grêmio x Palmeiras"
+    assert sheets_pushed[0]["data"] == "06/12/2026"
+    assert sheets_pushed[0]["responsavel"] == "Cleber BL01 e Backup"
+
+    # 3. Valida que o dataset local foi atualizado e ordenado
+    with open(clean_events_file, "r", encoding="utf-8") as f:
+        saved_events = json.load(f)
+
+    assert len(saved_events) == 2
+    gremio_ev = next(e for e in saved_events if e["id_sharepoint"] == "37731")
+    assert gremio_ev["partida"] == "Grêmio x Palmeiras"
+    assert gremio_ev["data"] == "06/12/2026"
+    assert gremio_ev["horario"] == "16:00"
+    assert gremio_ev["mes"] == "Dezembro"
+    assert gremio_ev["responsavel"] == "Cleber BL01 e Backup"
+    assert gremio_ev["pvid"] == "Prime Video - PV3687"
+    assert gremio_ev["_sort_key"] == "2026-12-06_16:00"
+
+    # Ordem cronológica mantida
+    assert saved_events[0]["_sort_key"] == "2026-11-24_17:00"
+    assert saved_events[1]["_sort_key"] == "2026-12-06_16:00"
+
