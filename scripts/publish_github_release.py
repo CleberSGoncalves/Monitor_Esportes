@@ -18,19 +18,25 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.21"
-    release_name = "v2.5.21 - Auto-Bootstrap Resiliente de Master Data e Publicação Contínua no Google Portal"
+    tag = "v2.5.22"
+    release_name = "v2.5.22 - Paridade Total com Streaming_Scheduler na Automação Diária das 01h e Auto-Busca"
     body = (
-        "### Novidades da versão v2.5.21:\n"
-        "- 🛡️ **Auto-Bootstrap Resiliente de Master Data (PyInstaller)**:\n"
-        "  - O módulo `portal_sync` agora recupera automaticamente o arquivo `sharepoint_portal_master_data.json` e datasets embutidos a partir do pacote PyInstaller (`sys._MEIPASS`) quando executado em diretórios de produção externos (ex: `D:\\MediaDNA_V2\\Applications\\Monitor_Esportes`).\n"
-        "  - Elimina definitivamente a exceção `[PortalSync] Arquivo master data não encontrado` que impedia a visualização imediata de relatórios no portal.\n"
-        "- 📑 **Sincronização 1:1 de Relatórios (Futebol, YouTube e NBA)**:\n"
-        "  - Garantia de reporte paralelo ponta a ponta: todo PDF gerado é arquivado em `docs/reports/` e `portal_web/reports/`, com atualização em tempo real do portal web.\n"
-        "- 🌐 **Geração Dinâmica do Portal Web na Raiz da Aplicação**:\n"
-        "  - O `build_portal_web.py` foi atualizado para compilar `index.html` na pasta externa do executável, garantindo que novas ocorrências, relatórios e eventos de streaming sejam renderizados sem defasagem.\n"
-        "- 🧪 **Validação Automatizada E2E**:\n"
-        "  - Bateria completa de testes automatizados (unitários, integração e E2E) aprovada com 100% de sucesso.\n"
+        "### Novidades da versão v2.5.22:\n"
+        "- ⏰ **Automação Diária das 01h com Paridade Total ao Streaming_Scheduler**:\n"
+        "  - O ciclo contínuo de monitoramento (`_re_executar_ciclo_monitoramento`) agora rastreia o horário programado (`hora_automatico`, padrão `01:00`) com algoritmo robusto diário (`agora >= alvo_hoje and _ultimo_agendamento_data != hoje`).\n"
+        "  - Atualização automática e dinâmica da data inicial de busca para o dia corrente (`re_data_inicio_var = hoje`).\n"
+        "- 🔍 **Auto Busca Unificada e Silenciosa de Eventos**:\n"
+        "  - Quando 'Auto Busca' (`re_auto_busca_var` / `check_automatico_Evento`) está ativo, executa a varredura unificada silenciosa nas plataformas oficiais (DAZN, Amazon Prime Video, Max, Disney+, Cazé TV, canais do YouTube e tabela CBF oficial).\n"
+        "  - Supressão de diálogos modais bloqueantes em modo de automação com encerramento limpo via callback assíncrono.\n"
+        "- 🔄 **Sincronização 1:1 Direta com SharePoint, Google Sheets e Google Portal**:\n"
+        "  - Correção na chamada de envio da grade para o SharePoint utilizando `push_events_from_tuples` com normalização profunda.\n"
+        "  - Espelhamento automático de eventos para a planilha do Google Sheets e reindexação instantânea do Google Portal Web.\n"
+        "- ✉️ **Disparo Consolidado de Auto E-mail**:\n"
+        "  - Se 'Auto E-mail' estiver ativo, o e-mail diário com a grade consolidada é despachado automaticamente ao término da varredura.\n"
+        "- 📺 **Monitoramento e Reprodução de Streams ao Vivo**:\n"
+        "  - Paridade com o monitoramento de jogos do dia: quando 'Somente Relatório' está desmarcado, aciona a reprodução e login automático no Chrome 9222 (Esquerda) ou 9224 (Direita) minutos antes do início da partida.\n"
+        "- 🧪 **Testes Automatizados Reais E2E**:\n"
+        "  - Nova suíte `tests/test_reporte_eventos_daily_schedule.py` com 6 testes específicos aprovados com 100% de sucesso.\n"
     )
 
     headers = {

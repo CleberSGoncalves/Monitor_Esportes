@@ -1,5 +1,5 @@
 {
-  "version": "2.5.21",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.21/Monitor_Esportes.exe",
-  "changelog": "v2.5.21: Auto-bootstrap resiliente de master data e eventos migrados em ambiente PyInstaller. Elimina o erro de arquivo master data não encontrado na pasta de instalação do executável (D:\\MediaDNA_V2\\...). Geração dinâmica do portal na raiz da aplicação garantindo publicação 1:1 de relatórios de Futebol, YouTube, NBA e Programação de Streaming."
+  "version": "2.5.22",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.22/Monitor_Esportes.exe",
+  "changelog": "v2.5.22: Paridade total com Streaming_Scheduler na automação da tarefa diária agendada (01:00 ou horário configurado). Execução automática de Auto Busca, atualização da data inicial para o dia corrente, varredura unificada silenciosa nas plataformas/CBF, sincronização direta com SharePoint, Google Sheets e Google Portal, disparo de auto e-mail consolidado e monitoramento contínuo de streams de confrontos ao vivo."
 }

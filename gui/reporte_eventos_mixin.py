@@ -18,7 +18,7 @@ import queue
 import logging
 import threading
 from datetime import datetime, date, timedelta
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Callable
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
@@ -73,6 +73,10 @@ from modules.reporte_eventos.selenium_browser_service import (
     padronizar_nomes_grid,
     remover_duplicatas,
     ajustartodootree,
+    loginprime,
+    logindazn,
+    loginmax,
+    logindisney,
 )
 from modules.reporte_eventos.cbf_pdf_service import (
     run_eventos_cbf,
@@ -84,7 +88,11 @@ from modules.reporte_eventos.email_report_service import (
 )
 from modules.reporte_eventos.sharepoint_client import (
     push_events_to_sharepoint,
+    push_events_from_tuples,
     _deep_normalize_partida,
+)
+from modules.reporte_eventos.google_sheets_sync_service import (
+    trigger_parallel_google_sheets_sync,
 )
 
 logger = logging.getLogger(__name__)
@@ -359,6 +367,11 @@ class ReporteEventosMixin:
         self.re_busy = False
         self._re_enviando_email = False
         self._re_ultimo_minuto_auto_email = ""
+        self._re_ultimo_agendamento_data = None
+        self._re_ultima_hora_config = str(cfg_xml.get("hora_automatico", "01:00")).strip()
+        self._re_tarefa_diaria_em_execucao = False
+        self._re_streams_reproduzidos_hoje = set()
+        self._re_reproduzindo_stream = False
 
         # Configura gravação ativa de logs em log.txt
         try:
@@ -1001,7 +1014,7 @@ class ReporteEventosMixin:
 
     # ── MÉTODOS DE BUSCA DE ALTA VELOCIDADE ───────────────────────────────────
 
-    def _re_buscar_eventos(self) -> None:
+    def _re_buscar_eventos(self, silencioso: bool = False, on_complete: Optional[Callable[[bool, str], None]] = None) -> None:
         """
         Executa a busca completa de eventos de forma 100% idêntica ao Streaming_Scheduler original:
         1. Inicializa o Chrome DevTools 9222 com TempProfile visível se necessário ou em modo somente relatório.
@@ -1015,7 +1028,10 @@ class ReporteEventosMixin:
         9. Se somente_relatorio, encerra o Chrome 9222.
         """
         if self.re_busy:
-            messagebox.showinfo("Aviso", "Uma busca de eventos já está em processamento.")
+            if not silencioso:
+                messagebox.showinfo("Aviso", "Uma busca de eventos já está em processamento.")
+            else:
+                logger.info("[ReporteEventos] Varredura agendada silenciosa ignorada: processo anterior ainda ativo.")
             return
 
         self.re_busy = True
@@ -1259,13 +1275,25 @@ class ReporteEventosMixin:
                         self.re_lbl_process.configure(text="")
                         self.re_progresso.set(1.0)
                         self._re_atualizar_kpis()
-                        messagebox.showinfo("Sucesso", msg[1])
+                        if not silencioso:
+                            messagebox.showinfo("Sucesso", msg[1])
+                        if on_complete:
+                            try:
+                                on_complete(True, msg[1])
+                            except Exception as ex_cb:
+                                logger.error(f"[ReporteEventos] Erro callback on_complete: {ex_cb}")
                     elif kind == "done_error":
                         self.re_lbl_status.configure(text=f"Erro na varredura: {msg[1]}")
                         self.re_lbl_process.configure(text="")
                         self.re_progresso.set(0.0)
                         self._re_atualizar_kpis()
-                        messagebox.showerror("Erro na Busca", f"Ocorreu um erro durante a varredura:\n{msg[1]}")
+                        if not silencioso:
+                            messagebox.showerror("Erro na Busca", f"Ocorreu um erro durante a varredura:\n{msg[1]}")
+                        if on_complete:
+                            try:
+                                on_complete(False, msg[1])
+                            except Exception as ex_cb:
+                                logger.error(f"[ReporteEventos] Erro callback on_complete: {ex_cb}")
                     elif kind == "finished":
                         self.re_busy = False
                         self.re_btn_buscar.configure(state="normal")
@@ -1496,23 +1524,244 @@ class ReporteEventosMixin:
         thread = threading.Thread(target=_watchdog_loop, daemon=True)
         thread.start()
 
-    def _re_executar_ciclo_monitoramento(self) -> None:
-        if not self.re_is_running: return
-        try:
-            if self.re_auto_email_var.get():
-                agora_str = datetime.now().strftime("%H:%M")
-                if agora_str == self.re_hora_auto_email_var.get().strip():
-                    if getattr(self, "_re_ultimo_minuto_auto_email", "") != agora_str:
-                        self._re_ultimo_minuto_auto_email = agora_str
-                        self._re_enviar_email(forcar=False)
-        except Exception as e:
-            logger.warning(f"[ReporteEventos] Erro no ciclo de monitoramento: {e}")
+    def _re_executar_tarefa_diaria_agendada(self) -> None:
+        """
+        Executa a rotina diária programada (01h ou horário configurado) com 100% de paridade com o Streaming_Scheduler:
+        1. Atualiza a data de início da busca para a data de hoje (DD/MM/YYYY).
+        2. Se 'Auto Busca' (re_auto_busca_var) estiver ativo:
+           - Dispara a varredura unificada silenciosa (_re_buscar_eventos com silencioso=True).
+           - Ao concluir a busca, executa o callback _re_pos_busca_tarefa_diaria.
+        3. Se 'Auto Busca' não estiver ativo, mas 'Auto E-mail' estiver ativo:
+           - Dispara o e-mail diário diretamente com os eventos atuais.
+        """
+        if getattr(self, "_re_tarefa_diaria_em_execucao", False) or self.re_busy:
+            logger.info("[ReporteEventos] Tarefa diária agendada ignorada: varredura já em andamento.")
+            return
 
+        self._re_tarefa_diaria_em_execucao = True
+        try:
+            hoje_str = datetime.now().strftime("%d/%m/%Y")
+            self.re_data_inicio_var.set(hoje_str)
+            logger.info(f"[ReporteEventos] [AGENDADO] Data da busca atualizada automaticamente para hoje: {hoje_str}")
+            self.re_lbl_status.configure(text=f"Executando atividades diárias agendadas: {datetime.now().strftime('%H:%M:%S')}")
+
+            if self.re_auto_busca_var.get():
+                logger.info("[ReporteEventos] [AGENDADO] Auto Busca ativa. Iniciando varredura unificada silenciosa...")
+                self._re_buscar_eventos(silencioso=True, on_complete=self._re_pos_busca_tarefa_diaria)
+            elif self.re_auto_email_var.get():
+                logger.info("[ReporteEventos] [AGENDADO] Auto Busca inativa. Disparando apenas auto e-mail diário...")
+                self._re_enviar_email(forcar=False)
+                self._re_tarefa_diaria_em_execucao = False
+            else:
+                self._re_tarefa_diaria_em_execucao = False
+        except Exception as ex:
+            logger.error(f"[ReporteEventos] Erro na execução da tarefa diária agendada: {ex}", exc_info=True)
+            self._re_tarefa_diaria_em_execucao = False
+
+    def _re_pos_busca_tarefa_diaria(self, sucesso: bool, msg: str) -> None:
+        """
+        Callback executado após o término da varredura diária agendada:
+        1. Sincroniza a grade com o SharePoint (push_events_from_tuples).
+        2. Dispara a sincronização paralela com Google Sheets e Google Portal.
+        3. Se 'Auto E-mail' estiver ativo, dispara o e-mail com a grade atualizada.
+        """
+        try:
+            linhas = [list(self.re_tree.item(i, "values")) for i in self.re_tree.get_children()]
+            logger.info(f"[ReporteEventos] Pós-busca diária: {len(linhas)} evento(s) na grade.")
+
+            if linhas:
+                # 1. Sincronização direta com SharePoint
+                try:
+                    logger.info("[ReporteEventos] Sincronizando eventos da tarefa diária no SharePoint...")
+                    sp_res = push_events_from_tuples(linhas)
+                    logger.info(f"[ReporteEventos] SharePoint atualizado: {sp_res.get('inserted', 0)} inseridos, {sp_res.get('skipped_existing', 0)} já existentes.")
+                except Exception as e_sp:
+                    logger.error(f"[ReporteEventos] Erro ao sincronizar SharePoint na tarefa diária: {e_sp}")
+
+                # 2. Sincronização em paralelo com Google Sheets & Google Portal
+                try:
+                    logger.info("[ReporteEventos] Sincronizando eventos da tarefa diária com Google Sheets...")
+                    trigger_parallel_google_sheets_sync(linhas)
+                except Exception as e_gs:
+                    logger.debug(f"[ReporteEventos] Erro ao sincronizar Google Sheets na tarefa diária: {e_gs}")
+
+            # 3. Disparo do e-mail diário agendado com os eventos consolidados
+            if self.re_auto_email_var.get():
+                if self.re_tree.get_children():
+                    logger.info("[ReporteEventos] Disparando e-mail diário agendado com os eventos encontrados...")
+                    self._re_enviar_email(forcar=False)
+                else:
+                    logger.warning("[ReporteEventos] Nenhum dado encontrado na grade para enviar no auto e-mail.")
+
+        except Exception as ex:
+            logger.error(f"[ReporteEventos] Erro no pós-busca da tarefa diária: {ex}", exc_info=True)
+        finally:
+            self._re_tarefa_diaria_em_execucao = False
+            self.re_lbl_status.configure(text=f"Tarefa diária concluída em {datetime.now().strftime('%H:%M:%S')}.")
+
+    def _re_executar_ciclo_monitoramento(self) -> None:
+        if not getattr(self, "re_is_running", False):
+            return
+
+        # 1. Verificação robusta da Tarefa Diária Agendada (Auto Busca / Auto E-mail)
+        try:
+            agora = datetime.now()
+            hora_cfg = self.re_hora_auto_email_var.get().strip()
+            if (self.re_auto_busca_var.get() or self.re_auto_email_var.get()) and ":" in hora_cfg:
+                try:
+                    h, m = map(int, hora_cfg.split(":"))
+                    alvo_hoje = agora.replace(hour=h, minute=m, second=0, microsecond=0)
+
+                    # Se a hora foi reconfigurada pelo usuário para um horário futuro no dia de hoje
+                    if getattr(self, "_re_ultima_hora_config", None) != hora_cfg:
+                        self._re_ultima_hora_config = hora_cfg
+                        if agora < alvo_hoje:
+                            self._re_ultimo_agendamento_data = (agora - timedelta(days=1)).date()
+
+                    # Inicialização segura na primeira rodada
+                    if getattr(self, "_re_ultimo_agendamento_data", None) is None:
+                        if agora > alvo_hoje:
+                            self._re_ultimo_agendamento_data = agora.date()
+                            logger.info(f"[ReporteEventos] Horário configurado ({hora_cfg}) já passou hoje. Próxima execução programada para amanhã às {hora_cfg}.")
+                        else:
+                            self._re_ultimo_agendamento_data = (agora - timedelta(days=1)).date()
+
+                    # Disparo automático se o horário foi atingido e ainda não foi executado hoje
+                    if agora >= alvo_hoje and getattr(self, "_re_ultimo_agendamento_data", None) != agora.date():
+                        logger.info(f"[ReporteEventos] [AGENDADO] Horário atingido ({hora_cfg}). Executando tarefa diária automatizada...")
+                        self._re_ultimo_agendamento_data = agora.date()
+                        self._re_executar_tarefa_diaria_agendada()
+                except ValueError:
+                    pass
+        except Exception as e_sched:
+            logger.warning(f"[ReporteEventos] Erro ao checar agendamento diário: {e_sched}")
+
+        # 2. Verificação de Streams ao Vivo durante o dia (quando Somente Relatório estiver desmarcado)
+        try:
+            if not self.re_somente_relatorio_var.get():
+                self._re_verificar_e_reproduzir_streams_jogos_hoje()
+        except Exception as e_stream:
+            logger.debug(f"[ReporteEventos] Erro ao verificar streams ao vivo: {e_stream}")
+
+        # 3. Intervalo de refresh configurado
         try:
             ref_seg = max(5, int(self.re_refresh_var.get().strip()))
         except Exception:
             ref_seg = 20
-        self.re_loop_job_id = self.after(ref_seg * 1000, self._re_executar_ciclo_monitoramento)
+
+        try:
+            self.re_loop_job_id = self.after(ref_seg * 1000, self._re_executar_ciclo_monitoramento)
+        except Exception:
+            pass
+
+    def _re_verificar_e_reproduzir_streams_jogos_hoje(self) -> None:
+        """
+        Monitora os confrontos de hoje na grade e aciona a reprodução no Chrome 
+        (9222 Esquerda ou 9224 Direita) com login automático quando o horário se aproximar.
+        """
+        if getattr(self, "_re_reproduzindo_stream", False):
+            return
+
+        hoje_str = date.today().strftime("%d/%m/%Y")
+        agora_time = datetime.now().time()
+
+        if not hasattr(self, "_re_streams_reproduzidos_hoje"):
+            self._re_streams_reproduzidos_hoje = set()
+
+        for item_id in self.re_tree.get_children():
+            try:
+                vals = self.re_tree.item(item_id, "values")
+                if len(vals) < 8:
+                    continue
+
+                partida = str(vals[1]).strip()
+                data_str = str(vals[2]).strip()
+                hora_str = str(vals[3]).strip()
+                navegador = str(vals[4]).strip().upper()
+                min_antes_str = str(vals[5]).strip()
+                plataforma = str(vals[6]).strip()
+                url = str(vals[7]).strip()
+
+                if data_str != hoje_str or not url or not hora_str or ":" not in hora_str:
+                    continue
+
+                try:
+                    timeantes = int(min_antes_str) if min_antes_str.isdigit() else 10
+                except Exception:
+                    timeantes = 10
+
+                try:
+                    jogo_dt = datetime.strptime(f"{data_str} {hora_str}", "%d/%m/%Y %H:%M")
+                    hora_gatilho = (jogo_dt - timedelta(minutes=timeantes)).time()
+                except Exception:
+                    continue
+
+                chave_stream = f"{partida}_{data_str}_{hora_str}_{plataforma}"
+                if agora_time >= hora_gatilho and chave_stream not in self._re_streams_reproduzidos_hoje:
+                    logger.info(f"[ReporteEventos Stream] Horário do confronto atingido: {partida} ({hora_str}) - {plataforma}.")
+                    self._re_streams_reproduzidos_hoje.add(chave_stream)
+                    threading.Thread(
+                        target=self._re_worker_reproduzir_stream,
+                        args=(plataforma, url, navegador, timeantes, partida),
+                        daemon=True
+                    ).start()
+                    break
+            except Exception as e_row:
+                logger.debug(f"[ReporteEventos Stream] Erro ao avaliar linha: {e_row}")
+
+    def _re_worker_reproduzir_stream(self, plataforma: str, url: str, navegador: str, timeantes: int, evento: str) -> None:
+        self._re_reproduzindo_stream = True
+        try:
+            porta = "9224" if "DIREITA" in navegador else "9222"
+            lado_label = "direita (Porta 9224)" if porta == "9224" else "esquerda (Porta 9222)"
+            self.after(0, lambda: self.re_lbl_status.configure(text=f"Abrindo no Chrome da {lado_label}: {plataforma} - {evento}"))
+
+            driver = obter_driver_conectado(porta)
+            if not driver:
+                logger.error(f"[ReporteEventos Stream] Não foi possível obter conexão com o Chrome na porta {porta}")
+                return
+
+            plat_lower = plataforma.lower()
+            if "prime" in plat_lower:
+                user = get_config_value("usuario_prime") or ""
+                pas = get_config_value("senha_prime") or ""
+                driver.get("https://www.primevideo.com/offers/nonprimehomepage/ref=atv_auth_signout")
+                loginprime(url, user, pas, driver, timeantes, evento)
+            elif "dazn" in plat_lower:
+                user = get_config_value("usuario_dazn") or ""
+                pas = get_config_value("senha_dazn") or ""
+                logindazn(url, user, pas, driver, timeantes, evento)
+            elif "disney" in plat_lower:
+                user = get_config_value("usuario_disney") or ""
+                pas = get_config_value("senha_disney") or ""
+                driver.get("https://www.disneyplus.com/identity/login/enter-email")
+                logindisney(url, user, pas, driver, timeantes, evento)
+            elif "max" in plat_lower:
+                user = get_config_value("usuario_max") or ""
+                pas = get_config_value("senha_max") or ""
+                driver.get("https://auth.hbomax.com/login")
+                loginmax("https://auth.hbomax.com/login", url, user, pas, driver, timeantes, evento)
+            elif "cazé" in plat_lower or "caze" in plat_lower or "youtube" in plat_lower:
+                driver.get(url)
+                time.sleep(3)
+                try:
+                    from selenium.webdriver.common.by import By
+                    banner = driver.find_elements(By.XPATH, '//*[@id="dismiss-button"]/yt-button-shape/button')
+                    if banner:
+                        banner[0].click()
+                    play_btn = driver.find_elements(By.CSS_SELECTOR, "button.ytp-large-play-button")
+                    if play_btn:
+                        play_btn[0].click()
+                except Exception:
+                    pass
+            else:
+                driver.get(url)
+
+            self.after(0, lambda: self.re_lbl_status.configure(text=f"Em reprodução: {plataforma} - {evento}"))
+        except Exception as ex:
+            logger.error(f"[ReporteEventos Stream] Erro na reprodução de stream {evento}: {ex}")
+        finally:
+            self._re_reproduzindo_stream = False
 
     def _re_enviar_email(self, forcar: bool = False) -> None:
         if getattr(self, "_re_enviando_email", False):
@@ -2012,13 +2261,18 @@ class ReporteEventosMixin:
                         self.after(0, lambda e=ev: self._re_inserir_evento_na_grade(e))
                         total_encontrados += 1
 
-                # Sincronização direta no SharePoint
-                self.re_lbl_status.configure(text="Sincronizando eventos validados com o SharePoint...")
+                # Sincronização direta no SharePoint e Google Sheets
+                self.re_lbl_status.configure(text="Sincronizando eventos validados com o SharePoint e Google Sheets...")
                 linhas = [list(self.re_tree.item(i, "values")) for i in self.re_tree.get_children()]
-                sp_res = push_events_to_sharepoint(linhas)
-                msg_final = f"Busca e publicação concluídas!\n• {total_encontrados} confrontos identificados nos canais.\n• {sp_res.get('inseridos', 0)} novos itens sincronizados no SharePoint."
+                sp_res = push_events_from_tuples(linhas)
+                try:
+                    trigger_parallel_google_sheets_sync(linhas)
+                except Exception as e_gs:
+                    logger.debug(f"[ReporteEventos] Erro ao sincronizar Google Sheets: {e_gs}")
+                inseridos = sp_res.get('inserted', sp_res.get('inseridos', 0))
+                msg_final = f"Busca e publicação concluídas!\n• {total_encontrados} confrontos identificados nos canais.\n• {inseridos} novos itens sincronizados no SharePoint e Google Sheets."
                 self.re_lbl_status.configure(text="Sincronização concluída.")
-                self.after(0, lambda: messagebox.showinfo("SharePoint Sincronizado", msg_final))
+                self.after(0, lambda: messagebox.showinfo("Publicação Sincronizada", msg_final))
             except Exception as e:
                 err_msg = str(e)
                 logger.error(f"[ReporteEventos] Erro ao buscar canais YouTube: {err_msg}")
