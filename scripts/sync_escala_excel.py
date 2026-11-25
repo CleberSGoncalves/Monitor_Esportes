@@ -36,7 +36,7 @@ def sync_from_sharepoint_if_possible(excel_path: str):
         if r.status_code == 200:
             with open(excel_path, "wb") as f:
                 f.write(r.content)
-            print(f"📥 Planilha mais recente baixada do SharePoint com sucesso! ({len(r.content)} bytes)")
+            print(f"📥 Planilha mais recente baixada com sucesso! ({len(r.content)} bytes)")
     except Exception as e:
         print(f"ℹ️ Usando planilha local existente: {e}")
 
@@ -62,20 +62,16 @@ def parse_escala_excel(excel_path: str, output_json: str):
 
         ws = wb[sheet_name]
         operadores = []
-        num_dias = 31
-        if matched_month in ["Fevereiro"]:
-            num_dias = 28
-        elif matched_month in ["Abril", "Junho", "Setembro", "Novembro"]:
-            num_dias = 30
+        atividades = []
 
-        # Encontrar linha de cabeçalho (dias 1..31)
+        # Encontrar linha de cabeçalho dos dias 1..31
         header_row_idx = None
         day_col_map = {} # day_int -> col_idx
 
         for r_idx in range(1, 15):
-            row_vals = [ws.cell(r_idx, c).value for c in range(1, 45)]
             days_found = []
-            for c_idx, val in enumerate(row_vals, 1):
+            for c_idx in range(1, 45):
+                val = ws.cell(r_idx, c_idx).value
                 try:
                     v_int = int(str(val).strip())
                     if 1 <= v_int <= 31:
@@ -86,41 +82,79 @@ def parse_escala_excel(excel_path: str, output_json: str):
                 header_row_idx = r_idx
                 for d_num, col_idx in days_found:
                     day_col_map[d_num] = col_idx
-                num_dias = max(d[0] for d in days_found)
                 break
 
         if not header_row_idx:
             continue
 
-        # Ler operadores abaixo do cabeçalho
-        for r_idx in range(header_row_idx + 1, header_row_idx + 35):
-            nome = ws.cell(r_idx, 1).value or ws.cell(r_idx, 2).value
-            if not nome or str(nome).strip().lower() in ["nome", "operador", "total", "legenda"]:
-                continue
-            nome_str = str(nome).strip()
-            if len(nome_str) < 3:
+        num_dias = max(day_col_map.keys())
+        current_equipe = "Monitoração"
+
+        # Ler operadores e atividades abaixo do cabeçalho
+        for r_idx in range(header_row_idx + 1, ws.max_row + 1):
+            c1 = str(ws.cell(r_idx, 1).value or "").strip()
+            c2 = str(ws.cell(r_idx, 2).value or "").strip()
+            c3 = str(ws.cell(r_idx, 3).value or "").strip()
+            c4 = str(ws.cell(r_idx, 4).value or "").strip()
+
+            all_row_text = f"{c1} {c2} {c3} {c4}".lower()
+
+            # Detecção de Grupo / Equipe
+            if "captação" in all_row_text or "captacao" in all_row_text:
+                current_equipe = "Captação"
+            elif "monitoração" in all_row_text or "monitoracao" in all_row_text:
+                current_equipe = "Monitoração"
+
+            # Pular linhas de cabeçalho repetidas
+            if c2.lower() == "matricula" or c3.lower() == "matricula" or "escala de trabalho" in all_row_text:
                 continue
 
-            mat = str(ws.cell(r_idx, 2).value or "").strip()
-            horario = str(ws.cell(r_idx, 3).value or "").strip()
-            equipe = str(ws.cell(r_idx, 4).value or "").strip()
-            if not equipe or equipe == "None":
-                equipe = "Monitoração" if "06:" in horario or "10:" in horario or "14:" in horario or "22:" in horario else "Captação"
+            # Detecção de Atividades Operacionais (Chamados, Incidentes, SobreAviso)
+            if c2.lower().startswith("atividade") or c1.lower().startswith("atividade"):
+                ativ_nome = c2 if c2.lower().startswith("atividade") else c1
+                dias_ativ = {}
+                for d, col in day_col_map.items():
+                    val = ws.cell(r_idx, col).value
+                    if val is not None and str(val).strip().upper() not in ["NONE", ""]:
+                        dias_ativ[str(d)] = str(val).strip()
+                atividades.append({
+                    "nome": ativ_nome,
+                    "dias": dias_ativ
+                })
+                continue
+
+            # Mapeamento dinâmico e cirúrgico dos campos do operador
+            nome = ""
+            matricula = ""
+            horario = ""
+
+            if c2.isdigit():
+                # Formato Outubro/Novembro/Dezembro: c2=Matrícula, c3=Horário, c4=Nome
+                matricula = c2
+                horario = c3
+                nome = c4
+            elif ":" in c2:
+                # Formato Janeiro-Setembro: c2=Horário, c3=Nome
+                horario = c2
+                nome = c3
+            elif ":" in c3:
+                horario = c3
+                nome = c4
+
+            if not nome or nome.lower() in ["none", "nome", "horário", ""]:
+                continue
 
             dias = {}
-            for d in range(1, num_dias + 1):
-                col = day_col_map.get(d)
-                if col:
-                    val = ws.cell(r_idx, col).value
-                    val_str = str(val).strip().upper() if val is not None else ""
-                    if val_str and val_str != "NONE":
-                        dias[str(d)] = val_str
+            for d, col in day_col_map.items():
+                val = ws.cell(r_idx, col).value
+                if val is not None and str(val).strip().upper() not in ["NONE", ""]:
+                    dias[str(d)] = str(val).strip().upper()
 
             operadores.append({
-                "nome": nome_str,
-                "matricula": mat if mat != "None" else "",
-                "horario": horario if horario != "None" else "08:00 - 17:00",
-                "equipe": equipe,
+                "nome": nome.strip(),
+                "matricula": matricula.strip(),
+                "horario": horario.strip() if horario else "08:00 - 17:00",
+                "equipe": current_equipe,
                 "dias": dias
             })
 
@@ -128,7 +162,7 @@ def parse_escala_excel(excel_path: str, output_json: str):
             escala_data[matched_month] = {
                 "num_dias": num_dias,
                 "operadores": operadores,
-                "atividades": []
+                "atividades": atividades
             }
 
     if escala_data:
@@ -151,6 +185,8 @@ def parse_escala_excel(excel_path: str, output_json: str):
 
 def main():
     excel_path = os.path.join(PROJECT_ROOT, "config", "Escala de trabalho 2026.xlsx")
+    if not os.path.exists(excel_path):
+        excel_path = os.path.join(PROJECT_ROOT, "docs", "Escala_de_trabalho_2026.xlsx")
     json_path = os.path.join(PROJECT_ROOT, "config", "escala_completa_2026.json")
     sync_from_sharepoint_if_possible(excel_path)
     if parse_escala_excel(excel_path, json_path):
@@ -160,3 +196,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

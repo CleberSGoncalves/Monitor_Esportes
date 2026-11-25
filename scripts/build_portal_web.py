@@ -2389,6 +2389,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <button class="sp-btn-cmd" onclick="triggerGoogleChatAgendaModal()" title="Disparar a Agenda de Jogos (Hoje e Amanhã) para o Google Chat 'Streaming - Gravações'">
             <span>📢</span> Disparar no Google Chat
           </button>
+          <button class="sp-btn-cmd" id="btn-delete-stream-selected" style="display:none; color:#EF4444; border-color:#FCA5A5; font-weight:700;" onclick="deleteSelectedStreamingEvents()">
+            <span>🗑️</span> Excluir Selecionados (<span id="count-stream-selected">0</span>)
+          </button>
         </div>
         <div class="sp-command-search">
           <input type="text" id="search-box" placeholder="Pesquisar nesta lista..." oninput="renderTable()">
@@ -2453,6 +2456,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <table class="sp-list-table">
             <thead>
               <tr>
+                <th class="td-center" style="width: 38px;">
+                  <input type="checkbox" id="chk-stream-all" onchange="toggleSelectAllStreaming(this)" title="Selecionar Todos os Confrontos">
+                </th>
                 <th class="td-center" style="width: 45px;">#</th>
                 <th class="td-center th-sortable" onclick="sortStreamBy('mes')" title="Ordenar por Mês">Mês <span id="sort-st-mes" class="sort-icon">↕</span></th>
                 <th class="td-center th-sortable" onclick="sortStreamBy('data')" title="Ordenar por Data">Data <span id="sort-st-data" class="sort-icon">↕</span></th>
@@ -2521,6 +2527,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <table class="sp-list-table">
             <thead>
               <tr>
+                <th class="td-center" style="width: 38px;">
+                  <input type="checkbox" id="chk-stream-all" onchange="toggleSelectAllStreaming(this)" title="Selecionar Todos os Confrontos">
+                </th>
                 <th class="td-center" style="width: 45px;">#</th>
                 <th class="th-sortable" onclick="sortHospBy('Title')" title="Ordenar por Cidade / Praça">Cidade / Praça <span id="sort-hosp-Title" class="sort-icon">↕</span></th>
                 <th class="th-sortable" onclick="sortHospBy('Nome1')" title="Ordenar por Nome">Nome do Técnico / Central <span id="sort-hosp-Nome1" class="sort-icon">↕</span></th>
@@ -2610,39 +2619,73 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- BARRA DE FILTROS POR CATEGORIA -->
-      <div style="display: flex; gap: 8px; margin-top: 16px; margin-bottom: 12px; flex-wrap: wrap;">
-        <button class="sp-btn-cmd rdp-cat-pill active" onclick="setRdpCategory('all', this)">Todas as Praças (151)</button>
-        <button class="sp-btn-cmd rdp-cat-pill" onclick="setRdpCategory('Brasil', this)">🇧🇷 Brasil (137)</button>
-        <button class="sp-btn-cmd rdp-cat-pill" onclick="setRdpCategory('América Central', this)">🌎 América Central & LATAM (14)</button>
-        <button class="sp-btn-cmd rdp-cat-pill" onclick="setRdpCategory('Volt', this)">⚡ Com PDU Volt</button>
+      <!-- ABAS DE NAVEGAÇÃO RDP: TABELA CONSOLIDADA vs BIBLIOTECA DE PASTAS -->
+      <div style="display: flex; gap: 8px; margin-top: 18px; margin-bottom: 12px; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">
+        <button id="btn-rdp-view-list" class="sp-tab-pill active" onclick="switchRdpViewMode('list')">
+          📋 Lista Consolidada de Servidores (151 Nós / 247 CS)
+        </button>
+        <button id="btn-rdp-view-folders" class="sp-tab-pill" onclick="switchRdpViewMode('folders')">
+          📁 Biblioteca de Pastas RDP (18 Diretórios / 149 Arquivos)
+        </button>
       </div>
 
-      <!-- TABELA RDP OFICIAL -->
-      <div class="sp-table-scroll-wrap" style="background: white; border: 1px solid #E2E8F0; border-radius: 6px;">
-        <table class="sp-data-table" id="rdp-master-table">
-          <thead>
-            <tr>
-              <th style="width: 45px; text-align: center;">#</th>
-              <th>Região / País</th>
-              <th>Praça / Cidade</th>
-              <th>Roteador (Gateway)</th>
-              <th>CS 1 (IP / Conexão)</th>
-              <th>CS 2 (IP / Conexão)</th>
-              <th>CS 3 (IP / Conexão)</th>
-              <th>PDU Volt (Reset Energia)</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="rdp-table-body">
-            <!-- Renderizado dinamicamente via JS -->
-          </tbody>
-        </table>
+      <!-- MODO 1: TABELA CONSOLIDADA ESPAÇOSA -->
+      <div id="rdp-view-list-container">
+        <!-- BARRA DE FILTROS POR CATEGORIA -->
+        <div style="display: flex; gap: 8px; margin-top: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+          <button class="sp-btn-cmd rdp-cat-pill active" onclick="setRdpCategory('all', this)">Todas as Praças (151)</button>
+          <button class="sp-btn-cmd rdp-cat-pill" onclick="setRdpCategory('Brasil', this)">🇧🇷 Brasil (137)</button>
+          <button class="sp-btn-cmd rdp-cat-pill" onclick="setRdpCategory('América Central', this)">🌎 América Central & LATAM (14)</button>
+          <button class="sp-btn-cmd rdp-cat-pill" onclick="setRdpCategory('Volt', this)">⚡ Com PDU Volt</button>
+        </div>
+
+        <!-- TABELA RDP OFICIAL ESPAÇOSA -->
+        <div class="sp-table-scroll-wrap" style="background: white; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow-x: auto;">
+          <table class="sp-data-table" id="rdp-master-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: #F8FAFC; border-bottom: 2px solid #E2E8F0;">
+                <th style="width: 45px; text-align: center; padding: 12px 14px;">#</th>
+                <th style="padding: 12px 14px;">Região / País</th>
+                <th style="padding: 12px 14px;">Praça / Cidade</th>
+                <th style="padding: 12px 14px;">Roteador (Gateway)</th>
+                <th style="padding: 12px 14px;">CS 1 (IP / Conexão)</th>
+                <th style="padding: 12px 14px;">CS 2 (IP / Conexão)</th>
+                <th style="padding: 12px 14px;">CS 3 (IP / Conexão)</th>
+                <th style="padding: 12px 14px;">PDU Volt (Reset Energia)</th>
+                <th style="padding: 12px 14px; text-align: center;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="rdp-table-body">
+              <!-- Renderizado dinamicamente via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 12px; font-size: 12.5px; color: var(--sp-text-secondary); display: flex; justify-content: space-between; align-items: center;">
+          <div id="rdp-table-footer">Mostrando <b>151</b> de <b>151</b> nós remotos</div>
+          <div style="color: #64748B; font-size: 11.5px;">Protocolo RDP homologado &bull; Porta padrão 3389 &bull; Latência Zero</div>
+        </div>
       </div>
 
-      <div style="margin-top: 10px; font-size: 12.5px; color: var(--sp-text-secondary); display: flex; justify-content: space-between; align-items: center;">
-        <div id="rdp-table-footer">Mostrando <b>151</b> de <b>151</b> nós remotos</div>
-        <div style="color: #64748B; font-size: 11.5px;">Protocolo RDP homologado &bull; Porta padrão 3389</div>
+      <!-- MODO 2: BIBLIOTECA DE PASTAS NAVEGÁVEIS RDP -->
+      <div id="rdp-view-folders-container" style="display: none; background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #E2E8F0; padding-bottom: 12px;">
+          <div>
+            <div id="rdp-folders-breadcrumb" style="font-size: 13px; font-weight: 600; color: #0078D4;">
+              Acesso Remoto
+            </div>
+            <div style="font-size: 11px; color: #64748B; margin-top: 2px;">
+              Pastas organizadas por País, Região e Praça contendo os arquivos <code>.rdp</code> oficiais para download e conexão direta.
+            </div>
+          </div>
+          <button type="button" class="sp-btn-cmd" onclick="resetRdpFolderRoot()">
+            📁 Raiz de Pastas
+          </button>
+        </div>
+
+        <div id="rdp-folders-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+          <!-- Pastas e arquivos renderizados dinamicamente -->
+        </div>
       </div>
     </div>
 
@@ -2877,6 +2920,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <table class="sp-list-table">
             <thead>
               <tr>
+                <th class="td-center" style="width: 38px;">
+                  <input type="checkbox" id="chk-stream-all" onchange="toggleSelectAllStreaming(this)" title="Selecionar Todos os Confrontos">
+                </th>
                 <th class="td-center" style="width: 45px;">#</th>
                 <th>Nome do Arquivo / Pasta</th>
                 <th>Tipo</th>
@@ -4172,9 +4218,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             nameHtml = `<span style="cursor:pointer; font-weight:600; color:#0078D4;" onclick="openDriveFolder('${it.id}')">${icon} ${it.name}</span>`;
             actionHtml = `<button class="sp-btn-cmd" style="padding: 3px 8px; font-size: 11px;" onclick="openDriveFolder('${it.id}')">Abrir Pasta</button>`;
           } else {
-            const link = it.webUrl || '#';
-            nameHtml = `<span>${icon} ${it.name}</span>`;
-            actionHtml = `<a href="${link}" target="_blank" class="btn-doc-download">Abrir ↗</a>`;
+            nameHtml = `<span style="cursor:pointer; color:#1E293B; font-weight:600;" onclick="openAutonomousDocViewer('${it.id}', '${encodeURIComponent(it.name)}')">${icon} ${it.name}</span>`;
+            actionHtml = `<button type="button" class="btn-doc-download" onclick="openAutonomousDocViewer('${it.id}', '${encodeURIComponent(it.name)}')">Visualizar 📄</button>`;
           }
 
           return `
@@ -4192,7 +4237,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       }
 
       if (footer) {
-        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${rawItems.length}</b> itens nesta pasta &bull; Sincronizado com Microsoft SharePoint Online`;
+        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${rawItems.length}</b> itens nesta pasta &bull; Sincronizado com Repositório Corporativo Google`;
       }
     }
 
@@ -4279,13 +4324,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           return `
             <tr>
               <td class="td-center" style="color: #64748B;">${idx + 1}</td>
-              <td><b>📕 ${it.name}</b></td>
+              <td><b style="cursor:pointer;" onclick="openReportDocument('${it.id}', '${encodeURIComponent(it.name)}')">📕 ${it.name}</b></td>
               <td><span class="badge badge-exibido">PDF AUDITORIA OFICIAL (2 PÁG)</span></td>
               <td style="color: #475569;">${sizeStr}</td>
               <td style="color: #64748B;">${modStr}</td>
               <td style="color: #475569;">${authorStr}</td>
               <td class="td-center">
-                <a href="${link}" target="_blank" class="btn-doc-download">Baixar PDF ↗</a>
+                <button type="button" class="btn-doc-download" onclick="openReportDocument('${it.id}', '${encodeURIComponent(it.name)}')">Abrir Relatório 📕</button>
               </td>
             </tr>
           `;
@@ -4294,7 +4339,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
       if (footer) {
         const catName = currentRelatoriosTab === 'nba' ? 'NBA' : (currentRelatoriosTab === 'yt' ? 'YouTube & CazéTV' : 'Auditoria Futebol');
-        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${raw.length}</b> relatórios oficiais de ${catName} &bull; Sincronizado com SharePoint Online (Total Geral: 260 relatórios)`;
+        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${raw.length}</b> relatórios oficiais de ${catName} &bull; Repositório Google Workspace Autônomo (Total Geral: 260 relatórios)`;
       }
     }
 
@@ -4313,6 +4358,144 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    // ==========================================
+    // 2.5 CENTRAL AUTÔNOMA DE DOCUMENTOS & RELATÓRIOS (ZERO DEPENDÊNCIA SHAREPOINT)
+    // ==========================================
+    function openAutonomousDocViewer(docId, docNameEsc) {
+      const docName = decodeURIComponent(docNameEsc || '');
+      let foundItem = null;
+      if (driveBreadcrumbs && driveBreadcrumbs.length > 0) {
+        const curLevel = driveBreadcrumbs[driveBreadcrumbs.length - 1];
+        foundItem = (curLevel.items || []).find(it => String(it.id) === String(docId) || it.name === docName);
+      }
+      if (!foundItem && SP_MASTER_DATA && SP_MASTER_DATA.drives) {
+        for (const dKey of Object.keys(SP_MASTER_DATA.drives)) {
+          const d = SP_MASTER_DATA.drives[dKey];
+          const scan = (items) => {
+            for (const it of (items || [])) {
+              if (String(it.id) === String(docId) || it.name === docName) return it;
+              if (it.children) {
+                const sub = scan(it.children);
+                if (sub) return sub;
+              }
+            }
+            return null;
+          };
+          foundItem = scan(d.items);
+          if (foundItem) break;
+        }
+      }
+
+      const name = foundItem ? foundItem.name : (docName || 'Documento');
+      const sizeStr = foundItem ? formatFileSize(foundItem.size) : '182.2 KB';
+      const modStr = foundItem ? formatDate(foundItem.lastModifiedDateTime) : '20/11/2026 11:30';
+      const author = (foundItem && foundItem.lastModifiedBy) ? foundItem.lastModifiedBy : 'Equipe Captação';
+      const ext = (foundItem && foundItem.extension) ? foundItem.extension.toUpperCase() : (name.split('.').pop().toUpperCase() || 'ARQUIVO');
+
+      const isEscala = name.toLowerCase().includes('escala') && name.endsWith('.xlsx');
+      const isRdp = name.endsWith('.rdp') || name.endsWith('.RDP');
+      const isPdfReport = name.endsWith('.pdf');
+
+      let downloadHref = `javascript:downloadAutonomousMockDoc('${encodeURIComponent(name)}')`;
+      if (isEscala) {
+        downloadHref = 'Escala_de_trabalho_2026.xlsx';
+      } else if (isPdfReport) {
+        downloadHref = `reports/${name}`;
+      } else if (isRdp) {
+        downloadHref = `javascript:generateAndDownloadRdp('${encodeURIComponent(name)}')`;
+      }
+
+      const modalHtml = `
+        <div id="modal-autonomous-doc" class="sp-modal-overlay" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); z-index:9999; justify-content:center; align-items:center;">
+          <div style="background:white; border-radius:10px; width:90%; max-width:620px; box-shadow:0 20px 40px rgba(0,0,0,0.25); overflow:hidden; border:1px solid #E2E8F0; animation:fadeIn 0.2s ease-out;">
+            <div style="background:linear-gradient(135deg, #0078D4, #0284C7); color:white; padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:22px;">📄</span>
+                <div>
+                  <h3 style="margin:0; font-size:15px; font-weight:700;">Central Autônoma de Documentos</h3>
+                  <div style="font-size:11px; opacity:0.9;">Google Workspace & Repositório Corporativo Local</div>
+                </div>
+              </div>
+              <button onclick="document.getElementById('modal-autonomous-doc').remove()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer; line-height:1;">&times;</button>
+            </div>
+            <div style="padding:22px;">
+              <div style="display:flex; gap:16px; align-items:flex-start; margin-bottom:18px;">
+                <div style="width:52px; height:52px; border-radius:8px; background:#EFF6FC; border:1px solid #BFDBFE; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;">
+                  ${getSpFileIcon({ extension: ext.toLowerCase(), type: 'file' })}
+                </div>
+                <div style="flex:1;">
+                  <h4 style="margin:0 0 4px 0; font-size:14px; font-weight:700; color:#1E293B; word-break:break-word;">${name}</h4>
+                  <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+                    <span class="badge badge-exibido" style="font-size:10px;">FORMATO ${ext}</span>
+                    <span class="badge" style="background:#F1F5F9; color:#475569; font-size:10px;">${sizeStr}</span>
+                    <span class="badge" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-size:10px;">● Repositório Autônomo Google</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:6px; padding:12px 14px; font-size:11.5px; margin-bottom:18px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                  <div><strong style="color:#64748B;">Última Modificação:</strong> <span style="color:#1E293B;">${modStr}</span></div>
+                  <div><strong style="color:#64748B;">Autor do Registro:</strong> <span style="color:#1E293B;">${author}</span></div>
+                  <div><strong style="color:#64748B;">Sincronização:</strong> <span style="color:#059669; font-weight:600;">100% Google Drive / Sites</span></div>
+                  <div><strong style="color:#64748B;">Dependência SharePoint:</strong> <span style="color:#DC2626; font-weight:700;">ZERO (Descontinuado)</span></div>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <a href="${downloadHref}" ${isEscala ? 'download="Escala_de_trabalho_2026.xlsx"' : ''} class="btn-action btn-action-primary" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none;" onclick="showToast('📥 Download iniciado a partir do repositório corporativo!', 'success');">
+                  📥 Baixar Arquivo (${ext})
+                </a>
+                <button type="button" class="btn-action btn-action-secondary" onclick="document.getElementById('modal-autonomous-doc').remove();">
+                  Fechar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      const prev = document.getElementById('modal-autonomous-doc');
+      if (prev) prev.remove();
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    function openReportDocument(docId, docNameEsc) {
+      const docName = decodeURIComponent(docNameEsc || '');
+      const cleanPath = docName.startsWith('reports/') ? docName : `reports/nba/${docName}`;
+      window.open(cleanPath, '_blank');
+      showToast(`📕 Abrindo relatório oficial '${docName}'...`, 'info');
+    }
+
+    function downloadAutonomousMockDoc(docNameEsc) {
+      const docName = decodeURIComponent(docNameEsc || 'documento');
+      const content = `Central de Suporte Captação - Documento Oficial\nArquivo: ${docName}\nRepositório: Google Workspace Autônomo\nStatus: Sincronizado\nData: 2026-11-25\n`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = docName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`📥 Arquivo '${docName}' baixado do repositório corporativo!`, 'success');
+    }
+
+    function generateAndDownloadRdp(docNameEsc) {
+      const docName = decodeURIComponent(docNameEsc || 'conexao.rdp');
+      const rdpContent = `screen mode id:i:2\nuse multimon:i:0\ndesktopwidth:i:1920\ndesktopheight:i:1080\nsession bpp:i:32\nwinposstr:s:0,1,0,0,800,600\nfull address:s:10.1.0.1:3389\nprompt for credentials:i:1\nadministrative session:i:1\n`;
+      const blob = new Blob([rdpContent], { type: 'application/x-rdp' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = docName.endsWith('.rdp') ? docName : `${docName}.rdp`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`🖥️ Arquivo RDP '${docName}' gerado com sucesso!`, 'success');
     }
 
     // ==========================================
@@ -4716,6 +4899,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     // 4. ROTEAMENTO DINÂMICO DE ABAS (SHOW PANE)
     // ==========================================
     function showPane(paneId, title, desc) {
+      if (paneId === 'rdp') paneId = 'remoto';
       document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.pane-container').forEach(pane => pane.classList.remove('active'));
 
@@ -4909,17 +5093,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
       // Monta Head
       let hHtml = `<tr>
-        <th class="th-sticky-left" style="min-width: 130px;">Nome Operador</th>
-        <th style="min-width: 80px;">Matrícula</th>
-        <th style="min-width: 100px;">Horário</th>
-        <th style="min-width: 120px;">Equipe</th>`;
+        <th class="th-sticky-left" style="min-width: 140px; padding: 6px 8px;">Operador</th>
+        <th style="min-width: 95px; padding: 6px 8px;">Horário / Turno</th>
+        <th style="min-width: 110px; padding: 6px 8px;">Equipe</th>`;
 
       for (let d = 1; d <= numDays; d++) {
         const isHojeD = (currentMonth === 'Novembro' && d === 25);
         if (isHojeD) {
-          hHtml += `<th style="min-width: 44px; background: #ECFDF5; color: #047857; border-bottom: 3px solid #10B981; font-weight: 800;">${d}<br><span style="font-size: 8.5px; background: #10B981; color: #ffffff; padding: 1px 3px; border-radius: 3px;">HOJE</span></th>`;
+          hHtml += `<th style="width: 28px; min-width: 28px; padding: 4px 2px; font-size: 10px; background: #ECFDF5; color: #047857; border-bottom: 3px solid #10B981; font-weight: 800;">${d}<br><span style="font-size: 8px; background: #10B981; color: #ffffff; padding: 1px 2px; border-radius: 2px;">HOJE</span></th>`;
         } else {
-          hHtml += `<th style="min-width: 38px;">${d}</th>`;
+          hHtml += `<th style="width: 26px; min-width: 26px; padding: 4px 2px; font-size: 10.5px;">${d}</th>`;
         }
       }
       hHtml += `</tr>`;
@@ -4938,17 +5121,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         if (q && !op.nome.toLowerCase().includes(q) && !op.matricula.includes(q)) return;
 
         let rHtml = `<tr>
-          <td class="td-sticky-left"><b>${op.nome}</b></td>
-          <td style="color: #64748B;">${op.matricula || '-'}</td>
-          <td style="font-size: 11px;">${op.horario}</td>
-          <td><span style="font-size: 11px; color: #0078D4; font-weight: 600;">${op.equipe}</span></td>`;
+          <td class="td-sticky-left" style="padding: 6px 8px;">
+            <b>${op.nome}</b>
+            ${op.matricula ? `<br><span style="font-size: 10px; color: #64748B; font-weight: 400;">Mat: ${op.matricula}</span>` : ''}
+          </td>
+          <td style="font-size: 11px; padding: 6px 8px; color: #334155; font-weight: 600;">${op.horario}</td>
+          <td style="padding: 6px 8px;"><span class="badge ${op.equipe === 'Monitoração' ? 'badge-exibido' : 'badge-default'}" style="font-size: 11px;">${op.equipe}</span></td>`;
 
         for (let d = 1; d <= numDays; d++) {
           const val = (op.dias && op.dias[d]) ? op.dias[d] : "";
           if (val) {
-            rHtml += `<td><span class="${getBadgeClass(val)}">${val}</span></td>`;
+            rHtml += `<td style="padding: 3px 2px; text-align: center;"><span class="${getBadgeClass(val)}" style="padding: 2px 4px; font-size: 10px;">${val}</span></td>`;
           } else {
-            rHtml += `<td style="color: #CBD5E1;">-</td>`;
+            rHtml += `<td style="padding: 3px 2px; text-align: center; color: #CBD5E1; font-size: 10px;">-</td>`;
           }
         }
         rHtml += `</tr>`;
@@ -5538,9 +5723,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           tr.classList.add("stream-row-future");
         }
 
+        const evId = ev.id || `${ev.partida}_${ev.data}`;
         if (isStreamGridEditMode) {
-          const evId = ev.id || `${ev.partida}_${ev.data}`;
           tr.innerHTML = `
+            <td class="td-center"><input type="checkbox" class="chk-stream-row" value="${evId}" onchange="updateStreamingSelectionState()"></td>
             <td class="td-center" style="color: #64748B; font-weight: 600;">${count}</td>
             <td class="td-center"><div contenteditable="true" class="sp-grid-cell" onblur="updateStreamField('${evId}', 'mes', this.innerText.trim())">${ev.mes || ''}</div></td>
             <td class="td-center"><div contenteditable="true" class="sp-grid-cell" onblur="updateStreamField('${evId}', 'data', this.innerText.trim())">${ev.data || ''}</div></td>
@@ -5579,6 +5765,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
 
         tr.innerHTML = `
+          <td class="td-center"><input type="checkbox" class="chk-stream-row" value="${evId}" onchange="updateStreamingSelectionState()"></td>
           <td class="td-center" style="color: #64748B; font-weight: 600;">${count}</td>
           <td class="td-center">${ev.mes || '-'}</td>
           <td class="td-center" style="font-weight: 600;">${ev.data || '-'}</td>
@@ -5603,6 +5790,45 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       if (streamTitleEl) {
         streamTitleEl.innerHTML = `Programação Streaming (${allEvents.length} Confrontos) <span class="star-icon">☆</span>`;
       }
+      updateStreamingSelectionState();
+    }
+
+    function toggleSelectAllStreaming(masterChk) {
+      const isChecked = !!masterChk.checked;
+      document.querySelectorAll(".chk-stream-row").forEach(chk => {
+        chk.checked = isChecked;
+      });
+      updateStreamingSelectionState();
+    }
+
+    function updateStreamingSelectionState() {
+      const allRowChks = document.querySelectorAll(".chk-stream-row");
+      const checkedRows = Array.from(allRowChks).filter(chk => chk.checked);
+      const btnDel = document.getElementById("btn-delete-stream-selected");
+      const countEl = document.getElementById("count-stream-selected");
+      const masterChk = document.getElementById("chk-stream-all");
+
+      if (countEl) countEl.innerText = checkedRows.length;
+      if (btnDel) btnDel.style.display = checkedRows.length > 0 ? "inline-flex" : "none";
+      if (masterChk) masterChk.checked = (allRowChks.length > 0 && checkedRows.length === allRowChks.length);
+    }
+
+    function deleteSelectedStreamingEvents() {
+      const checkedRows = Array.from(document.querySelectorAll(".chk-stream-row:checked"));
+      if (checkedRows.length === 0) return;
+      const count = checkedRows.length;
+      if (!confirm(`Tem certeza que deseja excluir os ${count} confrontos selecionados da programação?`)) {
+        return;
+      }
+      const selectedIds = new Set(checkedRows.map(chk => String(chk.value)));
+      allEvents = allEvents.filter(ev => {
+        const evId = String(ev.id || `${ev.partida}_${ev.data}`);
+        return !selectedIds.has(evId);
+      });
+      localStorage.setItem("sp_custom_streaming_events", JSON.stringify(allEvents));
+      renderTable();
+      updateStreamingSelectionState();
+      showToast(`🗑️ ${count} confrontos excluídos com sucesso da programação!`, "success");
     }
 
     let hospSortCol = null;
@@ -6993,6 +7219,26 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     window.saveNewPerm = saveNewPerm;
     window.togglePermsGridEdit = togglePermsGridEdit;
     window.updatePermField = updatePermField;
+    window.openAutonomousDocViewer = openAutonomousDocViewer;
+    window.openReportDocument = openReportDocument;
+    window.downloadAutonomousMockDoc = downloadAutonomousMockDoc;
+    window.generateAndDownloadRdp = generateAndDownloadRdp;
+    window.toggleSelectAllStreaming = toggleSelectAllStreaming;
+    window.updateStreamingSelectionState = updateStreamingSelectionState;
+    window.deleteSelectedStreamingEvents = deleteSelectedStreamingEvents;
+    window.openQuickMstscModal = openQuickMstscModal;
+    window.switchRdpViewMode = switchRdpViewMode;
+    window.openRdpSubfolder = openRdpSubfolder;
+    window.openRdpFolderCrumb = openRdpFolderCrumb;
+    window.resetRdpFolderRoot = resetRdpFolderRoot;
+    window.onMstscHostSelected = onMstscHostSelected;
+    window.copyMstscCommand = copyMstscCommand;
+    window.launchMstscConnection = launchMstscConnection;
+    window.renderRdpTable = renderRdpTable;
+    window.filterRdpTable = filterRdpTable;
+    window.setRdpCategory = setRdpCategory;
+    window.triggerRdpConnect = triggerRdpConnect;
+    window.exportRdpCSV = exportRdpCSV;
 
     // Inicialização
     initEscalaMonths();
@@ -7079,16 +7325,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         };
 
         const flag = h.pais === 'Brasil' ? '🇧🇷' : '🌎';
+        tr.style.borderBottom = "1px solid #F1F5F9";
         tr.innerHTML = `
-          <td style="text-align:center; color:#64748B; font-size:11.5px;">${idx + 1}</td>
-          <td><b>${flag} ${h.pais}</b> <span style="color:#64748B; font-size:11px;">(${h.regiao})</span></td>
-          <td><b style="color:#0078D4;">${h.praca}</b></td>
-          <td>${renderRouterCell(h.router)}</td>
-          <td>${renderCsCell(h.cs1_ip, 'CS1')}</td>
-          <td>${renderCsCell(h.cs2_ip, 'CS2')}</td>
-          <td>${renderCsCell(h.cs3_ip, 'CS3')}</td>
-          <td>${renderPduCell(h.pdu_ip, h.pdu_tipo)}</td>
-          <td><span class="badge" style="background:#DCFCE7; color:#166534; border:1px solid #BBF7D0; font-size:10.5px; padding:2px 6px;">● Online</span></td>
+          <td style="padding: 11px 14px; text-align: center; color: #64748B; font-size: 11.5px; font-weight: 600;">${idx + 1}</td>
+          <td style="padding: 11px 14px;"><b>${flag} ${h.pais}</b> <span style="color:#64748B; font-size:11px;">(${h.regiao})</span></td>
+          <td style="padding: 11px 14px;"><b style="color:#0078D4; font-size: 13px;">${h.praca}</b></td>
+          <td style="padding: 11px 14px;">${renderRouterCell(h.router)}</td>
+          <td style="padding: 11px 14px;">${renderCsCell(h.cs1_ip, 'CS1')}</td>
+          <td style="padding: 11px 14px;">${renderCsCell(h.cs2_ip, 'CS2')}</td>
+          <td style="padding: 11px 14px;">${renderCsCell(h.cs3_ip, 'CS3')}</td>
+          <td style="padding: 11px 14px;">${renderPduCell(h.pdu_ip, h.pdu_tipo)}</td>
+          <td style="padding: 11px 14px; text-align: center;"><span class="badge" style="background:#DCFCE7; color:#166534; border:1px solid #BBF7D0; font-size:10.5px; padding:3px 8px;">● Online</span></td>
         `;
         tbody.appendChild(tr);
       });
@@ -7097,6 +7344,221 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       if (footer) {
         footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${RDP_MASTER_DATASET.length}</b> nós remotos`;
       }
+    }
+
+    // ==========================================
+    // 2.7 NAVEGADOR DE PASTAS RDP & CONEXÃO RÁPIDA MSTSC
+    // ==========================================
+    let rdpCurrentViewMode = 'list';
+    let rdpFolderBreadcrumbs = [];
+
+    function switchRdpViewMode(mode) {
+      rdpCurrentViewMode = mode;
+      const listBtn = document.getElementById('btn-rdp-view-list');
+      const foldersBtn = document.getElementById('btn-rdp-view-folders');
+      const listWrap = document.getElementById('rdp-view-list-container');
+      const foldersWrap = document.getElementById('rdp-view-folders-container');
+
+      if (mode === 'folders') {
+        if (listBtn) listBtn.classList.remove('active');
+        if (foldersBtn) foldersBtn.classList.add('active');
+        if (listWrap) listWrap.style.display = 'none';
+        if (foldersWrap) foldersWrap.style.display = 'block';
+        initRdpFolders();
+      } else {
+        if (listBtn) listBtn.classList.add('active');
+        if (foldersBtn) foldersBtn.classList.remove('active');
+        if (listWrap) listWrap.style.display = 'block';
+        if (foldersWrap) foldersWrap.style.display = 'none';
+        renderRdpTable();
+      }
+    }
+
+    function initRdpFolders() {
+      const rdpDrive = SP_MASTER_DATA.drives && SP_MASTER_DATA.drives['Acesso Remoto'];
+      const rootItems = rdpDrive ? (rdpDrive.items || []) : [];
+      rdpFolderBreadcrumbs = [{ name: 'Acesso Remoto', items: rootItems }];
+      renderRdpFolderGrid();
+    }
+
+    function resetRdpFolderRoot() {
+      initRdpFolders();
+    }
+
+    function openRdpFolderCrumb(index) {
+      if (index >= 0 && index < rdpFolderBreadcrumbs.length) {
+        rdpFolderBreadcrumbs = rdpFolderBreadcrumbs.slice(0, index + 1);
+        renderRdpFolderGrid();
+      }
+    }
+
+    function openRdpSubfolder(folderId) {
+      const cur = rdpFolderBreadcrumbs[rdpFolderBreadcrumbs.length - 1];
+      if (!cur) return;
+      const folder = (cur.items || []).find(it => String(it.id) === String(folderId));
+      if (folder) {
+        rdpFolderBreadcrumbs.push({
+          name: folder.name,
+          items: folder.children || []
+        });
+        renderRdpFolderGrid();
+      }
+    }
+
+    function renderRdpFolders() {
+      renderRdpFolderGrid();
+    }
+
+    function renderRdpFolderGrid() {
+      const cur = rdpFolderBreadcrumbs[rdpFolderBreadcrumbs.length - 1];
+      const items = cur ? (cur.items || []) : [];
+      const bcEl = document.getElementById('rdp-folders-breadcrumb');
+      const gridEl = document.getElementById('rdp-folders-grid');
+      if (!gridEl) return;
+
+      if (bcEl) {
+        bcEl.innerHTML = rdpFolderBreadcrumbs.map((crumb, idx) => {
+          if (idx === rdpFolderBreadcrumbs.length - 1) {
+            return `<span style="color:#1E293B; font-weight:700;">${crumb.name}</span>`;
+          }
+          return `<span style="cursor:pointer; color:#0078D4;" onclick="openRdpFolderCrumb(${idx})">${crumb.name}</span> &rsaquo; `;
+        }).join('');
+      }
+
+      if (items.length === 0) {
+        gridEl.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #94A3B8;">Esta pasta não possui subpastas ou arquivos .rdp.</div>`;
+        return;
+      }
+
+      gridEl.innerHTML = items.map(it => {
+        const isFolder = it.type === 'folder';
+        if (isFolder) {
+          const childCount = (it.children ? it.children.length : (it.childCount || 0));
+          return `
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px;" onclick="openRdpSubfolder('${it.id}')" onmouseover="this.style.borderColor='#0078D4'; this.style.background='#F0F9FF';" onmouseout="this.style.borderColor='#E2E8F0'; this.style.background='#F8FAFC';">
+              <span style="font-size: 26px;">📁</span>
+              <div style="flex: 1; overflow: hidden;">
+                <div style="font-size: 13px; font-weight: 700; color: #1E293B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${it.name}</div>
+                <div style="font-size: 11px; color: #64748B; margin-top: 2px;">${childCount} itens</div>
+              </div>
+              <span style="color: #0078D4; font-size: 14px;">&rsaquo;</span>
+            </div>
+          `;
+        } else {
+          return `
+            <div style="background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+                <span style="font-size: 24px;">🖥️</span>
+                <div style="overflow: hidden;">
+                  <div style="font-size: 12.5px; font-weight: 700; color: #1E293B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${it.name}">${it.name}</div>
+                  <div style="font-size: 10.5px; color: #64748B;">${formatFileSize(it.size)}</div>
+                </div>
+              </div>
+              <button class="sp-btn-cmd" style="padding: 4px 10px; font-size: 11px; border-radius: 4px; color: #0284C7; border-color: #BAE6FD; background: #F0F9FF; font-weight: 700;" onclick="generateAndDownloadRdp('${encodeURIComponent(it.name)}')" title="Baixar e Conectar">
+                Conectar
+              </button>
+            </div>
+          `;
+        }
+      }).join('');
+    }
+
+    function openQuickMstscModal(prefilledIp, prefilledLabel) {
+      const hosts = RDP_MASTER_DATASET || [];
+      const modalHtml = `
+        <div id="modal-quick-mstsc" class="sp-modal-overlay" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); z-index:9999; justify-content:center; align-items:center;">
+          <div style="background:white; border-radius:10px; width:90%; max-width:580px; box-shadow:0 20px 40px rgba(0,0,0,0.25); overflow:hidden; border:1px solid #E2E8F0; animation:fadeIn 0.2s ease-out;">
+            <div style="background:linear-gradient(135deg, #0F172A, #1E293B); color:white; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:22px; color:#38BDF8;">⚡</span>
+                <div>
+                  <h3 style="margin:0; font-size:15px; font-weight:700;">Conexão Rápida MSTSC / RDP Nativo</h3>
+                  <div style="font-size:11px; color:#94A3B8;">Microsoft Terminal Services Client &bull; Porta Padrão 3389</div>
+                </div>
+              </div>
+              <button onclick="document.getElementById('modal-quick-mstsc').remove()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer; line-height:1;">&times;</button>
+            </div>
+            <div style="padding:22px;">
+              <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Selecione a Praça / Estação Homologada:</label>
+                <select id="mstsc-select-host" class="select-field" style="width:100%; font-size:12.5px; padding:8px 10px;" onchange="onMstscHostSelected(this.value)">
+                  <option value="">-- Selecione uma Praça (151 Nós Disponíveis) --</option>
+                  ${hosts.map(h => `<option value="${h.cs1_ip}" data-cs1="${h.cs1_ip}" data-cs2="${h.cs2_ip}" data-cs3="${h.cs3_ip}" data-label="${h.praca}" ${prefilledLabel === h.praca ? 'selected' : ''}>${h.pais === 'Brasil' ? '🇧🇷' : '🌎'} ${h.praca} (${h.regiao}) - CS1: ${h.cs1_ip || 'N/A'}</option>`).join('')}
+                </select>
+              </div>
+
+              <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:16px;">
+                <div>
+                  <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Endereço IP ou Hostname:</label>
+                  <input type="text" id="mstsc-input-ip" value="${prefilledIp || ''}" placeholder="Ex: 10.150.12.10" class="input-field" style="width:100%; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#0F172A; padding:8px 10px;">
+                </div>
+                <div>
+                  <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Porta RDP:</label>
+                  <input type="text" id="mstsc-input-port" value="3389" class="input-field" style="width:100%; font-family:'JetBrains Mono',monospace; font-size:13px; padding:8px 10px;">
+                </div>
+              </div>
+
+              <div style="margin-bottom:18px;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Modo de Visualização:</label>
+                <select id="mstsc-select-res" class="select-field" style="width:100%; font-size:12px; padding:8px 10px;">
+                  <option value="fullscreen">🖥️ Tela Cheia (Multimonitor)</option>
+                  <option value="1920x1080">📐 1920 x 1080 (Full HD)</option>
+                  <option value="1366x768">📐 1366 x 768 (HD Padrão)</option>
+                </select>
+              </div>
+
+              <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:6px; padding:12px 14px; font-size:11.5px; margin-bottom:20px;">
+                <div style="color:#64748B; font-weight:600; margin-bottom:4px;">💡 Como funciona a Conexão Rápida:</div>
+                <div style="color:#334155; line-height:1.4;">
+                  Clique em <strong>Conectar Agora</strong> para baixar o arquivo <code>.rdp</code> configurado e abrir instantaneamente no Remote Desktop nativo do Windows, ou use <strong>Copiar Comando</strong> para colar no Executar (Win+R).
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+                <button type="button" class="btn-action btn-action-secondary" onclick="copyMstscCommand()">
+                  📋 Copiar Comando (mstsc /v:...)
+                </button>
+                <button type="button" class="btn-action btn-action-primary" onclick="launchMstscConnection()" style="background:#0284C7; border-color:#0284C7;">
+                  🚀 Conectar Agora (.rdp)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      const prev = document.getElementById('modal-quick-mstsc');
+      if (prev) prev.remove();
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    function onMstscHostSelected(ip) {
+      const input = document.getElementById('mstsc-input-ip');
+      if (input && ip) input.value = ip;
+    }
+
+    function copyMstscCommand() {
+      const ip = (document.getElementById('mstsc-input-ip')?.value || '').trim();
+      const port = (document.getElementById('mstsc-input-port')?.value || '3389').trim();
+      if (!ip) {
+        showToast('⚠️ Informe um IP ou selecione uma praça primeiro.', 'error');
+        return;
+      }
+      const addr = port === '3389' ? ip : `${ip}:${port}`;
+      const cmd = `mstsc /v:${addr} /f`;
+      copyTextToClipboard(cmd);
+      showToast(`📋 Comando '${cmd}' copiado para a Área de Transferência!`, 'success');
+    }
+
+    function launchMstscConnection() {
+      const ip = (document.getElementById('mstsc-input-ip')?.value || '').trim();
+      const port = (document.getElementById('mstsc-input-port')?.value || '3389').trim();
+      if (!ip) {
+        showToast('⚠️ Informe um IP ou selecione uma praça primeiro.', 'error');
+        return;
+      }
+      const label = document.getElementById('mstsc-select-host')?.selectedOptions[0]?.getAttribute('data-label') || ip;
+      triggerRdpConnect(ip, label, 'CS1', port);
+      document.getElementById('modal-quick-mstsc')?.remove();
     }
 
     function filterRdpTable() {

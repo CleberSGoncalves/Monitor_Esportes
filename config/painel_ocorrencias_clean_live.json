@@ -1,5 +1,27 @@
 [
   {
+    "id": "15538",
+    "Status": "Em andamento",
+    "Criado": "2026-11-25T21:27:07Z",
+    "hostLookupId": "80",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Switch / Roteador",
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "em contato com parceiro o mesmo informa que esta sem energia no local",
+    "AreaResponsavel": "N1",
+    "Redmine": "N1"
+  },
+  {
     "id": "15537",
     "Status": "Concluido",
     "Criado": "2026-11-25T12:50:25Z",
@@ -80,7 +102,7 @@
     "InformarOperacao": true,
     "AcoesExecutadas": "Estamos sem acesso a maquina principal, aguardando retorno do parceiro",
     "AreaResponsavel": "N1",
-    "Redmine": "* Solucionador - Suporte Técnico N2"
+    "Redmine": "Marcos Silva"
   },
   {
     "id": "15533",
