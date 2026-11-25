@@ -698,7 +698,9 @@ class SharePointReporter:
                         partida=partida,
                         campeonato=campeonato,
                         plataforma=plataforma,
-                        confianca=confianca
+                        confianca=confianca,
+                        data_hora=datetime.now().strftime("%d/%m/%Y %H:%M"),
+                        auditado=True
                     )
                     if portal_ok:
                         logger.info(f"🌐 [Portal Web] Relatório '{sp_filename}' publicado e sincronizado no novo Portal Web Suporte Captação (Futebol)!")

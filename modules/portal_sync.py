@@ -49,7 +49,11 @@ class PortalSyncManager:
         partida: str = "",
         campeonato: str = "",
         plataforma: str = "",
-        confianca: str = "99.0%"
+        confianca: str = "99.0%",
+        data_hora: Optional[str] = None,
+        auditado: bool = True,
+        placar: Optional[str] = None,
+        canal: Optional[str] = None
     ) -> bool:
         """
         Publica o PDF no repositório local do Portal Web (docs/reports/),
@@ -109,11 +113,26 @@ class PortalSyncManager:
                     existing_item = it
                     break
 
+            now_dt_str = data_hora or datetime.now().strftime("%d/%m/%Y %H:%M")
+            fields_data = {
+                "Data_Hora": now_dt_str,
+                "Data_Jogo": now_dt_str,
+                "Campeonato": campeonato or "Brasileiro Serie A",
+                "Partida": partida or target_filename,
+                "Plataforma": plataforma or canal or "Caze TV",
+                "Canal": canal or plataforma or "Caze TV",
+                "Confiança": confianca or "99.0%",
+                "Auditado": auditado,
+                "Placar": placar or ""
+            }
+
             if existing_item:
                 existing_item["size"] = file_size
                 existing_item["lastModifiedDateTime"] = now_iso
                 existing_item["webUrl"] = relative_web_url
                 existing_item["lastModifiedBy"] = "Monitor_Esportes Auto-Audit"
+                existing_item["fields"] = fields_data
+                existing_item["meta"] = fields_data
             else:
                 new_item = {
                     "id": f"PORTAL_{uuid.uuid4().hex[:12].upper()}",
@@ -126,12 +145,8 @@ class PortalSyncManager:
                     "lastModifiedBy": "Monitor_Esportes Auto-Audit",
                     "webUrl": relative_web_url,
                     "childCount": None,
-                    "meta": {
-                        "partida": partida,
-                        "campeonato": campeonato,
-                        "plataforma": plataforma,
-                        "confianca": confianca
-                    }
+                    "fields": fields_data,
+                    "meta": fields_data
                 }
                 # Inserir no topo para aparecer primeiro
                 items.insert(0, new_item)

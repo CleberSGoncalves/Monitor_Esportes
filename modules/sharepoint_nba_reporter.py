@@ -181,7 +181,10 @@ class SharePointNBAReporter:
                             partida=f"{away_tri} @ {home_tri}",
                             campeonato="NBA",
                             plataforma=plat_norm,
-                            confianca=conf_val
+                            confianca=conf_val,
+                            data_hora=datetime.now().strftime("%d/%m/%Y %H:%M"),
+                            auditado=is_audited,
+                            placar=f"{away_tri} x {home_tri}"
                         )
                         if portal_ok:
                             logger.info(f"🌐 [Portal Web] Relatório '{sp_filename}' publicado e sincronizado no novo Portal Web Suporte Captação (NBA)!")

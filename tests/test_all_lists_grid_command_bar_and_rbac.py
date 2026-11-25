@@ -197,8 +197,8 @@ def test_rbac_roles_visibility(driver):
 
 def test_acesso_remoto_guatemala_rdp_drilldown(driver):
     """Verifica que a biblioteca Acesso Remoto permite navegar em Guatemala > Bloco 02 e ver os arquivos RDP reais"""
-    # Abre o drive Acesso Remoto via menu
-    driver.execute_script("handleMenuClick('remoto', '🎮 Acesso Remoto & América Central')")
+    # Abre o drive Acesso Remoto diretamente no visualizador de drive
+    driver.execute_script("openDrive('Acesso Remoto', 'Acesso Remoto & América Central');")
     time.sleep(0.5)
 
     tbody = driver.find_element(By.ID, "drive-viewer-tbody")
