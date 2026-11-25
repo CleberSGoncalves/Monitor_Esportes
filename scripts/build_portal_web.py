@@ -1848,6 +1848,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('redmine', '🐞 Redmine (Demandas)', event)">🐞 Redmine (Demandas) <span class="item-count-badge">300</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('hosts', '📡 Cadastro de Hosts', event)">📡 Cadastro de Hosts <span class="item-count-badge">__HOSTS_COUNT__</span></a>
             <a href="javascript:void(0)" class="sp-dropdown-link" onclick="handleMenuClick('cidades', '🏙️ Mapeamento de Cidades e Emissoras', event)">🏙️ Mapeamento de Cidades e Emissoras <span class="item-count-badge">229</span></a>
+            <a href="javascript:void(0)" class="sp-dropdown-link" onclick="openRelatorioTecnicoModal(event)"><span style="color:#10B981;">🛡️</span> Relatório Técnico & Arquitetura NOC (Segurança) <span class="item-count-badge" style="background:#10B981; color:#fff;">OFICIAL</span></a>
           </div>
         </div>
 
@@ -2162,6 +2163,30 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
 
       <!-- Navegador de Meses -->
+      <!-- CARDS DE RESUMO OPERACIONAL DA ESCALA 2026 -->
+      <div class="escala-kpi-summary-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px;">
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px; border-left: 4px solid #0078D4; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+          <div style="font-size: 11.5px; font-weight: 700; color: #64748B; text-transform: uppercase;">👥 Operadores Ativos</div>
+          <div style="font-size: 22px; font-weight: 800; color: #0F172A; margin: 4px 0;" id="kpi-escala-total">15 Operadores</div>
+          <div style="font-size: 11px; color: #0078D4;">Monitoração & Captação</div>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px; border-left: 4px solid #10B981; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+          <div style="font-size: 11.5px; font-weight: 700; color: #047857; text-transform: uppercase;">🟢 Escalados Hoje (25/11)</div>
+          <div style="font-size: 22px; font-weight: 800; color: #065F46; margin: 4px 0;" id="kpi-escala-hoje">11 em Turno (T)</div>
+          <div style="font-size: 11px; color: #059669;">Conformidade CLT Art. 66</div>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px; border-left: 4px solid #F59E0B; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+          <div style="font-size: 11.5px; font-weight: 700; color: #B45309; text-transform: uppercase;">🔵 Sobreaviso Hoje (SM)</div>
+          <div style="font-size: 22px; font-weight: 800; color: #92400E; margin: 4px 0;" id="kpi-escala-sm">2 em Prontidão</div>
+          <div style="font-size: 11px; color: #D97706;">Acionamento Imediato</div>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px; border-left: 4px solid #64748B; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+          <div style="font-size: 11.5px; font-weight: 700; color: #475569; text-transform: uppercase;">⚪ Folga Hoje (F)</div>
+          <div style="font-size: 22px; font-weight: 800; color: #334155; margin: 4px 0;" id="kpi-escala-folga">2 Operadores</div>
+          <div style="font-size: 11px; color: #64748B;">Descanso Regulamentar</div>
+        </div>
+      </div>
+
       <div class="month-pills-row" id="escala-month-pills">
         <!-- Renderizado dinamicamente via JS -->
       </div>
@@ -2529,8 +2554,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <button class="sp-btn-cmd" onclick="renderRdpTable()">
             <span>↺</span> Atualizar Conexões
           </button>
-          <button class="sp-btn-cmd" onclick="window.open('https://adgbl.sharepoint.com/sites/suportecaptacao/Acesso%20Remoto', '_blank')">
-            <span>☁️</span> Abrir Pasta no SharePoint
+          <button class="sp-btn-cmd" onclick="openQuickMstscModal()">
+            <span style="color:#0078D4;">⚡</span> Conexão Rápida MSTSC
+          </button>
+          <button class="sp-btn-cmd" onclick="exportRdpCsv()">
+            <span style="color:#10B981;">📥</span> Exportar Lista RDP (.csv)
           </button>
         </div>
         <div class="sp-command-search">
@@ -4739,6 +4767,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       else if (paneId === 'streaming') renderTable();
       else if (paneId === 'antenistas') renderAntenistasTable();
       else if (paneId === 'hosts') renderHostsTable();
+      else if (paneId === 'remoto') renderRdpTable();
+      else if (paneId === 'escala') renderEscalaTable();
 
       document.querySelectorAll('.tab-link').forEach(btn => {
         if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + paneId + "'")) {
@@ -4885,7 +4915,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <th style="min-width: 120px;">Equipe</th>`;
 
       for (let d = 1; d <= numDays; d++) {
-        hHtml += `<th style="min-width: 38px;">${d}</th>`;
+        const isHojeD = (currentMonth === 'Novembro' && d === 25);
+        if (isHojeD) {
+          hHtml += `<th style="min-width: 44px; background: #ECFDF5; color: #047857; border-bottom: 3px solid #10B981; font-weight: 800;">${d}<br><span style="font-size: 8.5px; background: #10B981; color: #ffffff; padding: 1px 3px; border-radius: 3px;">HOJE</span></th>`;
+        } else {
+          hHtml += `<th style="min-width: 38px;">${d}</th>`;
+        }
       }
       hHtml += `</tr>`;
       thead.innerHTML = hHtml;
@@ -5330,8 +5365,82 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       }
     }
 
+    function updateStreamingHighlightCards() {
+      const hojeStr = "25/11/2026";
+      const amanhaStr = "26/11/2026";
+
+      const lblHoje = document.getElementById("label-data-hoje");
+      const lblAmanha = document.getElementById("label-data-amanha");
+      if (lblHoje) lblHoje.innerText = hojeStr;
+      if (lblAmanha) lblAmanha.innerText = amanhaStr;
+
+      const eventosHoje = allEvents.filter(e => String(e.data || "").trim() === hojeStr);
+      const eventosAmanha = allEvents.filter(e => String(e.data || "").trim() === amanhaStr);
+
+      const badgeHoje = document.getElementById("badge-count-hoje");
+      const badgeAmanha = document.getElementById("badge-count-amanha");
+      if (badgeHoje) badgeHoje.innerText = `${eventosHoje.length} ${eventosHoje.length === 1 ? 'jogo' : 'jogos'}`;
+      if (badgeAmanha) badgeAmanha.innerText = `${eventosAmanha.length} ${eventosAmanha.length === 1 ? 'jogo' : 'jogos'}`;
+
+      const listHoje = document.getElementById("list-eventos-hoje");
+      const listAmanha = document.getElementById("list-eventos-amanha");
+
+      if (listHoje) {
+        if (eventosHoje.length === 0) {
+          listHoje.innerHTML = '<div style="color: #94A3B8; font-size: 12px; text-align: center; padding: 12px;">Nenhum confronto agendado para hoje.</div>';
+        } else {
+          listHoje.innerHTML = eventosHoje.map(ev => `
+            <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-left: 4px solid #16A34A; border-radius: 6px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <div>
+                <div style="font-size: 11px; color: #166534; font-weight: 700; text-transform: uppercase;">
+                  ${ev.campeonato || 'FUTEBOL / ESPORTES'} &bull; <span style="font-size: 12px; color: #0F172A; font-weight: 800;">${ev.horario || '--:--'}</span>
+                </div>
+                <div style="font-size: 13.5px; font-weight: 700; color: #1E293B; margin: 3px 0;">
+                  ${ev.partida || '-'}
+                </div>
+                <div style="font-size: 11px; color: #475569;">
+                  Responsável: <b>${ev.responsavel || '-'}</b> &bull; PVID: <code style="font-family:'JetBrains Mono',monospace; background:#E2E8F0; padding:1px 4px; border-radius:3px;">${ev.pvid || '-'}</code>
+                </div>
+              </div>
+              <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                ${getChannelBadge(ev.canal)}
+                ${getStatusBadge(ev.status_entrega)}
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      if (listAmanha) {
+        if (eventosAmanha.length === 0) {
+          listAmanha.innerHTML = '<div style="color: #94A3B8; font-size: 12px; text-align: center; padding: 12px;">Nenhum confronto agendado para amanhã.</div>';
+        } else {
+          listAmanha.innerHTML = eventosAmanha.map(ev => `
+            <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-left: 4px solid #2563EB; border-radius: 6px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <div>
+                <div style="font-size: 11px; color: #1E40AF; font-weight: 700; text-transform: uppercase;">
+                  ${ev.campeonato || 'FUTEBOL / ESPORTES'} &bull; <span style="font-size: 12px; color: #0F172A; font-weight: 800;">${ev.horario || '--:--'}</span>
+                </div>
+                <div style="font-size: 13.5px; font-weight: 700; color: #1E293B; margin: 3px 0;">
+                  ${ev.partida || '-'}
+                </div>
+                <div style="font-size: 11px; color: #475569;">
+                  Responsável: <b>${ev.responsavel || '-'}</b> &bull; PVID: <code style="font-family:'JetBrains Mono',monospace; background:#E2E8F0; padding:1px 4px; border-radius:3px;">${ev.pvid || '-'}</code>
+                </div>
+              </div>
+              <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                ${getChannelBadge(ev.canal)}
+                ${getStatusBadge(ev.status_entrega)}
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
     function renderTable() {
       initStreamingFilters();
+      updateStreamingHighlightCards();
       // Ordenação padrão decrescente por data para os mais recentes no topo
       if (!streamSortCol) {
         streamSortCol = 'data';
@@ -5396,9 +5505,38 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         });
       }
 
+      const hojeStr = "25/11/2026";
+      const hojeParts = hojeStr.split('/');
+      const hojeTimestamp = new Date(hojeParts[2], hojeParts[1] - 1, hojeParts[0]).getTime();
+
+      const parseEvTimestamp = (dateStr) => {
+        if (!dateStr) return 0;
+        const parts = String(dateStr).split('/');
+        if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+        return 0;
+      };
+
       filtered.forEach((ev) => {
         count++;
         const tr = document.createElement("tr");
+
+        const evTimestamp = parseEvTimestamp(ev.data);
+        const isHoje = String(ev.data || "").trim() === hojeStr;
+        const isPassado = evTimestamp > 0 && evTimestamp < hojeTimestamp;
+        const isFuturo = evTimestamp > hojeTimestamp;
+
+        if (isHoje) {
+          tr.style.backgroundColor = "rgba(34, 197, 94, 0.12)";
+          tr.style.borderLeft = "5px solid #16A34A";
+          tr.classList.add("stream-row-today");
+        } else if (isPassado) {
+          tr.style.backgroundColor = "rgba(239, 68, 68, 0.08)";
+          tr.style.borderLeft = "5px solid #EF4444";
+          tr.classList.add("stream-row-past");
+        } else if (isFuturo) {
+          tr.style.borderLeft = "5px solid #3B82F6";
+          tr.classList.add("stream-row-future");
+        }
 
         if (isStreamGridEditMode) {
           const evId = ev.id || `${ev.partida}_${ev.data}`;
@@ -7322,7 +7460,28 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       }
     }
 
-  </script>
+  
+    function openRelatorioTecnicoModal(ev) {
+      if (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+      }
+      const modal = document.getElementById("modal-relatorio-tecnico-pdf");
+      const iframe = document.getElementById("iframe-relatorio-pdf");
+      if (modal && iframe) {
+        iframe.src = "Relatorio_Tecnico_Arquitetura_Fluxo_Dados_Seguranca_NOC.pdf?v=" + Date.now();
+        modal.style.display = "flex";
+      }
+    }
+
+    function closeRelatorioTecnicoModal() {
+      const modal = document.getElementById("modal-relatorio-tecnico-pdf");
+      const iframe = document.getElementById("iframe-relatorio-pdf");
+      if (modal) modal.style.display = "none";
+      if (iframe) iframe.src = "";
+    }
+
+</script>
 
   <!-- MODAL OFICIAL DE VISUALIZAÇÃO DE RELATÓRIO PDF -->
   <div id="modal-pdf-viewer" class="sp-modal-overlay" style="display: none; z-index: 999999; position: fixed; inset: 0; background: rgba(0,0,0,0.65); align-items: center; justify-content: center; backdrop-filter: blur(4px);">
@@ -7341,6 +7500,31 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
       <div style="flex: 1; background: #525659; position: relative;">
         <iframe id="pdf-viewer-frame" style="width: 100%; height: 100%; border: none;"></iframe>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL DO RELATÓRIO TÉCNICO OFICIAL (ARQUITETURA, FLUXO & SEGURANÇA NOC) -->
+  <div id="modal-relatorio-tecnico-pdf" class="sp-modal-overlay" style="display:none; z-index:99999; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center;">
+    <div class="sp-modal-card" style="width: 95vw; max-width: 1200px; height: 90vh; display: flex; flex-direction: column; background: #ffffff; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid #CBD5E1; overflow: hidden;">
+      <div style="background: #004578; color: #ffffff; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #003359;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 20px;">🛡️</span>
+          <div>
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; letter-spacing: 0.3px;">Relatório Técnico Oficial — Arquitetura, Fluxo de Dados e Segurança do Ambiente NOC</h3>
+            <span style="font-size: 11px; color: #BAE6FD;">Documento Homologado &bull; Auditoria de Segurança &bull; Central Autônoma</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <a href="Relatorio_Tecnico_Arquitetura_Fluxo_Dados_Seguranca_NOC.pdf" download class="sp-btn-cmd" style="background: #10B981; border-color: #059669; color: #fff; font-weight: 700; padding: 6px 14px; border-radius: 6px; text-decoration: none;">
+            📥 Baixar PDF
+          </a>
+          <button type="button" class="sp-modal-close-btn" style="background: transparent; border: none; color: #ffffff; font-size: 22px; cursor: pointer;" onclick="closeRelatorioTecnicoModal()">✕</button>
+        </div>
+      </div>
+      <div style="flex: 1; background: #525659; position: relative;">
+        <iframe id="iframe-relatorio-pdf" src="" style="width: 100%; height: 100%; border: none;"></iframe>
       </div>
     </div>
   </div>

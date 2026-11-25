@@ -1,7 +1,7 @@
 [
   {
     "id": "15537",
-    "Status": "Em andamento",
+    "Status": "Concluido",
     "Criado": "2026-11-25T12:50:25Z",
     "hostLookupId": "213",
     "CS": [
@@ -60,7 +60,7 @@
     "InformarOperacao": false,
     "AcoesExecutadas": "A globo nao esta gravando mesmo fazendo os procedimentos primarios, nao volta a gravar. Aberto redmine",
     "AreaResponsavel": "N1",
-    "Redmine": "* Solucionador - Suporte Técnico N2"
+    "Redmine": "Lucieudes Vicente Ferreira"
   },
   {
     "id": "15534",
@@ -80,11 +80,11 @@
     "InformarOperacao": true,
     "AcoesExecutadas": "Estamos sem acesso a maquina principal, aguardando retorno do parceiro",
     "AreaResponsavel": "N1",
-    "Redmine": "N1"
+    "Redmine": "* Solucionador - Suporte Técnico N2"
   },
   {
     "id": "15533",
-    "Status": "Em andamento",
+    "Status": "Concluido",
     "Criado": "2026-11-25T05:49:07Z",
     "hostLookupId": "118",
     "CS": [
@@ -105,7 +105,7 @@
   },
   {
     "id": "15532",
-    "Status": "Em andamento",
+    "Status": "Concluido",
     "Criado": "2026-11-25T02:33:41Z",
     "hostLookupId": "53",
     "CS": [
@@ -125,7 +125,7 @@
   },
   {
     "id": "15531",
-    "Status": "Em andamento",
+    "Status": "Concluido",
     "Criado": "2026-11-25T01:53:56Z",
     "hostLookupId": "119",
     "CS": [
@@ -21445,5 +21445,1031 @@
     "AcoesExecutadas": "Estamos com nosso tomate imagem congelada desde ontem 13/11 as 15:30, wadt queimado sendo tratado pelo redmine 8956, enviado mensagem ao parceiro reiniciar o tomate,, no aguardo ",
     "AreaResponsavel": "N2 - Marcos",
     "Redmine": 8973.0
+  },
+  {
+    "id": "9609",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:45Z",
+    "hostLookupId": "6",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "TNT e Warner",
+    "Equipamento": [
+      "Equipamento do Parceiro"
+    ],
+    "TipoProblema": "Tela preta",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado e-mail para a equipe da Argentina verificar.\n\nRecuperar TNT no STR1 e Warner no STR3",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9608",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:45Z",
+    "hostLookupId": "94",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Rede TV",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Tela azul",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado e-mail para a operação verificar.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9607",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:44Z",
+    "hostLookupId": "153",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "todos",
+    "Equipamento": [
+      "Switch / Roteador"
+    ],
+    "TipoProblema": "Travamento",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "1 sem acesso as CSs, apos voltou comunicação mas não envia arquivo, solicitado parceiro verificar switch e link ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9606",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:44Z",
+    "hostLookupId": "165",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "todos ",
+    "Equipamento": [
+      "Switch / Roteador",
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "sem acesso aos computadores, enviado msg ao parceiro ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9605",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:43Z",
+    "hostLookupId": "161",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "todos",
+    "Equipamento": [
+      "Switch / Roteador",
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Estamos sem comunicação desde às 11:00 da manhã do dia 14/10/2023; Enviado e-mail e mensagem para o parceiro local veriifcar.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9604",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:41Z",
+    "hostLookupId": "94",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Band",
+    "Equipamento": [
+      "TOMATE",
+      "WADT"
+    ],
+    "TipoProblema": "Sem sinal",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Confrimado com o Renato do DIB de Fortaleza, a emisorra está fora na região.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9603",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:40Z",
+    "hostLookupId": "66",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Globo",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Imagem congelada",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado e-mail para a operação verificar.",
+    "AreaResponsavel": "N2 - Lucieudes",
+    "Redmine": 7152.0
+  },
+  {
+    "id": "9602",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:39Z",
+    "hostLookupId": "127",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "GLOBO",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Imagem congelada",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado e-mail para equipe fazer o reset no decoder",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9601",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:39Z",
+    "hostLookupId": "66",
+    "CS": [
+      "03"
+    ],
+    "Veiculo": "Rede TV, TV Brasil e TV Gênesis",
+    "Equipamento": [
+      "WADT"
+    ],
+    "TipoProblema": "Canal trocado",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado e-mail para realizar os ajustes de inversão dos cabos de áudios correspondentes ao canal correto, e reiniciar os receptores sem sinal.\nRede TV - CS03 - Com audio TV Gênesis\nTV Brasil - CS3 - Com audio da Rede TV\nTV Gênesis - CS03 - Com audio TV Brasil ",
+    "AreaResponsavel": "N2 - Lucieudes",
+    "Redmine": 7152.0
+  },
+  {
+    "id": "9600",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:38Z",
+    "hostLookupId": "127",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "GLOBO",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Imagem congelada",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado e-mail  para equipe reiniciar o decoder ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9599",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:37Z",
+    "hostLookupId": "101",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Travamento",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "Estamos sem acesso ao equipamento DT01, foi encaminhado mensagem para o parceiro verificar. Até o momento não tivemos retorno.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9598",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:38Z",
+    "hostLookupId": "99",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Travamento",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Estamos sem acesso ao equipamento DT02, tentei reiniciar pela régua e não houve sucesso.\nEnviado e-mail para a equipe local verificar.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9597",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:36Z",
+    "hostLookupId": "129",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "Record ",
+    "Equipamento": [
+      "ZIP - 910"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Record - ZIP IP 192.168.10.2 não está acessível, foi enviado e-mail para o suporte local. ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9596",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:36Z",
+    "hostLookupId": "63",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "todos",
+    "Equipamento": [
+      "Equipamento do Parceiro"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Estamos sem link na localidade. Noc está em contato com a operadora, verificando a normalização.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9595",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:35Z",
+    "hostLookupId": "127",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Switch / Roteador"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "NOC informa que link Down na unidade, ja acionou a  operadora para solução, aguardando ",
+    "AreaResponsavel": "NOC",
+    "Redmine": ""
+  },
+  {
+    "id": "9594",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:35Z",
+    "hostLookupId": "156",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "SBT",
+    "Equipamento": [
+      "WADT"
+    ],
+    "TipoProblema": "Equipamento queimado",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Verificado junto ao parceiro e o mesmo confirmou que estamos com tunner do SBT queimado. Aberto chamado N2 para verificação.",
+    "AreaResponsavel": "N2 - Lucieudes",
+    "Redmine": 7139.0
+  },
+  {
+    "id": "9593",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:35Z",
+    "hostLookupId": "99",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "TV Metropolis",
+    "Equipamento": [
+      "WADT",
+      "TOMATE"
+    ],
+    "TipoProblema": "Sem sinal",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Estamos sem sinal. Em contato com a filial para verificação, nos retornou que mesmo fazendo uma nova busca, não sintoniza.  Solicitado confirmação de falha de emissora.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9592",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:33Z",
+    "hostLookupId": "146",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Manutenção",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Estamos realizando migração na praça de Ponta-Porã. Detalhes Teams do Marcos.",
+    "AreaResponsavel": "N2 - Marcos",
+    "Redmine": ""
+  },
+  {
+    "id": "9591",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:33Z",
+    "hostLookupId": "193",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "FX",
+    "Equipamento": [
+      "Decoder SKY"
+    ],
+    "TipoProblema": "Logo da SKY",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "FX PV1757 esta na tela do mosaico, solicitado apoio ao grupo do Sup Cap",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9590",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:32Z",
+    "hostLookupId": "2",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Problema no sistema operacional",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Nossa CS de backup 'Argentina DATCO - ARBA-BL02-CS2 (Rádio)' esta com falha no sistema operacional e precisa de reparação ou formatação.\n\n",
+    "AreaResponsavel": "N2 - Marcos",
+    "Redmine": 7138.0
+  },
+  {
+    "id": "9589",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:32Z",
+    "hostLookupId": "193",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "FX",
+    "Equipamento": [
+      "Decoder SKY"
+    ],
+    "TipoProblema": "Logo da SKY",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Equipamento com logo da Sky  coloca no grupo para verificar ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9588",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:31Z",
+    "hostLookupId": "87",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "TV Cidade Verde / Record TV",
+    "Equipamento": [
+      "WADT"
+    ],
+    "TipoProblema": "Sem sinal",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Mesmo reiniciando o equipamento, sinal não volta. Solicitado apoio ao parceiro para fazer nova busca de canal no equipamento. Parceiro informa que vai avisar quando estiver a caminho.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9587",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:31Z",
+    "hostLookupId": "99",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Problema no serviço",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Verificado que máquina de Goiânia está parando o media recorder constantemente. Aberto chamado N2 para verificação.",
+    "AreaResponsavel": "N2 - Luis",
+    "Redmine": 7133.0
+  },
+  {
+    "id": "9586",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:30Z",
+    "hostLookupId": "206",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "BAND",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Imagem congelada",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Gravações da BAND CS02 com imagem congelada, foi reiniciado remotamente e não surtiu efeito, enviado msg para o parceiro. ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9585",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:29Z",
+    "hostLookupId": "208",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "Globo",
+    "Equipamento": [
+      "WADT"
+    ],
+    "TipoProblema": "Tela preta",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Gravações da Globo com tela preta, enviado e-mail solicitando validação no cabo HDMI.",
+    "AreaResponsavel": "N2 - Marcos",
+    "Redmine": 7132.0
+  },
+  {
+    "id": "9584",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:29Z",
+    "hostLookupId": "1",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "AMERICA",
+    "Equipamento": [
+      "Equipamento do Parceiro"
+    ],
+    "TipoProblema": "Imagem congelada",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "canal esta apresentando imagem barrosa enviado mensagem para equipe verificar  ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9583",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:28Z",
+    "hostLookupId": "93",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Travamento",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Estamos sem acesso a maquina DT02 em Florianópolis, foi solicitado por e-mail a verificação, um técnico informou que tinha verificado, mas a maquina não voltou. Informei a situação e não obtive mais resposta. ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9582",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:28Z",
+    "hostLookupId": "216",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Switch / Roteador"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "Estamos sem link na filial de Vitória, a equipe NOC já está em contato com a operadora para a normalização. ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9581",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:27Z",
+    "hostLookupId": "94",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Rede TV",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Tela azul",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Equipamento com tela azul. Será necessário religá-lo, esse tomate não está religando como os demais da régua.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9580",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:26Z",
+    "hostLookupId": "20",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "El trece - PV2572",
+    "Equipamento": [
+      "Equipamento do Parceiro"
+    ],
+    "TipoProblema": "Tela preta",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Gravações com tela preta, segundo a DATCO se trata de uma falha na origem do sinal, recuperar via CS03. Backup esta na Buenos Aires / ARBA-STREAM-07.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9579",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:26Z",
+    "hostLookupId": "20",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Telefe e El trece",
+    "Equipamento": [
+      "Equipamento do Parceiro"
+    ],
+    "TipoProblema": "Imagem congelada",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Problema no sinal da operadora Flow. Aguardando normalização.\n\nRecuperar:\nDATCO / Províncias - Bloque 01\n      Telefe - Santa fe\n\nDATCO / Províncias - Bloque 02:\n      Telefe - Tucuman\n      El trece - Tucuman\n     El trece - Parana\n",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9578",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:25Z",
+    "hostLookupId": "120",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "SBT",
+    "Equipamento": [
+      "TOMATE",
+      "WADT"
+    ],
+    "TipoProblema": "Sem audio",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "SBT - Gravando sem áudio no principal e backup, reiniciado os receptores e continua sem áudio. Inicio  21h40 05/10",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9577",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:25Z",
+    "hostLookupId": "52",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "Globo, Band",
+    "Equipamento": [
+      "ZIP - 910"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Não estamos acessando o ZIP da Globo PV1082 IP 192.168.10.1 e da Band PV1084 IP 192.168.10.3 apenas o IP 192.168.10.2 da Record está acessando e gravando, atualizado redmine do chamado.",
+    "AreaResponsavel": "N2 - Luis",
+    "Redmine": 7030.0
+  },
+  {
+    "id": "9576",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:24Z",
+    "hostLookupId": "52",
+    "CS": [
+      "02"
+    ],
+    "Veiculo": "Globo, Record",
+    "Equipamento": [
+      "WADT"
+    ],
+    "TipoProblema": "Sem sinal",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Equipamentos gravando sem conteúdo, Globo - tela preta e Record - sem sinal, necessário realizar ajuste como sintonizar o canal novamente. ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9575",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:24Z",
+    "hostLookupId": "95",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "SBT",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Equipamento queimado",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Equipamento com tela azul, mesmo reiniciando remotamente o receptor não volta",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9574",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:23Z",
+    "hostLookupId": "87",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Switch / Roteador",
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "parceiro ficou de enviar alguém para verificar a falta de comunicação ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9573",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:22Z",
+    "hostLookupId": "31",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "AZ Mundo",
+    "Equipamento": [
+      "Equipamento do Parceiro"
+    ],
+    "TipoProblema": "Sem audio",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado e-mail para o a equipe local verfiicar.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9572",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:21Z",
+    "hostLookupId": "119",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "GLOBO",
+    "Equipamento": [
+      "WADT"
+    ],
+    "TipoProblema": "Tela preta",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado e-mail para o parceiro, para reiniciar o equipamento",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9571",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:20Z",
+    "hostLookupId": "149",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "SBT",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Tela azul",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Sim",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado mensagem para parceiro verificar",
+    "AreaResponsavel": "N2 (Não atribuido)",
+    "Redmine": 7124.0
+  },
+  {
+    "id": "9570",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:20Z",
+    "hostLookupId": "135",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina",
+      "Switch / Roteador"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "comunicação oscilando, parceiro informa que esta enviando um técnico para verificar ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9569",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:19Z",
+    "hostLookupId": "119",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "todos",
+    "Equipamento": [
+      "Switch / Roteador",
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "sem comunicação com computadores, enviado msg ao parceiro para verificação ",
+    "AreaResponsavel": "N1",
+    "Redmine": 7123.0
+  },
+  {
+    "id": "9568",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:18Z",
+    "hostLookupId": "99",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "TV Metropolis ",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Sem sinal",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Imagem sem sinal, enviado e-mail a filial para reiniciar o tomate, o mesmo informa q emissora sem sinal na cidade ",
+    "AreaResponsavel": "N2 - Luis",
+    "Redmine": 7133.0
+  },
+  {
+    "id": "9567",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:18Z",
+    "hostLookupId": "215",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Globo",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Tela preta",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Gravações com tela preta, já foi reiniciado sem sucesso. ",
+    "AreaResponsavel": "N1",
+    "Redmine": 7117.0
+  },
+  {
+    "id": "9566",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:17Z",
+    "hostLookupId": "146",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Globo",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Manutenção",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado mensagem para parceiro verificar ",
+    "AreaResponsavel": "N2 - Marcos",
+    "Redmine": ""
+  },
+  {
+    "id": "9565",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:16Z",
+    "hostLookupId": "127",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "BAND",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Sem sinal",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "Estamos com problemas no sinal da BAND na gravação principal, foi solicitado apoio técnico no local para verificar esse caso.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9564",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:15Z",
+    "hostLookupId": "112",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "Record",
+    "Equipamento": [
+      "WADT",
+      "TOMATE"
+    ],
+    "TipoProblema": "Sem sinal",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "enviado e-mail ao parceiro verificar se ha sinal na cidade, reiniciado remotamente decoders volta imagem sem sinal ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9563",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:15Z",
+    "hostLookupId": "87",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "todos ",
+    "Equipamento": [
+      "Maquina",
+      "Switch / Roteador"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "parceiro informa que não tem acesso ao rack neste momento, vai solucionar problema pela manha ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9562",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:14Z",
+    "hostLookupId": "170",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "todos",
+    "Equipamento": [
+      "Switch / Roteador"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "em contato  com parceiro o mesmo confirmou falha da operadora ( link ) ainda sem previsão de solução, ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9561",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:14Z",
+    "hostLookupId": "53",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "todos ",
+    "Equipamento": [
+      "Switch / Roteador",
+      "Maquina"
+    ],
+    "TipoProblema": "Sem energia",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "parceiro informa que esta sem energia no local, solicito equipe para verificar o problema ",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
+  },
+  {
+    "id": "9560",
+    "Status": "Concluido",
+    "Criado": "2025-11-05T03:04:13Z",
+    "hostLookupId": "127",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "TV Brasil / Bandeirantes ",
+    "Equipamento": [
+      "TOMATE"
+    ],
+    "TipoProblema": "Imagem congelada",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": false,
+    "AcoesExecutadas": "Enviado e-mail para reiniciar o receptor.",
+    "AreaResponsavel": "N1",
+    "Redmine": ""
   }
 ]
