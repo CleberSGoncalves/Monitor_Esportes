@@ -1,5 +1,5 @@
 {
-  "version": "2.5.22",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.22/Monitor_Esportes.exe",
-  "changelog": "v2.5.22: Paridade total com Streaming_Scheduler na automação da tarefa diária agendada (01:00 ou horário configurado). Execução automática de Auto Busca, atualização da data inicial para o dia corrente, varredura unificada silenciosa nas plataformas/CBF, sincronização direta com SharePoint, Google Sheets e Google Portal, disparo de auto e-mail consolidado e monitoramento contínuo de streams de confrontos ao vivo."
+  "version": "2.5.23",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.23/Monitor_Esportes.exe",
+  "changelog": "v2.5.23: Implementada chave mestre liga/desliga da funcionalidade da aba Reporte de Eventos. Ao desativar a chave no cabeçalho superior executivo, a aba desabilita imediatamente os botões de ação e cessa totalmente todas as tarefas em segundo plano (monitoramento contínuo, Auto-Start, Watchdog Auto-Healing, tarefa diária agendada das 01h, varreduras unificadas, disparos de e-mail e reprodução de live streams). Estado salvo automaticamente no config.xml (<modulo_ativo>)."
 }

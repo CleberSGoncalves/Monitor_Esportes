@@ -335,6 +335,7 @@ class ReporteEventosMixin:
         self.re_auto_email_var = ctk.BooleanVar(value=bool(cfg_xml.get("check_automatico_Email", True)))
         self.re_auto_busca_var = ctk.BooleanVar(value=bool(cfg_xml.get("check_automatico_Evento", True)))
         self.re_somente_relatorio_var = ctk.BooleanVar(value=bool(cfg_xml.get("somente_relatorio", True)))
+        self.re_modulo_ativo_var = ctk.BooleanVar(value=bool(cfg_xml.get("modulo_ativo", True)))
 
         # Plataformas ativas
         plats = carrega_config_xml("config.xml", "plataformas") or {}
@@ -403,6 +404,46 @@ class ReporteEventosMixin:
         # Container mestre dark (#0f172a para compatibilidade 100% com a suíte de testes)
         self.re_master_frame = ctk.CTkFrame(self.tab_reporte, fg_color="#0f172a", corner_radius=0)
         self.re_master_frame.pack(fill="both", expand=True, padx=4, pady=4)
+
+        # Barra Superior com Chave Mestra da Aba Reporte de Eventos
+        self.re_header_bar = ctk.CTkFrame(self.re_master_frame, fg_color="#141414", corner_radius=10, border_width=1, border_color="#262626", height=44)
+        self.re_header_bar.pack(fill="x", padx=4, pady=(2, 4))
+        self.re_header_bar.pack_propagate(False)
+
+        re_h_left = ctk.CTkFrame(self.re_header_bar, fg_color="transparent")
+        re_h_left.pack(side="left", padx=10, pady=4)
+
+        ctk.CTkLabel(
+            re_h_left,
+            text="📅 REPORTE DE EVENTOS & PROGRAMAÇÃO STREAMING",
+            font=ctk.CTkFont(size=12, weight="bold"),
+            text_color="#00CED1"
+        ).pack(side="left", padx=(0, 10))
+
+        is_ativo_init = bool(self.re_modulo_ativo_var.get())
+        self.re_badge_ativo = ctk.CTkLabel(
+            re_h_left,
+            text="● OPERAÇÃO ATIVA" if is_ativo_init else "● ABA DESATIVADA",
+            font=ctk.CTkFont(size=10, weight="bold"),
+            text_color="#10b981" if is_ativo_init else "#ef4444"
+        )
+        self.re_badge_ativo.pack(side="left")
+
+        re_h_right = ctk.CTkFrame(self.re_header_bar, fg_color="transparent")
+        re_h_right.pack(side="right", padx=10, pady=4)
+
+        self.re_switch_ativo = ctk.CTkSwitch(
+            re_h_right,
+            text="Funcionalidade da Aba Ativa" if is_ativo_init else "Funcionalidade da Aba Desativada",
+            variable=self.re_modulo_ativo_var,
+            font=ctk.CTkFont(size=11, weight="bold"),
+            text_color="#f1f5f9",
+            progress_color="#10b981",
+            button_color="#00CED1",
+            button_hover_color="#008B8B",
+            command=self._on_re_toggle_modulo_ativo
+        )
+        self.re_switch_ativo.pack(side="right")
 
         # Tabview dark moderno para as sub-abas
         self.re_subtabs = ctk.CTkTabview(
@@ -485,6 +526,73 @@ class ReporteEventosMixin:
                 self._re_atualizar_kpis()
         except Exception as e:
             logger.debug(f"[ReporteEventos] Erro no switch de subtab: {e}")
+
+    def _on_re_toggle_modulo_ativo(self) -> None:
+        """Acionado ao alternar a chave liga/desliga da funcionalidade da aba Reporte de Eventos."""
+        ativo = bool(self.re_modulo_ativo_var.get())
+        logger.info(f"[ReporteEventos] Chave da aba Reporte de Eventos alterada: ativo={ativo}")
+
+        if hasattr(self, "re_switch_ativo") and self.re_switch_ativo:
+            self.re_switch_ativo.configure(
+                text="Funcionalidade da Aba Ativa" if ativo else "Funcionalidade da Aba Desativada"
+            )
+        if hasattr(self, "re_badge_ativo") and self.re_badge_ativo:
+            self.re_badge_ativo.configure(
+                text="● OPERAÇÃO ATIVA" if ativo else "● ABA DESATIVADA",
+                text_color="#10b981" if ativo else "#ef4444"
+            )
+
+        if not ativo:
+            # 1. Interrompe loop de monitoramento imediatamente se estiver rodando
+            if getattr(self, "re_is_running", False):
+                self.re_is_running = False
+                if hasattr(self, "re_btn_start") and self.re_btn_start:
+                    self.re_btn_start.configure(text="▶ Start", fg_color="#10b981", hover_color="#059669")
+
+            # 2. Cancela qualquer temporizador agendado do loop
+            if getattr(self, "re_loop_job_id", None):
+                try: self.after_cancel(self.re_loop_job_id)
+                except Exception: pass
+                self.re_loop_job_id = None
+
+            # 3. Atualiza os status e KPIs
+            if hasattr(self, "re_lbl_status") and self.re_lbl_status:
+                self.re_lbl_status.configure(text="Aba Reporte de Eventos desativada. Todas as rotinas e tarefas foram pausadas.")
+            if hasattr(self, "re_kpi_monitor_status") and self.re_kpi_monitor_status:
+                self.re_kpi_monitor_status.configure(text="DESATIVADO", text_color="#ef4444")
+
+            # 4. Desabilita botões de ação enquanto a aba estiver desligada
+            self._re_aplicar_estado_botoes(ativo=False)
+        else:
+            # Reativação da aba
+            if hasattr(self, "re_lbl_status") and self.re_lbl_status:
+                self.re_lbl_status.configure(text="Aba Reporte de Eventos ativada e pronta para monitoramento.")
+            if hasattr(self, "re_kpi_monitor_status") and self.re_kpi_monitor_status:
+                self.re_kpi_monitor_status.configure(text="EM ESPERA", text_color="#f59e0b")
+
+            self._re_aplicar_estado_botoes(ativo=True)
+            self._re_atualizar_kpis()
+
+        # 5. Salva configuração no config.xml
+        self._re_salvar_config_atual()
+
+    def _re_aplicar_estado_botoes(self, ativo: bool) -> None:
+        """Habilita ou desabilita botões de ação conforme o estado da chave da aba."""
+        st = "normal" if ativo else "disabled"
+        botoes = [
+            "re_btn_buscar",
+            "re_btn_start",
+            "re_btn_email",
+            "re_btn_chrome9222",
+            "re_btn_chrome9224"
+        ]
+        for b_name in botoes:
+            btn = getattr(self, b_name, None)
+            if btn and hasattr(btn, "configure"):
+                try:
+                    btn.configure(state=st)
+                except Exception:
+                    pass
 
     # ── SUB-ABA 1: STREAMING (TOTALMENTE RESPONSIVA & COM KPIS) ────────────────
 
@@ -659,6 +767,11 @@ class ReporteEventosMixin:
 
         self.re_lbl_process = ctk.CTkLabel(self.re_toolbar, text="", font=ctk.CTkFont(size=11), text_color="#00CED1")
         self.re_lbl_process.pack(side="right", padx=6, pady=4)
+
+        # Inicializa estado visual de acordo com a chave da aba
+        if not self.re_modulo_ativo_var.get():
+            self._re_aplicar_estado_botoes(ativo=False)
+            self.re_lbl_status.configure(text="Aba Reporte de Eventos desativada. Nenhuma tarefa será executada.")
 
         # Atualiza contadores iniciais mantendo a grade limpa para nova varredura
         self.after(50, self._re_atualizar_kpis)
@@ -944,7 +1057,9 @@ class ReporteEventosMixin:
 
             # 4. Status do Monitor
             if hasattr(self, "re_kpi_monitor_status") and self.re_kpi_monitor_status:
-                if getattr(self, "re_busy", False):
+                if getattr(self, "re_modulo_ativo_var", None) and not self.re_modulo_ativo_var.get():
+                    self.re_kpi_monitor_status.configure(text="DESATIVADO", text_color="#ef4444")
+                elif getattr(self, "re_busy", False):
                     self.re_kpi_monitor_status.configure(text="VARRENDO...", text_color="#00CED1")
                 elif getattr(self, "re_is_running", False):
                     self.re_kpi_monitor_status.configure(text="MONITORANDO", text_color="#10b981")
@@ -1027,6 +1142,15 @@ class ReporteEventosMixin:
         8. Ordena cronologicamente e alterna Esquerda/Direita (ajustartodootree).
         9. Se somente_relatorio, encerra o Chrome 9222.
         """
+        if getattr(self, "re_modulo_ativo_var", None) and not self.re_modulo_ativo_var.get():
+            msg = "A aba Reporte de Eventos está desativada. Ative a funcionalidade da aba para executar buscas."
+            logger.warning(f"[ReporteEventos] {msg}")
+            if not silencioso:
+                messagebox.showwarning("Aba Desativada", msg)
+            if on_complete:
+                on_complete(False, msg)
+            return
+
         if self.re_busy:
             if not silencioso:
                 messagebox.showinfo("Aviso", "Uma busca de eventos já está em processamento.")
@@ -1397,6 +1521,8 @@ class ReporteEventosMixin:
             cfg["check_automatico_Email"] = bool(self.re_auto_email_var.get())
             cfg["check_automatico_Evento"] = bool(self.re_auto_busca_var.get())
             cfg["somente_relatorio"] = bool(self.re_somente_relatorio_var.get())
+            if hasattr(self, "re_modulo_ativo_var"):
+                cfg["modulo_ativo"] = bool(self.re_modulo_ativo_var.get())
             cfg["plataformas"] = {k: v.get() for k, v in self.re_plat_vars.items()}
             cfg["campeonatos"] = {k: v.get() for k, v in self.re_camp_vars.items()}
             salvar_config_xml(cfg)
@@ -1474,6 +1600,11 @@ class ReporteEventosMixin:
         self._re_atualizar_kpis()
 
     def _re_toggle_start(self) -> None:
+        if getattr(self, "re_modulo_ativo_var", None) and not self.re_modulo_ativo_var.get():
+            if not self.re_is_running:
+                messagebox.showwarning("Aba Desativada", "A aba Reporte de Eventos está desativada. Ative a funcionalidade da aba no topo para iniciar o monitoramento.")
+                return
+
         if self.re_is_running:
             self.re_is_running = False
             self.re_btn_start.configure(text="▶ Start", fg_color="#10b981", hover_color="#059669")
@@ -1492,6 +1623,9 @@ class ReporteEventosMixin:
     def _re_auto_start_if_needed(self) -> None:
         """Inicia o monitoramento automaticamente 2 segundos após a inicialização (idêntico ao Streaming_Scheduler)."""
         try:
+            if getattr(self, "re_modulo_ativo_var", None) and not self.re_modulo_ativo_var.get():
+                logger.info("[ReporteEventos] Auto-Start ignorado: funcionalidade da aba Reporte de Eventos desativada.")
+                return
             if not getattr(self, "re_is_running", False):
                 logger.info("[ReporteEventos] Inicializando monitoramento contínuo automaticamente (Auto-Start)...")
                 self._re_toggle_start()
@@ -1508,6 +1642,9 @@ class ReporteEventosMixin:
             while True:
                 time.sleep(5)
                 try:
+                    if getattr(self, "re_modulo_ativo_var", None) and not self.re_modulo_ativo_var.get():
+                        tempo_inicial = None
+                        continue
                     is_rodando = getattr(self, "re_is_running", False)
                     if not is_rodando:
                         if tempo_inicial is None:
@@ -1534,6 +1671,10 @@ class ReporteEventosMixin:
         3. Se 'Auto Busca' não estiver ativo, mas 'Auto E-mail' estiver ativo:
            - Dispara o e-mail diário diretamente com os eventos atuais.
         """
+        if getattr(self, "re_modulo_ativo_var", None) and not self.re_modulo_ativo_var.get():
+            logger.info("[ReporteEventos] Tarefa diária agendada ignorada: funcionalidade da aba Reporte de Eventos desativada.")
+            return
+
         if getattr(self, "_re_tarefa_diaria_em_execucao", False) or self.re_busy:
             logger.info("[ReporteEventos] Tarefa diária agendada ignorada: varredura já em andamento.")
             return
@@ -1600,6 +1741,16 @@ class ReporteEventosMixin:
             self.re_lbl_status.configure(text=f"Tarefa diária concluída em {datetime.now().strftime('%H:%M:%S')}.")
 
     def _re_executar_ciclo_monitoramento(self) -> None:
+        if getattr(self, "re_modulo_ativo_var", None) and not self.re_modulo_ativo_var.get():
+            if getattr(self, "re_is_running", False):
+                self.re_is_running = False
+                if hasattr(self, "re_btn_start") and self.re_btn_start and hasattr(self.re_btn_start, "configure"):
+                    self.re_btn_start.configure(text="▶ Start", fg_color="#10b981", hover_color="#059669")
+                if hasattr(self, "re_lbl_status") and self.re_lbl_status:
+                    self.re_lbl_status.configure(text="Monitoramento pausado (aba desativada).")
+                self._re_atualizar_kpis()
+            return
+
         if not getattr(self, "re_is_running", False):
             return
 
@@ -1659,6 +1810,9 @@ class ReporteEventosMixin:
         Monitora os confrontos de hoje na grade e aciona a reprodução no Chrome 
         (9222 Esquerda ou 9224 Direita) com login automático quando o horário se aproximar.
         """
+        if getattr(self, "re_modulo_ativo_var", None) and not self.re_modulo_ativo_var.get():
+            return
+
         if getattr(self, "_re_reproduzindo_stream", False):
             return
 
@@ -1764,6 +1918,13 @@ class ReporteEventosMixin:
             self._re_reproduzindo_stream = False
 
     def _re_enviar_email(self, forcar: bool = False) -> None:
+        if getattr(self, "re_modulo_ativo_var", None) and not self.re_modulo_ativo_var.get():
+            msg = "A aba Reporte de Eventos está desativada. Ative a funcionalidade da aba para enviar e-mails."
+            logger.warning(f"[ReporteEventos] {msg}")
+            if forcar:
+                messagebox.showwarning("Aba Desativada", msg)
+            return
+
         if getattr(self, "_re_enviando_email", False):
             if forcar:
                 messagebox.showwarning("Aviso E-mail", "O disparo de e-mail já está em andamento. Aguarde a conclusão...")

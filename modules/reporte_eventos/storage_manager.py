@@ -202,6 +202,7 @@ def carrega_config_xml(caminho_ou_arquivo=None, secao=None) -> Any:
         cfg["check_automatico_Email"] = _get_bool("check_automatico_Email", False)
         cfg["check_automatico_Evento"] = _get_bool("check_automatico_Evento", False)
         cfg["somente_relatorio"] = _get_bool("somente_relatorio", False)
+        cfg["modulo_ativo"] = _get_bool("modulo_ativo", True)
 
         # Plataformas (Padrão: todas ativas, idêntico ao Streaming_Scheduler)
         cfg["plataformas"]["Amazon Prime"] = _get_bool("plataforma_prime", True)
@@ -241,6 +242,7 @@ def salvar_config_xml(cfg: Dict[str, Any]) -> None:
         _add("check_automatico_Email", cfg.get("check_automatico_Email", False))
         _add("check_automatico_Evento", cfg.get("check_automatico_Evento", False))
         _add("somente_relatorio", cfg.get("somente_relatorio", False))
+        _add("modulo_ativo", cfg.get("modulo_ativo", True))
 
         plats = cfg.get("plataformas", {})
         _add("plataforma_dazn", plats.get("Dazn", False))

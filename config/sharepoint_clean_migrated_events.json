@@ -12855,6 +12855,21 @@
     "_sort_key": "2026-11-24_17:00"
   },
   {
+    "id_sharepoint": "37732",
+    "anexos": "",
+    "mes": "Novembro",
+    "data": "25/11/2026",
+    "horario": "19:00",
+    "campeonato": "CBF - Brasileirão Série A",
+    "partida": "Atlético-MG x Corinthians",
+    "responsavel": "Cleber BL01 e Backup",
+    "canal": "Gaúcha",
+    "pvid": "Gaucha - PV3796",
+    "status_entrega": "Pendente",
+    "programado": "NÃO",
+    "_sort_key": "2026-11-25_19:00"
+  },
+  {
     "id_sharepoint": "37573",
     "anexos": "",
     "mes": "Dezembro",
@@ -12904,7 +12919,7 @@
     "anexos": "",
     "mes": "Dezembro",
     "data": "06/12/2026",
-    "horario": "16:00",
+    "horario": "15:00",
     "campeonato": "CBF - Copa do Brasil",
     "partida": "Grêmio x Palmeiras",
     "responsavel": "Cleber BL01 e Backup",
@@ -12912,7 +12927,7 @@
     "pvid": "Prime Video - PV3687",
     "status_entrega": "Pendente",
     "programado": "NÃO",
-    "_sort_key": "2026-12-06_16:00"
+    "_sort_key": "2026-12-06_15:00"
   },
   {
     "id_sharepoint": "37574",
