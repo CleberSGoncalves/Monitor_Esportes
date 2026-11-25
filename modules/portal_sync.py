@@ -184,6 +184,57 @@ class PortalSyncManager:
 
             drive["items_count"] = len(items)
 
+            # 2.1 Também atualizar em master_data["lists"][drive_name] para exibição 1:1 nas listas oficiais
+            lists_data = master_data.setdefault("lists", {})
+            target_list_name = drive_name
+            # Mapear sinônimos se necessário
+            if target_list_name not in lists_data:
+                for k in lists_data.keys():
+                    if k.replace(" ", "_").lower() == drive_name.replace(" ", "_").lower():
+                        target_list_name = k
+                        break
+
+            list_entry = lists_data.setdefault(target_list_name, {
+                "name": target_list_name,
+                "displayName": target_list_name,
+                "columns": [],
+                "items": []
+            })
+            list_items = list_entry.setdefault("items", [])
+
+            # Montar item com todos os campos da tabela SharePoint
+            list_item_data = {
+                "Data_Hora": now_dt_str,
+                "Data_Partida": now_dt_str,
+                "Data_Jogo": now_dt_str,
+                "Campeonato": campeonato or "Brasileiro Serie A",
+                "Partida": partida or target_filename,
+                "Plataforma": plataforma or canal or "Caze TV",
+                "Canal": canal or plataforma or "Caze TV",
+                "Confianca": confianca or "99.0%",
+                "Confiança": confianca or "99.0%",
+                "Placar": placar or confianca or "99.0%",
+                "Auditado": auditado,
+                "Modified": now_iso,
+                "Created": now_iso,
+                "CriadoPor": "svc.captacao",
+                "ModificadoPor": "SharePoint App",
+                "Title": target_filename,
+                "FileLeafRef": target_filename,
+                "pdfUrl": relative_web_url,
+                "webUrl": relative_web_url
+            }
+
+            # Inserir ou atualizar na lista
+            found_list_item = False
+            for idx, li in enumerate(list_items):
+                if li.get("Title") == target_filename or li.get("FileLeafRef") == target_filename:
+                    list_items[idx].update(list_item_data)
+                    found_list_item = True
+                    break
+            if not found_list_item:
+                list_items.insert(0, list_item_data)
+
             with open(master_data_path, "w", encoding="utf-8") as f:
                 json.dump(master_data, f, ensure_ascii=False, indent=2)
 

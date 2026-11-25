@@ -1,5 +1,5 @@
 {
-  "last_scan_utc": "2026-11-25T02:48:03.265514+00:00",
+  "last_scan_utc": "2026-11-25T03:47:09.994372+00:00",
   "lists": {
     "Cadastro - Hosts": {
       "id": "f61d5727-9464-4d1e-9deb-133741ec64ee",
@@ -23,11 +23,11 @@
     },
     "Documentos": {
       "id": "e6769e9f-0ad8-40ef-8b19-20c9e5f87b7e",
-      "lastModifiedDateTime": "2026-11-25T02:03:25Z",
-      "last_synced_modified": "2026-11-25T02:03:25Z",
-      "last_synced_at": "2026-11-25T02:09:22.123911+00:00",
+      "lastModifiedDateTime": "2026-11-25T03:31:22Z",
+      "last_synced_modified": "2026-11-25T03:31:22Z",
+      "last_synced_at": "2026-11-25T03:32:38.323767+00:00",
       "inserted_count": 0,
-      "updated_count": 0
+      "updated_count": 50
     },
     "Acesso Remote Control - America Central": {
       "id": "16cdc917-70ce-4477-af69-30e6405e3294",
@@ -197,9 +197,9 @@
     },
     "Relatorio Jogos Youtube": {
       "id": "f524737d-87c4-4c65-b540-d6583eda61d9",
-      "lastModifiedDateTime": "2026-11-24T22:53:17Z",
-      "last_synced_modified": "2026-11-24T22:53:17Z",
-      "last_synced_at": "2026-11-24T22:57:08.387278+00:00",
+      "lastModifiedDateTime": "2026-11-25T03:12:36Z",
+      "last_synced_modified": "2026-11-25T03:12:36Z",
+      "last_synced_at": "2026-11-25T03:17:07.827655+00:00",
       "inserted_count": 1,
       "updated_count": 49
     },
@@ -225,19 +225,19 @@
     },
     "Relatorios_de_Jogos_NBA": {
       "id": "fa332a4b-5c46-433f-953d-e0534a9f5ecd",
-      "lastModifiedDateTime": "2026-11-25T02:42:58Z",
-      "last_synced_modified": "2026-11-25T02:42:58Z",
-      "last_synced_at": "2026-11-25T02:47:32.932598+00:00",
+      "lastModifiedDateTime": "2026-11-25T03:44:40Z",
+      "last_synced_modified": "2026-11-25T03:44:40Z",
+      "last_synced_at": "2026-11-25T03:47:06.630631+00:00",
       "inserted_count": 0,
       "updated_count": 50
     },
     "Redmine": {
       "id": "dead8ceb-e9b7-455b-8b4f-e235127d956b",
-      "lastModifiedDateTime": "2026-11-25T02:46:56Z",
-      "last_synced_modified": "2026-11-25T02:46:56Z",
-      "last_synced_at": "2026-11-25T02:48:03.265514+00:00",
-      "inserted_count": 1,
-      "updated_count": 49
+      "lastModifiedDateTime": "2026-11-25T03:46:55Z",
+      "last_synced_modified": "2026-11-25T03:46:55Z",
+      "last_synced_at": "2026-11-25T03:47:09.994372+00:00",
+      "inserted_count": 0,
+      "updated_count": 50
     },
     "Cidades": {
       "id": "95057727-55a9-4c78-989e-e82fc4197b07",
@@ -279,25 +279,25 @@
     },
     "Painel de gestão de serviços dos CS": {
       "id": "2e2afc16-dfd6-4277-a16c-cd78bdd2e769",
-      "lastModifiedDateTime": "2026-11-25T02:42:36Z",
-      "last_synced_modified": "2026-11-25T02:42:36Z",
-      "last_synced_at": "2026-11-25T02:47:31.094682+00:00",
-      "inserted_count": 0,
-      "updated_count": 50
-    },
-    "Painel de Ocorrências": {
-      "id": "9d23cb01-b29c-45e6-9ae7-cfac1d1dd598",
-      "lastModifiedDateTime": "2026-11-25T02:34:45Z",
-      "last_synced_modified": "2026-11-25T02:34:45Z",
-      "last_synced_at": "2026-11-25T02:37:07.126859+00:00",
+      "lastModifiedDateTime": "2026-11-25T03:47:01Z",
+      "last_synced_modified": "2026-11-25T03:47:01Z",
+      "last_synced_at": "2026-11-25T03:47:05.100825+00:00",
       "inserted_count": 1,
       "updated_count": 49
     },
+    "Painel de Ocorrências": {
+      "id": "9d23cb01-b29c-45e6-9ae7-cfac1d1dd598",
+      "lastModifiedDateTime": "2026-11-25T03:00:03Z",
+      "last_synced_modified": "2026-11-25T03:00:03Z",
+      "last_synced_at": "2026-11-25T03:02:08.994740+00:00",
+      "inserted_count": 0,
+      "updated_count": 50
+    },
     "Monitoramento de Canais CS": {
       "id": "b0ffcdd7-a0e7-4eb0-a5e8-e2142776b8eb",
-      "lastModifiedDateTime": "2026-11-25T02:42:16Z",
-      "last_synced_modified": "2026-11-25T02:42:16Z",
-      "last_synced_at": "2026-11-25T02:48:01.611271+00:00",
+      "lastModifiedDateTime": "2026-11-25T03:46:51Z",
+      "last_synced_modified": "2026-11-25T03:46:51Z",
+      "last_synced_at": "2026-11-25T03:47:08.215268+00:00",
       "inserted_count": 0,
       "updated_count": 50
     },
@@ -411,9 +411,9 @@
     },
     "Relatorio Jogos Youtube": {
       "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuB9cyT1xIdlTLVA1lg-2mHZ",
-      "lastModifiedDateTime": "2026-11-24T22:53:16Z",
-      "last_synced_modified": "2026-11-24T22:53:16Z",
-      "last_synced_at": "2026-11-24T22:57:11.381729+00:00"
+      "lastModifiedDateTime": "2026-11-25T03:12:35Z",
+      "last_synced_modified": "2026-11-25T03:12:35Z",
+      "last_synced_at": "2026-11-25T03:17:12.581100+00:00"
     },
     "SLA": {
       "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuAiMlxcWATcTY1l2wDjd68a",
@@ -435,9 +435,9 @@
     },
     "Relatorios_de_Jogos_NBA": {
       "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuBLKjP6Rlw_Q5U94FNKn17N",
-      "lastModifiedDateTime": "2026-11-24T12:58:12Z",
-      "last_synced_modified": "2026-11-24T12:58:12Z",
-      "last_synced_at": "2026-11-24T12:58:22.927499+00:00"
+      "lastModifiedDateTime": "2026-11-25T03:03:47Z",
+      "last_synced_modified": "2026-11-25T03:03:47Z",
+      "last_synced_at": "2026-11-25T03:07:50.756116+00:00"
     },
     "Relatorios_de_Jogos": {
       "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuD6Kj6uN9mtQa9I7NZf2GFD",
@@ -447,129 +447,6 @@
     }
   },
   "sync_history": [
-    {
-      "timestamp": "2026-11-24T22:43:13.371210+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Relatorios_de_Jogos_NBA",
-        "Monitoramento de Canais CS"
-      ],
-      "items_inserted": 1,
-      "items_updated": 149
-    },
-    {
-      "timestamp": "2026-11-24T22:50:21.154159+00:00",
-      "lists_synced": [
-        "Monitoramento de Canais CS",
-        "Painel de gestão de serviços dos CS"
-      ],
-      "items_inserted": 1,
-      "items_updated": 99
-    },
-    {
-      "timestamp": "2026-11-24T22:52:08.339810+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Relatorios_de_Jogos_NBA",
-        "Monitoramento de Canais CS"
-      ],
-      "items_inserted": 0,
-      "items_updated": 150
-    },
-    {
-      "timestamp": "2026-11-24T22:57:11.381729+00:00",
-      "lists_synced": [
-        "Documentos",
-        "Painel de gestão de serviços dos CS",
-        "Relatorio Jogos Youtube",
-        "Relatorios_de_Jogos_NBA",
-        "Monitoramento de Canais CS"
-      ],
-      "items_inserted": 2,
-      "items_updated": 248
-    },
-    {
-      "timestamp": "2026-11-24T23:03:12.309929+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Relatorios_de_Jogos_NBA"
-      ],
-      "items_inserted": 1,
-      "items_updated": 99
-    },
-    {
-      "timestamp": "2026-11-24T23:09:27.401244+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Relatorios_de_Jogos_NBA",
-        "Monitoramento de Canais CS"
-      ],
-      "items_inserted": 0,
-      "items_updated": 150
-    },
-    {
-      "timestamp": "2026-11-24T23:12:11.255277+00:00",
-      "lists_synced": [
-        "Procedimentos",
-        "Painel de gestão de serviços dos CS",
-        "Relatorios_de_Jogos_NBA",
-        "Monitoramento de Canais CS"
-      ],
-      "items_inserted": 8,
-      "items_updated": 192
-    },
-    {
-      "timestamp": "2026-11-24T23:17:08.789235+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Relatorios_de_Jogos_NBA",
-        "Monitoramento de Canais CS"
-      ],
-      "items_inserted": 0,
-      "items_updated": 150
-    },
-    {
-      "timestamp": "2026-11-24T23:22:08.749630+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Relatorios_de_Jogos_NBA",
-        "Monitoramento de Canais CS"
-      ],
-      "items_inserted": 0,
-      "items_updated": 150
-    },
-    {
-      "timestamp": "2026-11-24T23:28:34.215430+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Relatorios_de_Jogos_NBA",
-        "Monitoramento de Canais CS"
-      ],
-      "items_inserted": 1,
-      "items_updated": 149
-    },
-    {
-      "timestamp": "2026-11-24T23:32:14.593301+00:00",
-      "lists_synced": [
-        "Documentos",
-        "Painel de gestão de serviços dos CS",
-        "Relatorios_de_Jogos_NBA",
-        "Monitoramento de Canais CS"
-      ],
-      "items_inserted": 1,
-      "items_updated": 199
-    },
-    {
-      "timestamp": "2026-11-24T23:37:10.967359+00:00",
-      "lists_synced": [
-        "Configurações de Rede do CS",
-        "Painel de gestão de serviços dos CS",
-        "Relatorios_de_Jogos_NBA",
-        "Monitoramento de Canais CS"
-      ],
-      "items_inserted": 51,
-      "items_updated": 149
-    },
     {
       "timestamp": "2026-11-24T23:42:10.253200+00:00",
       "lists_synced": [
@@ -940,6 +817,139 @@
     },
     {
       "timestamp": "2026-11-25T02:48:03.265514+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 1,
+      "items_updated": 199
+    },
+    {
+      "timestamp": "2026-11-25T02:52:42.798359+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 0,
+      "items_updated": 200
+    },
+    {
+      "timestamp": "2026-11-25T02:57:09.960406+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 0,
+      "items_updated": 200
+    },
+    {
+      "timestamp": "2026-11-25T03:02:13.548285+00:00",
+      "lists_synced": [
+        "Documentos",
+        "Painel de gestão de serviços dos CS",
+        "Painel de Ocorrências",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 10,
+      "items_updated": 290
+    },
+    {
+      "timestamp": "2026-11-25T03:07:50.756116+00:00",
+      "lists_synced": [
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 1,
+      "items_updated": 149
+    },
+    {
+      "timestamp": "2026-11-25T03:13:41.079383+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 1,
+      "items_updated": 199
+    },
+    {
+      "timestamp": "2026-11-25T03:17:12.581100+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorio Jogos Youtube",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 2,
+      "items_updated": 248
+    },
+    {
+      "timestamp": "2026-11-25T03:22:09.981441+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 0,
+      "items_updated": 200
+    },
+    {
+      "timestamp": "2026-11-25T03:27:08.346131+00:00",
+      "lists_synced": [
+        "Relatorios_de_Jogos_NBA",
+        "Redmine"
+      ],
+      "items_inserted": 0,
+      "items_updated": 100
+    },
+    {
+      "timestamp": "2026-11-25T03:33:43.037818+00:00",
+      "lists_synced": [
+        "Documentos",
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 0,
+      "items_updated": 250
+    },
+    {
+      "timestamp": "2026-11-25T03:37:12.929821+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 0,
+      "items_updated": 200
+    },
+    {
+      "timestamp": "2026-11-25T03:42:11.234253+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorios_de_Jogos_NBA",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 1,
+      "items_updated": 199
+    },
+    {
+      "timestamp": "2026-11-25T03:47:09.994372+00:00",
       "lists_synced": [
         "Painel de gestão de serviços dos CS",
         "Relatorios_de_Jogos_NBA",

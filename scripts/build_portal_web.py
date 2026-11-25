@@ -2310,6 +2310,39 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
       </div>
 
+      <!-- QUADRO DE DESTAQUE: JOGOS & EVENTOS PROGRAMADOS PARA HOJE E AMANHÃ -->
+      <div class="today-tomorrow-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; margin-bottom: 20px;">
+        <!-- CARD HOJE -->
+        <div class="schedule-highlight-card card-hoje" style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid #10B981;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">⚽</span>
+              <span style="font-size: 13.5px; font-weight: 700; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px;">Jogos & Eventos de Hoje</span>
+              <span id="badge-count-hoje" style="background: #ECFDF5; color: #059669; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 12px; border: 1px solid #A7F3D0;">0 jogos</span>
+            </div>
+            <span id="label-data-hoje" style="font-size: 12px; font-weight: 600; color: #64748B;">--/--</span>
+          </div>
+          <div id="list-eventos-hoje" style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto;">
+            <div style="color: #94A3B8; font-size: 12px; text-align: center; padding: 12px;">Carregando eventos de hoje...</div>
+          </div>
+        </div>
+
+        <!-- CARD AMANHÃ -->
+        <div class="schedule-highlight-card card-amanha" style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid #3B82F6;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">📅</span>
+              <span style="font-size: 13.5px; font-weight: 700; color: #0F172A; text-transform: uppercase; letter-spacing: 0.5px;">Jogos & Eventos de Amanhã</span>
+              <span id="badge-count-amanha" style="background: #EFF6FF; color: #2563EB; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 12px; border: 1px solid #BFDBFE;">0 jogos</span>
+            </div>
+            <span id="label-data-amanha" style="font-size: 12px; font-weight: 600; color: #64748B;">--/--</span>
+          </div>
+          <div id="list-eventos-amanha" style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto;">
+            <div style="color: #94A3B8; font-size: 12px; text-align: center; padding: 12px;">Carregando eventos de amanhã...</div>
+          </div>
+        </div>
+      </div>
+
       <!-- BARRA DE COMANDOS DO SHAREPOINT -->
       <div class="sp-command-bar">
         <div class="sp-command-left">
@@ -2842,6 +2875,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div class="sp-command-left">
           <button class="sp-btn-new" onclick="openNewListItemModal()" title="Adicionar novo registro a esta lista"><span>+</span> Novo</button>
           <button id="btn-grid-generic" class="sp-btn-cmd btn-grid-edit" onclick="toggleGenericListGridEdit()" title="Editar linhas e colunas diretamente no navegador"><span id="btn-grid-generic-icon">田</span> <span id="btn-grid-generic-text">Editar no modo de exibição de grade</span></button>
+          <button id="btn-delete-generic" class="sp-btn-cmd" style="display:none; color: #EF4444; border-color: rgba(239, 68, 68, 0.4); font-weight: 600;" onclick="deleteSelectedGenericItems()" title="Excluir registros selecionados"><span>🗑️</span> Excluir (<span id="delete-count-generic">0</span>)</button>
           <button class="sp-btn-cmd" onclick="filterRealListTable()" title="Atualizar dados da lista"><span>↺</span> Atualizar</button>
           <button class="sp-btn-cmd" onclick="exportGenericListCSV()" title="Exportar para CSV"><span>📥</span> Exportar CSV</button>
           <button class="sp-btn-cmd" onclick="handleMenuClick('home', 'Página Inicial')"><span>🏠</span> Voltar ao Início</button>
@@ -3940,6 +3974,43 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         while ((m = re.exec(s)) !== null) vals.push(m[1]);
         if (vals.length) return vals.join(', ');
       }
+      // Auditoria e Confirmação de Jogos / Relatórios
+      if (colName === 'Auditado') {
+        if (val === true || String(val).toLowerCase() === 'true' || String(val) === 'Sim') {
+          return '<span style="color: #10B981; font-weight: 700; font-size: 15px;" title="Auditado com Sucesso">✓</span>';
+        }
+        return '<span style="color: #94A3B8; font-size: 12px;">-</span>';
+      }
+
+      if (colName === 'Confianca' || colName === 'Confiança' || colName === 'Placar') {
+        const sConf = String(val).trim();
+        if (sConf === 'Agendado') {
+          return '<span style="background: #F1F5F9; color: #475569; padding: 2px 8px; border-radius: 12px; font-weight: 600; font-size: 11px;">Agendado</span>';
+        }
+        return `<span style="background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; padding: 2px 8px; border-radius: 12px; font-weight: 700; font-size: 11px;">${sConf}</span>`;
+      }
+
+      if (colName === 'Campeonato') {
+        const sCamp = String(val).trim();
+        let bg = "#EFF6FF", color = "#1D4ED8", border = "#BFDBFE";
+        if (sCamp.toLowerCase().includes("copa")) { bg = "#FEF3C7"; color = "#B45309"; border = "#FDE68A"; }
+        else if (sCamp.toLowerCase().includes("nba")) { bg = "#FAF5FF"; color = "#7E22CE"; border = "#E9D5FF"; }
+        return `<span style="background: ${bg}; color: ${color}; border: 1px solid ${border}; padding: 2px 8px; border-radius: 12px; font-weight: 600; font-size: 11px;">${sCamp}</span>`;
+      }
+
+      if (colName === 'Plataforma' || colName === 'Canal') {
+        const sPlat = String(val).trim();
+        let bg = "#F8FAFC", color = "#334155", border = "#E2E8F0";
+        if (sPlat.toLowerCase().includes("prime")) { bg = "#EFF6FF"; color = "#00509E"; border = "#BFDBFE"; }
+        else if (sPlat.toLowerCase().includes("caze") || sPlat.toLowerCase().includes("cazé")) { bg = "#ECFDF5"; color = "#059669"; border = "#A7F3D0"; }
+        else if (sPlat.toLowerCase().includes("youtube")) { bg = "#FEF2F2"; color = "#DC2626"; border = "#FECACA"; }
+        return `<span style="background: ${bg}; color: ${color}; border: 1px solid ${border}; padding: 2px 8px; border-radius: 12px; font-weight: 600; font-size: 11px;">${sPlat}</span>`;
+      }
+
+      if ((colName === 'Title' || colName === 'FileLeafRef' || colName === 'Arquivo / Relatório PDF') && String(val).toLowerCase().endsWith('.pdf')) {
+        return `<span class="sp-pdf-pill" onclick="event.stopPropagation(); openReportPdf('${val}')" title="Clique duplo na linha ou clique aqui para abrir o PDF" style="display: inline-flex; align-items: center; gap: 4px; color: #DC2626; background: #FEF2F2; border: 1px solid #FECACA; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 11px; cursor: pointer;">📄 ${val}</span>`;
+      }
+
       if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s)) {
         return formatDate(s);
       }
@@ -4291,7 +4362,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         if (!listData || !listData.columns || listData.columns.length === 0) {
           thead.innerHTML = '<tr><th>Registro</th></tr>';
         } else {
-          thead.innerHTML = '<tr><th class="td-center" style="width: 45px;">#</th>' + listData.columns.map(col =>
+          thead.innerHTML = '<tr><th class="td-center" style="width: 36px;"><input type="checkbox" id="checkall-generic" onchange="toggleCheckAllGeneric(this.checked)" title="Selecionar todos os registros"></th><th class="td-center" style="width: 45px;">#</th>' + listData.columns.map(col =>
             `<th class="th-sortable" onclick="sortGenericList('${col.name}')" title="Clique para ordenar por ${col.displayName || col.name}">${col.displayName || col.name} <span id="sort-gen-${col.name}" class="sort-icon">↕</span></th>`
           ).join('') + '</tr>';
         }
@@ -4338,7 +4409,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               }
               return `<td>${formatCellContent(val, c.name)}</td>`;
             }).join('');
-            const trClick = isGenericListGridEditMode ? "" : `onclick="openEditListItemModal(${origIdx})" style="cursor: pointer;" title="Clique para ver detalhes e editar este registro"`; return `<tr ${trClick} class="sp-list-row-clickable"><td class="td-center" style="color: #64748B;">${idx + 1}</td>${cells}</tr>`;
+            const trClick = isGenericListGridEditMode ? "" : `onclick="openEditListItemModal(${origIdx})" ondblclick="handleRowDblClick(${origIdx})" style="cursor: pointer;" title="Clique para ver detalhes / Clique duplo para abrir relatório PDF se disponível"`;
+            return `<tr ${trClick} class="sp-list-row-clickable">
+              <td class="td-center" style="width: 36px;" onclick="event.stopPropagation();"><input type="checkbox" class="check-item-generic" data-orig-idx="${origIdx}" onchange="updateGenericSelectionUI()"></td>
+              <td class="td-center" style="color: #64748B;">${idx + 1}</td>
+              ${cells}
+            </tr>`;
           }).join('');
         }
       }
@@ -4347,6 +4423,123 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${items.length}</b> registros &bull; Sincronizado com Microsoft SharePoint Online`;
       }
     }
+
+    
+    // ==========================================
+    // FUNÇÕES DE EXCLUSÃO EM LOTE E SELEÇÃO GENÉRICA
+    // ==========================================
+    function toggleCheckAllGeneric(isChecked) {
+      const cbs = document.querySelectorAll('.check-item-generic');
+      cbs.forEach(cb => { cb.checked = isChecked; });
+      updateGenericSelectionUI();
+    }
+
+    function updateGenericSelectionUI() {
+      const cbs = document.querySelectorAll('.check-item-generic:checked');
+      const btnDel = document.getElementById('btn-delete-generic');
+      const countEl = document.getElementById('delete-count-generic');
+      const canDelete = (currentRole && (currentRole.startsWith('admin') || currentRole === 'operador'));
+      if (countEl) countEl.innerText = cbs.length;
+      if (btnDel) {
+        if (cbs.length > 0 && canDelete) {
+          btnDel.style.display = 'inline-flex';
+        } else {
+          btnDel.style.display = 'none';
+        }
+      }
+    }
+
+    function deleteSelectedGenericItems() {
+      const canDelete = (currentRole && (currentRole.startsWith('admin') || currentRole === 'operador'));
+      if (!canDelete) {
+        showToast("Permissão negada: apenas Operadores e Administradores podem excluir registros.", "error");
+        return;
+      }
+      const checked = Array.from(document.querySelectorAll('.check-item-generic:checked'));
+      if (checked.length === 0) {
+        showToast("Nenhum item selecionado para exclusão.", "warning");
+        return;
+      }
+      if (!confirm(`Deseja realmente excluir ${checked.length} item(ns) selecionado(s) desta lista?`)) {
+        return;
+      }
+      const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[currentRealListName];
+      if (!listData || !listData.items) return;
+
+      const origIndices = checked.map(cb => parseInt(cb.getAttribute('data-orig-idx'), 10)).sort((a, b) => b - a);
+      origIndices.forEach(idx => {
+        if (idx >= 0 && idx < listData.items.length) {
+          listData.items.splice(idx, 1);
+        }
+      });
+
+      // Salvar lista personalizada no localStorage
+      try {
+        localStorage.setItem('sp_custom_list_deleted_' + currentRealListName, JSON.stringify(listData.items));
+      } catch (e) {
+        console.warn("Erro ao salvar lista após exclusão:", e);
+      }
+
+      showToast(`${checked.length} item(ns) excluído(s) com sucesso!`, "success");
+      const checkall = document.getElementById('checkall-generic');
+      if (checkall) checkall.checked = false;
+      updateGenericSelectionUI();
+      filterRealListTable();
+    }
+
+    // ==========================================
+    // VISUALIZADOR OFICIAL DE RELATÓRIOS PDF (DOIS CLIQUES)
+    // ==========================================
+    function handleRowDblClick(origIdx) {
+      const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[currentRealListName];
+      if (!listData || !listData.items) return;
+      const it = listData.items[origIdx];
+      if (!it) return;
+      const pdfTarget = it.pdfUrl || it.FileLeafRef || it.Title || '';
+      if (String(pdfTarget).toLowerCase().endsWith('.pdf') || it.ContentType === 'Documento') {
+        openReportPdf(pdfTarget);
+      } else {
+        openEditListItemModal(origIdx);
+      }
+    }
+
+    function openReportPdf(filenameOrUrl) {
+      if (!filenameOrUrl) return;
+      let targetUrl = filenameOrUrl;
+      if (!targetUrl.startsWith('http') && !targetUrl.startsWith('/') && !targetUrl.startsWith('reports/')) {
+        let category = "futebol";
+        if (currentRealListName && currentRealListName.toLowerCase().includes("nba")) category = "nba";
+        else if (currentRealListName && currentRealListName.toLowerCase().includes("youtube")) category = "youtube";
+        targetUrl = `reports/${category}/${filenameOrUrl}`;
+      }
+      const modal = document.getElementById("modal-pdf-viewer");
+      const frame = document.getElementById("pdf-viewer-frame");
+      const title = document.getElementById("pdf-viewer-title");
+      const dl = document.getElementById("pdf-viewer-download");
+      if (modal && frame) {
+        if (title) title.innerText = "Relatório Oficial: " + filenameOrUrl.split("/").pop();
+        if (dl) dl.href = targetUrl;
+        frame.src = targetUrl;
+        modal.style.display = "flex";
+      } else {
+        window.open(targetUrl, "_blank");
+      }
+    }
+
+    function closePdfModal() {
+      const modal = document.getElementById("modal-pdf-viewer");
+      const frame = document.getElementById("pdf-viewer-frame");
+      if (modal) modal.style.display = "none";
+      if (frame) frame.src = "";
+    }
+
+    // Expor no objeto window para acessibilidade global
+    window.toggleCheckAllGeneric = toggleCheckAllGeneric;
+    window.updateGenericSelectionUI = updateGenericSelectionUI;
+    window.deleteSelectedGenericItems = deleteSelectedGenericItems;
+    window.handleRowDblClick = handleRowDblClick;
+    window.openReportPdf = openReportPdf;
+    window.closePdfModal = closePdfModal;
 
     function toggleGenericListGridEdit() {
       if (!currentRealListName) {
@@ -5139,6 +5332,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     function renderTable() {
       initStreamingFilters();
+      // Ordenação padrão decrescente por data para os mais recentes no topo
+      if (!streamSortCol) {
+        streamSortCol = 'data';
+        streamSortAsc = false;
+      }
       const searchBox = document.getElementById("search-box");
       const q = searchBox ? searchBox.value.toLowerCase().trim() : "";
       const mesBox = document.getElementById("filter-mes");
@@ -7125,6 +7323,28 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     }
 
   </script>
+
+  <!-- MODAL OFICIAL DE VISUALIZAÇÃO DE RELATÓRIO PDF -->
+  <div id="modal-pdf-viewer" class="sp-modal-overlay" style="display: none; z-index: 999999; position: fixed; inset: 0; background: rgba(0,0,0,0.65); align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div class="sp-modal-content" style="max-width: 980px; width: 95vw; height: 92vh; display: flex; flex-direction: column; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); border: 1px solid #CBD5E1;">
+      <div style="background: linear-gradient(135deg, #004578 0%, #002d50 100%); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14.5px;">
+          <span style="font-size: 18px;">📄</span>
+          <span id="pdf-viewer-title">Relatório Oficial de Auditoria</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <a id="pdf-viewer-download" href="#" download class="sp-btn-cmd" style="color: #fff; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); text-decoration: none; padding: 5px 12px; font-size: 12px; border-radius: 6px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+            <span>⬇️</span> Baixar PDF
+          </a>
+          <button onclick="closePdfModal()" style="background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 4px; line-height: 1;" title="Fechar">✕</button>
+        </div>
+      </div>
+      <div style="flex: 1; background: #525659; position: relative;">
+        <iframe id="pdf-viewer-frame" style="width: 100%; height: 100%; border: none;"></iframe>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>"""
 
