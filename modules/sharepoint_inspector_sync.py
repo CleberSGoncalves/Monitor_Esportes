@@ -137,6 +137,32 @@ class SharePointInspectorSync:
         self.chat_webhook_file = os.path.join(self.project_root, "config", "google_chat_webhook.json")
         self.session = requests.Session()
         self._token: Optional[str] = None
+        self._ensure_config_files()
+
+    def _ensure_config_files(self) -> None:
+        """Garante que os arquivos essenciais de configuração existam no disco."""
+        config_dir = os.path.join(self.project_root, "config")
+        os.makedirs(config_dir, exist_ok=True)
+        meipass = getattr(sys, "_MEIPASS", None)
+        if meipass:
+            for fname in [
+                "sharepoint_portal_master_data.json",
+                "sharepoint_clean_migrated_events.json",
+                "sharepoint_extracted_permissions.json",
+                "sharepoint_migrated_standalone_data.json",
+                "escala_completa_2026.json",
+                "Escala de trabalho 2026.xlsx",
+                "painel_ocorrencias_clean_live.json",
+                "cadastro_hosts_all.json"
+            ]:
+                dest = os.path.join(config_dir, fname)
+                if not os.path.exists(dest):
+                    src = os.path.join(meipass, "config", fname)
+                    if os.path.exists(src):
+                        try:
+                            shutil.copy2(src, dest)
+                        except Exception:
+                            pass
 
     def get_token(self) -> str:
         """Obtém token de autorização do Microsoft Graph com cache e renovação automática."""

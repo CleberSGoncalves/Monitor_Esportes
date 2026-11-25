@@ -1,5 +1,5 @@
 {
-  "version": "2.5.20",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.20/Monitor_Esportes.exe",
-  "changelog": "v2.5.20: Sincronização automática e contínua da Programação Streaming (sharepoint_clean_migrated_events.json) no Google Portal e Google Sheets. Associação automática de responsável (Cleber BL01 e Backup) e PVID oficial para eventos vazios com patch reverso no SharePoint. Título e contadores dinâmicos no portal (864 confrontos) e integração 100% headless."
+  "version": "2.5.21",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.21/Monitor_Esportes.exe",
+  "changelog": "v2.5.21: Auto-bootstrap resiliente de master data e eventos migrados em ambiente PyInstaller. Elimina o erro de arquivo master data não encontrado na pasta de instalação do executável (D:\\MediaDNA_V2\\...). Geração dinâmica do portal na raiz da aplicação garantindo publicação 1:1 de relatórios de Futebol, YouTube, NBA e Programação de Streaming."
 }

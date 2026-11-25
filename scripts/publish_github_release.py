@@ -18,20 +18,19 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.20"
-    release_name = "v2.5.20 - Sincronização Automática Streaming no Google Portal & Enriquecimento de Escala"
+    tag = "v2.5.21"
+    release_name = "v2.5.21 - Auto-Bootstrap Resiliente de Master Data e Publicação Contínua no Google Portal"
     body = (
-        "### Novidades da versão v2.5.20:\n"
-        "- ⚽ **Sincronização Automática da Programação de Streaming (SharePoint -> Google Portal & Sheets)**:\n"
-        "  - O motor de sincronização agora atualiza automaticamente o dataset canônico `config/sharepoint_clean_migrated_events.json` e a planilha Google Sheets oficial.\n"
-        "  - Novos jogos adicionados no SharePoint (como Grêmio x Palmeiras pela Copa do Brasil) são imediatamente integrados ao Google Portal com data, horário, canal e badges corretos.\n"
-        "- 👤 **Associação Automática da Escala de Gravação e PVID TV BOX**:\n"
-        "  - Eventos inseridos sem operador ou sem PVID no SharePoint são associados automaticamente à escala de gravação ('Cleber BL01 e Backup' e 'Prime Video - PV3687').\n"
-        "  - Enriquecimento reverso via Microsoft Graph API PATCH, preenchendo os campos no próprio SharePoint para manter paridade absoluta entre ambos os ambientes.\n"
-        "- 📊 **Contadores Dinâmicos e Título Responsivo no Portal**:\n"
-        "  - Título do portal e contadores de confrontos agora refletem com precisão o total real de jogos (864 confrontos).\n"
-        "- 🧪 **Testes E2E Automatizados**:\n"
-        "  - Suíte completa de testes unitários e integração aprovada com 100% de sucesso.\n"
+        "### Novidades da versão v2.5.21:\n"
+        "- 🛡️ **Auto-Bootstrap Resiliente de Master Data (PyInstaller)**:\n"
+        "  - O módulo `portal_sync` agora recupera automaticamente o arquivo `sharepoint_portal_master_data.json` e datasets embutidos a partir do pacote PyInstaller (`sys._MEIPASS`) quando executado em diretórios de produção externos (ex: `D:\\MediaDNA_V2\\Applications\\Monitor_Esportes`).\n"
+        "  - Elimina definitivamente a exceção `[PortalSync] Arquivo master data não encontrado` que impedia a visualização imediata de relatórios no portal.\n"
+        "- 📑 **Sincronização 1:1 de Relatórios (Futebol, YouTube e NBA)**:\n"
+        "  - Garantia de reporte paralelo ponta a ponta: todo PDF gerado é arquivado em `docs/reports/` e `portal_web/reports/`, com atualização em tempo real do portal web.\n"
+        "- 🌐 **Geração Dinâmica do Portal Web na Raiz da Aplicação**:\n"
+        "  - O `build_portal_web.py` foi atualizado para compilar `index.html` na pasta externa do executável, garantindo que novas ocorrências, relatórios e eventos de streaming sejam renderizados sem defasagem.\n"
+        "- 🧪 **Validação Automatizada E2E**:\n"
+        "  - Bateria completa de testes automatizados (unitários, integração e E2E) aprovada com 100% de sucesso.\n"
     )
 
     headers = {

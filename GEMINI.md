@@ -57,3 +57,19 @@
 > [!IMPORTANT]
 > **OBRIGATORIEDADE DE TESTES E VALIDAÇÃO REAL A CADA NOVA FUNÇÃO OU CORREÇÃO**
 > Sempre que desenvolver ou entregar uma função nova, modificação arquitetural ou correção de bug neste projeto, o agente DEVE OBRIGATORIAMENTE escrever e executar testes automatizados reais (unitários, integração e/ou validação de ponta a ponta E2E) comprovando o funcionamento correto antes de concluir a resposta. NUNCA entregar código baseado em suposições sem validação prática.
+
+---
+
+## 6. PROIBIÇÃO ABSOLUTA DE LINKS E DEPENDÊNCIA DO SHAREPOINT (ZERO DEPENDÊNCIA EXTERNA)
+
+> [!CAUTION]
+> **O SHAREPOINT SERÁ DESCONTINUADO — PROIBIÇÃO DE LINKS PARA ADGBL.SHAREPOINT.COM NO PORTAL**
+> 
+> O objetivo central da migração para o Google Workspace / Google Sites é a **eliminação completa e definitiva do SharePoint**.
+> 
+> ### Regras Rígidas de Arquitetura:
+> 1. **Proibição Absoluta de Links para o SharePoint**: Em nenhuma hipótese qualquer botão ("Abrir", "Visualizar", "Baixar"), menu, tabela ou biblioteca de documentos do Google Sites (`portal_web` / `docs`) pode redirecionar o usuário para `adgbl.sharepoint.com` ou exigir autenticação Microsoft.
+> 2. **Repositório Local e Google Workspace Autônomo**: Todos os documentos, planilhas (ex: `Escala_de_trabalho_2026.xlsx`, SLA Interno), relatórios em PDF, arquivos de configuração e arquivos de Acesso Remoto (.RDP) devem estar armazenados diretamente no repositório da aplicação (`portal_web/reports/`, `portal_web/acessos_rdp/`, ou servidos via data URIs/visualizadores locais).
+> 3. **Sobrevivência ao Desligamento do SharePoint**: O portal e o sistema devem funcionar com 100% de autonomia e disponibilidade, mesmo que o SharePoint seja desligado permanentemente hoje.
+> 4. **Acesso Remoto RDP Inovador**: O Centro de Gerenciamento RDP deve prover pesquisa por cidade/praça, filtros por país e CS (CS01, CS02, CS03, PayTV), modal interativo de conexão direta com download de arquivos .rdp pré-configurados locais, e navegação em árvore por pastas de documentos RDP diretamente no repositório.
+> 5. **Operações em Massa e Governança de Exclusão (RBAC)**: Todas as listas do portal devem conter seleção por checkbox individual e Check-All no cabeçalho com botão de exclusão em massa (`Excluir Selecionados`), condicionado estritamente às permissões configuradas na aba "Permissões".

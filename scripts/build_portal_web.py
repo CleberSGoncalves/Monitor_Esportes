@@ -18,6 +18,7 @@ Contém todos os módulos nativos:
 """
 
 import os
+import sys
 import json
 import csv
 import shutil
@@ -2592,7 +2593,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <button class="sp-btn-new" onclick="openNewOcoModal()" title="Criar nova ocorrência operacional">
             <span>+</span> Novo
           </button>
-          <button id="btn-grid-oco" class="sp-btn-cmd" onclick="toggleOcoGridEdit()" title="Editar linhas e colunas diretamente no navegador">
+          <button id="btn-grid-oco" class="sp-btn-cmd btn-grid-edit" onclick="toggleOcoGridEdit()" title="Editar linhas e colunas diretamente no navegador">
             <span id="btn-grid-oco-icon">田</span> <span id="btn-grid-oco-text">Editar no modo de exibição de grade</span>
           </button>
           <button class="sp-btn-cmd" id="btn-refresh-oco" onclick="refreshOcorrenciasData(this)" title="Buscar atualizações e sincronizar do SharePoint">
@@ -6820,7 +6821,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         "gatewayusagemethod:i:0",
         `promptcredentialonce:i:0`,
         "authentication level:i:2"
-      ].join("\r\n");
+      ].join("\\r\\n");
 
       const blob = new Blob([rdpContent], { type: 'application/x-rdp' });
       const url = URL.createObjectURL(blob);
@@ -6865,7 +6866,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         `"${h.status || 'nominal'}"`
       ].join(","));
 
-      const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\r\n");
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\\r\\n");
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -7128,13 +7129,46 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </html>"""
 
 
+def get_project_root() -> str:
+    """Retorna a raiz real do projeto tanto em ambiente de desenvolvimento quanto em PyInstaller."""
+    if getattr(sys, "frozen", False):
+        exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+        if os.path.basename(exe_dir).lower() == "dist":
+            return os.path.dirname(exe_dir)
+        if os.path.exists(os.path.join(exe_dir, "config")):
+            return exe_dir
+        parent = os.path.dirname(exe_dir)
+        if os.path.exists(os.path.join(parent, "config")):
+            return parent
+        return exe_dir
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def resolve_config_path(base_dir: str, filename: str) -> str:
+    """Busca o arquivo de configuração no diretório local e, se ausente, recupera do bundle PyInstaller."""
+    target = os.path.join(base_dir, "config", filename)
+    if os.path.exists(target):
+        return target
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass:
+        bundled = os.path.join(meipass, "config", filename)
+        if os.path.exists(bundled):
+            try:
+                os.makedirs(os.path.join(base_dir, "config"), exist_ok=True)
+                shutil.copy2(bundled, target)
+                return target
+            except Exception:
+                return bundled
+    return target
+
+
 def generate_portal():
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    json_path = os.path.join(base_dir, "config", "sharepoint_clean_migrated_events.json")
-    perms_path = os.path.join(base_dir, "config", "sharepoint_extracted_permissions.json")
-    migrated_data_path = os.path.join(base_dir, "config", "sharepoint_migrated_standalone_data.json")
-    escala_path = os.path.join(base_dir, "config", "escala_completa_2026.json")
-    raw_escala_excel = os.path.join(base_dir, "config", "Escala de trabalho 2026.xlsx")
+    base_dir = get_project_root()
+    json_path = resolve_config_path(base_dir, "sharepoint_clean_migrated_events.json")
+    perms_path = resolve_config_path(base_dir, "sharepoint_extracted_permissions.json")
+    migrated_data_path = resolve_config_path(base_dir, "sharepoint_migrated_standalone_data.json")
+    escala_path = resolve_config_path(base_dir, "escala_completa_2026.json")
+    raw_escala_excel = resolve_config_path(base_dir, "Escala de trabalho 2026.xlsx")
     
     output_dir = os.path.join(base_dir, "portal_web")
     os.makedirs(output_dir, exist_ok=True)
@@ -7169,14 +7203,14 @@ def generate_portal():
     antenistas = standalone_data.get("contatos_antenistas", [])
 
     # Carregar Hosts cadastrados (220 hosts)
-    hosts_path = os.path.join(base_dir, "config", "cadastro_hosts_all.json")
+    hosts_path = resolve_config_path(base_dir, "cadastro_hosts_all.json")
     hosts_dict = {}
     if os.path.exists(hosts_path):
         with open(hosts_path, "r", encoding="utf-8") as f:
             hosts_dict = json.load(f)
 
     # Carregar Ocorrências Live Sincronizadas do SharePoint (1.000 Casos)
-    live_oco_path = os.path.join(base_dir, "config", "painel_ocorrencias_clean_live.json")
+    live_oco_path = resolve_config_path(base_dir, "painel_ocorrencias_clean_live.json")
     if os.path.exists(live_oco_path):
         with open(live_oco_path, "r", encoding="utf-8") as f:
             ocorrencias = json.load(f)
@@ -7281,7 +7315,7 @@ def generate_portal():
 
     perms_json_str = json.dumps(all_permissions, ensure_ascii=False)
     # 5. Master Data do SharePoint (21 Drives com 260 Relatórios e 46 Listas Reais)
-    master_data_path = os.path.join(base_dir, "config", "sharepoint_portal_master_data.json")
+    master_data_path = resolve_config_path(base_dir, "sharepoint_portal_master_data.json")
     master_data = {"drives": {}, "lists": {}}
     if os.path.exists(master_data_path):
         with open(master_data_path, "r", encoding="utf-8") as f:
@@ -7290,6 +7324,7 @@ def generate_portal():
 
 
     # Exporta CSV oficial
+    os.makedirs(os.path.join(base_dir, "config"), exist_ok=True)
     csv_path = os.path.join(base_dir, "config", "permissoes_google_workspace_suportecaptacao.csv")
     with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
         writer = csv.writer(f)

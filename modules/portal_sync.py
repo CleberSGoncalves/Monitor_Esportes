@@ -87,10 +87,35 @@ class PortalSyncManager:
             relative_web_url = f"reports/{category}/{target_filename}"
 
             # 2. Atualizar config/sharepoint_portal_master_data.json
-            master_data_path = os.path.join(project_root, "config", "sharepoint_portal_master_data.json")
+            config_dir = os.path.join(project_root, "config")
+            os.makedirs(config_dir, exist_ok=True)
+            master_data_path = os.path.join(config_dir, "sharepoint_portal_master_data.json")
+            
+            # Auto-bootstrap resiliente para ambiente compilado (PyInstaller) e novas instalações
             if not os.path.exists(master_data_path):
-                logger.error(f"[PortalSync] Arquivo master data não encontrado: {master_data_path}")
-                return False
+                meipass = getattr(sys, "_MEIPASS", None)
+                if meipass:
+                    bundled_master = os.path.join(meipass, "config", "sharepoint_portal_master_data.json")
+                    if os.path.exists(bundled_master):
+                        try:
+                            shutil.copy2(bundled_master, master_data_path)
+                            logger.info(f"[PortalSync] Master data inicializado a partir do bundle PyInstaller: {master_data_path}")
+                        except Exception as e_copy:
+                            logger.warning(f"[PortalSync] Falha ao copiar master data do _MEIPASS: {e_copy}")
+            
+            if not os.path.exists(master_data_path):
+                try:
+                    initial_data = {
+                        "last_sync": datetime.now(timezone.utc).isoformat(),
+                        "drives": {},
+                        "lists": {}
+                    }
+                    with open(master_data_path, "w", encoding="utf-8") as f_init:
+                        json.dump(initial_data, f_init, ensure_ascii=False, indent=2)
+                    logger.info(f"[PortalSync] Master data base criado com sucesso: {master_data_path}")
+                except Exception as e_create:
+                    logger.error(f"[PortalSync] Erro ao criar master data base em {master_data_path}: {e_create}")
+                    return False
 
             with open(master_data_path, "r", encoding="utf-8") as f:
                 master_data = json.load(f)
@@ -123,7 +148,13 @@ class PortalSyncManager:
                 "Canal": canal or plataforma or "Caze TV",
                 "Confiança": confianca or "99.0%",
                 "Auditado": auditado,
-                "Placar": placar or ""
+                "Placar": placar or "",
+                # Aliases lowercase para compatibilidade retroativa
+                "partida": partida or target_filename,
+                "campeonato": campeonato or "Brasileiro Serie A",
+                "plataforma": plataforma or canal or "Caze TV",
+                "canal": canal or plataforma or "Caze TV",
+                "confianca": confianca or "99.0%"
             }
 
             if existing_item:
