@@ -1,5 +1,5 @@
 {
-  "version": "2.5.24",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.24/Monitor_Esportes.exe",
-  "changelog": "v2.5.24: Correção crítica nos relatórios de futebol (Arthur 25/11/2026). (1) Cálculo dinâmico e fidedigno de toda a cronologia a partir do horário real do jogo, eliminando os horários fixos de 19:15/19:30. (2) Trava rigorosa de direitos de transmissão: relatórios são gerados ESTRITAMENTE para jogos transmitidos na CazéTV ou Amazon Prime Video (bloqueando partidas de Premiere, SporTV ou TV Globo). (3) Saneamento das tabelas e caches da CBF (remoção de confrontos espúrios como Remo x Chapecoense na Série A)."
+  "version": "2.5.25",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.25/Monitor_Esportes.exe",
+  "changelog": "v2.5.25: Integração nativa do Sistema Principal (ExpertAssistant com Search Grounding e Súmula CBF oficial) na Auditoria Autônoma para eliminação de fallbacks incoerentes. Saneamento completo do SharePoint e do Google Portal: remoção de 8 relatórios indevidos de partidas fora do pacote CazéTV/Amazon Prime e republicação dos laudos legítimos com horários dinâmicos e metadados oficiais."
 }

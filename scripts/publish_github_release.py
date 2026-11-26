@@ -18,19 +18,23 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.24"
-    release_name = "v2.5.24 - Correção Crítica na Cronologia e Trava de Transmissão dos Relatórios de Futebol"
+    tag = "v2.5.25"
+    release_name = "v2.5.25 - Integração do Sistema Principal e Saneamento Geral SharePoint/Portal"
     body = (
-        "### Novidades da versão v2.5.24:\n"
+        "### Novidades da versão v2.5.25:\n"
+        "- 🧠 **Integração Nativa do Sistema Principal (ExpertAssistant com Grounding e Súmula CBF)**:\n"
+        "  - O pipeline da auditoria autônoma agora prioriza 100% o sistema principal (ExpertAssistant) com busca oficial de súmulas CBF e Gemini Grounding, eliminando desvios e fallbacks incoerentes com horários estáticos.\n"
         "- ⏱️ **Cálculo Dinâmico e Fidedigno de Toda a Cronologia dos Jogos**:\n"
-        "  - Eliminação definitiva dos horários fixos de 19:15 / 19:30: cada relatório agora calcula os marcos técnicos (Abertura de Sinal, Apito Inicial 1T, Fim do 1T, Apito Inicial 2T, Apito Final e Encerramento) a partir do horário oficial REAL de cada confronto.\n"
+        "  - Eliminação definitiva dos horários fixos de 19:15 / 19:30: cada relatório calcula os marcos técnicos (Abertura de Sinal, Apito Inicial 1T, Fim do 1T, Apito Inicial 2T, Apito Final e Encerramento) a partir do horário oficial REAL de cada confronto.\n"
         "- 🛡️ **Trava Estrita de Direitos de Transmissão (CazéTV e Amazon Prime Video)**:\n"
-        "  - O pipeline de auditoria agora valida rigorosamente a plataforma de transmissão: relatórios são gerados e sincronizados ESTRITAMENTE para jogos com direitos da CazéTV ou Amazon Prime Video (conforme as Colunas 4 e 5 da CBF).\n"
-        "  - Jogos de outras janelas (ex: Premiere/Pay-Per-View, SporTV ou TV Globo) são automaticamente bloqueados e descartados da emissão de laudos.\n"
-        "- 🧹 **Saneamento e Limpeza das Tabelas da CBF**:\n"
-        "  - Remoção de confrontos atribuídos erroneamente à CazéTV/Amazon nas tabelas e caches (incluindo Remo x Chapecoense, Cruzeiro x Palmeiras, Corinthians x Botafogo e Flamengo x Athletico-PR).\n"
+        "  - O pipeline de auditoria valida rigorosamente a plataforma: relatórios são gerados e sincronizados ESTRITAMENTE para jogos com direitos da CazéTV ou Amazon Prime Video (Colunas 4 e 5 da CBF).\n"
+        "  - Jogos de outras emissoras (Premiere, SporTV, TV Globo) são bloqueados e descartados.\n"
+        "- 🧹 **Saneamento Completo do SharePoint e do Google Sites**:\n"
+        "  - Exclusão remota via Microsoft Graph API dos 8 relatórios gerados indevidamente no SharePoint (`Relatorios_de_Jogos`).\n"
+        "  - Regeneração e ressincronização dos relatórios legítimos (Mirassol x Atlético-MG e Coritiba x Santos) com metadados e horários reais.\n"
+        "  - Recompilação e validação Playwright do Google Portal (`portal_web/` e `docs/`).\n"
         "- 🧪 **Testes Automatizados Reais E2E**:\n"
-        "  - Nova suíte `tests/test_audit_timestamps_and_broadcaster_fidelity.py` validando os horários dinâmicos e o bloqueio de transmissoras com 100% de sucesso.\n"
+        "  - Suíte completa de testes aprovada garantindo integridade de ponta a ponta.\n"
     )
 
     headers = {

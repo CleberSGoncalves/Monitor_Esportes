@@ -235,7 +235,24 @@ class AutonomousAuditor:
                 self._log(f"🛠️ [DIVERGÊNCIA IDENTIFICADA] em '{name}': {', '.join(fix_reasons)}")
                 self._log(f"🔄 Executando autocorreção canônica para '{name}'...")
                 
-                correc_data = self._build_canonical_match_data(name, partida_field, fields)
+                t1 = fields.get("Time1") or (partida_field.split(" x ")[0].strip() if " x " in partida_field else "")
+                t2 = fields.get("Time2") or (partida_field.split(" x ")[1].strip() if " x " in partida_field else "")
+                dt = fields.get("Data_Partida") or ""
+                if "T" in dt:
+                    try:
+                        dt = datetime.fromisoformat(dt.replace("Z", "+00:00")).strftime("%d/%m/%Y")
+                    except Exception:
+                        dt = ""
+                correc_data = self._generate_match_audit_data(
+                    team1=t1,
+                    team2=t2,
+                    date=dt,
+                    platform=plat_field,
+                    comp=comp_field,
+                    filename=name,
+                    partida_field=partida_field,
+                    fields=fields
+                )
                 if correc_data:
                     new_pdf_path = rg.write_expert_report([correc_data])
                     iso_date = SharePointReporter.format_iso_datetime(correc_data["date"], correc_data["time"])
@@ -330,9 +347,16 @@ class AutonomousAuditor:
                 self._log(f"🚨 [JOGO NÃO PUBLICADO ENCONTRADO]: {team1} x {team2} ({date}) na {platform}.")
                 self._log(f"⚙️ O sistema principal não publicou este jogo. Gerando relatório via Auditoria Autônoma...")
 
-                match_data = self._build_canonical_match_data(f"expert_{team1}_{team2}_{date}", f"{team1} x {team2}", {
-                    "team1": team1, "team2": team2, "date": date, "platform": platform, "comp": comp, "time": time_str
-                })
+                match_data = self._generate_match_audit_data(
+                    team1=team1,
+                    team2=team2,
+                    date=date,
+                    platform=platform,
+                    comp=comp,
+                    time_str=time_str,
+                    filename=f"expert_{team1}_{team2}_{date}",
+                    partida_field=f"{team1} x {team2}"
+                )
 
                 if match_data:
                     pdf_path = rg.write_expert_report([match_data])
@@ -362,6 +386,83 @@ class AutonomousAuditor:
                 self._log(f"✔️ Jogo verificado no SharePoint: {team1} x {team2} ({date}) - OK.")
 
         return recovered_matches
+
+    def _generate_match_audit_data(
+        self,
+        team1: str,
+        team2: str,
+        date: str,
+        platform: str,
+        comp: str,
+        time_str: str = "19:30",
+        filename: str = "",
+        partida_field: str = "",
+        fields: Optional[Dict[str, Any]] = None
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Gera os metadados e a cronologia técnica completa para a auditoria do jogo:
+        1. SISTEMA PRINCIPAL (PRIORIDADE 1): Tenta executar via ExpertAssistant (Gemini com Search Grounding e Súmula Oficial da CBF).
+        2. MOTOR CANÔNICO DINÂMICO (CONTINGÊNCIA): Caso o assistente especialista falhe, utiliza o motor canônico
+           com cálculo dinâmico baseado no horário REAL do confronto (nunca horários fixos).
+        """
+        # 1. TENTATIVA VIA SISTEMA PRINCIPAL (ExpertAssistant + Súmula Oficial)
+        try:
+            cfg_path = os.path.join(PROJECT_ROOT, "config", "google_ai.json")
+            api_key = ""
+            model_id = "gemini-3.8-flash"
+            if os.path.exists(cfg_path):
+                with open(cfg_path, "r", encoding="utf-8") as f_ai:
+                    ai_data = json.load(f_ai)
+                    api_key = ai_data.get("api_key") or ai_data.get("gemini_api_key") or ""
+                    model_id = ai_data.get("model") or model_id
+
+            if api_key and team1 and team2:
+                from modules.expert_assistant import ExpertAssistant
+                from modules.cbf_schedule_fetcher import CBFScheduleFetcher
+
+                self._log(f"🧠 [SISTEMA PRINCIPAL] Acionando ExpertAssistant com Search Grounding para {team1} x {team2}...")
+
+                sumula_raw = ""
+                try:
+                    game_url = CBFScheduleFetcher.find_game_page_url(team1, team2, date, comp=comp)
+                    if game_url:
+                        sumula_raw = CBFScheduleFetcher.fetch_sumula_from_cbf_html(game_url)
+                        if sumula_raw:
+                            self._log(f"📄 [CBF SÚMULA] Súmula oficial obtida ({len(sumula_raw)} chars) para {team1} x {team2}.")
+                except Exception as ex_sum:
+                    self._log(f"⚠️ [CBF SÚMULA WARN] Erro ao buscar súmula direta: {ex_sum}")
+
+                assistant = ExpertAssistant(api_key=api_key, model_id=model_id)
+                expert_res = assistant.get_match_chronology(
+                    team1=team1,
+                    team2=team2,
+                    competition=comp,
+                    platform=platform,
+                    date=date,
+                    sumula_raw_text=sumula_raw,
+                    allow_web_fallback=True
+                )
+                if expert_res and isinstance(expert_res, dict) and expert_res.get("technical_milestones"):
+                    self._log(f"✅ [SISTEMA PRINCIPAL SUCESSO] Cronologia oficial obtida via Gemini/Súmula para {team1} x {team2}!")
+                    expert_res.setdefault("time", time_str)
+                    expert_res.setdefault("platform", platform)
+                    expert_res.setdefault("competition", comp)
+                    return expert_res
+        except Exception as ex_expert:
+            self._log(f"⚠️ [SISTEMA PRINCIPAL WARN] Falha na consulta ExpertAssistant: {ex_expert}. Acionando contingência canônica dinâmica...")
+
+        # 2. CONTINGÊNCIA CANÔNICA DINÂMICA
+        meta = {
+            "team1": team1,
+            "team2": team2,
+            "date": date,
+            "platform": platform,
+            "comp": comp,
+            "time": time_str
+        }
+        if fields:
+            meta.update(fields)
+        return self._build_canonical_match_data(filename or f"expert_{team1}_{team2}_{date}", partida_field or f"{team1} x {team2}", meta)
 
     def _build_canonical_match_data(self, filename: str, partida: str, meta_fields: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Constrói o payload canônico de eventos para qualquer partida conhecida da CBF."""
