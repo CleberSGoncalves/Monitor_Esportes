@@ -4470,24 +4470,41 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 </div>
               </div>
 
-              <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
-                ${foundItem && (foundItem.drive_edit_url || (foundItem.webUrl && foundItem.webUrl.includes('docs.google.com'))) ? `
-                  <a href="${foundItem.drive_edit_url || foundItem.webUrl}" target="_blank" class="btn-action" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:linear-gradient(135deg,#059669,#047857);color:white;border:none;" onclick="showToast('✏️ Abrindo para edição no Google Sheets...', 'success');">
-                    ✏️ Editar no Google Sheets
-                  </a>
-                ` : ''}
-                <a href="${downloadHref}" ${isEscala ? 'download="Escala_de_trabalho_2026.xlsx"' : ''} class="btn-action btn-action-primary" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none;" onclick="showToast('📥 Download iniciado a partir do repositório corporativo!', 'success');">
-                  📥 Baixar Arquivo (${ext})
-                </a>
-                ${(ext === 'XLSX' || ext === 'XLS') && !(foundItem && foundItem.drive_edit_url) ? `
-                  <button type="button" class="btn-action btn-action-secondary" style="font-size:11px;" title="Para editar colaborativamente, o arquivo precisa estar vinculado ao Google Drive." onclick="showToast('💡 Para edição online, o arquivo precisa estar no Google Drive. Contate o administrador para vincular.', 'info');">
-                    💡 Editar Online?
-                  </button>
-                ` : ''}
-                <button type="button" class="btn-action btn-action-secondary" onclick="document.getElementById('modal-autonomous-doc').remove();">
-                  Fechar
-                </button>
-              </div>
+              ${(() => {
+                const savedSheetUrl = localStorage.getItem('sp_gsheet_link_' + name) || '';
+                const effectiveSheetUrl = (foundItem && (foundItem.drive_edit_url || (foundItem.webUrl && foundItem.webUrl.includes('docs.google.com')))) || savedSheetUrl;
+                const isSpreadsheet = ['XLSX', 'XLS', 'CSV'].includes(ext);
+                return `
+                  <div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; margin-top:6px;">
+                    ${effectiveSheetUrl ? `
+                      <a href="${effectiveSheetUrl}" target="_blank" class="btn-action" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:linear-gradient(135deg,#059669,#047857);color:white;border:none;" onclick="showToast('✏️ Abrindo no Google Sheets...', 'success');">
+                        ✏️ Abrir no Google Sheets
+                      </a>
+                    ` : ''}
+                    ${isSpreadsheet ? `
+                      <button type="button" class="btn-action" style="display:inline-flex;align-items:center;gap:6px;background:#0F766E;color:white;border:none;cursor:pointer;" onclick="openOnlineSheetEditor('${encodeURIComponent(name)}')">
+                        📝 Editar Planilha Online
+                      </button>
+                      <button type="button" class="btn-action btn-action-secondary" style="font-size:11px;" onclick="toggleGoogleSheetLinkBox('${encodeURIComponent(name)}')">
+                        🔗 ${effectiveSheetUrl ? 'Alterar Link Sheets' : 'Vincular Google Sheets'}
+                      </button>
+                    ` : ''}
+                    <a href="${downloadHref}" ${isEscala ? 'download="Escala_de_trabalho_2026.xlsx"' : ''} class="btn-action btn-action-primary" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none;" onclick="showToast('📥 Download iniciado a partir do repositório corporativo!', 'success');">
+                      📥 Baixar Arquivo (${ext})
+                    </a>
+                    <button type="button" class="btn-action btn-action-secondary" onclick="document.getElementById('modal-autonomous-doc').remove();">
+                      Fechar
+                    </button>
+                  </div>
+                  <div id="gsheet-link-box" style="display:none; margin-top:12px; padding:10px 12px; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:6px;">
+                    <div style="font-size:11.5px; font-weight:700; color:#166534; margin-bottom:6px;">🔗 Cole a URL do Google Sheets / Google Drive para esta planilha:</div>
+                    <div style="display:flex; gap:8px;">
+                      <input type="url" id="gsheet-link-input" value="${effectiveSheetUrl}" placeholder="https://docs.google.com/spreadsheets/d/.../edit" style="flex:1; padding:6px 10px; border:1px solid #86EFAC; border-radius:5px; font-size:12px;">
+                      <button type="button" class="btn-action btn-action-primary" style="padding:6px 12px; font-size:11.5px;" onclick="saveGoogleSheetLink('${encodeURIComponent(name)}')">💾 Salvar Link</button>
+                    </div>
+                  </div>
+                `;
+              })()}
             </div>
           </div>
         </div>
@@ -4496,6 +4513,117 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       if (prev) prev.remove();
       document.body.insertAdjacentHTML('beforeend', modalHtml);
     }
+
+    function toggleGoogleSheetLinkBox(docNameEsc) {
+      const box = document.getElementById('gsheet-link-box');
+      if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+    window.toggleGoogleSheetLinkBox = toggleGoogleSheetLinkBox;
+
+    function saveGoogleSheetLink(docNameEsc) {
+      const name = decodeURIComponent(docNameEsc || '');
+      const inp = document.getElementById('gsheet-link-input');
+      const url = (inp ? inp.value : '').trim();
+      if (!url || !url.startsWith('http')) {
+        showToast('Informe uma URL válida do Google Sheets / Drive (https://...).', 'warning');
+        return;
+      }
+      localStorage.setItem('sp_gsheet_link_' + name, url);
+      showToast('✅ Link do Google Sheets vinculado! Reabrindo documento...', 'success');
+      document.getElementById('modal-autonomous-doc')?.remove();
+      openAutonomousDocViewer('', encodeURIComponent(name));
+    }
+    window.saveGoogleSheetLink = saveGoogleSheetLink;
+
+    function openOnlineSheetEditor(docNameEsc) {
+      const name = decodeURIComponent(docNameEsc || 'Planilha.xlsx');
+      const storageKey = 'sp_online_sheet_' + name;
+      let rows = [];
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) rows = JSON.parse(saved);
+      } catch (e) {}
+      if (!Array.isArray(rows) || rows.length === 0) {
+        rows = [
+          ['Data / Referência', 'Praça / Canal', 'Indicador / SLA', 'Status', 'Responsável', 'Observações'],
+          [new Date().toLocaleDateString('pt-BR'), 'Nacional / Globo', 'Dentro do Prazo (100%)', 'Concluído', 'Equipe Captação', 'Registro inicial online'],
+          ['', '', '', 'Em Análise', '', '']
+        ];
+      }
+      document.getElementById('modal-online-sheet-editor')?.remove();
+      const editorModal = document.createElement('div');
+      editorModal.id = 'modal-online-sheet-editor';
+      editorModal.className = 'sp-modal-overlay';
+      editorModal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(15,23,42,0.82);backdrop-filter:blur(4px);z-index:10050;justify-content:center;align-items:center;padding:16px;';
+      editorModal.innerHTML = `
+        <div style="background:#fff;border-radius:12px;width:96%;max-width:980px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);">
+          <div style="background:linear-gradient(135deg,#0F766E,#059669);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <h3 style="margin:0;font-size:15px;font-weight:700;">📝 Editor Online de Planilha — ${name}</h3>
+              <div style="font-size:11px;opacity:0.9;">Edite as células diretamente e salve no portal ou exporte em CSV/Excel</div>
+            </div>
+            <button type="button" data-close-sheet style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;">&times;</button>
+          </div>
+          <div style="padding:14px 20px;overflow:auto;flex:1;">
+            <table id="online-sheet-table" style="width:100%;border-collapse:collapse;font-size:12.5px;">
+              <thead>
+                <tr style="background:#F1F5F9;">
+                  ${rows[0].map((col, ci) => `<th contenteditable="true" style="border:1px solid #CBD5E1;padding:8px 10px;text-align:left;font-weight:700;color:#1E293B;min-width:110px;">${col}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.slice(1).map(r => `<tr>${r.map(c => `<td contenteditable="true" style="border:1px solid #CBD5E1;padding:7px 10px;color:#334155;">${c}</td>`).join('')}</tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div style="background:#F8FAFC;border-top:1px solid #E2E8F0;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;gap:8px;">
+              <button type="button" id="btn-sheet-add-row" class="btn-action btn-action-secondary" style="font-size:12px;">➕ Adicionar Linha</button>
+              <button type="button" id="btn-sheet-export-csv" class="btn-action btn-action-secondary" style="font-size:12px;">📥 Exportar .CSV (Excel)</button>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button type="button" data-close-sheet class="btn-action btn-action-secondary" style="font-size:12px;">Fechar</button>
+              <button type="button" id="btn-sheet-save" class="btn-action btn-action-primary" style="font-size:12px;background:#059669;border-color:#059669;">💾 Salvar Alterações Online</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(editorModal);
+      editorModal.querySelectorAll('[data-close-sheet]').forEach(b => b.addEventListener('click', () => editorModal.remove()));
+      const readGrid = () => Array.from(editorModal.querySelectorAll('#online-sheet-table tr')).map(tr =>
+        Array.from(tr.children).map(cell => cell.innerText.trim())
+      );
+      editorModal.querySelector('#btn-sheet-add-row').addEventListener('click', () => {
+        const cols = editorModal.querySelectorAll('#online-sheet-table thead th').length;
+        const tr = document.createElement('tr');
+        for (let i = 0; i < cols; i++) {
+          const td = document.createElement('td');
+          td.contentEditable = 'true';
+          td.style.cssText = 'border:1px solid #CBD5E1;padding:7px 10px;color:#334155;';
+          tr.appendChild(td);
+        }
+        editorModal.querySelector('#online-sheet-table tbody').appendChild(tr);
+      });
+      editorModal.querySelector('#btn-sheet-save').addEventListener('click', () => {
+        localStorage.setItem(storageKey, JSON.stringify(readGrid()));
+        showToast('✅ Alterações da planilha salvas online com sucesso!', 'success');
+      });
+      editorModal.querySelector('#btn-sheet-export-csv').addEventListener('click', () => {
+        const grid = readGrid();
+        const csv = '\\uFEFF' + grid.map(r => r.map(v => `"${v.replace(/"/g, '""')}"`).join(';')).join('\\r\\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const u = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = u;
+        a.download = name.replace(/\\.(xlsx|xls|csv)$/i, '') + '_editado.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(u), 2000);
+        showToast('📥 Planilha exportada com as edições!', 'success');
+      });
+    }
+    window.openOnlineSheetEditor = openOnlineSheetEditor;
 
     function openReportDocument(docId, docNameEsc) {
       const docName = decodeURIComponent(docNameEsc || '');
