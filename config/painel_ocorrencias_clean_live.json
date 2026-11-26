@@ -1,5 +1,67 @@
 [
   {
+    "id": "15542",
+    "Status": "Em andamento",
+    "Criado": "2026-11-26T20:28:43Z",
+    "hostLookupId": "65",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "Estamos sem comunicação com nossas máquinas. Já enviamos uma mensagem ao parceiro local para que verifique a situação. No momento, estamos aguardando um retorno.\n ",
+    "AreaResponsavel": "N1",
+    "Redmine": "N1"
+  },
+  {
+    "id": "15541",
+    "Status": "Concluido",
+    "Criado": "2026-11-26T19:28:25Z",
+    "hostLookupId": "139",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "Estamos sem comunicação com nossa máquina CS1. Já enviamos uma mensagem ao parceiro local para que verifique a situação. No momento, estamos aguardando um retorno.\n ",
+    "AreaResponsavel": "N1",
+    "Redmine": "N1"
+  },
+  {
+    "id": "15540",
+    "Status": "Concluido",
+    "Criado": "2026-11-26T19:21:12Z",
+    "hostLookupId": "213",
+    "CS": [
+      "01",
+      "02"
+    ],
+    "Veiculo": "Todos",
+    "Equipamento": [
+      "Maquina"
+    ],
+    "TipoProblema": "Sem comunicação",
+    "EmRecuperacao": "Não",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "Estamos sem comunicação com nossas máquinas. Já enviamos uma mensagem ao parceiro local para que verifique a situação. No momento, estamos aguardando um retorno.\n ",
+    "AreaResponsavel": "N1",
+    "Redmine": "N1"
+  },
+  {
     "id": "15539",
     "Status": "Concluido",
     "Criado": "2026-11-25T22:44:30Z",

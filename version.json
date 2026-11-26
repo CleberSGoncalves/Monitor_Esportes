@@ -1,5 +1,5 @@
 {
-  "version": "2.5.25",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.25/Monitor_Esportes.exe",
-  "changelog": "v2.5.25: Integração nativa do Sistema Principal (ExpertAssistant com Search Grounding e Súmula CBF oficial) na Auditoria Autônoma para eliminação de fallbacks incoerentes. Saneamento completo do SharePoint e do Google Portal: remoção de 8 relatórios indevidos de partidas fora do pacote CazéTV/Amazon Prime e republicação dos laudos legítimos com horários dinâmicos e metadados oficiais."
+  "version": "2.5.26",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.26/Monitor_Esportes.exe",
+  "changelog": "v2.5.26: Correção crítica de travamento da interface ao clicar em Verificar Atualizações. AutoUpdater() era instanciado na thread Tkinter principal bloqueando a UI. Agora toda a lógica (checagem, confirmação e download do .exe) é executada 100% em threads dedicadas em background, mantendo a interface sempre responsiva."
 }

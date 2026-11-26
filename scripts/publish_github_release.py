@@ -18,23 +18,15 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.25"
-    release_name = "v2.5.25 - Integração do Sistema Principal e Saneamento Geral SharePoint/Portal"
+    tag = "v2.5.26"
+    release_name = "v2.5.26 - Correção: Travamento ao Verificar Atualizações"
     body = (
-        "### Novidades da versão v2.5.25:\n"
-        "- 🧠 **Integração Nativa do Sistema Principal (ExpertAssistant com Grounding e Súmula CBF)**:\n"
-        "  - O pipeline da auditoria autônoma agora prioriza 100% o sistema principal (ExpertAssistant) com busca oficial de súmulas CBF e Gemini Grounding, eliminando desvios e fallbacks incoerentes com horários estáticos.\n"
-        "- ⏱️ **Cálculo Dinâmico e Fidedigno de Toda a Cronologia dos Jogos**:\n"
-        "  - Eliminação definitiva dos horários fixos de 19:15 / 19:30: cada relatório calcula os marcos técnicos (Abertura de Sinal, Apito Inicial 1T, Fim do 1T, Apito Inicial 2T, Apito Final e Encerramento) a partir do horário oficial REAL de cada confronto.\n"
-        "- 🛡️ **Trava Estrita de Direitos de Transmissão (CazéTV e Amazon Prime Video)**:\n"
-        "  - O pipeline de auditoria valida rigorosamente a plataforma: relatórios são gerados e sincronizados ESTRITAMENTE para jogos com direitos da CazéTV ou Amazon Prime Video (Colunas 4 e 5 da CBF).\n"
-        "  - Jogos de outras emissoras (Premiere, SporTV, TV Globo) são bloqueados e descartados.\n"
-        "- 🧹 **Saneamento Completo do SharePoint e do Google Sites**:\n"
-        "  - Exclusão remota via Microsoft Graph API dos 8 relatórios gerados indevidamente no SharePoint (`Relatorios_de_Jogos`).\n"
-        "  - Regeneração e ressincronização dos relatórios legítimos (Mirassol x Atlético-MG e Coritiba x Santos) com metadados e horários reais.\n"
-        "  - Recompilação e validação Playwright do Google Portal (`portal_web/` e `docs/`).\n"
-        "- 🧪 **Testes Automatizados Reais E2E**:\n"
-        "  - Suíte completa de testes aprovada garantindo integridade de ponta a ponta.\n"
+        "### Novidades da versão v2.5.26:\n"
+        "- 🐛 **Correção Crítica: Travamento ao clicar em 'Verificar Atualizações'**:\n"
+        "  - `AutoUpdater()` era instanciado diretamente na thread principal do Tkinter antes de disparar a thread de checagem, bloqueando todo o event loop da GUI.\n"
+        "  - `perform_update_and_restart()` (download de ~317 MB) era chamado dentro do callback `ask_user()` vinculado ao `self.after(0, ...)` da thread Tkinter, travando completamente a janela durante o download.\n"
+        "  - **Solução:** Toda a lógica do AutoUpdater (instanciação, checagem, confirmação do usuário e download do executável) é agora executada 100% em threads `daemon` dedicadas, usando `self.after(0, ...)` apenas para atualizações seguras de widgets da UI.\n"
+        "  - A interface permanece totalmente responsiva durante a verificação e durante o download da nova versão, com barra de progresso no label de status.\n"
     )
 
     headers = {

@@ -9790,54 +9790,62 @@ class MonitorApp(MonitorCoreMixin, CanaisLiveMixin, NBAEventsMixin, ReporteEvent
         
 
         def force_update_check():
-
-            lbl_version_status.configure(text=f"Versão Instalada: v{AutoUpdater().current_version} (Checando novas versões...)")
+            # ✅ FIX: Nunca instanciar AutoUpdater na thread Tkinter (bloqueante).
+            # Toda a lógica (incluindo download) roda 100% em background thread.
+            lbl_version_status.configure(text="Verificando novas versões...")
 
             def run_check():
-
                 try:
-
                     updater = AutoUpdater()
+                    cur_ver = updater.current_version
+                    self.after(0, lambda: lbl_version_status.configure(
+                        text=f"Versão Instalada: v{cur_ver} (Checando novas versões...)"
+                    ))
 
                     has_update, remote_ver, download_url, changelog = updater.check_for_update()
 
                     if has_update:
-
                         def ask_user():
-
-                            lbl_version_status.configure(text=f"Versão Instalada: v{updater.current_version} (Nova versão v{remote_ver} disponível!)", text_color="#00FF00")
-
+                            lbl_version_status.configure(
+                                text=f"Versão Instalada: v{cur_ver} (Nova versão v{remote_ver} disponível!)",
+                                text_color="#00FF00"
+                            )
                             msg = f"Uma nova versão ({remote_ver}) está disponível!\n\nChangelog:\n{changelog}\n\nDeseja baixar e atualizar agora automaticamente?"
-
                             if messagebox.askyesno("Atualização Disponível", msg):
-
-                                self._log(f"[AUTO-UPDATER] Iniciando atualização automática para v{remote_ver}...")
-
-                                updater.perform_update_and_restart(download_url)
-
+                                # ✅ FIX: download (317 MB) em thread dedicada, NÃO na thread Tkinter
+                                lbl_version_status.configure(text=f"📥 Baixando v{remote_ver}... aguarde")
+                                def do_download():
+                                    try:
+                                        def prog(pct):
+                                            self.after(0, lambda p=pct: lbl_version_status.configure(
+                                                text=f"📥 Baixando v{remote_ver}: {p}%"
+                                            ))
+                                        self._log(f"[AUTO-UPDATER] Iniciando download v{remote_ver}...")
+                                        updater.perform_update_and_restart(download_url, progress_callback=prog)
+                                    except Exception as e_dl:
+                                        self.after(0, lambda err=e_dl: (
+                                            lbl_version_status.configure(text=f"❌ Falha no download: {err}", text_color="#FF4500"),
+                                            messagebox.showerror("Falha no Download", f"Não foi possível baixar a atualização:\n{err}")
+                                        ))
+                                threading.Thread(target=do_download, daemon=True).start()
                         self.after(0, ask_user)
-
                     else:
-
                         def notify_up_to_date():
-
-                            lbl_version_status.configure(text=f"Versão Instalada: v{updater.current_version} (Você está na versão mais recente!)", text_color="#FFFFFF")
-
-                            messagebox.showinfo("Sistema Atualizado", f"Você já está utilizando a versão mais recente ({updater.current_version}) do Monitor Esportes.")
-
+                            lbl_version_status.configure(
+                                text=f"Versão Instalada: v{cur_ver} (Você está na versão mais recente!)",
+                                text_color="#FFFFFF"
+                            )
+                            messagebox.showinfo("Sistema Atualizado", f"Você já está utilizando a versão mais recente ({cur_ver}) do Monitor Esportes.")
                         self.after(0, notify_up_to_date)
 
                 except Exception as e_up:
-
                     def notify_error(err=e_up):
-
-                        lbl_version_status.configure(text=f"Versão Instalada: v{updater.current_version} (Erro ao checar atualizações)", text_color="#FF4500")
-
+                        lbl_version_status.configure(
+                            text="❌ Erro ao checar atualizações",
+                            text_color="#FF4500"
+                        )
                         messagebox.showerror("Erro de Rede", f"Não foi possível consultar atualizações no GitHub:\n{err}")
-
                     self.after(0, notify_error)
-
-
 
             threading.Thread(target=run_check, daemon=True).start()
 
