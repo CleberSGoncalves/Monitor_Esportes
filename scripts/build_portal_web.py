@@ -7734,21 +7734,26 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           </div>
           <div style="padding:20px;">
             <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:14px;margin-bottom:16px;">
-              <div style="font-size:13px;font-weight:700;color:#1D4ED8;margin-bottom:8px;">💡 Configure uma vez, use sempre:</div>
+              <div style="font-size:13px;font-weight:700;color:#1D4ED8;margin-bottom:8px;">💡 Como abrir automaticamente no Edge / Chrome:</div>
               <div style="font-size:12px;color:#1E3A5F;line-height:1.6;">
-                Para que próximas conexões abram <strong>automaticamente</strong> o Remote Desktop:<br>
-                1. Veja o arquivo <strong>.rdp</strong> na barra de downloads do navegador<br>
-                2. Clique em <strong>⋮ (três pontos)</strong> ao lado do arquivo<br>
-                3. Selecione <strong>"Sempre abrir arquivos deste tipo"</strong><br>
-                ✅ Pronto! Da próxima vez, o <strong>mstsc.exe</strong> abrirá sozinho.
+                O navegador baixa o arquivo <code>.rdp</code> por segurança. Para abrir com 1 clique:<br>
+                • No <strong>Microsoft Edge</strong>: se aparecer aviso de segurança em Downloads, clique em <strong>Manter</strong> → <strong>Abrir arquivo</strong> (ou clique com o <strong>botão direito</strong> no arquivo <code>.rdp</code> e marque <strong>"Sempre abrir arquivos deste tipo"</strong>).<br>
+                • No <strong>Google Chrome</strong>: clique na seta / botão direito no download e marque <strong>"Sempre abrir arquivos deste tipo"</strong>.<br>
+                • Ou use o botão abaixo para copiar <code>mstsc /v:${ip}</code> e colar no Executar (<code>Win+R</code>).
               </div>
             </div>
-            <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+              <button type="button" data-copy-mstsc-cmd class="btn-action btn-action-secondary" style="font-size:12px;padding:8px 14px;">📋 Copiar mstsc /v:${ip}</button>
               <button type="button" data-close-rdp-hint class="btn-action btn-action-primary" style="font-size:12px;padding:8px 18px;">✅ Entendi, Fechar</button>
             </div>
           </div>
         </div>
       `;
+      overlay.querySelectorAll('[data-copy-mstsc-cmd]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          copyTextToClipboard(`mstsc /v:${ip}`);
+        });
+      });
       overlay.querySelectorAll('[data-close-rdp-hint]').forEach(btn => {
         btn.addEventListener('click', () => overlay.remove());
       });
