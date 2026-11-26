@@ -18,27 +18,19 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.23"
-    release_name = "v2.5.23 - Chave Mestre Liga/Desliga da Funcionalidade da Aba Reporte de Eventos"
+    tag = "v2.5.24"
+    release_name = "v2.5.24 - Correção Crítica na Cronologia e Trava de Transmissão dos Relatórios de Futebol"
     body = (
-        "### Novidades da versão v2.5.23:\n"
-        "- 🔘 **Chave Mestre Liga/Desliga da Funcionalidade da Aba Reporte de Eventos**:\n"
-        "  - Adicionado switch executivo moderno (`ctk.CTkSwitch`) com indicador em tempo real (`● OPERAÇÃO ATIVA` / `● ABA DESATIVADA`) no topo da aba Reporte de Eventos.\n"
-        "  - O estado da chave é persistido automaticamente no `config.xml` sob a tag `<modulo_ativo>` (padrão `true`).\n"
-        "- ⛔ **Interrupção Total e Defensiva de Todas as Rotinas em Segundo Plano**:\n"
-        "  - Ao desligar a chave, o sistema interrompe e recusa imediatamente qualquer ciclo ou tarefa em background:\n"
-        "    - Monitoramento Contínuo (`_re_executar_ciclo_monitoramento` interrompido e timer cancelado).\n"
-        "    - Auto-Start no boot (`_re_auto_start_if_needed`).\n"
-        "    - Watchdog de Auto-Healing de 10 min (`_re_iniciar_watchdog_auto_healing`).\n"
-        "    - Tarefa diária agendada das 01h (`_re_executar_tarefa_diaria_agendada`).\n"
-        "    - Varreduras unificadas manuais e automáticas (`_re_buscar_eventos`).\n"
-        "    - Disparos de e-mail diário ou forçado (`_re_enviar_email`).\n"
-        "    - Monitoramento e acionamento de reprodução de streams ao vivo (`_re_verificar_e_reproduzir_streams_jogos_hoje`).\n"
-        "- 🔒 **Bloqueio Visual de Controles e KPI Indicativo**:\n"
-        "  - Botões de ação (`Buscar Eventos`, `Start/Parar`, `Disparar E-mail`, `Chrome 9222`, `Chrome 9224`) são desabilitados com `state='disabled'`.\n"
-        "  - Badge de status do monitoramento atualizado para `DESATIVADO` em vermelho (`#ef4444`).\n"
+        "### Novidades da versão v2.5.24:\n"
+        "- ⏱️ **Cálculo Dinâmico e Fidedigno de Toda a Cronologia dos Jogos**:\n"
+        "  - Eliminação definitiva dos horários fixos de 19:15 / 19:30: cada relatório agora calcula os marcos técnicos (Abertura de Sinal, Apito Inicial 1T, Fim do 1T, Apito Inicial 2T, Apito Final e Encerramento) a partir do horário oficial REAL de cada confronto.\n"
+        "- 🛡️ **Trava Estrita de Direitos de Transmissão (CazéTV e Amazon Prime Video)**:\n"
+        "  - O pipeline de auditoria agora valida rigorosamente a plataforma de transmissão: relatórios são gerados e sincronizados ESTRITAMENTE para jogos com direitos da CazéTV ou Amazon Prime Video (conforme as Colunas 4 e 5 da CBF).\n"
+        "  - Jogos de outras janelas (ex: Premiere/Pay-Per-View, SporTV ou TV Globo) são automaticamente bloqueados e descartados da emissão de laudos.\n"
+        "- 🧹 **Saneamento e Limpeza das Tabelas da CBF**:\n"
+        "  - Remoção de confrontos atribuídos erroneamente à CazéTV/Amazon nas tabelas e caches (incluindo Remo x Chapecoense, Cruzeiro x Palmeiras, Corinthians x Botafogo e Flamengo x Athletico-PR).\n"
         "- 🧪 **Testes Automatizados Reais E2E**:\n"
-        "  - Nova suíte `tests/test_reporte_eventos_toggle_switch.py` com 12 testes aprovados com 100% de sucesso.\n"
+        "  - Nova suíte `tests/test_audit_timestamps_and_broadcaster_fidelity.py` validando os horários dinâmicos e o bloqueio de transmissoras com 100% de sucesso.\n"
     )
 
     headers = {

@@ -1,7 +1,27 @@
 [
   {
-    "id": "15538",
+    "id": "15539",
     "Status": "Em andamento",
+    "Criado": "2026-11-25T22:44:30Z",
+    "hostLookupId": "197",
+    "CS": [
+      "01"
+    ],
+    "Veiculo": "TNT SERIES",
+    "Equipamento": [
+      "Decoder SKY"
+    ],
+    "TipoProblema": "Canal trocado",
+    "EmRecuperacao": "Sim",
+    "GravacaoStreaming": "Não",
+    "InformarOperacao": true,
+    "AcoesExecutadas": "deixado mensagem no teams para quem tiver no CGD verificar ",
+    "AreaResponsavel": "N1",
+    "Redmine": "N1"
+  },
+  {
+    "id": "15538",
+    "Status": "Concluido",
     "Criado": "2026-11-25T21:27:07Z",
     "hostLookupId": "80",
     "CS": [

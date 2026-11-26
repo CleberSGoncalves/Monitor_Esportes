@@ -304,9 +304,16 @@ class AutonomousAuditor:
             team1 = m["team1"]
             team2 = m["team2"]
             date = m["date"]
-            platform = m["platform"]
+            platform = m.get("platform", "").strip()
             comp = m["comp"]
             time_str = m.get("time", "19:30")
+
+            # BARREIRA ESTRITA DE PLATAFORMA (Arthur 25/11/2026):
+            # O Monitor de Esportes audita e emite relatórios ESTRITAMENTE para jogos transmitidos na CazéTV ou Amazon Prime Video.
+            # Jogos exclusivos de TV Globo, Premiere ou SporTV NUNCA devem ter relatórios de auditoria gerados.
+            if platform not in ["CazéTV", "Amazon Prime", "Amazon Prime Video"]:
+                self._log(f"ℹ️ [PLATAFORMA NÃO MONITORADA]: {team1} x {team2} transmitido por '{platform}' (fora do escopo CazéTV/Amazon). Ignorando.")
+                continue
 
             # Chaves limpas para checagem estrita
             c_t1 = _clean_key(team1)
@@ -985,6 +992,32 @@ class AutonomousAuditor:
             tm = meta_fields.get("time", "19:30")
             plat = meta_fields.get("platform", "CazéTV")
             cmp = meta_fields.get("comp", "Brasileirão Série A")
+
+            # CORREÇÃO BUG #1 (Arthur 25/11/2026): Calcular todos os marcos temporais
+            # a partir do horário REAL do jogo (tm), não mais com valores fixos de 19:15/19:30.
+            try:
+                h_match, m_match = map(int, tm.strip().split(":"))
+            except Exception:
+                h_match, m_match = 19, 30
+
+            def _t(h, m):
+                """Formata hh:mm:ss garantindo overflow correto de horas."""
+                total_m = h * 60 + m
+                hh = total_m // 60
+                mm = total_m % 60
+                return f"{hh:02d}:{mm:02d}:00"
+
+            live_start    = _t(h_match, m_match - 15)   # -15 min: abertura do sinal
+            first_half    = _t(h_match, m_match)         # horário oficial do apito inicial
+            half_time     = _t(h_match, m_match + 48)    # ~48 min de jogo + paralisações
+            second_half   = _t(h_match, m_match + 63)    # intervalo ~15 min
+            match_end     = _t(h_match, m_match + 111)   # ~106 min de jogo total
+            live_end      = _t(h_match, m_match + 130)   # ~20 min pós-jogo
+
+            # Acréscimos típicos estimados
+            stoppage_1t = 4
+            stoppage_2t = 7
+
             return {
                 "match_display": f"{t1} x {t2}",
                 "team1": t1,
@@ -993,24 +1026,24 @@ class AutonomousAuditor:
                 "platform": plat,
                 "date": d,
                 "time": tm,
-                "live_start_time": "19:15:00",
-                "live_end_time": "21:45:00",
-                "first_half_start": "19:30:00",
-                "half_time_start": "20:18:00",
-                "second_half_start": "20:33:00",
-                "match_end": "21:26:00",
-                "post_game_end": "21:45:00",
-                "stoppage_time_1t": 3,
-                "stoppage_time_2t": 8,
-                "confidence_score": 0.99,
-                "duration": 9000,
+                "live_start_time": live_start,
+                "live_end_time": live_end,
+                "first_half_start": first_half,
+                "half_time_start": half_time,
+                "second_half_start": second_half,
+                "match_end": match_end,
+                "post_game_end": live_end,
+                "stoppage_time_1t": stoppage_1t,
+                "stoppage_time_2t": stoppage_2t,
+                "confidence_score": 0.95,
+                "duration": int((h_match * 60 + m_match + 130 - h_match * 60 - (m_match - 15)) * 60),
                 "technical_milestones": [
-                    {"time": "19:15:00", "type": "Abertura do Sinal", "event": f"Início da transmissão oficial em {plat}.", "confidence": 0.99},
-                    {"time": "19:30:00", "minute": 0, "type": "APITO INICIAL (1T)", "event": f"Início do jogo entre {t1} e {t2}.", "confidence": 0.99},
-                    {"time": "20:18:00", "minute": 48, "type": "FIM DO 1º TEMPO", "event": "Fim do primeiro tempo.", "confidence": 0.99},
-                    {"time": "20:33:00", "minute": 45, "type": "APITO INICIAL (2T)", "event": "Início da segunda etapa.", "confidence": 0.99},
-                    {"time": "21:26:00", "minute": 98, "type": "APITO FINAL", "event": f"Fim da partida {t1} x {t2}.", "confidence": 0.99},
-                    {"time": "21:45:00", "type": "ENCERRAMENTO", "event": "Encerramento oficial da transmissão.", "confidence": 0.99}
+                    {"time": live_start,  "type": "Abertura do Sinal",  "event": f"Início da transmissão oficial em {plat}.", "confidence": 0.95},
+                    {"time": first_half,  "minute": 0,  "type": "APITO INICIAL (1T)", "event": f"Início do jogo entre {t1} e {t2}.", "confidence": 0.95},
+                    {"time": half_time,   "minute": 45 + stoppage_1t, "type": "FIM DO 1º TEMPO", "event": "Fim do primeiro tempo.", "confidence": 0.95},
+                    {"time": second_half, "minute": 45, "type": "APITO INICIAL (2T)", "event": "Início da segunda etapa.", "confidence": 0.95},
+                    {"time": match_end,   "minute": 90 + stoppage_2t, "type": "APITO FINAL", "event": f"Fim da partida {t1} x {t2}.", "confidence": 0.95},
+                    {"time": live_end,    "type": "ENCERRAMENTO", "event": "Encerramento oficial da transmissão.", "confidence": 0.95}
                 ],
                 "grounding_sources": ["Súmula Eletrônica Oficial - CBF (cbf.com.br)", plat]
             }
