@@ -2566,7 +2566,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <button class="sp-btn-cmd" onclick="openQuickMstscModal()">
             <span style="color:#0078D4;">⚡</span> Conexão Rápida MSTSC
           </button>
-          <button class="sp-btn-cmd" onclick="exportRdpCsv()">
+          <button class="sp-btn-cmd" onclick="exportRdpCSV()">
             <span style="color:#10B981;">📥</span> Exportar Lista RDP (.csv)
           </button>
         </div>
@@ -3609,6 +3609,32 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
   </div>
 
+  <!-- MODAL IN-DOM DE CONFIRMAÇÃO DE EXCLUSÃO (100% COMPATÍVEL COM IFRAMES DO GOOGLE SITES) -->
+  <div class="modal-overlay" id="modal-generic-confirm-delete" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.8); backdrop-filter:blur(4px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
+    <div class="modal-card" style="max-width:480px; width:100%; background:#ffffff; border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,0.3); border:1px solid #E2E8F0; overflow:hidden;">
+      <div style="background:#FEF2F2; border-bottom:1px solid #FEE2E2; padding:16px 20px; display:flex; align-items:center; gap:12px;">
+        <div style="width:40px; height:40px; border-radius:50%; background:#FEE2E2; display:flex; align-items:center; justify-content:center; font-size:20px; color:#EF4444; flex-shrink:0;">
+          🗑️
+        </div>
+        <div>
+          <h3 id="modal-delete-title" style="margin:0; font-size:16px; font-weight:700; color:#991B1B;">Confirmar Exclusão</h3>
+          <p style="margin:2px 0 0; font-size:12px; color:#B91C1C;">Esta ação removerá os itens selecionados</p>
+        </div>
+      </div>
+      <div style="padding:20px; font-size:13.5px; color:#334155; line-height:1.6;" id="modal-delete-message">
+        Tem certeza que deseja excluir os itens selecionados?
+      </div>
+      <div style="background:#F8FAFC; border-top:1px solid #E2E8F0; padding:14px 20px; display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" onclick="closeCustomDeleteModal(false)" style="background:#ffffff; border:1px solid #CBD5E1; color:#475569; font-weight:600; font-size:13px; padding:8px 16px; border-radius:6px; cursor:pointer;">
+          Cancelar
+        </button>
+        <button type="button" id="modal-delete-confirm-btn" onclick="closeCustomDeleteModal(true)" style="background:#EF4444; border:1px solid #DC2626; color:#ffffff; font-weight:700; font-size:13px; padding:8px 18px; border-radius:6px; cursor:pointer; box-shadow:0 2px 6px rgba(239,68,68,0.3);">
+          Sim, Excluir Definitivamente
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL DE NOVO EVENTO STREAMING -->
   <div class="modal-overlay" id="modal-new-stream-event">
     <div class="modal-card" style="max-width: 720px;">
@@ -4444,10 +4470,20 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 </div>
               </div>
 
-              <div style="display:flex; gap:10px; justify-content:flex-end;">
+              <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+                ${foundItem && (foundItem.drive_edit_url || (foundItem.webUrl && foundItem.webUrl.includes('docs.google.com'))) ? `
+                  <a href="${foundItem.drive_edit_url || foundItem.webUrl}" target="_blank" class="btn-action" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:linear-gradient(135deg,#059669,#047857);color:white;border:none;" onclick="showToast('✏️ Abrindo para edição no Google Sheets...', 'success');">
+                    ✏️ Editar no Google Sheets
+                  </a>
+                ` : ''}
                 <a href="${downloadHref}" ${isEscala ? 'download="Escala_de_trabalho_2026.xlsx"' : ''} class="btn-action btn-action-primary" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none;" onclick="showToast('📥 Download iniciado a partir do repositório corporativo!', 'success');">
                   📥 Baixar Arquivo (${ext})
                 </a>
+                ${(ext === 'XLSX' || ext === 'XLS') && !(foundItem && foundItem.drive_edit_url) ? `
+                  <button type="button" class="btn-action btn-action-secondary" style="font-size:11px;" title="Para editar colaborativamente, o arquivo precisa estar vinculado ao Google Drive." onclick="showToast('💡 Para edição online, o arquivo precisa estar no Google Drive. Contate o administrador para vincular.', 'info');">
+                    💡 Editar Online?
+                  </button>
+                ` : ''}
                 <button type="button" class="btn-action btn-action-secondary" onclick="document.getElementById('modal-autonomous-doc').remove();">
                   Fechar
                 </button>
@@ -4660,7 +4696,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       }
     }
 
-    function deleteSelectedGenericItems() {
+    async function deleteSelectedGenericItems() {
       const canDelete = (currentRole && (currentRole.startsWith('admin') || currentRole === 'operador'));
       if (!canDelete) {
         showToast("Permissão negada: apenas Operadores e Administradores podem excluir registros.", "error");
@@ -4671,9 +4707,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         showToast("Nenhum item selecionado para exclusão.", "warning");
         return;
       }
-      if (!confirm(`Deseja realmente excluir ${checked.length} item(ns) selecionado(s) desta lista?`)) {
-        return;
-      }
+      const confirmed = await showCustomDeleteModal(
+        "Confirmar Exclusão de Itens",
+        `Deseja realmente excluir <strong>${checked.length} item(ns)</strong> selecionado(s) desta lista?`
+      );
+      if (!confirmed) return;
       const listData = SP_MASTER_DATA.lists && SP_MASTER_DATA.lists[currentRealListName];
       if (!listData || !listData.items) return;
 
@@ -5813,13 +5851,45 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       if (masterChk) masterChk.checked = (allRowChks.length > 0 && checkedRows.length === allRowChks.length);
     }
 
-    function deleteSelectedStreamingEvents() {
+    // ==============================================================================
+    // MODAL IN-DOM SEGURO PARA CONFIRMAÇÃO DE EXCLUSÃO (GOOGLE SITES / IFRAME SAFE)
+    // ==============================================================================
+    let _customDeleteResolve = null;
+
+    function showCustomDeleteModal(title, message, confirmBtnText = "Sim, Excluir Definitivamente") {
+      return new Promise((resolve) => {
+        _customDeleteResolve = resolve;
+        const modal = document.getElementById("modal-generic-confirm-delete");
+        const titleEl = document.getElementById("modal-delete-title");
+        const msgEl = document.getElementById("modal-delete-message");
+        const btnConfirm = document.getElementById("modal-delete-confirm-btn");
+        if (titleEl) titleEl.innerText = title;
+        if (msgEl) msgEl.innerHTML = message;
+        if (btnConfirm) btnConfirm.innerText = confirmBtnText;
+        if (modal) modal.style.display = "flex";
+      });
+    }
+    window.showCustomDeleteModal = showCustomDeleteModal;
+
+    function closeCustomDeleteModal(confirmed) {
+      const modal = document.getElementById("modal-generic-confirm-delete");
+      if (modal) modal.style.display = "none";
+      if (_customDeleteResolve) {
+        _customDeleteResolve(confirmed);
+        _customDeleteResolve = null;
+      }
+    }
+    window.closeCustomDeleteModal = closeCustomDeleteModal;
+
+    async function deleteSelectedStreamingEvents() {
       const checkedRows = Array.from(document.querySelectorAll(".chk-stream-row:checked"));
       if (checkedRows.length === 0) return;
       const count = checkedRows.length;
-      if (!confirm(`Tem certeza que deseja excluir os ${count} confrontos selecionados da programação?`)) {
-        return;
-      }
+      const confirmed = await showCustomDeleteModal(
+        "Confirmar Exclusão de Confrontos",
+        `Tem certeza que deseja remover definitivamente <strong>${count} confronto(s)</strong> selecionado(s) da programação de streaming?`
+      );
+      if (!confirmed) return;
       const selectedIds = new Set(checkedRows.map(chk => String(chk.value)));
       allEvents = allEvents.filter(ev => {
         const evId = String(ev.id || `${ev.partida}_${ev.data}`);
@@ -7576,10 +7646,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     function triggerRdpConnect(ip, hostLabel, role, port) {
       if (!ip || ip === 'N/A') {
-        alert("IP indisponível para esta estação.");
+        showToast('IP indisponível para esta estação.', 'error');
         return;
       }
       port = port || 3389;
+      const addr = (port == 3389) ? ip : (ip + ':' + port);
       const rdpContent = [
         "screen mode id:i:2",
         "use multimon:i:0",
@@ -7604,7 +7675,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         "disable themes:i:0",
         "disable cursor setting:i:0",
         "bitmapcachepersistenable:i:1",
-        `full address:s:${ip}:${port}`,
+        `full address:s:${addr}`,
         "audiomode:i:0",
         "redirectprinters:i:0",
         "redirectcomports:i:0",
@@ -7615,9 +7686,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         "prompt for credentials:i:1",
         "negotiate security layer:i:1",
         "remoteapplicationmode:i:0",
-        "server port:i:3389",
+        `server port:i:${port}`,
         "gatewayusagemethod:i:0",
-        `promptcredentialonce:i:0`,
+        "promptcredentialonce:i:0",
         "authentication level:i:2"
       ].join("\\r\\n");
 
@@ -7627,12 +7698,63 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const safeLabel = (hostLabel || "Host").replace(/[^a-zA-Z0-9_-]/g, "_");
       a.href = url;
       a.download = `${safeLabel}_${role || 'CS'}_${ip}.rdp`;
+      a.style.display = "none";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast(`Arquivo RDP gerado para ${hostLabel} (${role} - ${ip})! Abra-o para conectar.`, "success");
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+
+      if (!localStorage.getItem('rdp_autopen_hint_shown')) {
+        localStorage.setItem('rdp_autopen_hint_shown', '1');
+        _showRdpFirstTimeHint(hostLabel || ip, ip, role || 'CS');
+      } else {
+        showToast(`🖥️ Arquivo .RDP gerado para ${hostLabel || ip} (${role || 'CS'} - ${ip})! Clique na barra de downloads para conectar.`, 'success');
+      }
     }
+
+    function _showRdpFirstTimeHint(label, ip, role) {
+      const pid = 'modal-rdp-firsttime-hint';
+      const prev = document.getElementById(pid);
+      if (prev) prev.remove();
+      const overlay = document.createElement('div');
+      overlay.id = pid;
+      overlay.className = 'sp-modal-overlay';
+      overlay.style.cssText = 'display:flex;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.8);backdrop-filter:blur(4px);z-index:10000;justify-content:center;align-items:center;';
+      overlay.innerHTML = `
+        <div style="background:white;border-radius:12px;width:90%;max-width:500px;box-shadow:0 20px 50px rgba(0,0,0,0.3);overflow:hidden;border:2px solid #0078D4;">
+          <div style="background:linear-gradient(135deg,#0078D4,#005A9E);color:white;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:22px;">🖥️</span>
+              <div>
+                <h3 style="margin:0;font-size:15px;font-weight:700;">Conexão RDP Iniciada!</h3>
+                <div style="font-size:11px;opacity:0.9;">Arquivo gerado para ${label} (${ip})</div>
+              </div>
+            </div>
+            <button type="button" data-close-rdp-hint style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1;">&times;</button>
+          </div>
+          <div style="padding:20px;">
+            <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:14px;margin-bottom:16px;">
+              <div style="font-size:13px;font-weight:700;color:#1D4ED8;margin-bottom:8px;">💡 Configure uma vez, use sempre:</div>
+              <div style="font-size:12px;color:#1E3A5F;line-height:1.6;">
+                Para que próximas conexões abram <strong>automaticamente</strong> o Remote Desktop:<br>
+                1. Veja o arquivo <strong>.rdp</strong> na barra de downloads do navegador<br>
+                2. Clique em <strong>⋮ (três pontos)</strong> ao lado do arquivo<br>
+                3. Selecione <strong>"Sempre abrir arquivos deste tipo"</strong><br>
+                ✅ Pronto! Da próxima vez, o <strong>mstsc.exe</strong> abrirá sozinho.
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+              <button type="button" data-close-rdp-hint class="btn-action btn-action-primary" style="font-size:12px;padding:8px 18px;">✅ Entendi, Fechar</button>
+            </div>
+          </div>
+        </div>
+      `;
+      overlay.querySelectorAll('[data-close-rdp-hint]').forEach(btn => {
+        btn.addEventListener('click', () => overlay.remove());
+      });
+      document.body.appendChild(overlay);
+    }
+    window._showRdpFirstTimeHint = _showRdpFirstTimeHint;
 
     function copyTextToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {

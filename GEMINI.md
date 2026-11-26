@@ -73,3 +73,18 @@
 > 3. **Sobrevivência ao Desligamento do SharePoint**: O portal e o sistema devem funcionar com 100% de autonomia e disponibilidade, mesmo que o SharePoint seja desligado permanentemente hoje.
 > 4. **Acesso Remoto RDP Inovador**: O Centro de Gerenciamento RDP deve prover pesquisa por cidade/praça, filtros por país e CS (CS01, CS02, CS03, PayTV), modal interativo de conexão direta com download de arquivos .rdp pré-configurados locais, e navegação em árvore por pastas de documentos RDP diretamente no repositório.
 > 5. **Operações em Massa e Governança de Exclusão (RBAC)**: Todas as listas do portal devem conter seleção por checkbox individual e Check-All no cabeçalho com botão de exclusão em massa (`Excluir Selecionados`), condicionado estritamente às permissões configuradas na aba "Permissões".
+
+---
+
+## 7. PROTOCOLO OBRIGATÓRIO PÓS-EDIÇÃO DO PORTAL WEB (`docs/index.html` e `portal_web/index.html`)
+
+> [!CAUTION]
+> **PROIBIDO COMMITAR OU FAZER PUSH DO PORTAL SEM VALIDAÇÃO DE SINTAXE JS + PLAYWRIGHT E2E**
+> Um único erro de sintaxe JS (ex: aspas não escapadas dentro de template string) derruba o `<script>` inteiro e trava **100% dos botões** do Google Sites.
+> Sempre que editar `docs/index.html` ou `portal_web/index.html`, o agente DEVE obrigatoriamente antes de qualquer `git commit` / `git push`:
+> 1. Extrair todos os blocos `<script>` de **ambos** os arquivos e validar com `node -c` (`returncode == 0`).
+> 2. Executar teste automatizado no **Playwright** carregando ambos os arquivos, verificando:
+>    - **0 erros** de `pageerror` e `console.error` no carregamento e na interação.
+>    - Cliques reais nos botões/cards da página inicial (Home), Acesso Remoto (botão RDP) e Streaming (`Excluir Selecionados` com modal in-DOM `#modal-generic-confirm-delete`).
+> 3. Nunca usar `window.confirm()`, `window.alert()` ou `window.prompt()` (são bloqueados silenciosamente em iframes do Google Sites).
+> 4. Garantir que `docs/index.html` e `portal_web/index.html` estejam sincronizados e validados antes do `git push origin main`.
