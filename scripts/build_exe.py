@@ -94,6 +94,8 @@ def main():
         "--hidden-import=modules.nba_visual_proof_service",
         "--hidden-import=modules.nba_report_generator",
         "--hidden-import=modules.sharepoint_youtube_reporter",
+        "--hidden-import=modules.sharepoint_nba_reporter",
+        "--hidden-import=modules.portal_sync",
         "--hidden-import=modules.reporte_eventos",
         "--collect-submodules=selenium",
         "--collect-submodules=webdriver_manager",

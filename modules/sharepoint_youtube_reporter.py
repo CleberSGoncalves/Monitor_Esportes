@@ -95,6 +95,39 @@ class SharePointYouTubeReporter:
             logger.error(f"[SharePoint YouTube] PDF não encontrado: {pdf_path}")
             return False
 
+        # Preparar metadados canônicos ANTES do envio (usados tanto no SharePoint quanto no Google Sites)
+        prog_name = event_info.get("program_name") or (event_info.get("meta") or {}).get("program_name") or ""
+        theme = event_info.get("coverage_theme") or (event_info.get("meta") or {}).get("theme") or ""
+        is_cov = bool(event_info.get("is_coverage_debate") or event_info.get("event_type") == "live_coverage_debate" or (prog_name and not event_info.get("is_match_narration")))
+
+        if is_cov and prog_name:
+            partida = f"[{prog_name}] {theme or event_info.get('title') or 'Debate'}"[:100].strip()
+        else:
+            partida = str(event_info.get("match_display") or event_info.get("partida") or event_info.get("title") or "Partida").strip()
+
+        raw_canal = str(event_info.get("channel_name") or event_info.get("canal") or event_info.get("channel") or "Gaúcha").strip()
+        canal = cls.normalizar_canal(raw_canal)
+        raw_comp = str(event_info.get("competition") or event_info.get("campeonato") or ("Debate Esportivo" if is_cov else "Copa do Brasil"))
+        campeonato = SharePointReporter.normalizar_campeonato(raw_comp) if not is_cov else "Copa do Brasil"
+
+        partida_norm = "".join(c for c in partida if c.isalnum() or c in " xX_").strip().replace(" ", "_").lower()
+        if is_cov and len(partida_norm) > 40:
+            partida_norm = partida_norm[:40]
+        canal_norm = "".join(c for c in canal if c.isalnum() or c in "_").strip().replace(" ", "_").lower()
+        date_clean = event_info.get("date_clean") or datetime.now().strftime("%Y%m%d")
+
+        if is_cov:
+            sp_filename = f"Relatorio_Youtube_debate_{canal_norm}_{partida_norm}_{date_clean}.pdf"
+        else:
+            sp_filename = f"Relatorio_Youtube_{canal_norm}_{partida_norm}_{date_clean}.pdf"
+
+        raw_date = event_info.get("date") or event_info.get("data_jogo") or datetime.now().strftime("%d/%m/%Y")
+        time_start = event_info.get("start_time") or event_info.get("live_start_time") or event_info.get("inicio_transmissao") or "17:00"
+        iso_utc = SharePointReporter.format_iso_datetime(raw_date, time_start)
+        conf_norm = SharePointReporter.normalizar_confianca(confianca)
+
+        sp_ok = False
+        auth_err = None
         try:
             token = SharePointReporter.obter_token_graph()
             site_id = SharePointReporter._cached_site_id
@@ -102,144 +135,102 @@ class SharePointYouTubeReporter:
 
             if not drive_id:
                 logger.error("[SharePoint YouTube] Nenhum drive disponível para sincronização.")
-                return False
-
-            prog_name = event_info.get("program_name") or (event_info.get("meta") or {}).get("program_name") or ""
-            theme = event_info.get("coverage_theme") or (event_info.get("meta") or {}).get("theme") or ""
-            is_cov = bool(event_info.get("is_coverage_debate") or event_info.get("event_type") == "live_coverage_debate" or (prog_name and not event_info.get("is_match_narration")))
-
-            if is_cov and prog_name:
-                partida = f"[{prog_name}] {theme or event_info.get('title') or 'Debate'}"[:100].strip()
             else:
-                partida = str(event_info.get("match_display") or event_info.get("partida") or event_info.get("title") or "Partida").strip()
+                upload_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root:/{sp_filename}:/content"
+                headers = {"Authorization": f"Bearer {token}"}
+                put_headers = dict(headers)
+                put_headers["Content-Type"] = "application/pdf"
 
-            raw_canal = str(event_info.get("channel_name") or event_info.get("canal") or event_info.get("channel") or "Gaúcha").strip()
-            canal = cls.normalizar_canal(raw_canal)
-            raw_comp = str(event_info.get("competition") or event_info.get("campeonato") or ("Debate Esportivo" if is_cov else "Copa do Brasil"))
-            campeonato = SharePointReporter.normalizar_campeonato(raw_comp) if not is_cov else "Copa do Brasil"
+                with open(pdf_path, "rb") as f:
+                    pdf_bytes = f.read()
 
-            partida_norm = "".join(c for c in partida if c.isalnum() or c in " xX_").strip().replace(" ", "_").lower()
-            if is_cov and len(partida_norm) > 40:
-                partida_norm = partida_norm[:40]
-            canal_norm = "".join(c for c in canal if c.isalnum() or c in "_").strip().replace(" ", "_").lower()
-            date_clean = event_info.get("date_clean") or datetime.now().strftime("%Y%m%d")
-
-            if is_cov:
-                sp_filename = f"Relatorio_Youtube_debate_{canal_norm}_{partida_norm}_{date_clean}.pdf"
-            else:
-                sp_filename = f"Relatorio_Youtube_{canal_norm}_{partida_norm}_{date_clean}.pdf"
-            upload_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root:/{sp_filename}:/content"
-
-            headers = {"Authorization": f"Bearer {token}"}
-            put_headers = dict(headers)
-            put_headers["Content-Type"] = "application/pdf"
-
-            with open(pdf_path, "rb") as f:
-                pdf_bytes = f.read()
-
-            r_up = SharePointReporter.request_with_retry("PUT", upload_url, headers=put_headers, data=pdf_bytes, timeout=60)
-            if not r_up or r_up.status_code not in (200, 201):
-                logger.error(f"[SharePoint YouTube] Falha no upload: HTTP {r_up.status_code if r_up else 'None'}")
-                return False
-
-            item_id = r_up.json().get("id")
-            if not item_id:
-                return False
-
-            # Normalização de data ISO UTC (idêntica ao Relatorios_de_Jogos)
-            raw_date = event_info.get("date") or event_info.get("data_jogo") or datetime.now().strftime("%d/%m/%Y")
-            time_start = event_info.get("start_time") or event_info.get("inicio_transmissao") or "17:00"
-            iso_utc = SharePointReporter.format_iso_datetime(raw_date, time_start)
-
-            # Estrutura idêntica à lista Relatorio Jogos Youtube
-            fields_payload = {
-                "Title": sp_filename,
-                "Partida": partida,
-                "Campeonato": campeonato,
-                "Canal": canal,
-                "Data_Jogo": iso_utc,
-                "Placar": SharePointReporter.normalizar_confianca(confianca),
-                "Auditado": True
-            }
-
-            fields_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{item_id}/listItem/fields"
-            json_headers = dict(headers)
-            json_headers["Content-Type"] = "application/json"
-
-            # Auto-recuperação: suporta variações de nome de coluna (Canal vs Plataforma, Data_Jogo vs Data_Partida vs Data_Hora)
-            for attempt in range(5):
-                err_text = ""
-                try:
-                    r_fields = SharePointReporter.request_with_retry(
-                        "PATCH", fields_url, headers=json_headers, json=fields_payload, timeout=20
-                    )
-                    if r_fields and r_fields.status_code in (200, 201):
-                        logger.info(f"🎉 [SharePoint YouTube] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca 'Relatorio Jogos Youtube'!")
-                        try:
-                            from modules.portal_sync import PortalSyncManager
-                            portal_ok = PortalSyncManager.sync_report_to_portal(
-                                pdf_path=pdf_path,
-                                drive_name="Relatorio Jogos Youtube",
-                                category="youtube",
-                                filename=sp_filename,
-                                partida=partida,
-                                campeonato=campeonato,
-                                plataforma=canal,
-                                canal=canal,
-                                confianca=confianca,
-                                data_hora=datetime.now().strftime("%d/%m/%Y %H:%M"),
-                                auditado=True
-                            )
-                            if portal_ok:
-                                logger.info(f"🌐 [Portal Web] Relatório '{sp_filename}' publicado e sincronizado no novo Portal Web Suporte Captação (YouTube)!")
-                        except Exception as e_portal:
-                            logger.warning(f"[PortalSync] Aviso ao sincronizar YouTube com portal web: {e_portal}")
-                        return True
-                    err_text = r_fields.text if r_fields else ""
-                except requests.HTTPError as he:
-                    err_text = he.response.text if he.response is not None else str(he)
-                except Exception as ex_gen:
-                    logger.warning(f"[SharePoint YouTube] Erro ao atualizar metadados: {ex_gen}")
-                    break
-
-                m_unrec = re.search(r"Field '([^']+)' is not recognized", err_text)
-                if m_unrec:
-                    bad_field = m_unrec.group(1)
-                    logger.warning(f"[SharePoint YouTube] Campo não reconhecido '{bad_field}'. Adaptando...")
-                    if bad_field == "Canal" and "Canal" in fields_payload:
-                        val = fields_payload.pop("Canal")
-                        fields_payload["Plataforma"] = val
-                    elif bad_field == "Data_Jogo" and "Data_Jogo" in fields_payload:
-                        val = fields_payload.pop("Data_Jogo")
-                        fields_payload["Data_Partida"] = val
-                    elif bad_field == "Data_Partida" and "Data_Partida" in fields_payload:
-                        val = fields_payload.pop("Data_Partida")
-                        fields_payload["Data_Hora"] = val
-                    else:
-                        fields_payload.pop(bad_field, None)
-                    continue
+                r_up = SharePointReporter.request_with_retry("PUT", upload_url, headers=put_headers, data=pdf_bytes, timeout=60)
+                if not r_up or r_up.status_code not in (200, 201):
+                    logger.error(f"[SharePoint YouTube] Falha no upload: HTTP {r_up.status_code if r_up else 'None'}")
                 else:
-                    logger.warning(f"[SharePoint YouTube] Metadados parciais (tentativa {attempt+1}): {err_text[:200]}")
-                    break
+                    item_id = r_up.json().get("id")
+                    if item_id:
+                        fields_payload = {
+                            "Title": sp_filename,
+                            "Partida": partida,
+                            "Campeonato": campeonato,
+                            "Canal": canal,
+                            "Data_Jogo": iso_utc,
+                            "Placar": conf_norm,
+                            "Auditado": True
+                        }
+                        fields_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{item_id}/listItem/fields"
+                        json_headers = dict(headers)
+                        json_headers["Content-Type"] = "application/json"
 
-            try:
-                from modules.portal_sync import PortalSyncManager
-                PortalSyncManager.sync_report_to_portal(
-                    pdf_path=pdf_path,
-                    drive_name="Relatorio Jogos Youtube",
-                    category="youtube",
-                    filename=sp_filename,
-                    partida=partida,
-                    campeonato=campeonato,
-                    plataforma=canal,
-                    confianca=confianca
-                )
-            except Exception as e_portal:
-                logger.warning(f"[PortalSync] Aviso ao sincronizar YouTube com portal web: {e_portal}")
-            return True
+                        for attempt in range(5):
+                            err_text = ""
+                            try:
+                                r_fields = SharePointReporter.request_with_retry(
+                                    "PATCH", fields_url, headers=json_headers, json=fields_payload, timeout=20
+                                )
+                                if r_fields and r_fields.status_code in (200, 201):
+                                    logger.info(f"🎉 [SharePoint YouTube] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca 'Relatorio Jogos Youtube'!")
+                                    sp_ok = True
+                                    break
+                                err_text = r_fields.text if r_fields else ""
+                            except requests.HTTPError as he:
+                                err_text = he.response.text if he.response is not None else str(he)
+                            except Exception as ex_gen:
+                                logger.warning(f"[SharePoint YouTube] Erro ao atualizar metadados: {ex_gen}")
+                                break
 
-        except SharePointAuthRequiredError:
-            raise
+                            m_unrec = re.search(r"Field '([^']+)' is not recognized", err_text)
+                            if m_unrec:
+                                bad_field = m_unrec.group(1)
+                                logger.warning(f"[SharePoint YouTube] Campo não reconhecido '{bad_field}'. Adaptando...")
+                                if bad_field == "Canal" and "Canal" in fields_payload:
+                                    val = fields_payload.pop("Canal")
+                                    fields_payload["Plataforma"] = val
+                                elif bad_field == "Data_Jogo" and "Data_Jogo" in fields_payload:
+                                    val = fields_payload.pop("Data_Jogo")
+                                    fields_payload["Data_Partida"] = val
+                                elif bad_field == "Data_Partida" and "Data_Partida" in fields_payload:
+                                    val = fields_payload.pop("Data_Partida")
+                                    fields_payload["Data_Hora"] = val
+                                else:
+                                    fields_payload.pop(bad_field, None)
+                                continue
+                            else:
+                                logger.warning(f"[SharePoint YouTube] Metadados parciais (tentativa {attempt+1}): {err_text[:200]}")
+                                sp_ok = True
+                                break
+        except SharePointAuthRequiredError as e_auth:
+            auth_err = e_auth
         except Exception as e:
-            logger.error(f"[SharePoint YouTube] Exceção ao sincronizar relatório de YouTube: {e}")
-            return False
+            logger.error(f"[SharePoint YouTube] Exceção ao sincronizar com SharePoint (Google Sites seguirá normalmente): {e}")
+
+        # Publicação obrigatória em paralelo no Google Sites / Portal Web (100% independente do SharePoint)
+        portal_ok = False
+        try:
+            from modules.portal_sync import PortalSyncManager, iso_utc_to_brt_str
+            data_hora_brt = iso_utc_to_brt_str(iso_utc)
+            portal_ok = PortalSyncManager.sync_report_to_portal(
+                pdf_path=pdf_path,
+                drive_name="Relatorio Jogos Youtube",
+                category="youtube",
+                filename=sp_filename,
+                partida=partida,
+                campeonato=campeonato,
+                plataforma=canal,
+                canal=canal,
+                confianca=conf_norm,
+                data_hora=data_hora_brt,
+                placar=conf_norm,
+                auditado=True
+            )
+            if portal_ok:
+                logger.info(f"🌐 [Portal Web / Google Sites] Relatório '{sp_filename}' publicado com sucesso (YouTube)!")
+            else:
+                logger.warning(f"⚠️ [Portal Web / Google Sites] Publicação remota pendente para '{sp_filename}' (YouTube).")
+        except Exception as e_portal:
+            logger.warning(f"[PortalSync] Erro ao sincronizar YouTube com Google Sites: {e_portal}")
+
+        if auth_err and not portal_ok:
+            raise auth_err
+        return bool(sp_ok or portal_ok)

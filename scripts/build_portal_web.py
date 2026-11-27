@@ -2887,6 +2887,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       <div class="sp-command-bar">
         <div class="sp-command-left">
           <button class="sp-btn-new" onclick="openNewDriveFileModal()"><span>+</span> Novo</button>
+          <button class="sp-btn-cmd" id="btn-refresh-drive-live" onclick="refreshLiveReportsFromRepo(currentDriveKey, false)" title="Buscar relatórios mais recentes publicados pelo Monitor_Esportes"><span>🔄</span> Atualizar Lista</button>
           <button class="sp-btn-cmd" onclick="toggleDriveGridMode()"><span>田</span> Modo Grade</button>
           <button class="sp-btn-cmd" onclick="exportCurrentDriveCSV()"><span>📥</span> Exportar CSV</button>
           <button class="sp-btn-cmd" id="btn-delete-drive-selected" style="display:none; color:#EF4444; border-color:#FCA5A5;" onclick="deleteSelectedDriveItems()"><span>🗑️</span> Excluir Selecionados</button>
@@ -4257,11 +4258,130 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     }
     window.clearDriveColFilters = clearDriveColFilters;
 
+    // ==========================================
+    // SINCRONIZAÇÃO AO VIVO DOS 3 RELATÓRIOS (GITHUB / GOOGLE SITES)
+    // ==========================================
+    const LIVE_REPORT_DRIVES_MAP = {
+      'Relatorios_de_Jogos': 'futebol',
+      'Relatorio Jogos Youtube': 'youtube',
+      'Relatorios_de_Jogos_NBA': 'nba'
+    };
+    const LIVE_RAW_BASE_URL = 'https://raw.githubusercontent.com/CleberSGoncalves/Monitor_Esportes/main/docs/';
+    const _liveReportLastFetchTs = {};
+
+    async function fetchSingleLiveReportIndex(driveName, category) {
+      // Em file:// local o Chromium bloqueia Fetch API; utiliza snapshot embutido em SP_MASTER_DATA sem gerar console.error
+      if (!window.location || !/^https?:/i.test(window.location.protocol)) {
+        return -1;
+      }
+      const bust = 't=' + Date.now();
+      const candidates = [
+        `${LIVE_RAW_BASE_URL}reports/index_${category}.json?${bust}`,
+        `reports/index_${category}.json?${bust}`
+      ];
+
+      let bestData = null;
+      for (const url of candidates) {
+        try {
+          const resp = await fetch(url, { cache: 'no-store' });
+          if (resp && resp.ok) {
+            const data = await resp.json();
+            if (data && Array.isArray(data.items) && data.items.length > 0) {
+              bestData = data;
+              break;
+            }
+          }
+        } catch (e) {
+          // fallback para próxima fonte
+        }
+      }
+
+      if (bestData && SP_MASTER_DATA && SP_MASTER_DATA.drives) {
+        if (!SP_MASTER_DATA.drives[driveName]) {
+          SP_MASTER_DATA.drives[driveName] = { name: driveName, items: [], items_count: 0 };
+        }
+        SP_MASTER_DATA.drives[driveName].items = bestData.items;
+        SP_MASTER_DATA.drives[driveName].items_count = bestData.items.length;
+        SP_MASTER_DATA.drives[driveName].live_updated_at = bestData.updated_at || new Date().toISOString();
+        _liveReportLastFetchTs[driveName] = Date.now();
+        return bestData.items.length;
+      }
+      return -1;
+    }
+
+    async function refreshLiveReportsFromRepo(targetDriveName, silent) {
+      const btn = document.getElementById('btn-refresh-drive-live');
+      if (btn && !silent) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> Atualizando...';
+      }
+      try {
+        const targets = (targetDriveName && LIVE_REPORT_DRIVES_MAP[targetDriveName])
+          ? [[targetDriveName, LIVE_REPORT_DRIVES_MAP[targetDriveName]]]
+          : Object.entries(LIVE_REPORT_DRIVES_MAP);
+
+        const results = await Promise.all(targets.map(([dName, cat]) => fetchSingleLiveReportIndex(dName, cat)));
+        const anyUpdated = results.some(cnt => cnt >= 0);
+
+        if (anyUpdated) {
+          // Atualizar contadores da aba consolidada se existir
+          const nbaLen = (SP_MASTER_DATA.drives['Relatorios_de_Jogos_NBA']?.items || []).length;
+          const ytLen = (SP_MASTER_DATA.drives['Relatorio Jogos Youtube']?.items || []).length;
+          const futLen = (SP_MASTER_DATA.drives['Relatorios_de_Jogos']?.items || []).length;
+          const cNba = document.getElementById('count-rel-nba');
+          const cYt = document.getElementById('count-rel-yt');
+          const cFut = document.getElementById('count-rel-fut');
+          if (cNba) cNba.innerText = nbaLen;
+          if (cYt) cYt.innerText = ytLen;
+          if (cFut) cFut.innerText = futLen;
+
+          // Se o usuário estiver visualizando um dos drives atualizados, re-renderiza mantendo filtros
+          if (currentDriveKey && LIVE_REPORT_DRIVES_MAP[currentDriveKey]) {
+            const drive = SP_MASTER_DATA.drives[currentDriveKey];
+            const deletedIds = getDeletedDriveIds(currentDriveKey);
+            const activeItems = (drive?.items || []).filter(it => !deletedIds.includes(String(it.id)));
+            if (driveBreadcrumbs && driveBreadcrumbs.length > 0) {
+              driveBreadcrumbs[0].items = activeItems;
+            }
+            const dEl = document.getElementById('drive-viewer-desc');
+            if (dEl) {
+              dEl.innerText = `Biblioteca oficial sincronizada em tempo real com o Monitor_Esportes (${activeItems.length} relatórios/arquivos disponíveis).`;
+            }
+            filterDriveTable();
+          }
+          if (!silent && typeof showToast === 'function') {
+            showToast('✅ Relatórios sincronizados com a versão mais recente do servidor!', 'success');
+          }
+        } else if (!silent && typeof showToast === 'function') {
+          showToast('ℹ️ Exibindo snapshot local dos relatórios.', 'info');
+        }
+      } catch (err) {
+        console.warn('[PortalLiveSync] Aviso ao atualizar índices ao vivo:', err);
+      } finally {
+        if (btn && !silent) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>🔄</span> Atualizar Lista';
+        }
+      }
+    }
+    window.refreshLiveReportsFromRepo = refreshLiveReportsFromRepo;
+
+    // Atualização silenciosa automática ao abrir o Portal Web
+    setTimeout(() => { refreshLiveReportsFromRepo(null, true); }, 350);
+
     function openDrive(driveName, title) {
       currentDriveKey = driveName;
       currentDriveTitle = title || driveName;
       driveSortCol = 'Data';
       driveSortAsc = false; // Padrão: mais recente no topo
+
+      // Disparar refresh ao vivo se for uma das 3 bibliotecas oficiais (cooldown 15s)
+      if (LIVE_REPORT_DRIVES_MAP[driveName]) {
+        const lastTs = _liveReportLastFetchTs[driveName] || 0;
+        if (Date.now() - lastTs > 15000) {
+          refreshLiveReportsFromRepo(driveName, true);
+        }
+      }
 
       const drive = SP_MASTER_DATA.drives && SP_MASTER_DATA.drives[driveName];
       const deletedIds = getDeletedDriveIds(driveName);
@@ -4803,8 +4923,20 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           const dtStr = f.Data_Hora || f.Data_Jogo || formatDate(it.lastModifiedDateTime);
           const campBadge = '<span class="badge" style="background:#E0F2FE;color:#0369A1;border:1px solid #BAE6FD;font-weight:700;padding:2px 8px;border-radius:12px;">NBA</span>';
           const matchTitle = f.Partida || it.name.replace(/\.pdf$/i, '');
-          const conf = f.Confiança || f.confianca || '99.0%';
-          const platBadge = '<span class="badge" style="background:#FCE7F3;color:#9D174D;border:1px solid #FBCFE8;font-weight:700;padding:2px 8px;border-radius:12px;">NBA</span>';
+          const conf = f.Confiança || f.Confianca || f.confianca || (f.Auditado ? '99.0%' : 'Agendado');
+          const plat = f.Plataforma || 'NBA';
+          const platLower = String(plat).toLowerCase();
+          let platStyle = 'background:#FCE7F3;color:#9D174D;border:1px solid #FBCFE8;';
+          if (platLower.includes('amazon') || platLower.includes('prime')) {
+            platStyle = 'background:#DBEAFE;color:#00509E;border:1px solid #93C5FD;';
+          } else if (platLower.includes('espn')) {
+            platStyle = 'background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;';
+          } else if (platLower.includes('disney')) {
+            platStyle = 'background:#E0E7FF;color:#3730A3;border:1px solid #C7D2FE;';
+          } else if (platLower.includes('caze') || platLower.includes('youtube')) {
+            platStyle = 'background:#DCFCE7;color:#166534;border:1px solid #BBF7D0;';
+          }
+          const platBadge = `<span class="badge" style="${platStyle}font-weight:700;padding:2px 8px;border-radius:12px;">${plat}</span>`;
           const audit = f.Auditado ? '<span style="color:#16A34A;font-weight:700;font-size:14px;">✓</span>' : '';
           const modStr = formatDate(it.lastModifiedDateTime);
           const placarStr = f.Placar || (f.Auditado ? 'Homologado Oficial' : 'Agendado');
@@ -5009,7 +5141,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
       if (footer) {
         const catName = currentRelatoriosTab === 'nba' ? 'NBA' : (currentRelatoriosTab === 'yt' ? 'YouTube & CazéTV' : 'Auditoria Futebol');
-        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${raw.length}</b> relatórios oficiais de ${catName} &bull; Repositório Google Workspace Autônomo (Total Geral: 260 relatórios)`;
+        const totalAll = ((SP_MASTER_DATA.drives?.['Relatorios_de_Jogos_NBA']?.items || []).length)
+          + ((SP_MASTER_DATA.drives?.['Relatorio Jogos Youtube']?.items || []).length)
+          + ((SP_MASTER_DATA.drives?.['Relatorios_de_Jogos']?.items || []).length);
+        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${raw.length}</b> relatórios oficiais de ${catName} &bull; Repositório Google Workspace Autônomo (Total Geral: ${totalAll} relatórios)`;
       }
     }
 
@@ -5215,6 +5350,24 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
         frame.src = safeUrl;
         modal.style.display = "flex";
+
+        // Fallback automático via raw.githubusercontent.com caso o relatório tenha sido publicado há < 60s (antes do rebuild do GitHub Pages)
+        if (window.location && /^https?:/i.test(window.location.protocol) && cleanPath.startsWith('reports/')) {
+          fetch(safeUrl, { method: 'HEAD', cache: 'no-store' }).then(resp => {
+            if (!resp.ok) {
+              const rawPdfUrl = `${LIVE_RAW_BASE_URL}${encodeURI(cleanPath)}?t=${Date.now()}`;
+              return fetch(rawPdfUrl).then(r2 => r2.ok ? r2.blob() : null).then(blob => {
+                if (blob && blob.size > 500) {
+                  const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+                  const blobUrl = URL.createObjectURL(pdfBlob);
+                  frame.src = blobUrl;
+                  if (dl) dl.href = blobUrl;
+                  if (newtab) newtab.href = blobUrl;
+                }
+              });
+            }
+          }).catch(() => {});
+        }
       }
 
       // 2. Disparar abertura em nova aba (se o navegador/iframe permitir popups)

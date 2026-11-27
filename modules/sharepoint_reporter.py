@@ -535,193 +535,113 @@ class SharePointReporter:
 
 
     @classmethod
-
     def sync_pdf_to_sharepoint(cls, pdf_path: str, partida: str, campeonato: str, plataforma: str, data_hora_iso: str = None, confianca: str = "99.0%") -> bool:
-
         """
-
-        Envia o PDF para a biblioteca de documentos do SharePoint e sincroniza os 7 campos de metadados.
-
+        Envia o PDF para a biblioteca de documentos do SharePoint ('Relatorios_de_Jogos')
+        e sincroniza simultaneamente com o Portal Web / Google Sites (GitHub Pages).
+        A publicação no Google Sites é garantida mesmo em caso de indisponibilidade do SharePoint.
         """
-
         if not os.path.exists(pdf_path):
-
             logger.error(f"[SharePoint] Arquivo PDF não encontrado: {pdf_path}")
-
             return False
 
-            
+        partida_norm = "".join(c for c in partida if c.isalnum() or c in " xX_").strip().replace(" ", "_").lower()
+        date_clean = (data_hora_iso or "").split("T")[0].replace("-", "") if data_hora_iso else datetime.now(timezone.utc).strftime("%Y%m%d")
+        sp_filename = f"expert_{partida_norm}_{date_clean}.pdf"
+        if not data_hora_iso:
+            data_hora_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
+        camp_norm = cls.normalizar_campeonato(campeonato)
+        plat_norm = cls.normalizar_plataforma(plataforma)
+        conf_norm = cls.normalizar_confianca(confianca)
+
+        sp_ok = False
         try:
-
-            # Gerar nome determinístico para o SharePoint (evita duplicação por timestamp)
-
-            partida_norm = "".join(c for c in partida if c.isalnum() or c in " xX_").strip().replace(" ", "_").lower()
-
-            date_clean = (data_hora_iso or "").split("T")[0].replace("-", "") if data_hora_iso else datetime.now(timezone.utc).strftime("%Y%m%d")
-
-            sp_filename = f"expert_{partida_norm}_{date_clean}.pdf"
-
-            
-
             token = cls.obter_token_graph()
-
             headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
-            
-
             # 1. Resolver Site ID (utiliza cache para economizar chamadas)
-
             if not cls._cached_site_id:
-
                 site_url = f"https://graph.microsoft.com/v1.0/sites/{SP_CONFIG['tenant_hostname']}:{SP_CONFIG['site_path']}"
-
                 r_site = cls.request_with_retry("GET", site_url, headers=headers, timeout=15)
-
                 cls._cached_site_id = r_site.json()["id"]
-
             site_id = cls._cached_site_id
 
-            
-
-            # 2. Localizar a Drive/Biblioteca de Documentos 'Relatorios_de_Jogos' (utiliza cache)
-
+            # 2. Localizar a Drive/Biblioteca de Documentos 'Relatorios_de_Jogos'
             if not cls._cached_drive_id:
-
                 drives_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives"
-
                 r_drives = cls.request_with_retry("GET", drives_url, headers=headers, timeout=15)
-
-                
-
                 target_names = ["Relatorios_Auditoria_Jogos", "Relatorios_de_Jogos", "Relatórios_de_Jogos"]
-
                 for d in r_drives.json().get("value", []):
-
                     if d.get("name") in target_names or "Relatorio" in d.get("name", ""):
-
                         cls._cached_drive_id = d.get("id")
-
                         break
-
             drive_id = cls._cached_drive_id
 
-                    
-
             if not drive_id:
-
                 logger.error("[SharePoint] Biblioteca de documentos não encontrada no SharePoint.")
-
-                return False
-
-                
-
-            # 3. Upload/Sobrescrita do arquivo PDF no SharePoint (mesmo sp_filename = substituição automática)
-
-            upload_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root:/{sp_filename}:/content"
-
-            put_headers = dict(headers)
-
-            put_headers["Content-Type"] = "application/pdf"
-
-            
-
-            with open(pdf_path, "rb") as f:
-
-                pdf_bytes = f.read()
-
-                
-
-            r_up = cls.request_with_retry("PUT", upload_url, headers=put_headers, data=pdf_bytes, timeout=60)
-
-            if not r_up or r_up.status_code not in (200, 201):
-
-                logger.error(f"[SharePoint] Falha no upload do PDF '{sp_filename}': HTTP {r_up.status_code if r_up else 'Sem resposta'}")
-
-                return False
-
-
-
-            item_id = r_up.json().get("id")
-
-            if not item_id:
-
-                logger.error(f"[SharePoint] ID do item não retornado para '{sp_filename}'")
-
-                return False
-
-            
-
-            # 4. Atualizar os 7 campos de metadados
-
-            if not data_hora_iso:
-
-                data_hora_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
-
-            fields_payload = {
-
-                "Title": sp_filename,
-
-                "Partida": partida,
-
-                "Campeonato": cls.normalizar_campeonato(campeonato),
-
-                "Plataforma": cls.normalizar_plataforma(plataforma),
-
-                "Data_Partida": data_hora_iso,  # NOME INTERNO DA COLUNA Data_Hora NO SHAREPOINT
-
-                "Confianca": cls.normalizar_confianca(confianca),
-
-                "Auditado": True
-
-            }
-
-            
-
-            fields_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{item_id}/listItem/fields"
-
-            r_fields = cls.request_with_retry("PATCH", fields_url, headers=headers, json=fields_payload, timeout=20)
-
-            if r_fields.status_code in (200, 201):
-                logger.info(f"🎉 [SharePoint] PDF '{sp_filename}' e 7 metadados sincronizados com sucesso!")
-                
-                # Sincronização em paralelo para o Portal Web (Google Sites / GitHub Pages)
-                try:
-                    from modules.portal_sync import PortalSyncManager
-                    portal_ok = PortalSyncManager.sync_report_to_portal(
-                        pdf_path=pdf_path,
-                        drive_name="Relatorios_de_Jogos",
-                        category="futebol",
-                        filename=sp_filename,
-                        partida=partida,
-                        campeonato=campeonato,
-                        plataforma=plataforma,
-                        confianca=confianca,
-                        data_hora=datetime.now().strftime("%d/%m/%Y %H:%M"),
-                        auditado=True
-                    )
-                    if portal_ok:
-                        logger.info(f"🌐 [Portal Web] Relatório '{sp_filename}' publicado e sincronizado no novo Portal Web Suporte Captação (Futebol)!")
-                except Exception as e_portal:
-                    logger.warning(f"[PortalSync] Aviso ao sincronizar com portal web: {e_portal}")
-
-                return True
-
             else:
+                # 3. Upload/Sobrescrita do arquivo PDF no SharePoint
+                upload_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root:/{sp_filename}:/content"
+                put_headers = dict(headers)
+                put_headers["Content-Type"] = "application/pdf"
 
-                logger.error(f"❌ [SharePoint] PDF enviado, mas falha estrita nos metadados ({r_fields.status_code}): {r_fields.text}")
+                with open(pdf_path, "rb") as f:
+                    pdf_bytes = f.read()
 
-                return False
-
-                
-
+                r_up = cls.request_with_retry("PUT", upload_url, headers=put_headers, data=pdf_bytes, timeout=60)
+                if not r_up or r_up.status_code not in (200, 201):
+                    logger.error(f"[SharePoint] Falha no upload do PDF '{sp_filename}': HTTP {r_up.status_code if r_up else 'Sem resposta'}")
+                else:
+                    item_id = r_up.json().get("id")
+                    if not item_id:
+                        logger.error(f"[SharePoint] ID do item não retornado para '{sp_filename}'")
+                    else:
+                        # 4. Atualizar os 7 campos de metadados
+                        fields_payload = {
+                            "Title": sp_filename,
+                            "Partida": partida,
+                            "Campeonato": camp_norm,
+                            "Plataforma": plat_norm,
+                            "Data_Partida": data_hora_iso,  # NOME INTERNO DA COLUNA Data_Hora NO SHAREPOINT
+                            "Confianca": conf_norm,
+                            "Auditado": True
+                        }
+                        fields_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{item_id}/listItem/fields"
+                        r_fields = cls.request_with_retry("PATCH", fields_url, headers=headers, json=fields_payload, timeout=20)
+                        if r_fields.status_code in (200, 201):
+                            logger.info(f"🎉 [SharePoint] PDF '{sp_filename}' e 7 metadados sincronizados com sucesso!")
+                            sp_ok = True
+                        else:
+                            logger.error(f"❌ [SharePoint] PDF enviado, mas falha estrita nos metadados ({r_fields.status_code}): {r_fields.text}")
         except Exception as e:
+            logger.error(f"❌ [SharePoint] Falha na sincronização do PDF (Google Sites seguirá normalmente): {e}")
 
-            logger.error(f"❌ [SharePoint] Falha na sincronização do PDF: {e}")
+        # 5. Publicação obrigatória em paralelo no Google Sites / Portal Web (100% independente do SharePoint)
+        portal_ok = False
+        try:
+            from modules.portal_sync import PortalSyncManager, iso_utc_to_brt_str
+            data_hora_brt = iso_utc_to_brt_str(data_hora_iso)
+            portal_ok = PortalSyncManager.sync_report_to_portal(
+                pdf_path=pdf_path,
+                drive_name="Relatorios_de_Jogos",
+                category="futebol",
+                filename=sp_filename,
+                partida=partida,
+                campeonato=camp_norm,
+                plataforma=plat_norm,
+                confianca=conf_norm,
+                data_hora=data_hora_brt,
+                auditado=True
+            )
+            if portal_ok:
+                logger.info(f"🌐 [Portal Web / Google Sites] Relatório '{sp_filename}' publicado com sucesso (Futebol)!")
+            else:
+                logger.warning(f"⚠️ [Portal Web / Google Sites] Publicação remota pendente para '{sp_filename}' (salvo localmente).")
+        except Exception as e_portal:
+            logger.warning(f"[PortalSync] Erro ao sincronizar Futebol com Google Sites: {e_portal}")
 
-            return False
+        return bool(sp_ok or portal_ok)
 
 
 

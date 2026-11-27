@@ -1,5 +1,5 @@
 {
   "version": "2.5.27",
   "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.27/Monitor_Esportes.exe",
-  "changelog": "v2.5.27: Sincronizacao em paralelo 1:1 com o Portal Web (Google Sites) para as 3 listas de relatorios (Futebol, YouTube e NBA) com colunas identicas ao SharePoint, resolucao correta de caminhos PDF (reports/youtube, reports/futebol, reports/nba) e base de planilhas autenticas."
+  "changelog": "v2.5.27: Publicação automática e em tempo real no Google Sites (GitHub Pages) diretamente pelo aplicativo (.exe) para TODAS as 3 bibliotecas de relatórios (Futebol, YouTube e NBA) via GitHub Git Data API em commit atômico. Independência total do SharePoint (publica no Google Sites mesmo se o SharePoint falhar), correção dos metadados reais (Data_Hora em BRT, Placar real, Partida completa e Plataforma dinâmica na NBA), backfill 1:1 de todos os 400 relatórios (40 Futebol, 132 YouTube, 228 NBA até 30/11) e atualização ao vivo (live fetch + botão Atualizar Lista) no Portal Web."
 }

@@ -18,15 +18,21 @@ def publish_release():
         return False
 
     repo = "CleberSGoncalves/Monitor_Esportes"
-    tag = "v2.5.26"
-    release_name = "v2.5.26 - Correção: Travamento ao Verificar Atualizações"
+    tag = "v2.5.27"
+    release_name = "v2.5.27 - Sincronização Automática em Tempo Real com o Google Sites (Futebol, YouTube e NBA)"
     body = (
-        "### Novidades da versão v2.5.26:\n"
-        "- 🐛 **Correção Crítica: Travamento ao clicar em 'Verificar Atualizações'**:\n"
-        "  - `AutoUpdater()` era instanciado diretamente na thread principal do Tkinter antes de disparar a thread de checagem, bloqueando todo o event loop da GUI.\n"
-        "  - `perform_update_and_restart()` (download de ~317 MB) era chamado dentro do callback `ask_user()` vinculado ao `self.after(0, ...)` da thread Tkinter, travando completamente a janela durante o download.\n"
-        "  - **Solução:** Toda a lógica do AutoUpdater (instanciação, checagem, confirmação do usuário e download do executável) é agora executada 100% em threads `daemon` dedicadas, usando `self.after(0, ...)` apenas para atualizações seguras de widgets da UI.\n"
-        "  - A interface permanece totalmente responsiva durante a verificação e durante o download da nova versão, com barra de progresso no label de status.\n"
+        "### Novidades da versão v2.5.27:\n"
+        "- 🌐 **Publicação Direta e em Tempo Real no Google Sites a partir do `.exe`**:\n"
+        "  - `PortalSyncManager` agora publica automaticamente via GitHub Git Data API (commit atômico único com o PDF + índice ao vivo `docs/reports/index_<cat>.json`), funcionando em qualquer máquina com o executável standalone sem depender de `git` instalado.\n"
+        "  - Cobre 100% das 3 bibliotecas oficiais: **Relatórios de Jogos (Futebol)**, **Relatório Jogos YouTube** e **Relatórios de Jogos NBA**.\n"
+        "  - Suporte a publicação em lote atômica (`flush_github_batch`) para os jogos agendados da NBA.\n"
+        "- 🛡️ **Autonomia Total (Independência do SharePoint)**:\n"
+        "  - Os 3 reporters (`SharePointReporter`, `SharePointYouTubeReporter`, `SharePointNBAReporter`) agora publicam no Google Sites de forma paralela e independente — mesmo que o SharePoint sofra 429/throttling ou indisponibilidade.\n"
+        "- 🎯 **Correção de Metadados 1:1 (Data/Hora BRT, Placar e Plataforma)**:\n"
+        "  - Todos os 3 reporters agora propagam a data/hora REAL do jogo em BRT (não mais `datetime.now()`), nome completo da partida, placar real/agendado e plataforma dinâmica.\n"
+        "- ⚡ **Portal Web (Google Sites) com Atualização Ao Vivo (Live Fetch)**:\n"
+        "  - O portal consulta os índices JSON leves ao vivo automaticamente ao abrir e ao trocar de biblioteca (e traz botão `🔄 Atualizar Lista`), além de fallback automático para PDFs recém-publicados.\n"
+        "  - Backfill completo 1:1 realizado: **40 Futebol**, **132 YouTube** e **228 NBA** (até 30/11/2026).\n"
     )
 
     headers = {

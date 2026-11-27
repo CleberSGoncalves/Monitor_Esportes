@@ -59,15 +59,57 @@ class SharePointNBAReporter:
         return fallback_drive
 
     @classmethod
-    def sync_nba_report(cls, pdf_path: str, game: Dict[str, Any], confianca: str = "99.0%") -> bool:
+    def sync_nba_report(cls, pdf_path: str, game: Dict[str, Any], confianca: str = "99.0%", defer_portal_push: bool = False) -> bool:
         """
         Envia o PDF de relatório da NBA para a biblioteca 'Relatorios_de_Jogos_NBA'
-        do SharePoint e sincroniza os metadados de forma canônica (1 item único por jogo).
+        do SharePoint e sincroniza simultaneamente com o Google Sites / Portal Web.
+        A publicação no Google Sites ocorre mesmo em caso de indisponibilidade do SharePoint.
         """
         if not os.path.exists(pdf_path):
             logger.error(f"[SharePoint NBA] PDF não encontrado: {pdf_path}")
             return False
 
+        away_tri = (game.get("away_tri") or "AWAY").upper()
+        home_tri = (game.get("home_tri") or "HOME").upper()
+        date_clean = game.get("date_clean") or datetime.now().strftime("%Y%m%d")
+        sp_filename = f"Relatorio_NBA_{away_tri}_at_{home_tri}_{date_clean}.pdf"
+
+        # Normalização de Plataforma estritamente alinhada com as Opções da Biblioteca
+        raw_plat = (game.get("platform") or "").upper()
+        if "AMAZON" in raw_plat or "PRIME" in raw_plat:
+            plat_norm = "Amazon Prime"
+        elif "DISNEY" in raw_plat:
+            plat_norm = "Disney"
+        elif "ESPN" in raw_plat:
+            plat_norm = "ESPN"
+        elif "CAZE" in raw_plat:
+            plat_norm = "Caze TV"
+        elif "YOUTUBE" in raw_plat:
+            plat_norm = "YouTube"
+        elif "LEAGUE" in raw_plat or "NBA" in raw_plat:
+            plat_norm = "NBA"
+        else:
+            plat_norm = "NBA"
+
+        iso_utc = game.get("iso_utc") or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        match_display = game.get("match_display") or f"{away_tri} @ {home_tri}"
+
+        is_fin = bool(game.get("is_finished"))
+        if is_fin:
+            is_audited = True
+            conf_val = confianca
+            score_val = game.get("score")
+            if not score_val and game.get("away_score") and game.get("home_score"):
+                score_val = f"{game.get('away_team', '')} {game.get('away_score')} x {game.get('home_score')} {game.get('home_team', '')}".strip()
+            if not score_val:
+                score_val = game.get("score_display", "Finalizado")
+        else:
+            is_audited = False
+            conf_val = "Agendado"
+            score_val = f"Agendado ({game.get('time_brt', '—')} BRT)"
+
+        sp_ok = False
+        auth_err = None
         try:
             token = SharePointReporter.obter_token_graph()
             site_id = SharePointReporter._cached_site_id
@@ -75,165 +117,117 @@ class SharePointNBAReporter:
 
             if not drive_id:
                 logger.error("[SharePoint NBA] Nenhum drive disponível para sincronização.")
-                return False
-
-            away_tri = (game.get("away_tri") or "AWAY").upper()
-            home_tri = (game.get("home_tri") or "HOME").upper()
-            date_clean = game.get("date_clean") or datetime.now().strftime("%Y%m%d")
-            sp_filename = f"Relatorio_NBA_{away_tri}_at_{home_tri}_{date_clean}.pdf"
-            upload_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root:/{sp_filename}:/content"
-            
-            headers = {"Authorization": f"Bearer {token}"}
-            put_headers = dict(headers)
-            put_headers["Content-Type"] = "application/pdf"
-
-            # Limpeza preventiva de duplicatas legadas com nomenclaturas antigas
-            try:
-                children_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root/children?$select=id,name"
-                r_children = SharePointReporter.request_with_retry("GET", children_url, headers=headers, timeout=15)
-                if r_children and r_children.status_code == 200:
-                    items = r_children.json().get("value", [])
-                    match_sub = f"{away_tri}_at_{home_tri}_{date_clean}".lower()
-                    for it in items:
-                        it_name = it.get("name", "").lower()
-                        it_id = it.get("id")
-                        if match_sub in it_name and it.get("name") != sp_filename:
-                            logger.info(f"[SharePoint NBA] Removendo arquivo duplicado legado: {it.get('name')}")
-                            del_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{it_id}"
-                            SharePointReporter.request_with_retry("DELETE", del_url, headers=headers, timeout=15)
-            except Exception as e_dup:
-                logger.debug(f"[SharePoint NBA] Checagem de duplicatas: {e_dup}")
-
-            with open(pdf_path, "rb") as f:
-                pdf_bytes = f.read()
-
-            r_up = SharePointReporter.request_with_retry("PUT", upload_url, headers=put_headers, data=pdf_bytes, timeout=60)
-            if not r_up or r_up.status_code not in (200, 201):
-                logger.error(f"[SharePoint NBA] Falha no upload: HTTP {r_up.status_code if r_up else 'None'}")
-                return False
-
-            item_id = r_up.json().get("id")
-            if not item_id:
-                return False
-
-            # Normalização de Plataforma estritamente alinhada com as Opções da Biblioteca:
-            # ['Amazon Prime', 'Disney', 'Escolha 3', 'ESPN', 'NBA', 'YouTube', 'Caze TV', 'Outro']
-            raw_plat = (game.get("platform") or "").upper()
-            if "AMAZON" in raw_plat or "PRIME" in raw_plat:
-                plat_norm = "Amazon Prime"
-            elif "DISNEY" in raw_plat:
-                plat_norm = "Disney"
-            elif "ESPN" in raw_plat:
-                plat_norm = "ESPN"
-            elif "CAZE" in raw_plat:
-                plat_norm = "Caze TV"
-            elif "YOUTUBE" in raw_plat:
-                plat_norm = "YouTube"
-            elif "LEAGUE" in raw_plat or "NBA" in raw_plat:
-                plat_norm = "NBA"
             else:
-                plat_norm = "NBA"
+                upload_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root:/{sp_filename}:/content"
+                headers = {"Authorization": f"Bearer {token}"}
+                put_headers = dict(headers)
+                put_headers["Content-Type"] = "application/pdf"
 
-            # Data ISO UTC
-            iso_utc = game.get("iso_utc") or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-            is_fin = bool(game.get("is_finished"))
-            if is_fin:
-                is_audited = True
-                conf_val = confianca
-                score_val = game.get("score")
-                if not score_val and game.get("away_score") and game.get("home_score"):
-                    score_val = f"{game.get('away_team', '')} {game.get('away_score')} x {game.get('home_score')} {game.get('home_team', '')}".strip()
-                if not score_val:
-                    score_val = game.get("score_display", "Finalizado")
-            else:
-                is_audited = False
-                conf_val = "Agendado"
-                score_val = f"Agendado ({game.get('time_brt', '—')} BRT)"
-
-            fields_payload = {
-                "Title": sp_filename,
-                "Partida": game.get("match_display", f"{away_tri} @ {home_tri}"),
-                "Campeonato": "NBA",
-                "Plataforma": plat_norm,
-                "Data_Hora": iso_utc,
-                "Confianca": conf_val,
-                "Auditado": is_audited,
-                "Placar": score_val
-            }
-
-            fields_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{item_id}/listItem/fields"
-            json_headers = dict(headers)
-            json_headers["Content-Type"] = "application/json"
-
-            # Executa com repetição e auto-reparo caso algum campo ainda não exista no SharePoint
-            for attempt in range(4):
-                r_fields = SharePointReporter.request_with_retry("PATCH", fields_url, headers=json_headers, json=fields_payload, timeout=20)
-                if r_fields.status_code in (200, 201):
-                    logger.info(f"🎉 [SharePoint NBA] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca NBA!")
+                # Limpeza preventiva de duplicatas legadas com nomenclaturas antigas (pula em lote agendado para poupar Graph API)
+                if not defer_portal_push:
                     try:
-                        from modules.portal_sync import PortalSyncManager
-                        portal_ok = PortalSyncManager.sync_report_to_portal(
-                            pdf_path=pdf_path,
-                            drive_name="Relatorios_de_Jogos_NBA",
-                            category="nba",
-                            filename=sp_filename,
-                            partida=f"{away_tri} @ {home_tri}",
-                            campeonato="NBA",
-                            plataforma=plat_norm,
-                            confianca=conf_val,
-                            data_hora=datetime.now().strftime("%d/%m/%Y %H:%M"),
-                            auditado=is_audited,
-                            placar=f"{away_tri} x {home_tri}"
-                        )
-                        if portal_ok:
-                            logger.info(f"🌐 [Portal Web] Relatório '{sp_filename}' publicado e sincronizado no novo Portal Web Suporte Captação (NBA)!")
-                    except Exception as e_portal:
-                        logger.warning(f"[PortalSync] Aviso ao sincronizar NBA com portal web: {e_portal}")
-                    return True
-                
-                err_text = r_fields.text
-                m_unrec = re.search(r"Field '([^']+)' is not recognized", err_text)
-                if m_unrec:
-                    bad_field = m_unrec.group(1)
-                    logger.warning(f"[SharePoint NBA] Removendo campo não reconhecido '{bad_field}' e tentando novamente...")
-                    fields_payload.pop(bad_field, None)
-                    continue
+                        children_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/root/children?$select=id,name"
+                        r_children = SharePointReporter.request_with_retry("GET", children_url, headers=headers, timeout=15)
+                        if r_children and r_children.status_code == 200:
+                            items = r_children.json().get("value", [])
+                            match_sub = f"{away_tri}_at_{home_tri}_{date_clean}".lower()
+                            for it in items:
+                                it_name = it.get("name", "").lower()
+                                it_id = it.get("id")
+                                if match_sub in it_name and it.get("name") != sp_filename:
+                                    logger.info(f"[SharePoint NBA] Removendo arquivo duplicado legado: {it.get('name')}")
+                                    del_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{it_id}"
+                                    SharePointReporter.request_with_retry("DELETE", del_url, headers=headers, timeout=15)
+                    except Exception as e_dup:
+                        logger.debug(f"[SharePoint NBA] Checagem de duplicatas: {e_dup}")
+
+                with open(pdf_path, "rb") as f:
+                    pdf_bytes = f.read()
+
+                r_up = SharePointReporter.request_with_retry("PUT", upload_url, headers=put_headers, data=pdf_bytes, timeout=60)
+                if not r_up or r_up.status_code not in (200, 201):
+                    logger.error(f"[SharePoint NBA] Falha no upload: HTTP {r_up.status_code if r_up else 'None'}")
                 else:
-                    logger.warning(f"[SharePoint NBA] Upload concluído, mas falha ao gravar metadados (tentativa {attempt+1}): {r_fields.status_code} - {err_text[:200]}")
-                    break
+                    item_id = r_up.json().get("id")
+                    if item_id:
+                        fields_payload = {
+                            "Title": sp_filename,
+                            "Partida": match_display,
+                            "Campeonato": "NBA",
+                            "Plataforma": plat_norm,
+                            "Data_Hora": iso_utc,
+                            "Confianca": conf_val,
+                            "Auditado": is_audited,
+                            "Placar": score_val
+                        }
+                        fields_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drives/{drive_id}/items/{item_id}/listItem/fields"
+                        json_headers = dict(headers)
+                        json_headers["Content-Type"] = "application/json"
 
-            try:
-                from modules.portal_sync import PortalSyncManager
-                PortalSyncManager.sync_report_to_portal(
-                    pdf_path=pdf_path,
-                    drive_name="Relatorios_de_Jogos_NBA",
-                    category="nba",
-                    filename=sp_filename,
-                    partida=f"{away_tri} @ {home_tri}",
-                    campeonato="NBA",
-                    plataforma=plat_norm,
-                    confianca=conf_val
-                )
-            except Exception as e_portal:
-                logger.warning(f"[PortalSync] Aviso ao sincronizar NBA com portal web: {e_portal}")
-            return True
-
-        except SharePointAuthRequiredError:
-            raise
+                        for attempt in range(4):
+                            r_fields = SharePointReporter.request_with_retry("PATCH", fields_url, headers=json_headers, json=fields_payload, timeout=20)
+                            if r_fields.status_code in (200, 201):
+                                logger.info(f"🎉 [SharePoint NBA] Relatório '{sp_filename}' e metadados sincronizados com sucesso na biblioteca NBA!")
+                                sp_ok = True
+                                break
+                            err_text = r_fields.text
+                            m_unrec = re.search(r"Field '([^']+)' is not recognized", err_text)
+                            if m_unrec:
+                                bad_field = m_unrec.group(1)
+                                logger.warning(f"[SharePoint NBA] Removendo campo não reconhecido '{bad_field}' e tentando novamente...")
+                                fields_payload.pop(bad_field, None)
+                                continue
+                            else:
+                                logger.warning(f"[SharePoint NBA] Upload concluído, mas falha ao gravar metadados (tentativa {attempt+1}): {r_fields.status_code} - {err_text[:200]}")
+                                sp_ok = True
+                                break
+        except SharePointAuthRequiredError as e_auth:
+            auth_err = e_auth
         except Exception as e:
-            logger.error(f"[SharePoint NBA] Exceção ao sincronizar relatório NBA: {e}")
-            return False
+            logger.error(f"[SharePoint NBA] Exceção ao sincronizar relatório NBA no SharePoint (Google Sites seguirá normalmente): {e}")
+
+        # Publicação obrigatória em paralelo no Google Sites / Portal Web (100% independente do SharePoint)
+        portal_ok = False
+        try:
+            from modules.portal_sync import PortalSyncManager, iso_utc_to_brt_str
+            # Data/Hora real do jogo em BRT (idêntica ao SharePoint)
+            if game.get("date_display") and game.get("time_brt") and ":" in str(game.get("time_brt")):
+                data_hora_brt = f"{game['date_display']} {game['time_brt']}"
+            else:
+                data_hora_brt = iso_utc_to_brt_str(iso_utc)
+
+            portal_ok = PortalSyncManager.sync_report_to_portal(
+                pdf_path=pdf_path,
+                drive_name="Relatorios_de_Jogos_NBA",
+                category="nba",
+                filename=sp_filename,
+                partida=match_display,
+                campeonato="NBA",
+                plataforma=plat_norm,
+                confianca=conf_val,
+                data_hora=data_hora_brt,
+                auditado=is_audited,
+                placar=score_val,
+                defer_github_push=defer_portal_push
+            )
+            if portal_ok:
+                logger.info(f"🌐 [Portal Web / Google Sites] Relatório '{sp_filename}' publicado com sucesso (NBA)!")
+        except Exception as e_portal:
+            logger.warning(f"[PortalSync] Erro ao sincronizar NBA com Google Sites: {e_portal}")
+
+        if auth_err and not portal_ok:
+            raise auth_err
+        return bool(sp_ok or portal_ok)
 
     @classmethod
     def sync_all_scheduled_games(cls, games: List[Dict[str, Any]], max_future_games: int = 60) -> int:
         """
-        Sincroniza antecipadamente os jogos agendados da NBA no SharePoint.
-        Gera uma ficha técnica oficial em PDF de agendamento e preenche as colunas
-        da biblioteca 'Relatorios_de_Jogos_NBA' com 'Agendado'.
-        Conforme as partidas acontecem, o relatório final substitui o registro automaticamente.
+        Sincroniza antecipadamente os jogos agendados da NBA no SharePoint e no Google Sites.
+        Usa publicação em lote atômica (1 único commit no GitHub) para todos os jogos futuros.
         """
         from modules.nba_report_generator import NBAReportGenerator
+        from modules.portal_sync import PortalSyncManager
+
         synced_count = 0
         scheduled_games = [g for g in games if not g.get("is_finished")]
 
@@ -241,12 +235,19 @@ class SharePointNBAReporter:
             try:
                 sheet_pdf = NBAReportGenerator.generate_schedule_sheet(g)
                 if sheet_pdf and os.path.exists(sheet_pdf):
-                    ok = cls.sync_nba_report(sheet_pdf, g, confianca="Agendado")
+                    ok = cls.sync_nba_report(sheet_pdf, g, confianca="Agendado", defer_portal_push=True)
                     if ok:
                         synced_count += 1
-                        logger.info(f"[SharePoint NBA] Jogo agendado sincronizado: {g.get('match_display')} ({g.get('date_display')})")
+                        logger.info(f"[SharePoint & Portal NBA] Jogo agendado sincronizado: {g.get('match_display')} ({g.get('date_display')})")
             except Exception as e_s:
                 logger.warning(f"[SharePoint NBA] Falha ao sincronizar agenda de {g.get('match_display')}: {e_s}")
                 continue
+
+        if synced_count > 0:
+            try:
+                batch_ok = PortalSyncManager.flush_github_batch("nba")
+                logger.info(f"🌐 [Portal Web / Google Sites] Lote de {synced_count} jogos agendados da NBA publicado: {'OK' if batch_ok else 'PENDENTE'}")
+            except Exception as e_flush:
+                logger.warning(f"[PortalSync] Erro ao publicar lote NBA no Google Sites: {e_flush}")
 
         return synced_count

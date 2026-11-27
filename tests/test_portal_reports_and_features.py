@@ -112,7 +112,8 @@ def test_portal_sync_dual_update():
             campeonato="Brasileiro Serie A",
             plataforma="Amazon Prime",
             confianca="100.0%",
-            auditado=True
+            auditado=True,
+            publish_github=False
         )
         assert ok is True
 
@@ -138,3 +139,29 @@ def test_portal_sync_dual_update():
     finally:
         if os.path.exists(tmp_pdf):
             os.remove(tmp_pdf)
+        # Limpar item de teste do disco e do master data para não poluir produção
+        for sub in ("docs", "portal_web"):
+            p_rem = os.path.join(r"E:\desenvolvimento\Monitor_Esportes", sub, "reports", "futebol", "test_auto_audit_unit_test.pdf")
+            if os.path.exists(p_rem):
+                os.remove(p_rem)
+            idx_p = os.path.join(r"E:\desenvolvimento\Monitor_Esportes", sub, "reports", "index_futebol.json")
+            if os.path.exists(idx_p):
+                with open(idx_p, "r", encoding="utf-8") as f_i:
+                    idx_d = json.load(f_i)
+                idx_d["items"] = [it for it in idx_d.get("items", []) if it.get("name") != "test_auto_audit_unit_test.pdf"]
+                idx_d["items_count"] = len(idx_d["items"])
+                with open(idx_p, "w", encoding="utf-8") as f_i:
+                    json.dump(idx_d, f_i, ensure_ascii=False, indent=2)
+        master_file = r"E:\desenvolvimento\Monitor_Esportes\config\sharepoint_portal_master_data.json"
+        if os.path.exists(master_file):
+            with open(master_file, "r", encoding="utf-8") as f_m:
+                m_d = json.load(f_m)
+            drv = m_d.get("drives", {}).get("Relatorios_de_Jogos")
+            if drv and "items" in drv:
+                drv["items"] = [it for it in drv["items"] if it.get("name") != "test_auto_audit_unit_test.pdf"]
+                drv["items_count"] = len(drv["items"])
+            lst = m_d.get("lists", {}).get("Relatorios_de_Jogos")
+            if lst and "items" in lst:
+                lst["items"] = [it for it in lst["items"] if it.get("Title") != "test_auto_audit_unit_test.pdf"]
+            with open(master_file, "w", encoding="utf-8") as f_m:
+                json.dump(m_d, f_m, ensure_ascii=False, indent=2)
