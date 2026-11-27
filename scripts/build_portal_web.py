@@ -5717,8 +5717,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     }
 
     function updateStreamingHighlightCards() {
-      const hojeStr = "25/11/2026";
-      const amanhaStr = "26/11/2026";
+      const now = new Date();
+      const pad = n => String(n).padStart(2, "0");
+      const hojeStr = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+      const tom = new Date(now.getTime() + 86400000);
+      const amanhaStr = `${pad(tom.getDate())}/${pad(tom.getMonth() + 1)}/${tom.getFullYear()}`;
 
       const lblHoje = document.getElementById("label-data-hoje");
       const lblAmanha = document.getElementById("label-data-amanha");
@@ -5856,7 +5859,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         });
       }
 
-      const hojeStr = "25/11/2026";
+      const now = new Date();
+      const pad = n => String(n).padStart(2, "0");
+      const hojeStr = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
       const hojeParts = hojeStr.split('/');
       const hojeTimestamp = new Date(hojeParts[2], hojeParts[1] - 1, hojeParts[0]).getTime();
 
