@@ -4831,53 +4831,191 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         const editorModal = document.createElement('div');
         editorModal.id = 'modal-online-sheet-editor';
         editorModal.className = 'sp-modal-overlay';
-        editorModal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(15,23,42,0.82);backdrop-filter:blur(4px);z-index:10050;justify-content:center;align-items:center;padding:16px;';
+        editorModal.style.cssText = 'display:flex;position:fixed;inset:0;background:#0F172A;z-index:10050;width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;';
         const tabsHtml = sheetNames.length > 1 ? `
-          <div style="display:flex;gap:6px;padding:8px 20px;background:#F1F5F9;border-bottom:1px solid #CBD5E1;overflow-x:auto;">
-            ${sheetNames.map(sn => `<button type="button" class="btn-sheet-tab" data-sheet="${encodeURIComponent(sn)}" style="padding:4px 10px;border-radius:4px;font-size:11.5px;font-weight:700;cursor:pointer;border:1px solid ${sn === currentSheetName ? '#0F766E' : '#CBD5E1'};background:${sn === currentSheetName ? '#0F766E' : '#fff'};color:${sn === currentSheetName ? '#fff' : '#334155'};">${sn}</button>`).join('')}
+          <div style="display:flex;gap:4px;padding:6px 16px;background:#F1F5F9;border-bottom:1px solid #CBD5E1;overflow-x:auto;align-items:center;">
+            <span style="font-size:11px;font-weight:700;color:#64748B;margin-right:6px;">ABAS:</span>
+            ${sheetNames.map(sn => `<button type="button" class="btn-sheet-tab" data-sheet="${encodeURIComponent(sn)}" style="padding:4px 12px;border-radius:4px;font-size:11.5px;font-weight:700;cursor:pointer;border:1px solid ${sn === currentSheetName ? '#107C41' : '#CBD5E1'};background:${sn === currentSheetName ? '#107C41' : '#fff'};color:${sn === currentSheetName ? '#fff' : '#334155'};transition:all 0.2s;">${sn}</button>`).join('')}
           </div>
         ` : '';
         const sourceBadge = savedPayload
-          ? '<span style="background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;margin-left:8px;">Editado Localmente</span>'
-          : (authSheets ? '<span style="background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;margin-left:8px;">✓ Conteúdo Autêntico SharePoint</span>' : '');
+          ? '<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:10px;">Editado Localmente</span>'
+          : (authSheets ? '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:10px;">✓ Conteúdo Autêntico SharePoint</span>' : '');
+
+        const colCount = currentRows[0] ? currentRows[0].length : 0;
+        const rowCount = Math.max(0, currentRows.length - 1);
+        const encodedDoc = encodeURIComponent(name);
+        const directDocUrl = `sheets/${encodedDoc}`;
 
         editorModal.innerHTML = `
-          <div style="background:#fff;border-radius:12px;width:96%;max-width:1100px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);">
-            <div style="background:linear-gradient(135deg,#0F766E,#059669);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;">
-              <div>
-                <h3 style="margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;">📝 Editor Online de Planilha — ${name} ${sourceBadge}</h3>
-                <div style="font-size:11px;opacity:0.9;">Edite as células diretamente e salve no portal ou exporte em CSV/Excel</div>
+          <div style="background:#fff;width:100vw;height:100vh;display:flex;flex-direction:column;overflow:hidden;">
+            <!-- HEADER EXCEL / GOOGLE SHEETS PREMIUM -->
+            <div style="background:linear-gradient(135deg,#107C41,#0b5c30);color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <span style="font-size:22px;">📊</span>
+                <div>
+                  <h3 style="margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;">
+                    Editor de Planilha — ${name} ${sourceBadge}
+                  </h3>
+                  <div style="font-size:11px;opacity:0.9;margin-top:2px;">
+                    Ambiente Completo de Planilhas • ${rowCount} Linhas • ${colCount} Colunas • Suporte a Edição no Excel Desktop & Google Sheets
+                  </div>
+                </div>
               </div>
-              <button type="button" data-close-sheet style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;">&times;</button>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <!-- ABRIR NO EXCEL DESKTOP -->
+                <button type="button" id="btn-open-desktop-excel" class="btn-action" style="background:#fff;color:#107C41;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;border:none;cursor:pointer;">
+                  <span>🖥️</span> Abrir no Excel (Desktop)
+                </button>
+                <!-- ABRIR NO GOOGLE SHEETS -->
+                <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" rel="noopener noreferrer" class="btn-action" style="background:rgba(255,255,255,0.18);color:#fff;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.4);text-decoration:none;cursor:pointer;">
+                  <span>📈</span> Abrir no Google Sheets
+                </a>
+                <!-- BAIXAR ORIGINAL -->
+                <a href="${directDocUrl}" download="${name}" class="btn-action" style="background:rgba(255,255,255,0.12);color:#fff;font-size:11.5px;padding:6px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.3);text-decoration:none;">
+                  📥 Baixar .xlsx
+                </a>
+                <button type="button" data-close-sheet style="background:none;border:none;color:#fff;font-size:26px;cursor:pointer;line-height:1;margin-left:8px;" title="Fechar Editor">&times;</button>
+              </div>
             </div>
+
+            <!-- TOOLBAR EXCEL: FÓRMULA & PESQUISA -->
+            <div style="background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:7px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;">
+              <!-- BARRA DE PESQUISA / FILTRO DE LINHAS -->
+              <div style="display:flex;align-items:center;gap:6px;min-width:260px;">
+                <span style="font-size:12px;color:#64748B;">🔍</span>
+                <input type="text" id="sheet-filter-input" placeholder="Filtrar dados nesta planilha..." style="padding:4px 8px;font-size:11.5px;border:1px solid #CBD5E1;border-radius:4px;width:100%;outline:none;">
+              </div>
+              <div style="width:1px;height:20px;background:#CBD5E1;"></div>
+              <!-- BARRA DE FÓRMULA FX -->
+              <div style="display:flex;align-items:center;gap:8px;flex:1;">
+                <span style="font-weight:800;font-family:serif;font-style:italic;color:#107C41;font-size:13px;">fx</span>
+                <input type="text" id="sheet-formula-bar" placeholder="Selecione uma célula para ver o conteúdo ou digitar fórmula..." style="flex:1;padding:4px 8px;font-size:11.5px;border:1px solid #CBD5E1;border-radius:4px;font-family:monospace;background:#fff;outline:none;">
+              </div>
+            </div>
+
             ${tabsHtml}
-            <div style="padding:14px 20px;overflow:auto;flex:1;">
-              <table id="online-sheet-table" style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead>
-                  <tr style="background:#F1F5F9;">
-                    ${currentRows[0].map(col => `<th contenteditable="true" style="border:1px solid #CBD5E1;padding:7px 9px;text-align:left;font-weight:700;color:#1E293B;min-width:90px;">${String(col || '')}</th>`).join('')}
+
+            <!-- GRID PRINCIPAL EM TELA CHEIA -->
+            <div style="padding:0;overflow:auto;flex:1;background:#fff;" id="sheet-table-wrapper">
+              <table id="online-sheet-table" style="width:100%;border-collapse:collapse;font-size:12px;user-select:text;">
+                <thead style="position:sticky;top:0;z-index:10;background:#F1F5F9;box-shadow:0 1px 2px rgba(0,0,0,0.06);">
+                  <tr>
+                    <th style="border:1px solid #CBD5E1;padding:6px 8px;text-align:center;font-weight:700;color:#64748B;width:40px;background:#E2E8F0;">#</th>
+                    ${currentRows[0].map((col, idx) => `<th contenteditable="true" data-col="${idx}" style="border:1px solid #CBD5E1;padding:7px 10px;text-align:left;font-weight:700;color:#1E293B;min-width:110px;background:#F1F5F9;">${String(col || '')}</th>`).join('')}
                   </tr>
                 </thead>
                 <tbody>
-                  ${currentRows.slice(1).map(r => `<tr>${r.map(c => `<td contenteditable="true" style="border:1px solid #CBD5E1;padding:6px 9px;color:#334155;">${String(c || '')}</td>`).join('')}</tr>`).join('')}
+                  ${currentRows.slice(1).map((r, rIdx) => `<tr data-row-idx="${rIdx + 1}"><td style="border:1px solid #CBD5E1;padding:5px;text-align:center;color:#94A3B8;font-size:11px;font-weight:600;background:#F8FAFC;user-select:none;">${rIdx + 1}</td>${r.map((c, cIdx) => `<td contenteditable="true" data-row="${rIdx + 1}" data-col="${cIdx}" style="border:1px solid #E2E8F0;padding:6px 10px;color:#334155;">${String(c || '')}</td>`).join('')}</tr>`).join('')}
                 </tbody>
               </table>
             </div>
-            <div style="background:#F8FAFC;border-top:1px solid #E2E8F0;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button type="button" id="btn-sheet-add-row" class="btn-action btn-action-secondary" style="font-size:12px;">➕ Adicionar Linha</button>
+
+            <!-- FOOTER COM CONTROLES E IMPORTADOR DE ARQUIVO LOCAL -->
+            <div style="background:#F8FAFC;border-top:1px solid #E2E8F0;padding:8px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;flex-shrink:0;">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                <button type="button" id="btn-sheet-add-row" class="btn-action btn-action-secondary" style="font-size:12px;">➕ Inserir Linha</button>
                 <button type="button" id="btn-sheet-export-csv" class="btn-action btn-action-secondary" style="font-size:12px;">📥 Exportar .CSV (Excel)</button>
-                ${savedPayload && authSheets ? '<button type="button" id="btn-sheet-reset" class="btn-action btn-action-secondary" style="font-size:12px;">🔄 Restaurar Original</button>' : ''}
+                
+                <!-- IMPORTAR ARQUIVO EDITADO NO PC -->
+                <label class="btn-action btn-action-secondary" style="font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin:0;" title="Carregue o arquivo salvo pelo Excel ou LibreOffice na sua máquina para atualizar a planilha online">
+                  <span>📤</span> Sincronizar Arquivo Salvo do PC
+                  <input type="file" id="input-sheet-sync-local" accept=".xlsx,.xls,.csv" style="display:none;">
+                </label>
+
+                ${savedPayload && authSheets ? '<button type="button" id="btn-sheet-reset" class="btn-action btn-action-secondary" style="font-size:12px;">🔄 Restaurar Conteúdo Original</button>' : ''}
               </div>
-              <div style="display:flex;gap:8px;">
+              <div style="display:flex;gap:8px;align-items:center;">
                 <button type="button" data-close-sheet class="btn-action btn-action-secondary" style="font-size:12px;">Fechar</button>
-                <button type="button" id="btn-sheet-save" class="btn-action btn-action-primary" style="font-size:12px;background:#059669;border-color:#059669;">💾 Salvar Alterações Online</button>
+                <button type="button" id="btn-sheet-save" class="btn-action btn-action-primary" style="font-size:12px;background:#107C41;border-color:#107C41;">💾 Salvar Alterações Online</button>
               </div>
             </div>
           </div>
         `;
         document.body.appendChild(editorModal);
         editorModal.querySelectorAll('[data-close-sheet]').forEach(b => b.addEventListener('click', () => editorModal.remove()));
+
+        // Suporte para abrir no Excel Desktop nativo da máquina
+        const btnDesktopExcel = editorModal.querySelector('#btn-open-desktop-excel');
+        if (btnDesktopExcel) {
+          btnDesktopExcel.addEventListener('click', () => {
+            const docFullUrl = `${window.location.origin}/${directDocUrl}`;
+            // Protocol handler oficial do Microsoft Office
+            const officeUri = `ms-excel:ofe|u|${docFullUrl}`;
+            window.location.href = officeUri;
+            showToast('🖥️ Solicitando abertura no Microsoft Excel Desktop...', 'info');
+            setTimeout(() => {
+              showToast('💡 Dica: Após editar no Excel, use o botão "Sincronizar Arquivo Salvo do PC" para atualizar o portal.', 'info');
+            }, 2500);
+          });
+        }
+
+        // Filtro em tempo real de linhas da tabela
+        const filterInput = editorModal.querySelector('#sheet-filter-input');
+        if (filterInput) {
+          filterInput.addEventListener('input', (e) => {
+            const kw = (e.target.value || '').toLowerCase().trim();
+            const trs = editorModal.querySelectorAll('#online-sheet-table tbody tr');
+            trs.forEach(tr => {
+              if (!kw) {
+                tr.style.display = '';
+              } else {
+                const text = tr.innerText.toLowerCase();
+                tr.style.display = text.includes(kw) ? '' : 'none';
+              }
+            });
+          });
+        }
+
+        // Sincronização da barra de fórmulas fx com a célula selecionada
+        let activeCell = null;
+        const formulaBar = editorModal.querySelector('#sheet-formula-bar');
+        editorModal.querySelectorAll('#online-sheet-table td[contenteditable="true"], #online-sheet-table th[contenteditable="true"]').forEach(cell => {
+          cell.addEventListener('focus', () => {
+            activeCell = cell;
+            if (formulaBar) formulaBar.value = cell.innerText;
+          });
+          cell.addEventListener('input', () => {
+            if (activeCell === cell && formulaBar) {
+              formulaBar.value = cell.innerText;
+            }
+          });
+        });
+        if (formulaBar) {
+          formulaBar.addEventListener('input', () => {
+            if (activeCell) {
+              activeCell.innerText = formulaBar.value;
+            }
+          });
+        }
+
+        // Importação de arquivo local editado no PC (CSV / Texto)
+        const localFileInput = editorModal.querySelector('#input-sheet-sync-local');
+        if (localFileInput) {
+          localFileInput.addEventListener('change', (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (re) => {
+              try {
+                const text = re.target?.result;
+                if (typeof text === 'string') {
+                  const lines = text.split(/\\r?\\n/).filter(l => l.trim().length > 0);
+                  const sep = lines[0].includes(';') ? ';' : (lines[0].includes('\\t') ? '\\t' : ',');
+                  const parsed = lines.map(l => l.split(sep).map(v => v.replace(/^"|"$/g, '').trim()));
+                  if (parsed.length > 0) {
+                    renderSheetModal(currentSheetName, parsed);
+                    showToast(`📤 Planilha '${file.name}' sincronizada com sucesso!`, 'success');
+                  }
+                }
+              } catch (ex) {
+                showToast('Erro ao ler arquivo: ' + ex.message, 'error');
+              }
+            };
+            reader.readAsText(file);
+          });
+        }
+
         editorModal.querySelectorAll('.btn-sheet-tab').forEach(tabBtn => {
           tabBtn.addEventListener('click', () => {
             const targetSheet = decodeURIComponent(tabBtn.getAttribute('data-sheet'));
@@ -4886,15 +5024,28 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           });
         });
         const readGrid = () => Array.from(editorModal.querySelectorAll('#online-sheet-table tr')).map(tr =>
-          Array.from(tr.children).map(cell => cell.innerText.trim())
+          Array.from(tr.children).slice(1).map(cell => cell.innerText.trim())
         );
         editorModal.querySelector('#btn-sheet-add-row').addEventListener('click', () => {
-          const cols = editorModal.querySelectorAll('#online-sheet-table thead th').length;
+          const cols = editorModal.querySelectorAll('#online-sheet-table thead th').length - 1;
+          const currentTrs = editorModal.querySelectorAll('#online-sheet-table tbody tr').length;
           const tr = document.createElement('tr');
+          tr.setAttribute('data-row-idx', String(currentTrs + 1));
+          const numTd = document.createElement('td');
+          numTd.style.cssText = 'border:1px solid #CBD5E1;padding:5px;text-align:center;color:#94A3B8;font-size:11px;font-weight:600;background:#F8FAFC;user-select:none;';
+          numTd.innerText = String(currentTrs + 1);
+          tr.appendChild(numTd);
           for (let i = 0; i < cols; i++) {
             const td = document.createElement('td');
             td.contentEditable = 'true';
-            td.style.cssText = 'border:1px solid #CBD5E1;padding:6px 9px;color:#334155;';
+            td.style.cssText = 'border:1px solid #E2E8F0;padding:6px 10px;color:#334155;';
+            td.addEventListener('focus', () => {
+              activeCell = td;
+              if (formulaBar) formulaBar.value = td.innerText;
+            });
+            td.addEventListener('input', () => {
+              if (activeCell === td && formulaBar) formulaBar.value = td.innerText;
+            });
             tr.appendChild(td);
           }
           editorModal.querySelector('#online-sheet-table tbody').appendChild(tr);
