@@ -115,3 +115,17 @@
 >    - O arquivo `.gitignore` DEVE conter estritamente `!docs/reports/` e `!docs/reports/**`.
 >    - É expressamente proibido colocar `reports/` de forma genérica no `.gitignore`, o que causaria a exclusão silenciosa dos PDFs do GitHub Pages e erro 404 ao operador.
 
+> 5. **Ordenação Interativa e Clicável por Qualquer Coluna (`sortDriveBy`)**:
+>    - Todo cabeçalho de coluna em bibliotecas de relatórios (`Relatórios de Jogos`, `Relatório Jogos YouTube`, `Relatórios de Jogos NBA`) e drives genéricos DEVE ser interativo e clicável (`th.th-sortable` com `onclick="sortDriveBy('...')"`) permitindo ordenar por qualquer coluna (Campeonato, Partida, Plataforma, Canal, Placar, Confiança, Auditado, Modificado, etc.).
+>    - O primeiro clique na coluna ativa ordenação ascendente (`▲`) ou decrescente para datas (`▼`), e o clique subsequente inverte a direção.
+>    - Cada coluna exibe o indicador visual da direção atual (`▲`, `▼` ou `↕`).
+>    - A ordenação padrão na abertura da biblioteca permanece obrigatoriamente a mais recente decrescente (`Data / Hora` `▼`).
+>
+> 6. **Visualização Robusta de PDFs (Dual In-DOM Modal + Pop-up com Resolução Absoluta)**:
+>    - Proibição absoluta de mocks ou arquivos corrompidos (<1KB) nas pastas oficiais (`docs/reports/`) e no `sharepoint_portal_master_data.json`.
+>    - Todo clique em título de relatório ou botão 'Abrir PDF' deve invocar `openReportDocument`, que resolve a URL absoluta via `new URL(encodeURI(cleanPath), baseUrl).href` (blindagem contra falta de trailing slash em `https://.../Monitor_Esportes`).
+>    - O relatório é exibido imediatamente no visualizador in-DOM `#modal-pdf-viewer` (blindagem contra bloqueadores de popups em iframes do Google Sites), com botões para 'Abrir em Nova Aba' e 'Baixar PDF', além do disparo nativo via `window.open`.
+>
+> 7. **Obrigatoriedade de Execução de Testes Automatizados Reais (E2E) Antes de Finalizar**:
+>    - Proibição absoluta de entregas baseadas em suposições sem validação prática.
+>    - Toda alteração DEVE ser comprovada pela execução de testes de sintaxe (`node -c`) e testes de ponta a ponta com Selenium Headless (`test_portal_syntax_and_e2e.py`), validando a ordenação das colunas, filtros, modal de PDF e zero erros no console do navegador.
