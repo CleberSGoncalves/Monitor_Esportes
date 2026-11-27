@@ -1,5 +1,5 @@
 {
-  "last_scan_utc": "2026-11-27T20:22:59.238368+00:00",
+  "last_scan_utc": "2026-11-27T22:02:21.466714+00:00",
   "lists": {
     "Cadastro - Hosts": {
       "id": "f61d5727-9464-4d1e-9deb-133741ec64ee",
@@ -25,9 +25,9 @@
     },
     "Documentos": {
       "id": "e6769e9f-0ad8-40ef-8b19-20c9e5f87b7e",
-      "lastModifiedDateTime": "2026-11-27T18:43:24Z",
-      "last_synced_modified": "2026-11-27T18:43:24Z",
-      "last_synced_at": "2026-11-27T18:47:06.028366+00:00",
+      "lastModifiedDateTime": "2026-11-27T21:33:53Z",
+      "last_synced_modified": "2026-11-27T21:33:53Z",
+      "last_synced_at": "2026-11-27T21:37:08.376925+00:00",
       "inserted_count": 0,
       "updated_count": 50
     },
@@ -207,17 +207,17 @@
     },
     "Relatorio Jogos Youtube": {
       "id": "f524737d-87c4-4c65-b540-d6583eda61d9",
-      "lastModifiedDateTime": "2026-11-27T17:13:03Z",
-      "last_synced_modified": "2026-11-27T17:13:03Z",
-      "last_synced_at": "2026-11-27T17:19:09.406572+00:00",
+      "lastModifiedDateTime": "2026-11-27T21:42:30Z",
+      "last_synced_modified": "2026-11-27T21:42:30Z",
+      "last_synced_at": "2026-11-27T21:47:21.825384+00:00",
       "inserted_count": 1,
       "updated_count": 49
     },
     "SLA": {
       "id": "5c5c3222-0458-4ddc-8d65-db00e377af1a",
-      "lastModifiedDateTime": "2026-11-27T20:22:41Z",
-      "last_synced_modified": "2026-11-27T20:22:41Z",
-      "last_synced_at": "2026-11-27T20:22:57.535429+00:00",
+      "lastModifiedDateTime": "2026-11-27T20:26:06Z",
+      "last_synced_modified": "2026-11-27T20:26:06Z",
+      "last_synced_at": "2026-11-27T20:27:34.661084+00:00",
       "inserted_count": 0,
       "updated_count": 50
     },
@@ -245,9 +245,9 @@
     },
     "Redmine": {
       "id": "dead8ceb-e9b7-455b-8b4f-e235127d956b",
-      "lastModifiedDateTime": "2026-11-27T20:00:07Z",
-      "last_synced_modified": "2026-11-27T20:00:07Z",
-      "last_synced_at": "2026-11-27T20:02:29.774435+00:00",
+      "lastModifiedDateTime": "2026-11-27T21:01:00Z",
+      "last_synced_modified": "2026-11-27T21:01:00Z",
+      "last_synced_at": "2026-11-27T21:02:37.498792+00:00",
       "inserted_count": 0,
       "updated_count": 50
     },
@@ -291,25 +291,25 @@
     },
     "Painel de gestão de serviços dos CS": {
       "id": "2e2afc16-dfd6-4277-a16c-cd78bdd2e769",
-      "lastModifiedDateTime": "2026-11-27T20:22:39Z",
-      "last_synced_modified": "2026-11-27T20:22:39Z",
-      "last_synced_at": "2026-11-27T20:22:55.260957+00:00",
+      "lastModifiedDateTime": "2026-11-27T22:00:31Z",
+      "last_synced_modified": "2026-11-27T22:00:31Z",
+      "last_synced_at": "2026-11-27T22:02:19.036217+00:00",
       "inserted_count": 1,
       "updated_count": 49
     },
     "Painel de Ocorrências": {
       "id": "9d23cb01-b29c-45e6-9ae7-cfac1d1dd598",
-      "lastModifiedDateTime": "2026-11-27T19:31:16Z",
-      "last_synced_modified": "2026-11-27T19:31:16Z",
-      "last_synced_at": "2026-11-27T19:32:32.238536+00:00",
-      "inserted_count": 3,
-      "updated_count": 47
+      "lastModifiedDateTime": "2026-11-27T21:00:03Z",
+      "last_synced_modified": "2026-11-27T21:00:03Z",
+      "last_synced_at": "2026-11-27T21:02:33.843387+00:00",
+      "inserted_count": 0,
+      "updated_count": 50
     },
     "Monitoramento de Canais CS": {
       "id": "b0ffcdd7-a0e7-4eb0-a5e8-e2142776b8eb",
-      "lastModifiedDateTime": "2026-11-27T20:21:25Z",
-      "last_synced_modified": "2026-11-27T20:21:25Z",
-      "last_synced_at": "2026-11-27T20:22:59.237837+00:00",
+      "lastModifiedDateTime": "2026-11-27T22:01:34Z",
+      "last_synced_modified": "2026-11-27T22:01:34Z",
+      "last_synced_at": "2026-11-27T22:02:21.466714+00:00",
       "inserted_count": 0,
       "updated_count": 50
     },
@@ -423,9 +423,9 @@
     },
     "Relatorio Jogos Youtube": {
       "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuB9cyT1xIdlTLVA1lg-2mHZ",
-      "lastModifiedDateTime": "2026-11-27T17:13:02Z",
-      "last_synced_modified": "2026-11-27T17:13:02Z",
-      "last_synced_at": "2026-11-27T17:22:09.182290+00:00"
+      "lastModifiedDateTime": "2026-11-27T21:42:28Z",
+      "last_synced_modified": "2026-11-27T21:42:28Z",
+      "last_synced_at": "2026-11-27T21:47:23.437126+00:00"
     },
     "SLA": {
       "id": "b!R5fko7abk0yZMN2ibI0QUFX-yDT-LPxOjOApWP13XuAiMlxcWATcTY1l2wDjd68a",
@@ -459,187 +459,6 @@
     }
   },
   "sync_history": [
-    {
-      "timestamp": "2026-11-27T16:18:14.447580+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 1,
-      "items_updated": 149
-    },
-    {
-      "timestamp": "2026-11-27T16:22:12.556754+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Relatorio Jogos Youtube",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 1,
-      "items_updated": 199
-    },
-    {
-      "timestamp": "2026-11-27T16:27:09.900869+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 1,
-      "items_updated": 149
-    },
-    {
-      "timestamp": "2026-11-27T16:32:09.852909+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 0,
-      "items_updated": 150
-    },
-    {
-      "timestamp": "2026-11-27T16:38:15.886121+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 2,
-      "items_updated": 148
-    },
-    {
-      "timestamp": "2026-11-27T16:42:10.086432+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 0,
-      "items_updated": 150
-    },
-    {
-      "timestamp": "2026-11-27T16:47:12.356044+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 1,
-      "items_updated": 149
-    },
-    {
-      "timestamp": "2026-11-27T16:52:35.551749+00:00",
-      "lists_synced": [
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 0,
-      "items_updated": 100
-    },
-    {
-      "timestamp": "2026-11-27T16:59:16.912814+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Relatorio Jogos Youtube",
-        "SLA",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 1,
-      "items_updated": 249
-    },
-    {
-      "timestamp": "2026-11-27T17:02:10.500431+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 1,
-      "items_updated": 149
-    },
-    {
-      "timestamp": "2026-11-27T17:07:11.048820+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 1,
-      "items_updated": 149
-    },
-    {
-      "timestamp": "2026-11-27T17:12:07.182749+00:00",
-      "lists_synced": [
-        "SLA",
-        "Redmine"
-      ],
-      "items_inserted": 0,
-      "items_updated": 100
-    },
-    {
-      "timestamp": "2026-11-27T17:19:15.387745+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Relatorio Jogos Youtube",
-        "SLA",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 2,
-      "items_updated": 248
-    },
-    {
-      "timestamp": "2026-11-27T17:22:09.182290+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 1,
-      "items_updated": 149
-    },
-    {
-      "timestamp": "2026-11-27T17:27:09.752103+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 0,
-      "items_updated": 150
-    },
-    {
-      "timestamp": "2026-11-27T17:32:05.058836+00:00",
-      "lists_synced": [
-        "Redmine"
-      ],
-      "items_inserted": 0,
-      "items_updated": 50
-    },
-    {
-      "timestamp": "2026-11-27T17:39:02.870683+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 1,
-      "items_updated": 149
-    },
-    {
-      "timestamp": "2026-11-27T17:42:10.268167+00:00",
-      "lists_synced": [
-        "Painel de gestão de serviços dos CS",
-        "Monitoramento de Canais CS",
-        "Redmine"
-      ],
-      "items_inserted": 0,
-      "items_updated": 150
-    },
     {
       "timestamp": "2026-11-27T17:47:12.934528+00:00",
       "lists_synced": [
@@ -947,6 +766,174 @@
       ],
       "items_inserted": 1,
       "items_updated": 149
+    },
+    {
+      "timestamp": "2026-11-27T20:27:36.393704+00:00",
+      "lists_synced": [
+        "Documentos",
+        "SLA",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 1,
+      "items_updated": 149
+    },
+    {
+      "timestamp": "2026-11-27T20:34:29.489535+00:00",
+      "lists_synced": [
+        "Monitoramento de Canais CS",
+        "Painel de gestão de serviços dos CS"
+      ],
+      "items_inserted": 0,
+      "items_updated": 100
+    },
+    {
+      "timestamp": "2026-11-27T20:37:07.520458+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 1,
+      "items_updated": 99
+    },
+    {
+      "timestamp": "2026-11-27T20:42:17.148009+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 0,
+      "items_updated": 100
+    },
+    {
+      "timestamp": "2026-11-27T20:47:43.050873+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 0,
+      "items_updated": 100
+    },
+    {
+      "timestamp": "2026-11-27T20:52:47.607803+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 0,
+      "items_updated": 100
+    },
+    {
+      "timestamp": "2026-11-27T20:57:08.496108+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 1,
+      "items_updated": 99
+    },
+    {
+      "timestamp": "2026-11-27T21:02:37.498792+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Painel de Ocorrências",
+        "Monitoramento de Canais CS",
+        "Redmine"
+      ],
+      "items_inserted": 1,
+      "items_updated": 199
+    },
+    {
+      "timestamp": "2026-11-27T21:14:49.294947+00:00",
+      "lists_synced": [
+        "Monitoramento de Canais CS",
+        "Painel de gestão de serviços dos CS"
+      ],
+      "items_inserted": 1,
+      "items_updated": 99
+    },
+    {
+      "timestamp": "2026-11-27T21:17:08.443198+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 0,
+      "items_updated": 100
+    },
+    {
+      "timestamp": "2026-11-27T21:28:28.737076+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 0,
+      "items_updated": 100
+    },
+    {
+      "timestamp": "2026-11-27T21:32:11.315339+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorio Jogos Youtube",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 50,
+      "items_updated": 100
+    },
+    {
+      "timestamp": "2026-11-27T21:37:11.834968+00:00",
+      "lists_synced": [
+        "Documentos",
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 1,
+      "items_updated": 149
+    },
+    {
+      "timestamp": "2026-11-27T21:42:34.731259+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 2,
+      "items_updated": 98
+    },
+    {
+      "timestamp": "2026-11-27T21:47:23.437126+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Relatorio Jogos Youtube",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 1,
+      "items_updated": 149
+    },
+    {
+      "timestamp": "2026-11-27T21:54:52.503876+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 0,
+      "items_updated": 50
+    },
+    {
+      "timestamp": "2026-11-27T21:57:17.633895+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 1,
+      "items_updated": 99
+    },
+    {
+      "timestamp": "2026-11-27T22:02:21.466714+00:00",
+      "lists_synced": [
+        "Painel de gestão de serviços dos CS",
+        "Monitoramento de Canais CS"
+      ],
+      "items_inserted": 1,
+      "items_updated": 99
     }
   ]
 }

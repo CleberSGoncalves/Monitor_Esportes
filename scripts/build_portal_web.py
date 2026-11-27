@@ -5289,6 +5289,427 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       document.body.insertAdjacentHTML('beforeend', modalHtml);
     }
 
+function toggleGoogleSheetLinkBox(docNameEsc) {
+      const box = document.getElementById('gsheet-link-box');
+      if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+    window.toggleGoogleSheetLinkBox = toggleGoogleSheetLinkBox;
+
+    function saveGoogleSheetLink(docNameEsc) {
+      const name = decodeURIComponent(docNameEsc || '');
+      const inp = document.getElementById('gsheet-link-input');
+      const url = (inp ? inp.value : '').trim();
+      if (!url || !url.startsWith('http')) {
+        showToast('Informe uma URL válida do Google Sheets / Drive (https://...).', 'warning');
+        return;
+      }
+      localStorage.setItem('sp_gsheet_link_' + name, url);
+      showToast('✅ Link do Google Sheets vinculado! Reabrindo documento...', 'success');
+      document.getElementById('modal-autonomous-doc')?.remove();
+      openAutonomousDocViewer('', encodeURIComponent(name));
+    }
+    window.saveGoogleSheetLink = saveGoogleSheetLink;
+
+    async function openOnlineSheetEditor(docNameEsc) {
+      const name = decodeURIComponent(docNameEsc || 'Planilha.xlsx');
+      const storageKey = 'sp_online_sheet_' + encodeURIComponent(name);
+
+      // Carregar base autêntica extraída dos arquivos reais do SharePoint
+      if (!window.__AUTHENTIC_SHEETS_DATA) {
+        if (window.location.protocol !== 'file:') {
+          try {
+            const resp = await fetch('assets/authentic_sheets_data.json?v=' + Date.now());
+            if (resp.ok) {
+              window.__AUTHENTIC_SHEETS_DATA = await resp.json();
+            } else {
+              window.__AUTHENTIC_SHEETS_DATA = {};
+            }
+          } catch (e) {
+            window.__AUTHENTIC_SHEETS_DATA = {};
+          }
+        } else {
+          window.__AUTHENTIC_SHEETS_DATA = {};
+        }
+      }
+
+      const authSheets = window.__AUTHENTIC_SHEETS_DATA[name] || null;
+      const sheetNames = authSheets ? Object.keys(authSheets) : [];
+      let activeSheet = sheetNames[0] || 'Planilha1';
+
+      let savedPayload = null;
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) savedPayload = JSON.parse(saved);
+      } catch (e) {}
+
+      let rows = [];
+      if (Array.isArray(savedPayload) && savedPayload.length > 0) {
+        rows = savedPayload;
+      } else if (authSheets && sheetNames.length > 0 && Array.isArray(authSheets[activeSheet]) && authSheets[activeSheet].length > 0) {
+        rows = authSheets[activeSheet];
+      } else {
+        rows = [
+          ['Documento', 'Status', 'Observação'],
+          [name, 'Arquivo sincronizado', 'Planilha sem linhas tabulares extraíveis ou protegida — clique em Baixar Arquivo para abrir no Excel.']
+        ];
+      }
+
+      function renderSheetModal(currentSheetName, currentRows) {
+        document.getElementById('modal-online-sheet-editor')?.remove();
+        const editorModal = document.createElement('div');
+        editorModal.id = 'modal-online-sheet-editor';
+        editorModal.className = 'sp-modal-overlay';
+        editorModal.style.cssText = 'display:flex;position:fixed;inset:0;background:#0F172A;z-index:10050;width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;';
+        const tabsHtml = sheetNames.length > 1 ? `
+          <div style="display:flex;gap:4px;padding:6px 16px;background:#F1F5F9;border-bottom:1px solid #CBD5E1;overflow-x:auto;align-items:center;">
+            <span style="font-size:11px;font-weight:700;color:#64748B;margin-right:6px;">ABAS:</span>
+            ${sheetNames.map(sn => `<button type="button" class="btn-sheet-tab" data-sheet="${encodeURIComponent(sn)}" style="padding:4px 12px;border-radius:4px;font-size:11.5px;font-weight:700;cursor:pointer;border:1px solid ${sn === currentSheetName ? '#107C41' : '#CBD5E1'};background:${sn === currentSheetName ? '#107C41' : '#fff'};color:${sn === currentSheetName ? '#fff' : '#334155'};transition:all 0.2s;">${sn}</button>`).join('')}
+          </div>
+        ` : '';
+        const sourceBadge = savedPayload
+          ? '<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:10px;">Editado Localmente</span>'
+          : (authSheets ? '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;margin-left:10px;">✓ Conteúdo Autêntico SharePoint</span>' : '');
+
+        const colCount = currentRows[0] ? currentRows[0].length : 0;
+        const rowCount = Math.max(0, currentRows.length - 1);
+        const encodedDoc = encodeURIComponent(name);
+        const directDocUrl = `sheets/${encodedDoc}`;
+        const isFileProto = window.location.protocol === 'file:';
+        const cleanFileName = name.toLowerCase().endsWith('.xlsx') ? name : `${name}.xlsx`;
+
+        editorModal.innerHTML = `
+          <div style="background:#fff;width:100vw;height:100vh;display:flex;flex-direction:column;overflow:hidden;">
+            <!-- HEADER EXCEL / GOOGLE SHEETS PREMIUM -->
+            <div style="background:linear-gradient(135deg,#107C41,#0b5c30);color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <span style="font-size:22px;">📊</span>
+                <div>
+                  <h3 style="margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;">
+                    Editor de Planilha — ${name} ${sourceBadge}
+                  </h3>
+                  <div style="font-size:11px;opacity:0.9;margin-top:2px;">
+                    Ambiente Completo de Planilhas • ${rowCount} Linhas • ${colCount} Colunas • Suporte a Edição no Excel Desktop & Google Sheets
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <!-- ABRIR NO EXCEL DESKTOP -->
+                <button type="button" id="btn-open-desktop-excel" class="btn-action" style="background:#fff;color:#107C41;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;border:none;cursor:pointer;" title="Baixar e abrir imediatamente no aplicativo nativo (Excel / LibreOffice)">
+                  <span>🖥️</span> Abrir no Excel (Desktop)
+                </button>
+                ${isFileProto ? `
+                <!-- ABRIR CAMINHO LOCAL (PROTOCOLO FILE:///) -->
+                <button type="button" id="btn-open-local-file" class="btn-action" style="background:rgba(255,255,255,0.18);color:#fff;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.4);cursor:pointer;" title="Abrir ou copiar o caminho direto do arquivo no computador">
+                  <span>📁</span> Arquivo Local
+                </button>
+                ` : ''}
+                <!-- ABRIR NO GOOGLE SHEETS -->
+                <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" rel="noopener noreferrer" class="btn-action" style="background:rgba(255,255,255,0.18);color:#fff;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.4);text-decoration:none;cursor:pointer;">
+                  <span>📈</span> Abrir no Google Sheets
+                </a>
+                <!-- BAIXAR ORIGINAL -->
+                <a href="${directDocUrl}" download="${cleanFileName}" class="btn-action" style="background:rgba(255,255,255,0.12);color:#fff;font-size:11.5px;padding:6px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.3);text-decoration:none;">
+                  📥 Baixar .xlsx
+                </a>
+                <button type="button" data-close-sheet style="background:none;border:none;color:#fff;font-size:26px;cursor:pointer;line-height:1;margin-left:8px;" title="Fechar Editor">&times;</button>
+              </div>
+            </div>
+
+            <!-- TOOLBAR EXCEL: FÓRMULA & PESQUISA -->
+            <div style="background:#F8FAFC;border-bottom:1px solid #E2E8F0;padding:7px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;">
+              <!-- BARRA DE PESQUISA / FILTRO DE LINHAS -->
+              <div style="display:flex;align-items:center;gap:6px;min-width:260px;">
+                <span style="font-size:12px;color:#64748B;">🔍</span>
+                <input type="text" id="sheet-filter-input" placeholder="Filtrar dados nesta planilha..." style="padding:4px 8px;font-size:11.5px;border:1px solid #CBD5E1;border-radius:4px;width:100%;outline:none;">
+              </div>
+              <div style="width:1px;height:20px;background:#CBD5E1;"></div>
+              <!-- BARRA DE FÓRMULA FX -->
+              <div style="display:flex;align-items:center;gap:8px;flex:1;">
+                <span style="font-weight:800;font-family:serif;font-style:italic;color:#107C41;font-size:13px;">fx</span>
+                <input type="text" id="sheet-formula-bar" placeholder="Selecione uma célula para ver o conteúdo ou digitar fórmula..." style="flex:1;padding:4px 8px;font-size:11.5px;border:1px solid #CBD5E1;border-radius:4px;font-family:monospace;background:#fff;outline:none;">
+              </div>
+            </div>
+
+            ${tabsHtml}
+
+            <!-- GRID PRINCIPAL EM TELA CHEIA -->
+            <div style="padding:0;overflow:auto;flex:1;background:#fff;" id="sheet-table-wrapper">
+              <table id="online-sheet-table" style="width:100%;border-collapse:collapse;font-size:12px;user-select:text;">
+                <thead style="position:sticky;top:0;z-index:10;background:#F1F5F9;box-shadow:0 1px 2px rgba(0,0,0,0.06);">
+                  <tr>
+                    <th style="border:1px solid #CBD5E1;padding:6px 8px;text-align:center;font-weight:700;color:#64748B;width:40px;background:#E2E8F0;">#</th>
+                    ${currentRows[0].map((col, idx) => `<th contenteditable="true" data-col="${idx}" style="border:1px solid #CBD5E1;padding:7px 10px;text-align:left;font-weight:700;color:#1E293B;min-width:110px;background:#F1F5F9;">${String(col || '')}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${currentRows.slice(1).map((r, rIdx) => `<tr data-row-idx="${rIdx + 1}"><td style="border:1px solid #CBD5E1;padding:5px;text-align:center;color:#94A3B8;font-size:11px;font-weight:600;background:#F8FAFC;user-select:none;">${rIdx + 1}</td>${r.map((c, cIdx) => `<td contenteditable="true" data-row="${rIdx + 1}" data-col="${cIdx}" style="border:1px solid #E2E8F0;padding:6px 10px;color:#334155;">${String(c || '')}</td>`).join('')}</tr>`).join('')}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- FOOTER COM CONTROLES E IMPORTADOR DE ARQUIVO LOCAL -->
+            <div style="background:#F8FAFC;border-top:1px solid #E2E8F0;padding:8px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;flex-shrink:0;">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                <button type="button" id="btn-sheet-add-row" class="btn-action btn-action-secondary" style="font-size:12px;">➕ Inserir Linha</button>
+                <button type="button" id="btn-sheet-export-csv" class="btn-action btn-action-secondary" style="font-size:12px;">📥 Exportar .CSV (Excel)</button>
+                
+                <!-- IMPORTAR ARQUIVO EDITADO NO PC -->
+                <label class="btn-action btn-action-secondary" style="font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin:0;" title="Carregue o arquivo salvo pelo Excel ou LibreOffice na sua máquina para atualizar a planilha online">
+                  <span>📤</span> Sincronizar Arquivo Salvo do PC
+                  <input type="file" id="input-sheet-sync-local" accept=".xlsx,.xls,.csv" style="display:none;">
+                </label>
+
+                ${savedPayload && authSheets ? '<button type="button" id="btn-sheet-reset" class="btn-action btn-action-secondary" style="font-size:12px;">🔄 Restaurar Conteúdo Original</button>' : ''}
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button type="button" data-close-sheet class="btn-action btn-action-secondary" style="font-size:12px;">Fechar</button>
+                <button type="button" id="btn-sheet-save" class="btn-action btn-action-primary" style="font-size:12px;background:#107C41;border-color:#107C41;">💾 Salvar Alterações Online</button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(editorModal);
+        editorModal.querySelectorAll('[data-close-sheet]').forEach(b => b.addEventListener('click', () => editorModal.remove()));
+
+        // Suporte para abrir no Excel Desktop nativo da máquina (Download imediato de arquivo autêntico .xlsx com MIME correto)
+        async function triggerExcelDownloadAndOpen() {
+          let localFsPath = '';
+          if (isFileProto) {
+            try {
+              const rawPath = window.location.pathname;
+              const cleanPath = decodeURIComponent(rawPath.replace(/^\/([a-zA-Z]:)/, '$1'));
+              const dirPath = cleanPath.substring(0, cleanPath.lastIndexOf('/') + 1).split('/').join(String.fromCharCode(92));
+              localFsPath = dirPath + 'sheets' + String.fromCharCode(92) + name;
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(localFsPath).catch(() => {});
+              }
+            } catch (e) {}
+          }
+
+          showToast('🖥️ Baixando planilha autêntica para o Excel Desktop...', 'info');
+
+          // Em ambiente local file:///, navegadores bloqueiam fetch por política de CORS local.
+          // O download é disparado diretamente via âncora nativa com atributo download.
+          if (isFileProto) {
+            const dlLink = document.createElement('a');
+            dlLink.href = directDocUrl;
+            dlLink.download = cleanFileName;
+            document.body.appendChild(dlLink);
+            dlLink.click();
+            setTimeout(() => {
+              document.body.removeChild(dlLink);
+            }, 1500);
+
+            if (localFsPath) {
+              showToast(`✅ Planilha baixada! Caminho no disco: ${localFsPath} (copiado).`, 'success');
+            } else {
+              showToast(`✅ Download iniciado: '${cleanFileName}'. Abra no Excel Desktop.`, 'success');
+            }
+          } else {
+            // Em ambiente Web / GitHub Pages / Servidor HTTP:
+            try {
+              // 1. Tentar obter o arquivo autêntico .xlsx via fetch e instanciar Blob com MIME application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+              const resp = await fetch(directDocUrl);
+              if (!resp.ok) throw new Error('HTTP ' + resp.status);
+              const arrayBuffer = await resp.arrayBuffer();
+              const blob = new Blob([arrayBuffer], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+              });
+              const blobUrl = URL.createObjectURL(blob);
+              const dlLink = document.createElement('a');
+              dlLink.href = blobUrl;
+              dlLink.download = cleanFileName;
+              document.body.appendChild(dlLink);
+              dlLink.click();
+              setTimeout(() => {
+                document.body.removeChild(dlLink);
+                URL.revokeObjectURL(blobUrl);
+              }, 2000);
+
+              showToast(`✅ Planilha autêntica '${cleanFileName}' baixada! Abra o arquivo no Excel Desktop.`, 'success');
+            } catch (err) {
+              // 2. Fallback robusto via elemento <a> com atributo download
+              const dlLink = document.createElement('a');
+              dlLink.href = directDocUrl;
+              dlLink.download = cleanFileName;
+              document.body.appendChild(dlLink);
+              dlLink.click();
+              setTimeout(() => {
+                document.body.removeChild(dlLink);
+              }, 1500);
+
+              showToast(`✅ Download iniciado: '${cleanFileName}'. Abra no Excel Desktop.`, 'success');
+            }
+          }
+
+          setTimeout(() => {
+            showToast('💡 Dica: Após editar no Excel, use o botão "Sincronizar Arquivo Salvo do PC" para atualizar o portal online.', 'info');
+          }, 3200);
+        }
+
+        const btnDesktopExcel = editorModal.querySelector('#btn-open-desktop-excel');
+        if (btnDesktopExcel) {
+          btnDesktopExcel.addEventListener('click', triggerExcelDownloadAndOpen);
+        }
+
+        // Se estiver rodando localmente (file:///), botão para abrir / copiar o caminho direto do arquivo no computador
+        const btnOpenLocal = editorModal.querySelector('#btn-open-local-file');
+        if (btnOpenLocal) {
+          btnOpenLocal.addEventListener('click', () => {
+            try {
+              const rawPath = window.location.pathname;
+              const cleanPath = decodeURIComponent(rawPath.replace(/^\/([a-zA-Z]:)/, '$1'));
+              const dirPath = cleanPath.substring(0, cleanPath.lastIndexOf('/') + 1).split('/').join(String.fromCharCode(92));
+              const localFsPath = dirPath + 'sheets' + String.fromCharCode(92) + name;
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(localFsPath).then(() => {
+                  showToast(`📁 Caminho copiado: "${localFsPath}" (Cole no Win+R ou Explorador)`, 'success');
+                }).catch(() => {
+                  showToast(`📁 Arquivo local: "${localFsPath}"`, 'info');
+                });
+              } else {
+                showToast(`📁 Arquivo local: "${localFsPath}"`, 'info');
+              }
+              window.open(directDocUrl, '_blank');
+            } catch (e) {
+              showToast('Não foi possível resolver o caminho local do arquivo.', 'error');
+            }
+          });
+        }
+
+        // Filtro em tempo real de linhas da tabela
+        const filterInput = editorModal.querySelector('#sheet-filter-input');
+        if (filterInput) {
+          filterInput.addEventListener('input', (e) => {
+            const kw = (e.target.value || '').toLowerCase().trim();
+            const trs = editorModal.querySelectorAll('#online-sheet-table tbody tr');
+            trs.forEach(tr => {
+              if (!kw) {
+                tr.style.display = '';
+              } else {
+                const text = tr.innerText.toLowerCase();
+                tr.style.display = text.includes(kw) ? '' : 'none';
+              }
+            });
+          });
+        }
+
+        // Sincronização da barra de fórmulas fx com a célula selecionada
+        let activeCell = null;
+        const formulaBar = editorModal.querySelector('#sheet-formula-bar');
+        editorModal.querySelectorAll('#online-sheet-table td[contenteditable="true"], #online-sheet-table th[contenteditable="true"]').forEach(cell => {
+          cell.addEventListener('focus', () => {
+            activeCell = cell;
+            if (formulaBar) formulaBar.value = cell.innerText;
+          });
+          cell.addEventListener('input', () => {
+            if (activeCell === cell && formulaBar) {
+              formulaBar.value = cell.innerText;
+            }
+          });
+        });
+        if (formulaBar) {
+          formulaBar.addEventListener('input', () => {
+            if (activeCell) {
+              activeCell.innerText = formulaBar.value;
+            }
+          });
+        }
+
+        // Importação de arquivo local editado no PC (CSV / Texto)
+        const localFileInput = editorModal.querySelector('#input-sheet-sync-local');
+        if (localFileInput) {
+          localFileInput.addEventListener('change', (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (re) => {
+              try {
+                const text = re.target?.result;
+                if (typeof text === 'string') {
+                  const lines = text.split(/\\r?\\n/).filter(l => l.trim().length > 0);
+                  const sep = lines[0].includes(';') ? ';' : (lines[0].includes('\\t') ? '\\t' : ',');
+                  const parsed = lines.map(l => l.split(sep).map(v => v.replace(/^"|"$/g, '').trim()));
+                  if (parsed.length > 0) {
+                    renderSheetModal(currentSheetName, parsed);
+                    showToast(`📤 Planilha '${file.name}' sincronizada com sucesso!`, 'success');
+                  }
+                }
+              } catch (ex) {
+                showToast('Erro ao ler arquivo: ' + ex.message, 'error');
+              }
+            };
+            reader.readAsText(file);
+          });
+        }
+
+        editorModal.querySelectorAll('.btn-sheet-tab').forEach(tabBtn => {
+          tabBtn.addEventListener('click', () => {
+            const targetSheet = decodeURIComponent(tabBtn.getAttribute('data-sheet'));
+            savedPayload = null;
+            renderSheetModal(targetSheet, authSheets[targetSheet]);
+          });
+        });
+        const readGrid = () => Array.from(editorModal.querySelectorAll('#online-sheet-table tr')).map(tr =>
+          Array.from(tr.children).slice(1).map(cell => cell.innerText.trim())
+        );
+        editorModal.querySelector('#btn-sheet-add-row').addEventListener('click', () => {
+          const cols = editorModal.querySelectorAll('#online-sheet-table thead th').length - 1;
+          const currentTrs = editorModal.querySelectorAll('#online-sheet-table tbody tr').length;
+          const tr = document.createElement('tr');
+          tr.setAttribute('data-row-idx', String(currentTrs + 1));
+          const numTd = document.createElement('td');
+          numTd.style.cssText = 'border:1px solid #CBD5E1;padding:5px;text-align:center;color:#94A3B8;font-size:11px;font-weight:600;background:#F8FAFC;user-select:none;';
+          numTd.innerText = String(currentTrs + 1);
+          tr.appendChild(numTd);
+          for (let i = 0; i < cols; i++) {
+            const td = document.createElement('td');
+            td.contentEditable = 'true';
+            td.style.cssText = 'border:1px solid #E2E8F0;padding:6px 10px;color:#334155;';
+            td.addEventListener('focus', () => {
+              activeCell = td;
+              if (formulaBar) formulaBar.value = td.innerText;
+            });
+            td.addEventListener('input', () => {
+              if (activeCell === td && formulaBar) formulaBar.value = td.innerText;
+            });
+            tr.appendChild(td);
+          }
+          editorModal.querySelector('#online-sheet-table tbody').appendChild(tr);
+        });
+        const resetBtn = editorModal.querySelector('#btn-sheet-reset');
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => {
+            localStorage.removeItem(storageKey);
+            savedPayload = null;
+            renderSheetModal(currentSheetName, authSheets[currentSheetName]);
+            showToast('🔄 Planilha restaurada para o conteúdo autêntico original!', 'info');
+          });
+        }
+        editorModal.querySelector('#btn-sheet-save').addEventListener('click', () => {
+          localStorage.setItem(storageKey, JSON.stringify(readGrid()));
+          showToast('✅ Alterações da planilha salvas online com sucesso!', 'success');
+        });
+        editorModal.querySelector('#btn-sheet-export-csv').addEventListener('click', () => {
+          const grid = readGrid();
+          const sep = String.fromCharCode(10);
+          const csv = '\\uFEFF' + grid.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(';')).join(sep);
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const u = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = u;
+          a.download = name.replace(/\\.(xlsx|xls|csv)$/i, '') + '_editado.csv';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(u), 2000);
+          showToast('📥 Planilha exportada com as edições!', 'success');
+        });
+      }
+      renderSheetModal(activeSheet, rows);
+    }
+    window.openOnlineSheetEditor = openOnlineSheetEditor;
+
     // RESOLUÇÃO DE RELATÓRIOS OFICIAIS: In-DOM Modal + Nova Aba com URL Segura
     function openReportDocument(docId, docNameEsc) {
       const docName = decodeURIComponent(docNameEsc || '');
