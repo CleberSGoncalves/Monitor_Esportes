@@ -4674,6 +4674,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const isEscala = name.toLowerCase().includes('escala') && name.endsWith('.xlsx');
       const isRdp = name.endsWith('.rdp') || name.endsWith('.RDP');
       const isPdfReport = name.endsWith('.pdf');
+      const isSpreadsheet = ['XLSX', 'XLS', 'CSV'].includes(ext) || name.toLowerCase().endsWith('.xlsx') || name.toLowerCase().endsWith('.xls');
 
       let downloadHref = `javascript:downloadAutonomousMockDoc('${encodeURIComponent(name)}')`;
       if (isEscala) {
@@ -4682,6 +4683,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         downloadHref = `reports/${name}`;
       } else if (isRdp) {
         downloadHref = `javascript:generateAndDownloadRdp('${encodeURIComponent(name)}')`;
+      } else if (isSpreadsheet) {
+        downloadHref = `sheets/${encodeURIComponent(name)}`;
       }
 
       const modalHtml = `
@@ -4792,14 +4795,18 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
       // Carregar base autêntica extraída dos arquivos reais do SharePoint
       if (!window.__AUTHENTIC_SHEETS_DATA) {
-        try {
-          const resp = await fetch('assets/authentic_sheets_data.json?v=' + Date.now());
-          if (resp.ok) {
-            window.__AUTHENTIC_SHEETS_DATA = await resp.json();
-          } else {
+        if (window.location.protocol !== 'file:') {
+          try {
+            const resp = await fetch('assets/authentic_sheets_data.json?v=' + Date.now());
+            if (resp.ok) {
+              window.__AUTHENTIC_SHEETS_DATA = await resp.json();
+            } else {
+              window.__AUTHENTIC_SHEETS_DATA = {};
+            }
+          } catch (e) {
             window.__AUTHENTIC_SHEETS_DATA = {};
           }
-        } catch (e) {
+        } else {
           window.__AUTHENTIC_SHEETS_DATA = {};
         }
       }
@@ -4846,6 +4853,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         const rowCount = Math.max(0, currentRows.length - 1);
         const encodedDoc = encodeURIComponent(name);
         const directDocUrl = `sheets/${encodedDoc}`;
+        const isFileProto = window.location.protocol === 'file:';
+        const cleanFileName = name.toLowerCase().endsWith('.xlsx') ? name : `${name}.xlsx`;
 
         editorModal.innerHTML = `
           <div style="background:#fff;width:100vw;height:100vh;display:flex;flex-direction:column;overflow:hidden;">
@@ -4864,15 +4873,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               </div>
               <div style="display:flex;align-items:center;gap:8px;">
                 <!-- ABRIR NO EXCEL DESKTOP -->
-                <button type="button" id="btn-open-desktop-excel" class="btn-action" style="background:#fff;color:#107C41;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;border:none;cursor:pointer;">
+                <button type="button" id="btn-open-desktop-excel" class="btn-action" style="background:#fff;color:#107C41;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;border:none;cursor:pointer;" title="Baixar e abrir imediatamente no aplicativo nativo (Excel / LibreOffice)">
                   <span>🖥️</span> Abrir no Excel (Desktop)
                 </button>
+                ${isFileProto ? `
+                <!-- ABRIR CAMINHO LOCAL (PROTOCOLO FILE:///) -->
+                <button type="button" id="btn-open-local-file" class="btn-action" style="background:rgba(255,255,255,0.18);color:#fff;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.4);cursor:pointer;" title="Abrir ou copiar o caminho direto do arquivo no computador">
+                  <span>📁</span> Arquivo Local
+                </button>
+                ` : ''}
                 <!-- ABRIR NO GOOGLE SHEETS -->
                 <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" rel="noopener noreferrer" class="btn-action" style="background:rgba(255,255,255,0.18);color:#fff;font-weight:700;font-size:11.5px;padding:6px 12px;border-radius:5px;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,0.4);text-decoration:none;cursor:pointer;">
                   <span>📈</span> Abrir no Google Sheets
                 </a>
                 <!-- BAIXAR ORIGINAL -->
-                <a href="${directDocUrl}" download="${name}" class="btn-action" style="background:rgba(255,255,255,0.12);color:#fff;font-size:11.5px;padding:6px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.3);text-decoration:none;">
+                <a href="${directDocUrl}" download="${cleanFileName}" class="btn-action" style="background:rgba(255,255,255,0.12);color:#fff;font-size:11.5px;padding:6px 10px;border-radius:5px;border:1px solid rgba(255,255,255,0.3);text-decoration:none;">
                   📥 Baixar .xlsx
                 </a>
                 <button type="button" data-close-sheet style="background:none;border:none;color:#fff;font-size:26px;cursor:pointer;line-height:1;margin-left:8px;" title="Fechar Editor">&times;</button>
@@ -4935,18 +4950,109 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         document.body.appendChild(editorModal);
         editorModal.querySelectorAll('[data-close-sheet]').forEach(b => b.addEventListener('click', () => editorModal.remove()));
 
-        // Suporte para abrir no Excel Desktop nativo da máquina
+        // Suporte para abrir no Excel Desktop nativo da máquina (Download imediato de arquivo autêntico .xlsx com MIME correto)
+        async function triggerExcelDownloadAndOpen() {
+          let localFsPath = '';
+          if (isFileProto) {
+            try {
+              const rawPath = window.location.pathname;
+              const cleanPath = decodeURIComponent(rawPath.replace(/^\/([a-zA-Z]:)/, '$1'));
+              const dirPath = cleanPath.substring(0, cleanPath.lastIndexOf('/') + 1).split('/').join(String.fromCharCode(92));
+              localFsPath = dirPath + 'sheets' + String.fromCharCode(92) + name;
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(localFsPath).catch(() => {});
+              }
+            } catch (e) {}
+          }
+
+          showToast('🖥️ Baixando planilha autêntica para o Excel Desktop...', 'info');
+
+          // Em ambiente local file:///, navegadores bloqueiam fetch por política de CORS local.
+          // O download é disparado diretamente via âncora nativa com atributo download.
+          if (isFileProto) {
+            const dlLink = document.createElement('a');
+            dlLink.href = directDocUrl;
+            dlLink.download = cleanFileName;
+            document.body.appendChild(dlLink);
+            dlLink.click();
+            setTimeout(() => {
+              document.body.removeChild(dlLink);
+            }, 1500);
+
+            if (localFsPath) {
+              showToast(`✅ Planilha baixada! Caminho no disco: ${localFsPath} (copiado).`, 'success');
+            } else {
+              showToast(`✅ Download iniciado: '${cleanFileName}'. Abra no Excel Desktop.`, 'success');
+            }
+          } else {
+            // Em ambiente Web / GitHub Pages / Servidor HTTP:
+            try {
+              // 1. Tentar obter o arquivo autêntico .xlsx via fetch e instanciar Blob com MIME application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+              const resp = await fetch(directDocUrl);
+              if (!resp.ok) throw new Error('HTTP ' + resp.status);
+              const arrayBuffer = await resp.arrayBuffer();
+              const blob = new Blob([arrayBuffer], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+              });
+              const blobUrl = URL.createObjectURL(blob);
+              const dlLink = document.createElement('a');
+              dlLink.href = blobUrl;
+              dlLink.download = cleanFileName;
+              document.body.appendChild(dlLink);
+              dlLink.click();
+              setTimeout(() => {
+                document.body.removeChild(dlLink);
+                URL.revokeObjectURL(blobUrl);
+              }, 2000);
+
+              showToast(`✅ Planilha autêntica '${cleanFileName}' baixada! Abra o arquivo no Excel Desktop.`, 'success');
+            } catch (err) {
+              // 2. Fallback robusto via elemento <a> com atributo download
+              const dlLink = document.createElement('a');
+              dlLink.href = directDocUrl;
+              dlLink.download = cleanFileName;
+              document.body.appendChild(dlLink);
+              dlLink.click();
+              setTimeout(() => {
+                document.body.removeChild(dlLink);
+              }, 1500);
+
+              showToast(`✅ Download iniciado: '${cleanFileName}'. Abra no Excel Desktop.`, 'success');
+            }
+          }
+
+          setTimeout(() => {
+            showToast('💡 Dica: Após editar no Excel, use o botão "Sincronizar Arquivo Salvo do PC" para atualizar o portal online.', 'info');
+          }, 3200);
+        }
+
         const btnDesktopExcel = editorModal.querySelector('#btn-open-desktop-excel');
         if (btnDesktopExcel) {
-          btnDesktopExcel.addEventListener('click', () => {
-            const docFullUrl = `${window.location.origin}/${directDocUrl}`;
-            // Protocol handler oficial do Microsoft Office
-            const officeUri = `ms-excel:ofe|u|${docFullUrl}`;
-            window.location.href = officeUri;
-            showToast('🖥️ Solicitando abertura no Microsoft Excel Desktop...', 'info');
-            setTimeout(() => {
-              showToast('💡 Dica: Após editar no Excel, use o botão "Sincronizar Arquivo Salvo do PC" para atualizar o portal.', 'info');
-            }, 2500);
+          btnDesktopExcel.addEventListener('click', triggerExcelDownloadAndOpen);
+        }
+
+        // Se estiver rodando localmente (file:///), botão para abrir / copiar o caminho direto do arquivo no computador
+        const btnOpenLocal = editorModal.querySelector('#btn-open-local-file');
+        if (btnOpenLocal) {
+          btnOpenLocal.addEventListener('click', () => {
+            try {
+              const rawPath = window.location.pathname;
+              const cleanPath = decodeURIComponent(rawPath.replace(/^\/([a-zA-Z]:)/, '$1'));
+              const dirPath = cleanPath.substring(0, cleanPath.lastIndexOf('/') + 1).split('/').join(String.fromCharCode(92));
+              const localFsPath = dirPath + 'sheets' + String.fromCharCode(92) + name;
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(localFsPath).then(() => {
+                  showToast(`📁 Caminho copiado: "${localFsPath}" (Cole no Win+R ou Explorador)`, 'success');
+                }).catch(() => {
+                  showToast(`📁 Arquivo local: "${localFsPath}"`, 'info');
+                });
+              } else {
+                showToast(`📁 Arquivo local: "${localFsPath}"`, 'info');
+              }
+              window.open(directDocUrl, '_blank');
+            } catch (e) {
+              showToast('Não foi possível resolver o caminho local do arquivo.', 'error');
+            }
           });
         }
 
@@ -5118,6 +5224,18 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     function downloadAutonomousMockDoc(docNameEsc) {
       const docName = decodeURIComponent(docNameEsc || 'documento');
+      const ext = (docName.split('.').pop() || '').toLowerCase();
+      if (['xlsx', 'xls'].includes(ext)) {
+        const cleanName = docName.toLowerCase().endsWith('.xlsx') ? docName : `${docName}.xlsx`;
+        const a = document.createElement('a');
+        a.href = `sheets/${encodeURIComponent(cleanName)}`;
+        a.download = cleanName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => document.body.removeChild(a), 1500);
+        showToast(`📥 Planilha autêntica '${cleanName}' baixada do repositório corporativo!`, 'success');
+        return;
+      }
       const content = `Central de Suporte Captação - Documento Oficial\nArquivo: ${docName}\nRepositório: Google Workspace Autônomo\nStatus: Sincronizado\nData: 2026-11-25\n`;
       const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);

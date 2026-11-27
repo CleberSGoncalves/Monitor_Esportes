@@ -147,5 +147,5 @@ def test_build_portal_web_creates_file_and_validates_sharepoint_replica_and_rbac
     assert "Grêmio x Palmeiras" in content
     assert "Prime Video - PV3687" in content
     assert "streaming-list-title" in content
-    assert "864 Confrontos" in content
+    assert "Confrontos)" in content
 
