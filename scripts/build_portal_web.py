@@ -4786,188 +4786,181 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     }
     window.saveGoogleSheetLink = saveGoogleSheetLink;
 
-    function openOnlineSheetEditor(docNameEsc) {
+    async function openOnlineSheetEditor(docNameEsc) {
       const name = decodeURIComponent(docNameEsc || 'Planilha.xlsx');
       const storageKey = 'sp_online_sheet_' + encodeURIComponent(name);
-      let rows = [];
-      try {
-        const saved = localStorage.getItem(storageKey);
-        if (saved) rows = JSON.parse(saved);
-      } catch (e) {}
 
-      if (!Array.isArray(rows) || rows.length === 0) {
-        const nl = name.toLowerCase();
-        if (nl.includes('treinamento') || nl.includes('capacita')) {
-          rows = [
-            ['Módulo', 'Tópico de Treinamento', 'Carga Horária', 'Técnico / Responsável', 'Status', 'Data Conclusão', 'Avaliação'],
-            ['MOD-01', 'Sintonia DTV e Frequências UHF / Tuners', '4h', 'Cleber Gonçalves', 'Concluído', '15/10/2026', 'Apto (10.0)'],
-            ['MOD-02', 'Operação e Configuração Atria Capture', '6h', 'Equipe Suporte Captação', 'Concluído', '22/10/2026', 'Apto (9.8)'],
-            ['MOD-03', 'Fluxo de FastMatching e Ingestão EMU', '4h', 'Lucineides / Cleber', 'Concluído', '05/11/2026', 'Apto (10.0)'],
-            ['MOD-04', 'Diagnóstico de RF e Apontamento de Antenas', '8h', 'Técnicos de Campo', 'Em Andamento', '-', 'Pendente'],
-            ['MOD-05', 'NOC e Auditoria de Jogos Streaming', '5h', 'Equipe Captação', 'Concluído', '20/11/2026', 'Apto (9.5)']
-          ];
-        } else if (nl.includes('tratativa') || nl.includes('problema')) {
-          rows = [
-            ['ID Tratativa', 'Praça / Host', 'Problema Reportado', 'Causa Raiz', 'Ação Corretiva', 'Status', 'Data Abertura', 'Técnico Responsável'],
-            ['TRAT-2026-081', 'Cascavel (CS01)', 'Oscilação intermitente no canal Band', 'Cabo coaxial degradado na torre', 'Substituição conector RG6 e reancoragem', 'Concluído', '12/11/2026', 'Equipe Campo'],
-            ['TRAT-2026-082', 'Itumbiara (CS01)', 'Nível de sinal baixo em dias chuvosos', 'Apontamento com perda de ganho 3dB', 'Reajuste do azimute para 45°', 'Concluído', '18/11/2026', 'Antenista Local'],
-            ['TRAT-2026-083', 'Cachoeiro (CS02)', 'Falha de comunicação no switch do CS', 'Porta LAN travada por surto elétrico', 'Troca de porta e fixação de protetor', 'Concluído', '24/11/2026', 'Suporte Captação'],
-            ['TRAT-2026-084', 'Corumbá (CS01)', 'Revisão geral de stack e multiplex', 'Atualização homologada Atria', 'Em Homologação', 'Em Andamento', '26/11/2026', 'Cleber Gonçalves']
-          ];
-        } else if (nl.includes('teamviewer') || nl.includes('anydesk') || nl.includes('acesso')) {
-          rows = [
-            ['Praça / CS', 'ID Conexão Remota', 'Senha / Credencial', 'IP Local', 'Tipo Máquina', 'Responsável Local', 'Última Conexão'],
-            ['Campinas CS01', '1 482 910 234', '••••••••', '192.168.10.52', 'Dell OptiPlex 7080 (Windows 11 Pro)', 'Cleber Gonçalves', 'Hoje 08:30'],
-            ['Cascavel CS01', '1 294 811 092', '••••••••', '192.168.10.215', 'HP ProDesk 400 (Windows 10)', 'Lucineides', '26/11/2026'],
-            ['Itumbiara CS01', '1 839 204 771', '••••••••', '192.168.10.289', 'Dell OptiPlex 3090', 'Suporte Captação', '25/11/2026'],
-            ['Cachoeiro CS01', '1 772 109 432', '••••••••', '192.168.10.312', 'Dell OptiPlex 7080', 'Antenista Local', '26/11/2026'],
-            ['Corumbá CS01', '1 902 443 118', '••••••••', '192.168.10.330', 'Dell Precision 3640', 'Cleber Gonçalves', 'Hoje 07:15']
-          ];
-        } else if (nl.includes('ferias') || nl.includes('férias')) {
-          rows = [
-            ['Colaborador', 'Matrícula', 'Período Aquisitivo', 'Início das Férias', 'Retorno', 'Dias', 'Status Homologação', 'Substituto Imediato'],
-            ['Cleber Gonçalves', 'IB-10928', '2025/2026', '01/12/2026', '15/12/2026', '15', 'Aprovado RH', 'Lucineides (RL01)'],
-            ['Lucineides', 'IB-10844', '2025/2026', '16/01/2027', '30/01/2027', '15', 'Aprovado RH', 'Cleber Gonçalves'],
-            ['Marcelo Silva', 'IB-11023', '2025/2026', '05/02/2027', '24/02/2027', '20', 'Planejado', 'Plantão Captação'],
-            ['Técnico Suporte 01', 'IB-11200', '2025/2026', '01/03/2027', '20/03/2027', '20', 'Pendente', 'Equipe Captação']
-          ];
-        } else if (nl.includes('escala')) {
-          rows = [
-            ['Dia', 'Data', 'Turno 1 (07h às 15h)', 'Turno 2 (15h às 23h)', 'Turno 3 (23h às 07h)', 'Sobreaviso 24h', 'Observação CLT / Art 66'],
-            ['Segunda', '24/11/2026', 'Cleber Gonçalves', 'Lucineides', 'Plantão Central', 'Cleber Gonçalves', 'Intervalo interjornada cumprido'],
-            ['Terça', '25/11/2026', 'Lucineides', 'Marcelo Silva', 'Plantão Central', 'Lucineides', 'Operação regular'],
-            ['Quarta', '26/11/2026', 'Cleber Gonçalves', 'Lucineides', 'Plantão Central', 'Cleber Gonçalves', 'Rodada CBF / Brasileirão'],
-            ['Quinta', '27/11/2026', 'Marcelo Silva', 'Cleber Gonçalves', 'Plantão Central', 'Marcelo Silva', 'Jogos NFL e NBA'],
-            ['Sexta', '28/11/2026', 'Lucineides', 'Marcelo Silva', 'Plantão Central', 'Plantão Fim de Semana', 'Planejamento fim de semana']
-          ];
-        } else if (nl.includes('campeonato') || nl.includes('sam')) {
-          rows = [
-            ['Campeonato', 'País / Região', 'Emissora / Plataforma', 'Detentora Direitos', 'Início', 'Término', 'Status Monitoramento'],
-            ['Brasileirão Série A', 'Brasil', 'Globo / Prime Video / Premiere', 'CBF / Clubes', 'Abril/2026', 'Dezembro/2026', '100% Monitorado (Ativo)'],
-            ['Copa do Brasil', 'Brasil', 'Globo / Prime Video', 'CBF', 'Fevereiro/2026', 'Novembro/2026', '100% Monitorado (Ativo)'],
-            ['NBA Temporada Regular', 'EUA / Global', 'YouTube / Prime Video / NBA App', 'NBA Properties', 'Outubro/2026', 'Abril/2027', '100% Monitorado (Ativo)'],
-            ['NFL Temporada Regular', 'EUA / Global', 'Netflix / CazéTV / ESPN', 'NFL Enterprises', 'Setembro/2026', 'Fevereiro/2027', '100% Monitorado (Ativo)'],
-            ['Copa Libertadores', 'América do Sul', 'Globo / ESPN / Paramount+', 'CONMEBOL', 'Março/2026', 'Novembro/2026', '100% Monitorado (Ativo)']
-          ];
-        } else if (nl.includes('fornecedor') || nl.includes('avaliacao') || nl.includes('avaliação')) {
-          rows = [
-            ['Fornecedor', 'Serviço / Produto', 'Critério Qualidade', 'Pontuação (1 a 10)', 'Conformidade SLA', 'Status Homologação', 'Auditor Técnico'],
-            ['Claro / Embratel', 'Link IP Dedicado 100Mbps', 'Disponibilidade e Latência', '9.8', '99.9% (Dentro)', 'Homologado', 'Cleber Gonçalves'],
-            ['Vivo Fibra Empresas', 'Link de Backup e Acesso Remoto', 'Estabilidade e MTTR', '9.5', '99.5% (Dentro)', 'Homologado', 'Lucineides'],
-            ['Antenistas Associados', 'Manutenção Preventiva de Torres', 'Agilidade no Chamado', '9.0', '98.0% (Dentro)', 'Homologado', 'Suporte Captação'],
-            ['Dell Technologies', 'Hardware Servidores CS', 'Garantia ProSupport NBD', '10.0', '100.0% (Dentro)', 'Homologado', 'Equipe Captação']
-          ];
-        } else if (nl.includes('contrato')) {
-          rows = [
-            ['Parceiro / Hospedeiro', 'Objeto do Contrato', 'Vigência Início', 'Vigência Fim', 'Valor Mensal (R$)', 'Status Contratual', 'Gestor Técnico'],
-            ['Hospedeiro Campinas', 'Locação de espaço e ponto de energia CS01', '01/01/2026', '31/12/2026', 'R$ 1.850,00', 'Vigente', 'Cleber Gonçalves'],
-            ['Hospedeiro Cascavel', 'Locação de espaço e mastro de antena CS01', '01/03/2026', '28/02/2027', 'R$ 1.600,00', 'Vigente', 'Lucineides'],
-            ['Hospedeiro Itumbiara', 'Ponto de captação e link fibra dedicado', '01/05/2026', '30/04/2027', 'R$ 1.750,00', 'Vigente', 'Suporte Captação'],
-            ['Hospedeiro Corumbá', 'Locação de infraestrutura climatizada', '01/06/2026', '31/05/2027', 'R$ 1.900,00', 'Vigente', 'Cleber Gonçalves']
-          ];
-        } else if (nl.includes('sla')) {
-          rows = [
-            ['Indicador / Métrica', 'Meta SLA (%)', 'Realizado Acumulado (%)', 'Praça / Escopo', 'Desvios Registrados', 'Status', 'Mês de Referência'],
-            ['Disponibilidade Gravadores Atria', '99.50%', '99.88%', 'Nacional (Todos os CS)', '0 eventos críticos', 'Dentro da Meta (100%)', 'Novembro/2026'],
-            ['Auditoria de Transmissão CBF', '99.00%', '99.90%', 'Jogos Série A e Copa do Brasil', 'Nenhum atraso', 'Dentro da Meta (100%)', 'Novembro/2026'],
-            ['Tempo de Resposta Incidentes N1', '≤ 15 min', '8.2 min', 'Central de Captação', '0 estouros', 'Dentro da Meta (100%)', 'Novembro/2026'],
-            ['Ingestão de Detecções Acústicas', '98.00%', '99.40%', 'FastMatching & SGG', 'Dentro dos parâmetros', 'Dentro da Meta (100%)', 'Novembro/2026']
-          ];
-        } else if (nl.includes('ocorrencia') || nl.includes('analise_de_dados') || nl.includes('retroativo')) {
-          rows = [
-            ['Data Ocorrência', 'Praça / Host', 'Tipo de Incidente', 'Tempo Indisponibilidade (min)', 'Impacto na Captação', 'Status Resolução', 'Técnico Responsável'],
-            ['14/11/2026 14:20', 'Cascavel CS01', 'Queda de energia externa na concessionária', '45 min', 'Operou em No-Break (sem perda de áudio)', 'Resolvido', 'Lucineides'],
-            ['19/11/2026 09:15', 'Campinas CS01', 'Troca programada de patch de segurança', '12 min', 'Agendado na janela da madrugada', 'Resolvido', 'Cleber Gonçalves'],
-            ['22/11/2026 18:00', 'Itumbiara CS01', 'Atenuação de RF por rajada de vento', '0 min (sinal degradou 4dB)', 'Gravação contínua mantida', 'Normalizado', 'Antenista Local'],
-            ['25/11/2026 21:00', 'Cachoeiro CS01', 'Alinhamento de perfil de sintonia EMU', '5 min', 'Reversão concluída com sucesso', 'Resolvido', 'Suporte Captação']
-          ];
-        } else {
-          rows = [
-            ['Código / Item', 'Descrição do Registro', 'Setor / Categoria', 'Data de Referência', 'Status Operacional', 'Responsável Técnico', 'Observações'],
-            ['REG-001', `Registro inicial da planilha ${name}`, 'Operação Captação', new Date().toLocaleDateString('pt-BR'), 'Ativo', 'Equipe Captação', 'Documento corporativo sincronizado'],
-            ['REG-002', 'Parâmetros operacionais e validação de conformidade', 'Qualidade & SLA', new Date().toLocaleDateString('pt-BR'), 'Conforme', 'Cleber Gonçalves', 'Auditado no Google Workspace'],
-            ['REG-003', 'Controle e acompanhamento de rotinas', 'Infraestrutura CS', new Date().toLocaleDateString('pt-BR'), 'Em Andamento', 'Suporte Captação', 'Pronto para edição e adição de linhas']
-          ];
+      // Carregar base autêntica extraída dos arquivos reais do SharePoint
+      if (!window.__AUTHENTIC_SHEETS_DATA) {
+        try {
+          const resp = await fetch('assets/authentic_sheets_data.json?v=' + Date.now());
+          if (resp.ok) {
+            window.__AUTHENTIC_SHEETS_DATA = await resp.json();
+          } else {
+            window.__AUTHENTIC_SHEETS_DATA = {};
+          }
+        } catch (e) {
+          window.__AUTHENTIC_SHEETS_DATA = {};
         }
       }
-      document.getElementById('modal-online-sheet-editor')?.remove();
-      const editorModal = document.createElement('div');
-      editorModal.id = 'modal-online-sheet-editor';
-      editorModal.className = 'sp-modal-overlay';
-      editorModal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(15,23,42,0.82);backdrop-filter:blur(4px);z-index:10050;justify-content:center;align-items:center;padding:16px;';
-      editorModal.innerHTML = `
-        <div style="background:#fff;border-radius:12px;width:96%;max-width:980px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);">
-          <div style="background:linear-gradient(135deg,#0F766E,#059669);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <h3 style="margin:0;font-size:15px;font-weight:700;">📝 Editor Online de Planilha — ${name}</h3>
-              <div style="font-size:11px;opacity:0.9;">Edite as células diretamente e salve no portal ou exporte em CSV/Excel</div>
-            </div>
-            <button type="button" data-close-sheet style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;">&times;</button>
+
+      const authSheets = window.__AUTHENTIC_SHEETS_DATA[name] || null;
+      const sheetNames = authSheets ? Object.keys(authSheets) : [];
+      let activeSheet = sheetNames[0] || 'Planilha1';
+
+      let savedPayload = null;
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) savedPayload = JSON.parse(saved);
+      } catch (e) {}
+
+      let rows = [];
+      if (Array.isArray(savedPayload) && savedPayload.length > 0) {
+        rows = savedPayload;
+      } else if (authSheets && sheetNames.length > 0 && Array.isArray(authSheets[activeSheet]) && authSheets[activeSheet].length > 0) {
+        rows = authSheets[activeSheet];
+      } else {
+        rows = [
+          ['Documento', 'Status', 'Observação'],
+          [name, 'Arquivo sincronizado', 'Planilha sem linhas tabulares extraíveis ou protegida — clique em Baixar Arquivo para abrir no Excel.']
+        ];
+      }
+
+      function renderSheetModal(currentSheetName, currentRows) {
+        document.getElementById('modal-online-sheet-editor')?.remove();
+        const editorModal = document.createElement('div');
+        editorModal.id = 'modal-online-sheet-editor';
+        editorModal.className = 'sp-modal-overlay';
+        editorModal.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(15,23,42,0.82);backdrop-filter:blur(4px);z-index:10050;justify-content:center;align-items:center;padding:16px;';
+        const tabsHtml = sheetNames.length > 1 ? `
+          <div style="display:flex;gap:6px;padding:8px 20px;background:#F1F5F9;border-bottom:1px solid #CBD5E1;overflow-x:auto;">
+            ${sheetNames.map(sn => `<button type="button" class="btn-sheet-tab" data-sheet="${encodeURIComponent(sn)}" style="padding:4px 10px;border-radius:4px;font-size:11.5px;font-weight:700;cursor:pointer;border:1px solid ${sn === currentSheetName ? '#0F766E' : '#CBD5E1'};background:${sn === currentSheetName ? '#0F766E' : '#fff'};color:${sn === currentSheetName ? '#fff' : '#334155'};">${sn}</button>`).join('')}
           </div>
-          <div style="padding:14px 20px;overflow:auto;flex:1;">
-            <table id="online-sheet-table" style="width:100%;border-collapse:collapse;font-size:12.5px;">
-              <thead>
-                <tr style="background:#F1F5F9;">
-                  ${rows[0].map((col, ci) => `<th contenteditable="true" style="border:1px solid #CBD5E1;padding:8px 10px;text-align:left;font-weight:700;color:#1E293B;min-width:110px;">${col}</th>`).join('')}
-                </tr>
-              </thead>
-              <tbody>
-                ${rows.slice(1).map(r => `<tr>${r.map(c => `<td contenteditable="true" style="border:1px solid #CBD5E1;padding:7px 10px;color:#334155;">${c}</td>`).join('')}</tr>`).join('')}
-              </tbody>
-            </table>
-          </div>
-          <div style="background:#F8FAFC;border-top:1px solid #E2E8F0;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <div style="display:flex;gap:8px;">
-              <button type="button" id="btn-sheet-add-row" class="btn-action btn-action-secondary" style="font-size:12px;">➕ Adicionar Linha</button>
-              <button type="button" id="btn-sheet-export-csv" class="btn-action btn-action-secondary" style="font-size:12px;">📥 Exportar .CSV (Excel)</button>
+        ` : '';
+        const sourceBadge = savedPayload
+          ? '<span style="background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;margin-left:8px;">Editado Localmente</span>'
+          : (authSheets ? '<span style="background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;margin-left:8px;">✓ Conteúdo Autêntico SharePoint</span>' : '');
+
+        editorModal.innerHTML = `
+          <div style="background:#fff;border-radius:12px;width:96%;max-width:1100px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);">
+            <div style="background:linear-gradient(135deg,#0F766E,#059669);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <h3 style="margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;">📝 Editor Online de Planilha — ${name} ${sourceBadge}</h3>
+                <div style="font-size:11px;opacity:0.9;">Edite as células diretamente e salve no portal ou exporte em CSV/Excel</div>
+              </div>
+              <button type="button" data-close-sheet style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;">&times;</button>
             </div>
-            <div style="display:flex;gap:8px;">
-              <button type="button" data-close-sheet class="btn-action btn-action-secondary" style="font-size:12px;">Fechar</button>
-              <button type="button" id="btn-sheet-save" class="btn-action btn-action-primary" style="font-size:12px;background:#059669;border-color:#059669;">💾 Salvar Alterações Online</button>
+            ${tabsHtml}
+            <div style="padding:14px 20px;overflow:auto;flex:1;">
+              <table id="online-sheet-table" style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                  <tr style="background:#F1F5F9;">
+                    ${currentRows[0].map(col => `<th contenteditable="true" style="border:1px solid #CBD5E1;padding:7px 9px;text-align:left;font-weight:700;color:#1E293B;min-width:90px;">${String(col || '')}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${currentRows.slice(1).map(r => `<tr>${r.map(c => `<td contenteditable="true" style="border:1px solid #CBD5E1;padding:6px 9px;color:#334155;">${String(c || '')}</td>`).join('')}</tr>`).join('')}
+                </tbody>
+              </table>
+            </div>
+            <div style="background:#F8FAFC;border-top:1px solid #E2E8F0;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" id="btn-sheet-add-row" class="btn-action btn-action-secondary" style="font-size:12px;">➕ Adicionar Linha</button>
+                <button type="button" id="btn-sheet-export-csv" class="btn-action btn-action-secondary" style="font-size:12px;">📥 Exportar .CSV (Excel)</button>
+                ${savedPayload && authSheets ? '<button type="button" id="btn-sheet-reset" class="btn-action btn-action-secondary" style="font-size:12px;">🔄 Restaurar Original</button>' : ''}
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button type="button" data-close-sheet class="btn-action btn-action-secondary" style="font-size:12px;">Fechar</button>
+                <button type="button" id="btn-sheet-save" class="btn-action btn-action-primary" style="font-size:12px;background:#059669;border-color:#059669;">💾 Salvar Alterações Online</button>
+              </div>
             </div>
           </div>
-        </div>
-      `;
-      document.body.appendChild(editorModal);
-      editorModal.querySelectorAll('[data-close-sheet]').forEach(b => b.addEventListener('click', () => editorModal.remove()));
-      const readGrid = () => Array.from(editorModal.querySelectorAll('#online-sheet-table tr')).map(tr =>
-        Array.from(tr.children).map(cell => cell.innerText.trim())
-      );
-      editorModal.querySelector('#btn-sheet-add-row').addEventListener('click', () => {
-        const cols = editorModal.querySelectorAll('#online-sheet-table thead th').length;
-        const tr = document.createElement('tr');
-        for (let i = 0; i < cols; i++) {
-          const td = document.createElement('td');
-          td.contentEditable = 'true';
-          td.style.cssText = 'border:1px solid #CBD5E1;padding:7px 10px;color:#334155;';
-          tr.appendChild(td);
+        `;
+        document.body.appendChild(editorModal);
+        editorModal.querySelectorAll('[data-close-sheet]').forEach(b => b.addEventListener('click', () => editorModal.remove()));
+        editorModal.querySelectorAll('.btn-sheet-tab').forEach(tabBtn => {
+          tabBtn.addEventListener('click', () => {
+            const targetSheet = decodeURIComponent(tabBtn.getAttribute('data-sheet'));
+            savedPayload = null;
+            renderSheetModal(targetSheet, authSheets[targetSheet]);
+          });
+        });
+        const readGrid = () => Array.from(editorModal.querySelectorAll('#online-sheet-table tr')).map(tr =>
+          Array.from(tr.children).map(cell => cell.innerText.trim())
+        );
+        editorModal.querySelector('#btn-sheet-add-row').addEventListener('click', () => {
+          const cols = editorModal.querySelectorAll('#online-sheet-table thead th').length;
+          const tr = document.createElement('tr');
+          for (let i = 0; i < cols; i++) {
+            const td = document.createElement('td');
+            td.contentEditable = 'true';
+            td.style.cssText = 'border:1px solid #CBD5E1;padding:6px 9px;color:#334155;';
+            tr.appendChild(td);
+          }
+          editorModal.querySelector('#online-sheet-table tbody').appendChild(tr);
+        });
+        const resetBtn = editorModal.querySelector('#btn-sheet-reset');
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => {
+            localStorage.removeItem(storageKey);
+            savedPayload = null;
+            renderSheetModal(currentSheetName, authSheets[currentSheetName]);
+            showToast('🔄 Planilha restaurada para o conteúdo autêntico original!', 'info');
+          });
         }
-        editorModal.querySelector('#online-sheet-table tbody').appendChild(tr);
-      });
-      editorModal.querySelector('#btn-sheet-save').addEventListener('click', () => {
-        localStorage.setItem(storageKey, JSON.stringify(readGrid()));
-        showToast('✅ Alterações da planilha salvas online com sucesso!', 'success');
-      });
-      editorModal.querySelector('#btn-sheet-export-csv').addEventListener('click', () => {
-        const grid = readGrid();
-        const csv = '\\uFEFF' + grid.map(r => r.map(v => `"${v.replace(/"/g, '""')}"`).join(';')).join('\\r\\n');
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const u = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = u;
-        a.download = name.replace(/\\.(xlsx|xls|csv)$/i, '') + '_editado.csv';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(u), 2000);
-        showToast('📥 Planilha exportada com as edições!', 'success');
-      });
+        editorModal.querySelector('#btn-sheet-save').addEventListener('click', () => {
+          localStorage.setItem(storageKey, JSON.stringify(readGrid()));
+          showToast('✅ Alterações da planilha salvas online com sucesso!', 'success');
+        });
+        editorModal.querySelector('#btn-sheet-export-csv').addEventListener('click', () => {
+          const grid = readGrid();
+          const sep = String.fromCharCode(10);
+          const csv = '\\uFEFF' + grid.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(';')).join(sep);
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const u = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = u;
+          a.download = name.replace(/\\.(xlsx|xls|csv)$/i, '') + '_editado.csv';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(u), 2000);
+          showToast('📥 Planilha exportada com as edições!', 'success');
+        });
+      }
+      renderSheetModal(activeSheet, rows);
     }
     window.openOnlineSheetEditor = openOnlineSheetEditor;
 
     function openReportDocument(docId, docNameEsc) {
       const docName = decodeURIComponent(docNameEsc || '');
-      const cleanPath = docName.startsWith('reports/') ? docName : `reports/nba/${docName}`;
+      let cleanPath = '';
+      if (docName.startsWith('reports/')) {
+        cleanPath = docName;
+      } else {
+        // Buscar webUrl exato no master data da biblioteca atual ou de todas as bibliotecas
+        const drives = (typeof SP_MASTER_DATA !== 'undefined' && SP_MASTER_DATA && SP_MASTER_DATA.drives) ? SP_MASTER_DATA.drives : {};
+        const searchOrder = (typeof currentDriveKey !== 'undefined' && drives[currentDriveKey])
+          ? [drives[currentDriveKey], ...Object.values(drives)]
+          : Object.values(drives);
+        for (const drv of searchOrder) {
+          const found = (drv.items || []).find(it => (it.id === docId || it.name === docName) && it.webUrl && it.webUrl !== '#');
+          if (found) {
+            cleanPath = found.webUrl;
+            break;
+          }
+        }
+        if (!cleanPath) {
+          const nl = docName.toLowerCase();
+          if (nl.includes('youtube') || (typeof currentDriveKey !== 'undefined' && currentDriveKey === 'Relatorio Jogos Youtube')) {
+            cleanPath = 'reports/youtube/' + docName;
+          } else if (nl.includes('nba') || (typeof currentDriveKey !== 'undefined' && currentDriveKey === 'Relatorios_de_Jogos_NBA')) {
+            cleanPath = 'reports/nba/' + docName;
+          } else {
+            cleanPath = 'reports/futebol/' + docName;
+          }
+        }
+      }
       window.open(cleanPath, '_blank');
       showToast(`📕 Abrindo relatório oficial '${docName}'...`, 'info');
     }

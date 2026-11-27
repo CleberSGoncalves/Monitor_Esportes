@@ -1,5 +1,5 @@
 {
-  "version": "2.5.26",
-  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.26/Monitor_Esportes.exe",
-  "changelog": "v2.5.26: Correção crítica de travamento da interface ao clicar em Verificar Atualizações. AutoUpdater() era instanciado na thread Tkinter principal bloqueando a UI. Agora toda a lógica (checagem, confirmação e download do .exe) é executada 100% em threads dedicadas em background, mantendo a interface sempre responsiva."
+  "version": "2.5.27",
+  "download_url": "https://github.com/CleberSGoncalves/Monitor_Esportes/releases/download/v2.5.27/Monitor_Esportes.exe",
+  "changelog": "v2.5.27: Sincronizacao em paralelo 1:1 com o Portal Web (Google Sites) para as 3 listas de relatorios (Futebol, YouTube e NBA) com colunas identicas ao SharePoint, resolucao correta de caminhos PDF (reports/youtube, reports/futebol, reports/nba) e base de planilhas autenticas."
 }
