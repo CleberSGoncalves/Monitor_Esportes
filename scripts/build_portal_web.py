@@ -4154,12 +4154,89 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     let currentDriveTitle = '';
     let driveBreadcrumbs = []; // [ { name, items } ]
 
+    // Utilitário de persistência para exclusão de relatórios
+    function getDeletedDriveIds(driveKey) {
+      try {
+        const k = 'sp_deleted_items_' + (driveKey || currentDriveKey);
+        return JSON.parse(localStorage.getItem(k) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveDeletedDriveIds(driveKey, ids) {
+      try {
+        const k = 'sp_deleted_items_' + (driveKey || currentDriveKey);
+        localStorage.setItem(k, JSON.stringify(ids));
+      } catch (e) {}
+    }
+
+    async function restoreDeletedDriveItems() {
+      if (!currentDriveKey) return;
+      const deleted = getDeletedDriveIds(currentDriveKey);
+      if (deleted.length === 0) {
+        showToast('Nenhum relatório excluído para restaurar.', 'info');
+        return;
+      }
+      const confirmed = await showCustomDeleteModal(
+        'Restaurar Relatórios Excluídos',
+        `Deseja realmente restaurar <strong>${deleted.length} relatório(s)</strong> excluído(s) desta biblioteca?`,
+        'Sim, Restaurar Todos'
+      );
+      if (!confirmed) return;
+
+      localStorage.removeItem('sp_deleted_items_' + currentDriveKey);
+      showToast('✅ Relatórios restaurados com sucesso!', 'success');
+      openDrive(currentDriveKey, currentDriveTitle);
+    }
+    window.restoreDeletedDriveItems = restoreDeletedDriveItems;
+
+    // Parser robusto de datas para ordenação decrescente (mais recente no topo)
+    function parseItemDateForSort(it) {
+      if (!it) return 0;
+      const f = it.fields || {};
+      const dStr = f.Data_Hora || f.Data_Jogo || it.lastModifiedDateTime || '';
+      if (!dStr) {
+        if (it.name) {
+          const mName = it.name.match(/(?:_|^)(\d{4})(\d{2})(\d{2})(?:_|$)/);
+          if (mName) {
+            return new Date(parseInt(mName[1], 10), parseInt(mName[2], 10) - 1, parseInt(mName[3], 10)).getTime();
+          }
+        }
+        return 0;
+      }
+      const mBr = String(dStr).match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2}))?/);
+      if (mBr) {
+        return new Date(
+          parseInt(mBr[3], 10),
+          parseInt(mBr[2], 10) - 1,
+          parseInt(mBr[1], 10),
+          parseInt(mBr[4] || 0, 10),
+          parseInt(mBr[5] || 0, 10)
+        ).getTime();
+      }
+      const dt = new Date(dStr);
+      return isNaN(dt.getTime()) ? 0 : dt.getTime();
+    }
+    window.parseItemDateForSort = parseItemDateForSort;
+
+    function clearDriveColFilters() {
+      document.querySelectorAll('.drive-col-filter').forEach(inp => { inp.value = ''; });
+      const sBox = document.getElementById('drive-viewer-search');
+      if (sBox) sBox.value = '';
+      filterDriveTable();
+      showToast('🧹 Todos os filtros da tabela foram limpos!', 'info');
+    }
+    window.clearDriveColFilters = clearDriveColFilters;
+
     function openDrive(driveName, title) {
       currentDriveKey = driveName;
       currentDriveTitle = title || driveName;
       const drive = SP_MASTER_DATA.drives && SP_MASTER_DATA.drives[driveName];
-      const items = drive ? (drive.items || []) : [];
-      driveBreadcrumbs = [{ name: currentDriveTitle, items: items }];
+      const deletedIds = getDeletedDriveIds(driveName);
+      const allItems = drive ? (drive.items || []) : [];
+      const activeItems = allItems.filter(it => !deletedIds.includes(String(it.id)));
+      driveBreadcrumbs = [{ name: currentDriveTitle, items: activeItems }];
       
       const pane = document.getElementById('pane-drive-viewer');
       if (pane && !pane.classList.contains('active')) {
@@ -4171,12 +4248,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const dEl = document.getElementById('drive-viewer-desc');
       const sBox = document.getElementById('drive-viewer-search');
       const thead = document.getElementById('drive-viewer-thead');
+      const btnDel = document.getElementById('btn-delete-drive-selected');
+      const chkAll = document.getElementById('checkall-drive');
+      if (btnDel) btnDel.style.display = 'none';
+      if (chkAll) chkAll.checked = false;
 
       if (tEl) tEl.innerHTML = currentDriveTitle + ' <span class="star-icon">☆</span>';
-      if (dEl) dEl.innerText = `Biblioteca oficial sincronizada 1:1 com o Microsoft SharePoint Online (${drive ? drive.items_count : 0} itens mapeados).`;
+      if (dEl) dEl.innerText = `Biblioteca oficial sincronizada 1:1 com o Microsoft SharePoint Online (${activeItems.length} relatórios/arquivos disponíveis).`;
       if (sBox) sBox.value = '';
       
-      // Ajustar colunas dinâmicas do thead 1:1 com SharePoint para os 3 relatórios oficiais
+      // Cabeçalhos e filtros por coluna 1:1 com SharePoint para os 3 relatórios oficiais
       if (thead) {
         if (currentDriveKey === 'Relatorios_de_Jogos') {
           thead.innerHTML = `
@@ -4187,12 +4268,32 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               <th>Campeonato</th>
               <th>Partida</th>
               <th>Plataforma</th>
-              <th>Confianca</th>
+              <th>Confiança</th>
               <th class="td-center" style="width: 70px;">Auditado</th>
               <th>Modificado</th>
               <th>Modificado por</th>
               <th>Criado por</th>
-              <th class="td-center" style="width: 120px;">PDF Oficial</th>
+              <th class="td-center" style="width: 150px;">Ações</th>
+            </tr>
+            <tr class="table-filter-row" style="background:#F1F5F9; border-bottom: 2px solid #CBD5E1;">
+              <th class="td-center"><button type="button" onclick="clearDriveColFilters()" title="Limpar todos os filtros" style="border:none;background:#E2E8F0;border-radius:4px;cursor:pointer;padding:2px 6px;font-size:11px;">🧹</button></th>
+              <th></th>
+              <th><input type="text" id="df-data" class="drive-col-filter" placeholder="Filtrar data..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-camp" class="drive-col-filter" placeholder="Filtrar camp..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-partida" class="drive-col-filter" placeholder="Filtrar partida..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-plat" class="drive-col-filter" placeholder="Filtrar plat..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-conf" class="drive-col-filter" placeholder="Confiança..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th>
+                <select id="df-audit" class="drive-col-filter" onchange="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 3px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;">
+                  <option value="">Todos</option>
+                  <option value="sim">Sim (✓)</option>
+                  <option value="nao">Não</option>
+                </select>
+              </th>
+              <th><input type="text" id="df-mod" class="drive-col-filter" placeholder="Modificado..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-modby" class="drive-col-filter" placeholder="Usuário..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-createdby" class="drive-col-filter" placeholder="Criador..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th class="td-center"><span style="font-size:10px;color:#64748B;">Filtros</span></th>
             </tr>
           `;
         } else if (currentDriveKey === 'Relatorio Jogos Youtube') {
@@ -4204,12 +4305,32 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               <th>Campeonato</th>
               <th>Partida</th>
               <th>Canal</th>
-              <th>Confianca</th>
+              <th>Confiança</th>
               <th class="td-center" style="width: 70px;">Auditado</th>
               <th>Nome</th>
               <th>Modificado</th>
               <th>Modificado por</th>
-              <th class="td-center" style="width: 120px;">Ação</th>
+              <th class="td-center" style="width: 150px;">Ações</th>
+            </tr>
+            <tr class="table-filter-row" style="background:#F1F5F9; border-bottom: 2px solid #CBD5E1;">
+              <th class="td-center"><button type="button" onclick="clearDriveColFilters()" title="Limpar todos os filtros" style="border:none;background:#E2E8F0;border-radius:4px;cursor:pointer;padding:2px 6px;font-size:11px;">🧹</button></th>
+              <th></th>
+              <th><input type="text" id="df-data" class="drive-col-filter" placeholder="Filtrar data..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-camp" class="drive-col-filter" placeholder="Filtrar camp..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-partida" class="drive-col-filter" placeholder="Filtrar partida..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-canal" class="drive-col-filter" placeholder="Filtrar canal..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-conf" class="drive-col-filter" placeholder="Confiança..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th>
+                <select id="df-audit" class="drive-col-filter" onchange="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 3px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;">
+                  <option value="">Todos</option>
+                  <option value="sim">Sim (✓)</option>
+                  <option value="nao">Não</option>
+                </select>
+              </th>
+              <th><input type="text" id="df-nome" class="drive-col-filter" placeholder="Nome..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-mod" class="drive-col-filter" placeholder="Modificado..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-modby" class="drive-col-filter" placeholder="Usuário..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th class="td-center"><span style="font-size:10px;color:#64748B;">Filtros</span></th>
             </tr>
           `;
         } else if (currentDriveKey === 'Relatorios_de_Jogos_NBA') {
@@ -4220,12 +4341,31 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               <th>Data_Hora</th>
               <th>Campeonato</th>
               <th>Partida</th>
-              <th>Confianca</th>
+              <th>Confiança</th>
               <th>Plataforma</th>
               <th class="td-center" style="width: 70px;">Auditado</th>
               <th>Modificado</th>
               <th>Placar</th>
-              <th class="td-center" style="width: 120px;">Ação</th>
+              <th class="td-center" style="width: 150px;">Ações</th>
+            </tr>
+            <tr class="table-filter-row" style="background:#F1F5F9; border-bottom: 2px solid #CBD5E1;">
+              <th class="td-center"><button type="button" onclick="clearDriveColFilters()" title="Limpar todos os filtros" style="border:none;background:#E2E8F0;border-radius:4px;cursor:pointer;padding:2px 6px;font-size:11px;">🧹</button></th>
+              <th></th>
+              <th><input type="text" id="df-data" class="drive-col-filter" placeholder="Filtrar data..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-camp" class="drive-col-filter" placeholder="Filtrar camp..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-partida" class="drive-col-filter" placeholder="Filtrar partida..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-conf" class="drive-col-filter" placeholder="Confiança..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-plat" class="drive-col-filter" placeholder="Filtrar plat..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th>
+                <select id="df-audit" class="drive-col-filter" onchange="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 3px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;">
+                  <option value="">Todos</option>
+                  <option value="sim">Sim (✓)</option>
+                  <option value="nao">Não</option>
+                </select>
+              </th>
+              <th><input type="text" id="df-mod" class="drive-col-filter" placeholder="Modificado..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-placar" class="drive-col-filter" placeholder="Placar..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th class="td-center"><span style="font-size:10px;color:#64748B;">Filtros</span></th>
             </tr>
           `;
         } else {
@@ -4240,7 +4380,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               <th>Tamanho</th>
               <th>Modificado em</th>
               <th>Modificado por</th>
-              <th class="td-center" style="width: 120px;">Ação</th>
+              <th class="td-center" style="width: 150px;">Ações</th>
+            </tr>
+            <tr class="table-filter-row" style="background:#F1F5F9; border-bottom: 2px solid #CBD5E1;">
+              <th class="td-center"><button type="button" onclick="clearDriveColFilters()" title="Limpar todos os filtros" style="border:none;background:#E2E8F0;border-radius:4px;cursor:pointer;padding:2px 6px;font-size:11px;">🧹</button></th>
+              <th></th>
+              <th><input type="text" id="df-nome" class="drive-col-filter" placeholder="Nome..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-tipo" class="drive-col-filter" placeholder="Tipo..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-tam" class="drive-col-filter" placeholder="Tamanho..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-mod" class="drive-col-filter" placeholder="Modificado..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th><input type="text" id="df-modby" class="drive-col-filter" placeholder="Usuário..." oninput="filterDriveTable()" style="width:100%;box-sizing:border-box;padding:2px 5px;font-size:11px;border:1px solid #CBD5E1;border-radius:3px;"></th>
+              <th class="td-center"><span style="font-size:10px;color:#64748B;">Filtros</span></th>
             </tr>
           `;
         }
@@ -4253,27 +4403,95 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const isChecked = master ? master.checked : false;
       const tbody = document.getElementById('drive-viewer-tbody');
       if (tbody) {
-        tbody.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = isChecked);
+        tbody.querySelectorAll('.check-item-drive').forEach(c => c.checked = isChecked);
       }
-      const btnDel = document.getElementById('btn-delete-drive-selected');
-      if (btnDel) {
-        btnDel.style.display = isChecked ? 'inline-block' : 'none';
-      }
+      updateDriveSelectionUI();
     }
     window.toggleSelectAllDrive = toggleSelectAllDrive;
 
-    function deleteSelectedDriveItems() {
-      if (typeof canUserDelete === 'function' && !canUserDelete()) {
-        showToast('⚠️ Apenas Administradores têm permissão para excluir relatórios.', 'error');
+    function updateDriveSelectionUI() {
+      const cbs = document.querySelectorAll('.check-item-drive:checked');
+      const btnDel = document.getElementById('btn-delete-drive-selected');
+      if (btnDel) {
+        if (cbs.length > 0) {
+          btnDel.style.display = 'inline-block';
+          btnDel.innerHTML = `<span>🗑️</span> Excluir Selecionados (${cbs.length})`;
+        } else {
+          btnDel.style.display = 'none';
+        }
+      }
+      const chkAll = document.getElementById('checkall-drive');
+      const allCbs = document.querySelectorAll('.check-item-drive');
+      if (chkAll && allCbs.length > 0) {
+        chkAll.checked = cbs.length === allCbs.length;
+      }
+    }
+    window.updateDriveSelectionUI = updateDriveSelectionUI;
+
+    async function deleteSingleDriveItem(itemId, event) {
+      if (event) event.stopPropagation();
+      const currentLevel = driveBreadcrumbs[driveBreadcrumbs.length - 1];
+      if (!currentLevel || !currentLevel.items) return;
+      const target = currentLevel.items.find(it => String(it.id) === String(itemId));
+      const docName = target ? target.name : 'este relatório';
+      const confirmed = await showCustomDeleteModal(
+        'Confirmar Exclusão de Relatório',
+        `Deseja realmente remover o relatório <strong>${docName}</strong> desta visualização?`,
+        'Sim, Excluir Relatório'
+      );
+      if (!confirmed) return;
+
+      const deletedIds = getDeletedDriveIds(currentDriveKey);
+      if (!deletedIds.includes(String(itemId))) {
+        deletedIds.push(String(itemId));
+        saveDeletedDriveIds(currentDriveKey, deletedIds);
+      }
+
+      const drive = SP_MASTER_DATA.drives && SP_MASTER_DATA.drives[currentDriveKey];
+      const masterItems = drive ? (drive.items || []) : [];
+      currentLevel.items = masterItems.filter(it => !deletedIds.includes(String(it.id)));
+
+      showToast(`🗑️ Relatório '${docName}' excluído com sucesso!`, 'success');
+      updateDriveSelectionUI();
+      filterDriveTable();
+    }
+    window.deleteSingleDriveItem = deleteSingleDriveItem;
+
+    async function deleteSelectedDriveItems() {
+      const cbs = Array.from(document.querySelectorAll('.check-item-drive:checked'));
+      if (cbs.length === 0) {
+        showToast('Nenhum relatório selecionado para exclusão.', 'warning');
         return;
       }
-      if (confirm('Deseja realmente remover os relatórios/arquivos selecionados?')) {
-        showToast('✅ Ação homologada. Itens marcados processados com sucesso.', 'success');
-        const btnDel = document.getElementById('btn-delete-drive-selected');
-        if (btnDel) btnDel.style.display = 'none';
-        const chkAll = document.getElementById('checkall-drive');
-        if (chkAll) chkAll.checked = false;
+      const confirmed = await showCustomDeleteModal(
+        'Confirmar Exclusão em Lote',
+        `Deseja realmente remover <strong>${cbs.length} relatório(s) selecionado(s)</strong> desta lista?`,
+        'Sim, Excluir Selecionados'
+      );
+      if (!confirmed) return;
+
+      const idsToDelete = cbs.map(cb => String(cb.getAttribute('data-id')));
+      const deletedIds = getDeletedDriveIds(currentDriveKey);
+      idsToDelete.forEach(id => {
+        if (!deletedIds.includes(id)) deletedIds.push(id);
+      });
+      saveDeletedDriveIds(currentDriveKey, deletedIds);
+
+      const drive = SP_MASTER_DATA.drives && SP_MASTER_DATA.drives[currentDriveKey];
+      const masterItems = drive ? (drive.items || []) : [];
+      const currentLevel = driveBreadcrumbs[driveBreadcrumbs.length - 1];
+      if (currentLevel) {
+        currentLevel.items = masterItems.filter(it => !deletedIds.includes(String(it.id)));
       }
+
+      const btnDel = document.getElementById('btn-delete-drive-selected');
+      if (btnDel) btnDel.style.display = 'none';
+      const chkAll = document.getElementById('checkall-drive');
+      if (chkAll) chkAll.checked = false;
+
+      showToast(`🗑️ ${idsToDelete.length} relatório(s) excluído(s) com sucesso!`, 'success');
+      updateDriveSelectionUI();
+      filterDriveTable();
     }
     window.deleteSelectedDriveItems = deleteSelectedDriveItems;
 
@@ -4325,23 +4543,83 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const rawItems = currentLevel.items || [];
       const q = (document.getElementById('drive-viewer-search')?.value || '').toLowerCase().trim();
 
-      // Ordenar: pastas primeiro, depois arquivos alfabeticamente
+      // Ler valores de filtros por coluna
+      const fData = (document.getElementById('df-data')?.value || '').toLowerCase().trim();
+      const fCamp = (document.getElementById('df-camp')?.value || '').toLowerCase().trim();
+      const fPartida = (document.getElementById('df-partida')?.value || '').toLowerCase().trim();
+      const fPlat = (document.getElementById('df-plat')?.value || '').toLowerCase().trim();
+      const fCanal = (document.getElementById('df-canal')?.value || '').toLowerCase().trim();
+      const fConf = (document.getElementById('df-conf')?.value || '').toLowerCase().trim();
+      const fAudit = (document.getElementById('df-audit')?.value || '').toLowerCase().trim();
+      const fNome = (document.getElementById('df-nome')?.value || '').toLowerCase().trim();
+      const fMod = (document.getElementById('df-mod')?.value || '').toLowerCase().trim();
+      const fModBy = (document.getElementById('df-modby')?.value || '').toLowerCase().trim();
+      const fCreatedBy = (document.getElementById('df-createdby')?.value || '').toLowerCase().trim();
+      const fPlacar = (document.getElementById('df-placar')?.value || '').toLowerCase().trim();
+      const fTipo = (document.getElementById('df-tipo')?.value || '').toLowerCase().trim();
+      const fTam = (document.getElementById('df-tam')?.value || '').toLowerCase().trim();
+
+      // REGRA OBRIGATÓRIA: Ordenação decrescente por data (mais recente no topo)
       const sorted = [...rawItems].sort((a, b) => {
         if (a.type === 'folder' && b.type !== 'folder') return -1;
         if (a.type !== 'folder' && b.type === 'folder') return 1;
+        const timeA = parseItemDateForSort(a);
+        const timeB = parseItemDateForSort(b);
+        if (timeB !== timeA) return timeB - timeA;
         return a.name.localeCompare(b.name);
       });
 
       const filtered = sorted.filter(it => {
-        if (!q) return true;
         const f = it.fields || {};
-        return it.name.toLowerCase().includes(q) ||
-               (it.lastModifiedBy && it.lastModifiedBy.toLowerCase().includes(q)) ||
-               (f.Partida && f.Partida.toLowerCase().includes(q)) ||
-               (f.Campeonato && f.Campeonato.toLowerCase().includes(q)) ||
-               (f.Plataforma && f.Plataforma.toLowerCase().includes(q)) ||
-               (f.Canal && f.Canal.toLowerCase().includes(q)) ||
-               (f.Placar && f.Placar.toLowerCase().includes(q));
+        const dtStr = (f.Data_Hora || f.Data_Jogo || formatDate(it.lastModifiedDateTime) || '').toLowerCase();
+        const matchTitle = (f.Partida || it.name.replace(/\.pdf$/i, '')).toLowerCase();
+        const campStr = (f.Campeonato || '').toLowerCase();
+        const platStr = (f.Plataforma || f.Canal || '').toLowerCase();
+        const canalStr = (f.Canal || '').toLowerCase();
+        const confStr = (f.Confiança || f.confianca || '').toLowerCase();
+        const modStr = (formatDate(it.lastModifiedDateTime) || '').toLowerCase();
+        const modBy = (it.lastModifiedBy || '').toLowerCase();
+        const createdBy = (f.Criado_Por || '').toLowerCase();
+        const placarStr = (f.Placar || '').toLowerCase();
+        const nameStr = (it.name || '').toLowerCase();
+        const isFolder = it.type === 'folder';
+        const typeStr = isFolder ? 'pasta de arquivos' : (it.extension ? it.extension.toLowerCase() : 'arquivo');
+        const sizeStr = (isFolder ? `${it.childCount !== undefined ? it.childCount : (it.children ? it.children.length : 0)} itens` : formatFileSize(it.size)).toLowerCase();
+
+        // Filtro global
+        if (q) {
+          const matchQ = nameStr.includes(q) ||
+                         modBy.includes(q) ||
+                         matchTitle.includes(q) ||
+                         campStr.includes(q) ||
+                         platStr.includes(q) ||
+                         canalStr.includes(q) ||
+                         placarStr.includes(q) ||
+                         dtStr.includes(q);
+          if (!matchQ) return false;
+        }
+
+        // Filtros por coluna
+        if (fData && !dtStr.includes(fData)) return false;
+        if (fCamp && !campStr.includes(fCamp)) return false;
+        if (fPartida && !matchTitle.includes(fPartida) && !nameStr.includes(fPartida)) return false;
+        if (fPlat && !platStr.includes(fPlat)) return false;
+        if (fCanal && !canalStr.includes(fCanal)) return false;
+        if (fConf && !confStr.includes(fConf)) return false;
+        if (fAudit) {
+          const isAud = f.Auditado !== false && f.Auditado;
+          if (fAudit === 'sim' && !isAud) return false;
+          if (fAudit === 'nao' && isAud) return false;
+        }
+        if (fNome && !nameStr.includes(fNome)) return false;
+        if (fMod && !modStr.includes(fMod)) return false;
+        if (fModBy && !modBy.includes(fModBy)) return false;
+        if (fCreatedBy && !createdBy.includes(fCreatedBy)) return false;
+        if (fPlacar && !placarStr.includes(fPlacar)) return false;
+        if (fTipo && !typeStr.includes(fTipo)) return false;
+        if (fTam && !sizeStr.includes(fTam)) return false;
+
+        return true;
       });
 
       const tbody = document.getElementById('drive-viewer-tbody');
@@ -4349,7 +4627,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       if (!tbody) return;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding: 30px; color: #94A3B8;">${q ? 'Nenhum item encontrado para esta busca.' : 'Esta biblioteca está vazia no SharePoint.'}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding: 30px; color: #94A3B8;">${(q || fData || fCamp || fPartida || fPlat || fCanal || fNome) ? 'Nenhum item encontrado para os filtros aplicados.' : 'Esta biblioteca está vazia no SharePoint.'}</td></tr>`;
       } else if (currentDriveKey === 'Relatorios_de_Jogos') {
         // TABELA 1:1 SHAREPOINT: Relatorios_de_Jogos (Futebol)
         tbody.innerHTML = filtered.map((it, idx) => {
@@ -4372,7 +4650,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
           return `
             <tr>
-              <td class="td-center"><input type="checkbox"></td>
+              <td class="td-center"><input type="checkbox" class="check-item-drive" data-id="${it.id}" onchange="updateDriveSelectionUI()"></td>
               <td class="td-center" style="color: #64748B;">${idx + 1}</td>
               <td style="white-space: nowrap; font-family: monospace; color:#1E293B;">${dtStr}</td>
               <td>${campBadge}</td>
@@ -4384,7 +4662,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               <td style="color: #475569;">${modBy}</td>
               <td style="color: #475569;">${createdBy}</td>
               <td class="td-center">
-                <button type="button" class="btn-doc-download" onclick="openReportDocument('${it.id}', '${encodeURIComponent(it.name)}')">Abrir PDF 📕</button>
+                <div style="display:inline-flex;gap:4px;align-items:center;">
+                  <button type="button" class="btn-doc-download" onclick="openReportDocument('${it.id}', '${encodeURIComponent(it.name)}')">Abrir PDF 📕</button>
+                  <button type="button" class="btn-doc-delete" onclick="deleteSingleDriveItem('${it.id}', event)" title="Excluir este relatório" style="background:#FEE2E2;border:1px solid #FCA5A5;color:#DC2626;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;transition:all 0.2s;">🗑️</button>
+                </div>
               </td>
             </tr>
           `;
@@ -4408,7 +4689,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
           return `
             <tr>
-              <td class="td-center"><input type="checkbox"></td>
+              <td class="td-center"><input type="checkbox" class="check-item-drive" data-id="${it.id}" onchange="updateDriveSelectionUI()"></td>
               <td class="td-center" style="color: #64748B;">${idx + 1}</td>
               <td style="white-space: nowrap; font-family: monospace; color:#1E293B;">${dtStr}</td>
               <td>${campBadge}</td>
@@ -4420,7 +4701,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               <td style="color: #64748B; font-size:12px;">${modStr}</td>
               <td style="color: #475569;">${modBy}</td>
               <td class="td-center">
-                <button type="button" class="btn-doc-download" onclick="openReportDocument('${it.id}', '${encodeURIComponent(it.name)}')">Abrir PDF 📕</button>
+                <div style="display:inline-flex;gap:4px;align-items:center;">
+                  <button type="button" class="btn-doc-download" onclick="openReportDocument('${it.id}', '${encodeURIComponent(it.name)}')">Abrir PDF 📕</button>
+                  <button type="button" class="btn-doc-delete" onclick="deleteSingleDriveItem('${it.id}', event)" title="Excluir este relatório" style="background:#FEE2E2;border:1px solid #FCA5A5;color:#DC2626;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;transition:all 0.2s;">🗑️</button>
+                </div>
               </td>
             </tr>
           `;
@@ -4440,7 +4724,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
           return `
             <tr>
-              <td class="td-center"><input type="checkbox"></td>
+              <td class="td-center"><input type="checkbox" class="check-item-drive" data-id="${it.id}" onchange="updateDriveSelectionUI()"></td>
               <td class="td-center" style="color: #64748B;">${idx + 1}</td>
               <td style="white-space: nowrap; font-family: monospace; color:#1E293B;">${dtStr}</td>
               <td>${campBadge}</td>
@@ -4451,7 +4735,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               <td style="color: #64748B; font-size:12px;">${modStr}</td>
               <td style="color: #1E293B; font-size:12px; font-weight:600;">${placarStr}</td>
               <td class="td-center">
-                <button type="button" class="btn-doc-download" onclick="openReportDocument('${it.id}', '${encodeURIComponent(it.name)}')">Abrir PDF 📕</button>
+                <div style="display:inline-flex;gap:4px;align-items:center;">
+                  <button type="button" class="btn-doc-download" onclick="openReportDocument('${it.id}', '${encodeURIComponent(it.name)}')">Abrir PDF 📕</button>
+                  <button type="button" class="btn-doc-delete" onclick="deleteSingleDriveItem('${it.id}', event)" title="Excluir este relatório" style="background:#FEE2E2;border:1px solid #FCA5A5;color:#DC2626;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;transition:all 0.2s;">🗑️</button>
+                </div>
               </td>
             </tr>
           `;
@@ -4473,12 +4760,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             actionHtml = `<button class="sp-btn-cmd" style="padding: 3px 8px; font-size: 11px;" onclick="openDriveFolder('${it.id}')">Abrir Pasta</button>`;
           } else {
             nameHtml = `<span style="cursor:pointer; color:#1E293B; font-weight:600;" onclick="openAutonomousDocViewer('${it.id}', '${encodeURIComponent(it.name)}')">${icon} ${it.name}</span>`;
-            actionHtml = `<button type="button" class="btn-doc-download" onclick="openAutonomousDocViewer('${it.id}', '${encodeURIComponent(it.name)}')">Visualizar 📄</button>`;
+            actionHtml = `
+              <div style="display:inline-flex;gap:4px;align-items:center;">
+                <button type="button" class="btn-doc-download" onclick="openAutonomousDocViewer('${it.id}', '${encodeURIComponent(it.name)}')">Visualizar 📄</button>
+                <button type="button" class="btn-doc-delete" onclick="deleteSingleDriveItem('${it.id}', event)" title="Excluir arquivo da lista" style="background:#FEE2E2;border:1px solid #FCA5A5;color:#DC2626;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;transition:all 0.2s;">🗑️</button>
+              </div>
+            `;
           }
 
           return `
             <tr class="${isFolder ? 'sp-folder-row' : ''}">
-              <td class="td-center"><input type="checkbox"></td>
+              <td class="td-center"><input type="checkbox" class="check-item-drive" data-id="${it.id}" onchange="updateDriveSelectionUI()"></td>
               <td class="td-center" style="color: #64748B;">${idx + 1}</td>
               <td>${nameHtml}</td>
               <td><span class="badge ${isFolder ? 'badge-exibido' : 'badge-default'}">${typeStr}</span></td>
@@ -4492,7 +4784,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       }
 
       if (footer) {
-        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${rawItems.length}</b> itens nesta pasta &bull; Sincronizado com Repositório Corporativo Google`;
+        const deletedIds = getDeletedDriveIds(currentDriveKey);
+        const restoreSnippet = deletedIds.length > 0
+          ? ` &bull; <span style="color:#DC2626;">${deletedIds.length} excluído(s)</span> (<a href="javascript:void(0)" onclick="restoreDeletedDriveItems()" style="color:#2563EB; font-weight:600; text-decoration:underline;">Restaurar</a>)`
+          : '';
+        footer.innerHTML = `Mostrando <b>${filtered.length}</b> de <b>${rawItems.length}</b> itens nesta pasta &bull; Sincronizado com Repositório Corporativo Google${restoreSnippet}`;
       }
     }
 
@@ -4584,7 +4880,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const footer = document.getElementById('relatorios-footer-count');
       if (!tbody) return;
 
-      const filtered = raw.filter(it => {
+      // REGRA OBRIGATÓRIA: Ordenação decrescente por data (mais recente no topo)
+      const sorted = [...raw].sort((a, b) => {
+        const timeA = (typeof parseItemDateForSort === 'function') ? parseItemDateForSort(a) : 0;
+        const timeB = (typeof parseItemDateForSort === 'function') ? parseItemDateForSort(b) : 0;
+        if (timeB !== timeA) return timeB - timeA;
+        return a.name.localeCompare(b.name);
+      });
+
+      const filtered = sorted.filter(it => {
         if (!q) return true;
         return it.name.toLowerCase().includes(q) || (it.lastModifiedBy && it.lastModifiedBy.toLowerCase().includes(q));
       });
@@ -4596,7 +4900,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           const sizeStr = formatFileSize(it.size);
           const modStr = formatDate(it.lastModifiedDateTime);
           const authorStr = it.lastModifiedBy || 'Equipe Captação';
-          const link = it.webUrl || '#';
 
           return `
             <tr>
@@ -4607,7 +4910,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
               <td style="color: #64748B;">${modStr}</td>
               <td style="color: #475569;">${authorStr}</td>
               <td class="td-center">
-                <button type="button" class="btn-doc-download" onclick="openReportDocument('${it.id}', '${encodeURIComponent(it.name)}')">Abrir Relatório 📕</button>
+                <div style="display:inline-flex;gap:4px;align-items:center;">
+                  <button type="button" class="btn-doc-download" onclick="openReportDocument('${it.id}', '${encodeURIComponent(it.name)}')">Abrir Relatório 📕</button>
+                  <button type="button" class="btn-doc-delete" onclick="deleteSingleDriveItem('${it.id}', event)" title="Excluir relatório" style="background:#FEE2E2;border:1px solid #FCA5A5;color:#DC2626;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;transition:all 0.2s;">🗑️</button>
+                </div>
               </td>
             </tr>
           `;

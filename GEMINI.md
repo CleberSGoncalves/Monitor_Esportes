@@ -88,3 +88,30 @@
 >    - Cliques reais nos botões/cards da página inicial (Home), Acesso Remoto (botão RDP) e Streaming (`Excluir Selecionados` com modal in-DOM `#modal-generic-confirm-delete`).
 > 3. Nunca usar `window.confirm()`, `window.alert()` ou `window.prompt()` (são bloqueados silenciosamente em iframes do Google Sites).
 > 4. Garantir que `docs/index.html` e `portal_web/index.html` estejam sincronizados e validados antes do `git push origin main`.
+
+---
+
+## 8. REGRAS OBRIGATÓRIAS DE RELATÓRIOS, FILTROS POR COLUNA E ORDENAÇÃO CRONOLÓGICA (GOOGLE SITES)
+
+> [!CAUTION]
+> **ORDENAÇÃO CRONOLÓGICA DECRESCENTE, FILTROS POR COLUNA E EXCLUSÃO NATIVOS EM TODAS AS LISTAS**
+>
+> 1. **Ordenação Obrigatória por Data Mais Recente no Topo**:
+>    - Em todos os visualizadores de relatórios oficiais (`Relatórios de Jogos`, `Relatório Jogos YouTube`, `Relatórios de Jogos NBA`), bibliotecas de documentos (Drives) e listas de ocorrências, a ordenação padrão DEVE OBRIGATORIAMENTE posicionar os eventos e relatórios mais recentes no topo (`Data / Hora` decrescente: `timeB - timeA`).
+>    - É expressamente proibida a ordenação padrão puramente alfabética por nome de arquivo quando houver campos de data/hora disponíveis.
+>
+> 2. **Filtros Individuais por Coluna em Todas as Listas**:
+>    - Toda tabela de relatórios ou lista corporativa DEVE dispor de uma linha dedicada de filtros (`.table-filter-row`) posicionada no `<thead>` logo abaixo dos títulos das colunas.
+>    - Cada coluna deve possuir seu controle de filtro interativo (campo de texto ou dropdown `<select>` com opções como "Todos", "Sim (✓)", "Não"), atuando em tempo real simultaneamente à busca global.
+>    - Deve existir botão de limpeza rápida de filtros (`🧹`) no primeiro cabeçalho.
+>
+> 3. **Governança de Exclusão Individual e em Lote (Modal In-DOM)**:
+>    - Toda linha de relatório DEVE conter um botão individual de exclusão (`🗑️ .btn-doc-delete`).
+>    - A barra de comandos DEVE conter botão de exclusão em massa (`🗑️ Excluir Selecionados`).
+>    - A confirmação deve utilizar estritamente modais in-DOM (`showCustomDeleteModal` / `#modal-generic-confirm-delete`) — NUNCA utilizar `window.confirm()` (bloqueado em iframes do Google Sites).
+>    - A exclusão deve persistir os IDs removidos no `localStorage` (`sp_deleted_items_<driveKey>`) sem corromper o master data original em memória, e disponibilizar link/botão para "Restaurar" os itens excluídos caso o operador deseje.
+>
+> 4. **Rastreamento Obrigatório de PDFs em `docs/reports/` (Anti-404)**:
+>    - O arquivo `.gitignore` DEVE conter estritamente `!docs/reports/` e `!docs/reports/**`.
+>    - É expressamente proibido colocar `reports/` de forma genérica no `.gitignore`, o que causaria a exclusão silenciosa dos PDFs do GitHub Pages e erro 404 ao operador.
+

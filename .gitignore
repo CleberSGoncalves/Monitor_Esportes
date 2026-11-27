@@ -11,7 +11,10 @@ __pycache__/
 config/google_ai.json
 config/sp_token_cache.json
 config/nba_cache/
-reports/
+/reports/
+portal_web/reports/
+!docs/reports/
+!docs/reports/**
 log.txt
 .gemini/
 .idea/
